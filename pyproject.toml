@@ -1,0 +1,53 @@
+[project]
+name = "enkoa-practice-knowledge-graph"
+version = "0.1.0"
+description = "엔코아 AI캠퍼스 지식 그래프·GraphRAG 실습자료"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=7.3.0",
+    "jupyterlab>=4.6.2",
+    "pandas>=2.3,<3",
+    "numpy>=2.3,<2.5",
+    "matplotlib>=3.9",
+    "python-dotenv>=1.0",
+    # day27: 그래프DB 개념·온톨로지·RDF/SPARQL
+    #   그래프는 파이썬 dict/list 로 모델링하고 networkx 로 그린다.
+    #   RDF/SPARQL 은 rdflib(내 컴퓨터 안의 그래프)과 SPARQLWrapper(공개 엔드포인트)로 실습한다.
+    "networkx>=3.4",
+    "rdflib>=7.1",
+    "SPARQLWrapper>=2.0",
+    # day28~34: Neo4j 설치·Cypher·집계/인덱스·지식그래프 적재·GDS
+    #   GDS 는 파이썬 클라이언트가 아니라 Cypher CALL 로 부른다(추가 의존성 없음).
+    "neo4j>=6.0",
+    # day34: 커뮤니티·유사도·경로 비교에 코사인 등 보조 계산
+    "scikit-learn>=1.5",
+    # day35: 벡터 검색·GraphRAG(리트리버). 임베딩과 답변 모두 OpenAI 를 쓴다
+    "neo4j-graphrag>=1.18",
+    # day40: SimpleKGPipeline 을 OpenAI 어댑터로 돌린다. 어댑터는 openai 클라이언트를 import 만 하고
+    #   의존성으로 걸지 않는다([openai] extra 는 openai<2 를 못 박아 쓰지 않는다). 노트북은
+    #   langchain_text_splitters 를 직접 import 한다. 둘 다 전이 의존으로 딸려 오지만 우연이라 명시한다.
+    "openai>=2.45",
+    "langchain-text-splitters>=1.1",
+    "langchain>=1.0",
+    "langchain-core>=0.3",
+    "langchain-openai>=0.3",
+    # day36~41: 정보추출·트리플·관계추출·엔티티 정규화·KG 파이프라인
+    #   추출 결과를 스키마로 받는다.
+    "pydantic>=2.0",
+    #   google-genai: 이 저장소 노트북은 직접 import 하지 않는다(2026-09-11 확인).
+    "google-genai>=1.0",
+    "langchain-google-genai>=4.0",
+    # day36 4절: 학습된 NER 모델(dslim/bert-base-NER)을 돌리고, 허브에서 모델 설정을 읽는다.
+    #   transformers 가 torch 를 함께 끌어온다. 모델 가중치는 첫 실행 때 약 430MB 를 내려받는다.
+    "transformers>=4.57",
+    "huggingface-hub>=0.30",
+    #   transformers 는 torch 를 필수 의존성으로 걸지 않는다(실측: 5.x 의 requires 에 없다).
+    #   빼먹으면 uv sync 는 통과하고 pipeline() 호출에서 "None of PyTorch ... found" 로 죽는다.
+    "torch>=2.0",
+    # day39 부록: Wikidata 공개 HTTP API 로 표준 ID 를 조회한다.
+    #   전이 의존으로 딸려 오지만 노트북이 직접 import 하므로 명시한다.
+    "requests>=2.32",
+    # day42: 도메인 GraphRAG(Text2Cypher 체인)
+    "langchain-neo4j>=0.10",
+]

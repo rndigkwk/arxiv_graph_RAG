@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+output/
+.DS_Store
+.env
+.env.*
+!.env.example
+.omc/
+.claude/
+내작업/
+.백업/
