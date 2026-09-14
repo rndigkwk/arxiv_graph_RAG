@@ -1,0 +1,36 @@
+주제 : arxiv api 를 이용해 computer science 분야의 논문 데이터들로 knowledge graph 와 graph RAG를 구현
+
+현재 데이터는 arxiv computer science 분야의 하위 분류 40개의 최근 3개월 데이터 3,8479 row
+row 별 구조는 id, title, abstract(요약), authors(저자), categories, primary_category(주요 분야 1개), published(date)
+abstract :   min_tokens=14, max_tokens=401, mean_tokens=189
+
+문제 1. pdf 파일을 포함해서 청크하여 임베딩할지 말지
+	pdf 파일을 포함한다면 pdf 데이터 크기 문제와 임베딩 시간이 오래 걸릴게 문제
+
+문제 2. 다층 적재를 할지 말지
+
+기본 (:ArxivAuthorName)-[:AUTHORED]->(:ArxivPaper)-[:IN_CATEGORY]->(:ArxivCategory)
+저자 -> 논문 -> 카테고리
+
+다층적재
+	Method/Task/Dataset/Metric/Domain/Tool 6종 논문  엔티티
+	Document, Chunk 임베딩용 라벨
+	APPLIED_TO/EVALUATED_ON/MEASURED_BY/TARGETS_DOMAIN/USES_TOOL/OUTPERFORMS/EXTENDS  라는 관계들이 위 엔티티들과 논문(paper)를 연결해줌
+
+	Method : 논문이 제안했거나 사용한 구체적으로 이름 붙은 방법·모델·알고리즘
+	Task : 논문이 다루는 연구 문제/과제
+	Dataset : 실제로 사용한, 이름이 있는 데이터셋·벤치마크
+	Metric : 성능을 측정하는 데 쓴 이름 있는 평가지표
+	Domain : 그 연구가 겨냥하는 구체적인 응용 분야
+	Tool : 구현·학습·실행에 쓴 이름 있는 소프트웨어 라이브러리/프레임워크/하드웨어
+
+이 프로젝트를 지식그래프로 만들어야하는 이유
+	특정 하위 분야에서 가장 활발한 주제나 툴은?
+	특정 하위 분야들을 공통으로 포함된 논문들은?
+	computer science에서 제일 많이 쓰이는 주제는?
+
+논문 인용 정보가 더 중요!. 다층 적재는 완성하고 시간이 남을때,
+
+citations 인용 데이터
+남길거 arxiv_id, citations_count
+중요한거 하위 분야를 ai를 비롯해 줄여서 refence 논문들도 수집하기
