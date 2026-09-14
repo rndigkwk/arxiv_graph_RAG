@@ -1,0 +1,29 @@
+HTTP/1.1 301 Unknown Error
+Connection: close
+Content-Length: 0
+Server: Varnish
+Retry-After: 0
+location: https://oaipmh.arxiv.org/oai?verb=ListRecords&from=2026-09-14&until=2026-09-14&set=cs&metadataPrefix=arXiv
+Accept-Ranges: bytes
+Date: Mon, 14 Sep 2026 12:59:05 GMT
+Via: 1.1 varnish
+X-Served-By: cache-icn1450071-ICN
+X-Cache: HIT
+X-Cache-Hits: 0
+X-Timer: S1789390746.740429,VS0,VE0
+Strict-Transport-Security: max-age=300
+
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 3131930
+server: Google Frontend
+via: 1.1 google, 1.1 varnish, 1.1 varnish, 1.1 varnish
+x-cloud-trace-context: 4f42feff5c7a0526f91efa9da5fd7cbb
+content-type: text/xml
+Accept-Ranges: bytes
+Age: 0
+Date: Mon, 14 Sep 2026 12:59:11 GMT
+X-Served-By: cache-lga21959-LGA, cache-lga21959-LGA, cache-lga21933-LGA, cache-icn1450072-ICN
+X-Cache: MISS, MISS, MISS
+X-Timer: S1789390746.755728,VS0,VE6211
+
