@@ -48,6 +48,8 @@ dependencies = [
     # day39 부록: Wikidata 공개 HTTP API 로 표준 ID 를 조회한다.
     #   전이 의존으로 딸려 오지만 노트북이 직접 import 하므로 명시한다.
     "requests>=2.32",
+    # Windows의 네이티브 인증서 저장소(CryptoAPI)를 사용해 공개 HTTPS API를 검증한다.
+    "truststore>=0.10.4",
     # day42: 도메인 GraphRAG(Text2Cypher 체인)
     "langchain-neo4j>=0.10",
 ]

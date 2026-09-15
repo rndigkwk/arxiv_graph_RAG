@@ -703,6 +703,7 @@ dependencies = [
     { name = "sparqlwrapper" },
     { name = "torch" },
     { name = "transformers" },
+    { name = "truststore" },
 ]
 
 [package.metadata]
@@ -732,6 +733,7 @@ requires-dist = [
     { name = "sparqlwrapper", specifier = ">=2.0" },
     { name = "torch", specifier = ">=2.0" },
     { name = "transformers", specifier = ">=4.57" },
+    { name = "truststore", specifier = ">=0.10.4" },
 ]
 
 [[package]]
