@@ -34,3 +34,13 @@ abstract :   min_tokens=14, max_tokens=401, mean_tokens=189
 citations 인용 데이터
 남길거 arxiv_id, citations_count
 중요한거 하위 분야를 ai를 비롯해 줄여서 refence 논문들도 수집하기
+
+		(:ArxivAuthorName) - [:AUTHORED] -> (:ArxivPaper) - [:IN_CATEGORY] -> (:ArxivCategory)	data=data/ai/arxiv_cs_rescent_3months_oai_part*.jsonl 
+				|					|							|
+property		authors		id+title+abstract+published+pdf_url			categories
+									|
+									▽
+								reference
+		(:ArxivAuthorName) - [:AUTHORED] -> (:ArxivPaper) - [:IN_CATEGORY] -> (:ArxivCategory)	data=data/ai_refereces/arxiv_ai_references_oai_bulk/
+				|					|							|
+property		authors		id+title+abstract+published+pdf_url			categories
