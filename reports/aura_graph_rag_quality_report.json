@@ -1,0 +1,255 @@
+{
+  "generated_at": "2026-09-17T10:52:59+09:00",
+  "source_files": {
+    "ai": [
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai\\arxiv_cs_recent_3months_oai_part1.jsonl",
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai\\arxiv_cs_recent_3months_oai_part2.jsonl"
+    ],
+    "references_api": [
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part1.jsonl",
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part2.jsonl",
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part3.jsonl",
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part4.jsonl",
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part5.jsonl",
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part6.jsonl",
+      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part7.jsonl"
+    ]
+  },
+  "metrics": {
+    "compliance_rate": {
+      "nodes": 1.0,
+      "references": 1.0,
+      "authored": 1.0,
+      "overall": 1.0
+    },
+    "compliance_rules": {
+      "arxiv_id 형식": 1.0,
+      "title 존재": 1.0,
+      "abstract 존재": 1.0,
+      "primary_category 정합": 1.0,
+      "categories 비어있지 않음": 1.0,
+      "published 유효": 1.0,
+      "embedding 차원 일치": 1.0,
+      "저자 연결 존재": 1.0
+    },
+    "precision": 1.0,
+    "precision_by_fact": {
+      "paper_exists": 1.0,
+      "title": 1.0,
+      "primary_category": 1.0,
+      "categories": 1.0,
+      "authors": 1.0,
+      "references": 1.0
+    },
+    "precision_sample_size": 50,
+    "precision_seed": 20260917,
+    "er_consistency": 1.0
+  },
+  "er_violations": {
+    "missing_id": 0,
+    "duplicate_id": 0,
+    "missing_title": 0,
+    "authored_type_error": 0,
+    "references_type_error": 0,
+    "orphan_papers": 0
+  },
+  "louvain_mode": "기본 설정 — 실행마다 커뮤니티 번호·크기가 달라집니다 (randomSeed 미지원: ClientError)",
+  "pagerank_top10": [
+    {
+      "nodeId": 1719,
+      "label": "ArxivPaper",
+      "key": "2507.06261",
+      "title": "Gemini 2.5: Pushing the Frontier with Advanced Reasoning, Multimodality, Long Context, and Next Generation Agentic Capabilities",
+      "communityId": 74773,
+      "score": 261.6446961201118
+    },
+    {
+      "nodeId": 89542,
+      "label": "ArxivPaper",
+      "key": "2501.14249",
+      "title": "Humanity's Last Exam",
+      "communityId": 74773,
+      "score": 111.21636884166203
+    },
+    {
+      "nodeId": 1871,
+      "label": "ArxivPaper",
+      "key": "2506.12103",
+      "title": "The Amazon Nova Family of Models: Technical Report and Model Card",
+      "communityId": 60007,
+      "score": 82.54584749378601
+    },
+    {
+      "nodeId": 412,
+      "label": "ArxivPaper",
+      "key": "2403.05530",
+      "title": "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context",
+      "communityId": 74773,
+      "score": 63.356399341239
+    },
+    {
+      "nodeId": 105398,
+      "label": "ArxivPaper",
+      "key": "2208.00211",
+      "title": "Gaia Data Release 3: Summary of the content and survey properties",
+      "communityId": 144983,
+      "score": 58.07974143835594
+    },
+    {
+      "nodeId": 1756,
+      "label": "ArxivPaper",
+      "key": "2407.21783",
+      "title": "The Llama 3 Herd of Models",
+      "communityId": 74773,
+      "score": 52.31470055603316
+    },
+    {
+      "nodeId": 19819,
+      "label": "ArxivPaper",
+      "key": "2601.03267",
+      "title": "OpenAI GPT-5 System Card",
+      "communityId": 74773,
+      "score": 36.89716288640899
+    },
+    {
+      "nodeId": 25391,
+      "label": "ArxivPaper",
+      "key": "2602.04705",
+      "title": "ERNIE 5.0 Technical Report",
+      "communityId": 60007,
+      "score": 35.827734554903465
+    },
+    {
+      "nodeId": 97417,
+      "label": "ArxivPaper",
+      "key": "0805.2366",
+      "title": "LSST: from Science Drivers to Reference Design and Anticipated Data Products",
+      "communityId": 135826,
+      "score": 33.90685985940867
+    },
+    {
+      "nodeId": 53213,
+      "label": "ArxivPaper",
+      "key": "2604.16216",
+      "title": "A digitally controlled silicon quantum processing unit",
+      "communityId": 58493,
+      "score": 32.6144973684209
+    }
+  ],
+  "communities_top5": [
+    {
+      "label": "C1",
+      "communityId": 74773,
+      "size": 18055,
+      "papers": 3466,
+      "authors": 14589,
+      "representative": {
+        "arxiv_id": "2507.06261",
+        "title": "Gemini 2.5: Pushing the Frontier with Advanced Reasoning, Multimodality, Long Context, and Next Generation Agentic Capabilities",
+        "score": 261.6446961201118
+      }
+    },
+    {
+      "label": "C2",
+      "communityId": 135535,
+      "size": 11099,
+      "papers": 3143,
+      "authors": 7956,
+      "representative": {
+        "arxiv_id": "2606.05405",
+        "title": "Agents' Last Exam",
+        "score": 21.30159036104528
+      }
+    },
+    {
+      "label": "C3",
+      "communityId": 60007,
+      "size": 7956,
+      "papers": 1877,
+      "authors": 6079,
+      "representative": {
+        "arxiv_id": "2506.12103",
+        "title": "The Amazon Nova Family of Models: Technical Report and Model Card",
+        "score": 82.54584749378601
+      }
+    },
+    {
+      "label": "C4",
+      "communityId": 68512,
+      "size": 5299,
+      "papers": 1492,
+      "authors": 3807,
+      "representative": {
+        "arxiv_id": "2606.19348",
+        "title": "DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence",
+        "score": 18.316384993089414
+      }
+    },
+    {
+      "label": "C5",
+      "communityId": 78245,
+      "size": 5234,
+      "papers": 1327,
+      "authors": 3907,
+      "representative": {
+        "arxiv_id": "2606.04490",
+        "title": "Prioritization of Risks from Artificial Intelligence: A Delphi Study of 272 International Experts",
+        "score": 18.182647771672755
+      }
+    }
+  ],
+  "community_citation_flow": {
+    "C1": {
+      "C1": 4052,
+      "C2": 1386,
+      "C3": 171,
+      "C4": 1055,
+      "C5": 183,
+      "기타": 3064
+    },
+    "C2": {
+      "C1": 1391,
+      "C2": 3475,
+      "C3": 154,
+      "C4": 653,
+      "C5": 72,
+      "기타": 2621
+    },
+    "C3": {
+      "C1": 532,
+      "C2": 558,
+      "C3": 332,
+      "C4": 373,
+      "C5": 36,
+      "기타": 1258
+    },
+    "C4": {
+      "C1": 635,
+      "C2": 469,
+      "C3": 49,
+      "C4": 1028,
+      "C5": 44,
+      "기타": 980
+    },
+    "C5": {
+      "C1": 671,
+      "C2": 293,
+      "C3": 49,
+      "C4": 150,
+      "C5": 422,
+      "기타": 831
+    },
+    "기타": {
+      "C1": 8591,
+      "C2": 6698,
+      "C3": 1063,
+      "C4": 3501,
+      "C5": 682,
+      "기타": 21916
+    }
+  },
+  "figures": [
+    "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\reports\\aura_community_overview.png",
+    "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\reports\\aura_community_hubs.png"
+  ]
+}

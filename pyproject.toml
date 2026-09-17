@@ -18,8 +18,9 @@ dependencies = [
     "rdflib>=7.1",
     "SPARQLWrapper>=2.0",
     # day28~34: Neo4j 설치·Cypher·집계/인덱스·지식그래프 적재·GDS
-    #   GDS 는 파이썬 클라이언트가 아니라 Cypher CALL 로 부른다(추가 의존성 없음).
+    #   AuraDB Free의 Aura Graph Analytics 세션은 Python Client로 연결한다.
     "neo4j>=6.0",
+    "graphdatascience>=1.18",
     # day34: 커뮤니티·유사도·경로 비교에 코사인 등 보조 계산
     "scikit-learn>=1.5",
     # day35: 벡터 검색·GraphRAG(리트리버). 임베딩과 답변 모두 OpenAI 를 쓴다
@@ -52,4 +53,8 @@ dependencies = [
     "truststore>=0.10.4",
     # day42: 도메인 GraphRAG(Text2Cypher 체인)
     "langchain-neo4j>=0.10",
+    # app/: Streamlit GraphRAG 챗봇. graphviz는 st.graphviz_chart에 넘길 DOT 문자열을 다루기 위해 넣습니다.
+    "streamlit>=1.55,<2",
+    "graphviz>=0.19,<1",
+    "tqdm>=4.70.0",
 ]

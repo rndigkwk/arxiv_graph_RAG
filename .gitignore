@@ -13,3 +13,4 @@ output/
 .백업/
 Neo4j*
 data/pdf_200/
+secret*
