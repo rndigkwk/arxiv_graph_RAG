@@ -11,9 +11,11 @@ import ast
 import atexit
 import json
 import os
+import threading
 from functools import partial
 from pathlib import Path
 
+import numpy as np
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ProviderStrategy
@@ -28,9 +30,12 @@ from neo4j_graphrag.embeddings import OpenAIEmbeddings
 from neo4j_graphrag.retrievers import VectorRetriever
 from neo4j_graphrag.types import RetrieverResultItem
 from pydantic import BaseModel, Field
+from scipy.sparse import csr_array
 
-# 실행한 터미널 위치와 관계없이 저장소 루트의 .env를 읽습니다.
-root_dir = Path(__file__).resolve().parent.parent
+# 이 파일이 저장소 루트에 있든 하위 폴더에 있든, pyproject.toml이 있는 폴더를 루트로 봅니다.
+here = Path(__file__).resolve()
+root_dir = next((p for p in [here.parent, *here.parents] if (p / "pyproject.toml").exists()),
+                here.parent)
 load_dotenv(root_dir / ".env", override=False)
 
 # 적재 노트북과 같은 값이어야 합니다. 바꾸면 질문 벡터가 저장된 벡터와 섞이지 않습니다.
@@ -232,6 +237,13 @@ Schema: {schema}
 - Use search_graph for stored relationships: authors, citations, categories, dates, counts, rankings.
   Use search_papers for topic or content questions that need the title/abstract meaning.
   Call both when the question needs both.
+- Whenever the answer centres on specific papers, call rank_related_papers with their arxiv_ids
+  and report the neighbours under a short "Related papers" heading. This applies both when the
+  user names a paper AND when you found the papers yourself through search_papers or search_graph
+  — after a topic search, seed it with the top 3 arxiv_ids you are about to report.
+  Say plainly that this ranking comes from the stored citation network around those papers, not
+  from overall popularity. Skip it only for pure aggregates: counts, rankings over a whole
+  category, and author or category listings where no particular paper is the subject.
 - Put the arxiv_id of every paper you used into `evidence_ids`, copied exactly from the tool output.
   Never invent an id. For a pure aggregate with no specific paper, return an empty list.
 - Report titles, author names and category codes exactly as the tools returned them. Do not add
@@ -255,6 +267,8 @@ def validate_answer(response):
             raise ValueError("조회 결과의 evidence_ids가 arxiv_id 목록이 아닙니다. 다시 질문해 주세요.")
     available_ids = {pid for row in response["rows"] for pid in row["evidence_ids"]}
     available_ids.update(hit["arxiv_id"] for hit in response["papers"])
+    # 개인화 PageRank가 찾은 논문도 저장된 인용 관계로 얻은 근거입니다.
+    available_ids.update(hit["arxiv_id"] for hit in response["related"])
     ids = response["evidence_ids"]
     if not isinstance(ids, list) or not all(isinstance(pid, str) and pid.strip() for pid in ids):
         raise ValueError("답변의 evidence_ids가 arxiv_id 목록이 아닙니다. 다시 질문해 주세요.")
@@ -286,7 +300,7 @@ def collect_response(result, question):
         if isinstance(message, ToolMessage):
             outputs[message.tool_call_id] = message
 
-    cypher, rows, papers, translations, errors = "", [], {}, [], []
+    cypher, rows, papers, translations, errors, related = "", [], {}, [], [], []
     for call in calls:
         message = outputs.get(call["id"])
         if message is None:
@@ -306,12 +320,15 @@ def collect_response(result, question):
                 old = papers.get(hit["arxiv_id"])
                 if old is None or hit.get("score", 0) > old.get("score", 0):
                     papers[hit["arxiv_id"]] = hit
+        elif call["name"] == "rank_related_papers":
+            related.extend(call["output"].get("related", []))
         elif call["name"] == "translate_to_english":
             translations.append(call["output"])
 
     return {"question": question, "answer": answer.answer, "evidence_ids": answer.evidence_ids,
             "tool_calls": calls, "cypher": cypher, "rows": rows,
-            "papers": list(papers.values()), "translations": translations, "errors": errors}
+            "papers": list(papers.values()), "translations": translations,
+            "errors": errors, "related": related}
 
 
 def partial_answer(text):
@@ -371,6 +388,220 @@ def translate_to_korean(text):
         return text
     message = translator.invoke([("system", korean_system), ("user", text)])
     return (message.text or "").strip() or text
+
+
+GRAPH_COUNTS = """
+RETURN COUNT { (:ArxivPaper) }        AS papers,
+       COUNT { (:ArxivAuthorName) }   AS authors,
+       COUNT { ()-[:AUTHORED]->() }   AS authored,
+       COUNT { ()-[:REFERENCES]->() } AS references
+"""
+
+
+def graph_counts():
+    """홈 화면의 스키마 메타그래프에 쓸 실제 노드·관계 수를 셉니다."""
+    return run_read(GRAPH_COUNTS)[0]
+
+
+# ── 인용망 PageRank ────────────────────────────────────────────────────────
+# 기본 엔진입니다. 인용망이 노드 3.8만·관계 6.9만으로 작아 여기서 직접 계산합니다.
+# 인용망을 읽는 데 20초쯤 걸리고, 그 뒤 PageRank 계산 자체는 0.1초 안에 끝납니다.
+# Aura Graph Analytics 세션으로 같은 계산을 하는 선택 엔진은 gds_pagerank.py에 있습니다.
+# 순위는 두 엔진이 같고, 세션은 시간당 과금이라 기본값을 이쪽으로 두었습니다.
+DAMPING = 0.85          # 표준값. 15% 확률로 텔레포트 벡터로 점프합니다.
+PAGERANK_ITERATIONS = 200
+PAGERANK_TOLERANCE = 1e-11
+
+PAPER_ROWS = """
+MATCH (p:ArxivPaper)
+RETURN p.arxiv_id AS arxiv_id, p.primary_category AS primary_category,
+       p.categories AS categories
+"""
+
+CITATION_EDGES = """
+MATCH (citing:ArxivPaper)-[:REFERENCES]->(cited:ArxivPaper)
+RETURN citing.arxiv_id AS citing, cited.arxiv_id AS cited
+"""
+
+PAPER_DETAILS = """
+MATCH (p:ArxivPaper)
+WHERE p.arxiv_id IN $ids
+RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_category,
+       p.categories AS categories, p.pdf_url AS pdf_url,
+       toString(p.published) AS published,
+       COUNT { (p)<-[:REFERENCES]-() } AS cited_by
+"""
+
+# 인용망은 한 번만 읽습니다. 두 세션이 동시에 처음 부를 수 있어 잠금으로 감쌉니다.
+# 잠금을 쥔 채 citation_graph()를 다시 부르는 경로가 있어 재진입 가능한 RLock을 씁니다.
+graph_lock = threading.RLock()
+graph_cache = {}
+
+
+def transition_matrix(rows, cols, size):
+    """행 방향으로 정규화한 전이 행렬과 각 노드의 출력 차수를 만듭니다."""
+    out_degree = np.bincount(rows, minlength=size).astype(np.float64)
+    # 출력 차수가 0인 행은 어차피 비어 있으므로 0으로 나누지 않게만 막습니다.
+    weights = 1.0 / np.where(out_degree[rows] == 0, 1.0, out_degree[rows])
+    return csr_array((weights, (rows, cols)), shape=(size, size)), out_degree
+
+
+def run_pagerank(matrix, out_degree, teleport):
+    """멱승법으로 PageRank를 계산합니다. teleport의 합은 1이어야 합니다."""
+    dangling = out_degree == 0
+    rank = teleport.copy()
+    for _ in range(PAGERANK_ITERATIONS):
+        # 나가는 인용이 없는 논문에 고인 점수는 텔레포트 분포로 다시 뿌립니다.
+        leaked = rank[dangling].sum()
+        nxt = DAMPING * (matrix.T @ rank) + (DAMPING * leaked + 1.0 - DAMPING) * teleport
+        moved = np.abs(nxt - rank).sum()
+        rank = nxt
+        if moved < PAGERANK_TOLERANCE:
+            break
+    return rank
+
+
+def citation_graph():
+    """논문 목록과 REFERENCES 관계를 한 번 읽어 PageRank용 행렬을 만듭니다."""
+    with graph_lock:
+        if "ids" in graph_cache:
+            return graph_cache
+        nodes = run_read(PAPER_ROWS)
+        edges = run_read(CITATION_EDGES)
+        ids = [row["arxiv_id"] for row in nodes]
+        index = {arxiv_id: position for position, arxiv_id in enumerate(ids)}
+        size = len(ids)
+        # 적재할 때 양쪽 논문을 MATCH했으므로 빠진 끝점은 없지만, 그래도 걸러 둡니다.
+        pairs = [(index[e["citing"]], index[e["cited"]]) for e in edges
+                 if e["citing"] in index and e["cited"] in index]
+        rows = np.array([a for a, _ in pairs], dtype=np.int32)
+        cols = np.array([b for _, b in pairs], dtype=np.int32)
+        # 무방향 행렬은 양쪽 방향을 모두 넣고 중복된 쌍을 한 번만 남깁니다.
+        both = np.unique(np.stack([np.concatenate([rows, cols]),
+                                   np.concatenate([cols, rows])]), axis=1)
+        directed, out_degree = transition_matrix(rows, cols, size)
+        undirected, degree = transition_matrix(both[0], both[1], size)
+        graph_cache.update({
+            "ids": ids, "index": index, "size": size, "rows": rows, "cols": cols,
+            "primary": [row["primary_category"] for row in nodes],
+            "categories": [set(row["categories"] or []) for row in nodes],
+            "directed": directed, "out_degree": out_degree,
+            "undirected": undirected, "undirected_degree": degree,
+            "scores": {},
+        })
+        return graph_cache
+
+
+def global_pagerank():
+    """인용 방향(인용하는 쪽 → 인용된 쪽) 그대로 계산한 전체 PageRank입니다."""
+    graph = citation_graph()
+    with graph_lock:
+        if "global" not in graph["scores"]:
+            size = graph["size"]
+            graph["scores"]["global"] = run_pagerank(
+                graph["directed"], graph["out_degree"], np.full(size, 1.0 / size))
+        return graph["scores"]["global"]
+
+
+def category_members(code, include_secondary=True):
+    """분류 코드에 해당하는 논문을 True로 표시한 배열을 돌려줍니다."""
+    graph = citation_graph()
+    if include_secondary:
+        return np.array([code in cats for cats in graph["categories"]])
+    return np.array([primary == code for primary in graph["primary"]])
+
+
+def subgraph_pagerank(code, include_secondary=True):
+    """해당 분류 논문과 그들 사이의 인용만 남긴 하위 그래프에서 계산합니다."""
+    graph = citation_graph()
+    key = f"subgraph:{code}:{include_secondary}"
+    with graph_lock:
+        if key not in graph["scores"]:
+            member = category_members(code, include_secondary)
+            if not member.any():
+                graph["scores"][key] = np.zeros(graph["size"])
+            else:
+                # 양 끝이 모두 이 분류인 인용만 남깁니다. 분류 밖 논문은 점수가 0이 됩니다.
+                keep = member[graph["rows"]] & member[graph["cols"]]
+                matrix, degree = transition_matrix(
+                    graph["rows"][keep], graph["cols"][keep], graph["size"])
+                graph["scores"][key] = run_pagerank(matrix, degree, member / member.sum())
+        return graph["scores"][key]
+
+
+def personalized_pagerank(seed_ids):
+    """시드 논문에서만 텔레포트하는 개인화 PageRank입니다. 무방향 인용망을 씁니다."""
+    graph = citation_graph()
+    seeds = [graph["index"][arxiv_id] for arxiv_id in seed_ids if arxiv_id in graph["index"]]
+    if not seeds:
+        return None, []
+    teleport = np.zeros(graph["size"])
+    teleport[seeds] = 1.0 / len(seeds)
+    # 인용 방향을 그대로 쓰면 시드가 인용한 논문 쪽으로만 흘러갑니다. 관련 논문을 찾는 것이
+    # 목적이므로 인용한 쪽·인용된 쪽을 모두 이웃으로 보는 무방향 그래프를 씁니다.
+    return run_pagerank(graph["undirected"], graph["undirected_degree"], teleport), seeds
+
+
+def with_details(arxiv_ids, score_of):
+    """순위에 오른 논문의 제목·분류·피인용 수를 Neo4j에서 붙여 옵니다."""
+    if not arxiv_ids:
+        return []
+    detail = {row["arxiv_id"]: row for row in run_read(PAPER_DETAILS, {"ids": list(arxiv_ids)})}
+    ranked = []
+    for position, arxiv_id in enumerate(arxiv_ids, 1):
+        row = detail.get(arxiv_id)
+        if row is not None:
+            ranked.append({"rank": position, "score": float(score_of(arxiv_id)), **row})
+    return ranked
+
+
+def top_by_score(score, mask=None, limit=20, exclude=()):
+    """점수가 높은 순으로 arxiv_id를 고릅니다. mask가 있으면 그 안에서만 고릅니다."""
+    graph = citation_graph()
+    usable = score.copy()
+    if mask is not None:
+        usable = np.where(mask, usable, -1.0)
+    for arxiv_id in exclude:
+        if arxiv_id in graph["index"]:
+            usable[graph["index"][arxiv_id]] = -1.0
+    limit = max(1, min(int(limit), 50))
+    order = np.argsort(-usable)[:limit]
+    # 점수가 0인 논문은 인용망에서 시드·분류와 이어지지 않은 논문이라 순위에 넣지 않습니다.
+    return [graph["ids"][position] for position in order if usable[position] > 0]
+
+
+def category_pagerank(code, limit=20, include_secondary=True, scope="global"):
+    """분류별 PageRank 순위를 표로 쓸 수 있는 행 목록으로 돌려줍니다."""
+    score = global_pagerank() if scope == "global" else subgraph_pagerank(code, include_secondary)
+    member = category_members(code, include_secondary)
+    chosen = top_by_score(score, mask=member, limit=limit)
+    graph = citation_graph()
+    return {"code": code, "scope": scope, "include_secondary": include_secondary,
+            "paper_count": int(member.sum()),
+            "papers": with_details(chosen, lambda i: score[graph["index"][i]])}
+
+
+@tool
+def rank_related_papers(arxiv_ids: list[str], top_k: int = 5) -> dict:
+    """개인화 PageRank로 주어진 논문과 인용망에서 가장 가까운 논문을 찾습니다.
+
+    특정 논문에 대한 질문("이 논문과 관련된 연구", "이어서 읽을 논문", "같이 읽히는 논문")에
+    사용합니다. arxiv_ids에는 search_graph나 search_papers로 먼저 확인한 arxiv_id만 넣으세요.
+    시드 논문에서 출발해 인용 관계를 따라 퍼지므로, 전체에서 피인용이 많은 논문이 아니라
+    이 논문 주변에서 중요한 논문이 위로 올라옵니다.
+    인용 관계가 저장되지 않은 논문은 결과가 비어 있습니다. 결과는 근거로 인용할 수 있습니다.
+    """
+    graph = citation_graph()
+    known = [arxiv_id for arxiv_id in arxiv_ids if arxiv_id in graph["index"]]
+    unknown = [arxiv_id for arxiv_id in arxiv_ids if arxiv_id not in graph["index"]]
+    score, _ = personalized_pagerank(known)
+    if score is None:
+        return {"seed_ids": known, "unknown_ids": unknown, "related": [],
+                "note": "그래프에 없는 arxiv_id입니다. 먼저 논문을 찾은 뒤 그 id를 넣으세요."}
+    chosen = top_by_score(score, limit=top_k, exclude=known)
+    related = with_details(chosen, lambda i: score[graph["index"][i]])
+    note = "" if related else "시드 논문에 저장된 인용 관계가 없어 관련 논문을 찾지 못했습니다."
+    return {"seed_ids": known, "unknown_ids": unknown, "related": related, "note": note}
 
 
 # ── 그래프 표시용 조회 ──────────────────────────────────────────────────────
@@ -441,7 +672,8 @@ try:
         cypher_rules=cypher_rules,
     )[0]
     agent = create_agent(
-        model=llm, tools=[translate_to_english, search_graph, search_papers],
+        model=llm,
+        tools=[translate_to_english, search_graph, search_papers, rank_related_papers],
         system_prompt=agent_system,
         # structured_response는 answer와 evidence_ids가 있는 GroundedAnswer 객체입니다.
         response_format=ProviderStrategy(GroundedAnswer, strict=True),

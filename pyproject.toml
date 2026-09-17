@@ -57,4 +57,5 @@ dependencies = [
     "streamlit>=1.55,<2",
     "graphviz>=0.19,<1",
     "tqdm>=4.70.0",
+    "plotly>=7.1.0",
 ]

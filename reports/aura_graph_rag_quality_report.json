@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-09-17T10:52:59+09:00",
+  "generated_at": "2026-09-17T17:14:06+09:00",
   "source_files": {
     "ai": [
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai\\arxiv_cs_recent_3months_oai_part1.jsonl",
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai\\arxiv_cs_recent_3months_oai_part2.jsonl"
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai\\arxiv_cs_recent_3months_oai_part1.jsonl",
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai\\arxiv_cs_recent_3months_oai_part2.jsonl"
     ],
     "references_api": [
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part1.jsonl",
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part2.jsonl",
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part3.jsonl",
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part4.jsonl",
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part5.jsonl",
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part6.jsonl",
-      "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part7.jsonl"
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part1.jsonl",
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part2.jsonl",
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part3.jsonl",
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part4.jsonl",
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part5.jsonl",
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part6.jsonl",
+      "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\data\\ai_references\\arxiv_ai_references_api\\arxiv_ai_references_api_part7.jsonl"
     ]
   },
   "metrics": {
@@ -42,214 +42,200 @@
       "references": 1.0
     },
     "precision_sample_size": 50,
-    "precision_seed": 20260917,
+    "precision_seed": 42,
     "er_consistency": 1.0
   },
   "er_violations": {
+    "duplicate_arxiv_id": 0,
     "missing_id": 0,
-    "duplicate_id": 0,
     "missing_title": 0,
+    "orphan_papers": 0,
     "authored_type_error": 0,
     "references_type_error": 0,
-    "orphan_papers": 0
+    "reference_self_loops": 0
   },
-  "louvain_mode": "기본 설정 — 실행마다 커뮤니티 번호·크기가 달라집니다 (randomSeed 미지원: ClientError)",
+  "community_mode": "결정적 (randomSeed=42, concurrency=1)",
   "pagerank_top10": [
     {
-      "nodeId": 1719,
+      "nodeId": 799,
       "label": "ArxivPaper",
-      "key": "2507.06261",
-      "title": "Gemini 2.5: Pushing the Frontier with Advanced Reasoning, Multimodality, Long Context, and Next Generation Agentic Capabilities",
-      "communityId": 74773,
-      "score": 261.6446961201118
+      "key": "2210.03629",
+      "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+      "communityId": 48,
+      "score": 3.775812663806034
     },
     {
-      "nodeId": 89542,
+      "nodeId": 156,
       "label": "ArxivPaper",
-      "key": "2501.14249",
-      "title": "Humanity's Last Exam",
-      "communityId": 74773,
-      "score": 111.21636884166203
+      "key": "2302.04761",
+      "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+      "communityId": 48,
+      "score": 1.8535205542954116
     },
     {
-      "nodeId": 1871,
+      "nodeId": 239,
       "label": "ArxivPaper",
-      "key": "2506.12103",
-      "title": "The Amazon Nova Family of Models: Technical Report and Model Card",
-      "communityId": 60007,
-      "score": 82.54584749378601
+      "key": "2005.11401",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "communityId": 48,
+      "score": 1.6068180899175015
     },
     {
-      "nodeId": 412,
+      "nodeId": 633,
       "label": "ArxivPaper",
-      "key": "2403.05530",
-      "title": "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context",
-      "communityId": 74773,
-      "score": 63.356399341239
+      "key": "2306.05685",
+      "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+      "communityId": 48,
+      "score": 1.5881027291715235
     },
     {
-      "nodeId": 105398,
+      "nodeId": 191,
       "label": "ArxivPaper",
-      "key": "2208.00211",
-      "title": "Gaia Data Release 3: Summary of the content and survey properties",
-      "communityId": 144983,
-      "score": 58.07974143835594
+      "key": "2303.11366",
+      "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+      "communityId": 48,
+      "score": 1.5629977661512704
     },
     {
-      "nodeId": 1756,
+      "nodeId": 652,
       "label": "ArxivPaper",
-      "key": "2407.21783",
-      "title": "The Llama 3 Herd of Models",
-      "communityId": 74773,
-      "score": 52.31470055603316
+      "key": "2304.03442",
+      "title": "Generative Agents: Interactive Simulacra of Human Behavior",
+      "communityId": 48,
+      "score": 1.4945047456377327
     },
     {
-      "nodeId": 19819,
+      "nodeId": 1228,
       "label": "ArxivPaper",
-      "key": "2601.03267",
-      "title": "OpenAI GPT-5 System Card",
-      "communityId": 74773,
-      "score": 36.89716288640899
+      "key": "2310.06770",
+      "title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+      "communityId": 48,
+      "score": 1.4401840122058611
     },
     {
-      "nodeId": 25391,
+      "nodeId": 1915,
       "label": "ArxivPaper",
-      "key": "2602.04705",
-      "title": "ERNIE 5.0 Technical Report",
-      "communityId": 60007,
-      "score": 35.827734554903465
+      "key": "2402.03300",
+      "title": "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models",
+      "communityId": 48,
+      "score": 1.4351544022907472
     },
     {
-      "nodeId": 97417,
+      "nodeId": 29,
       "label": "ArxivPaper",
-      "key": "0805.2366",
-      "title": "LSST: from Science Drivers to Reference Design and Anticipated Data Products",
-      "communityId": 135826,
-      "score": 33.90685985940867
+      "key": "1706.03762",
+      "title": "Attention Is All You Need",
+      "communityId": 66,
+      "score": 1.4240263651872538
     },
     {
-      "nodeId": 53213,
+      "nodeId": 148,
       "label": "ArxivPaper",
-      "key": "2604.16216",
-      "title": "A digitally controlled silicon quantum processing unit",
-      "communityId": 58493,
-      "score": 32.6144973684209
+      "key": "2201.11903",
+      "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+      "communityId": 48,
+      "score": 1.3589533256378206
     }
   ],
   "communities_top5": [
     {
       "label": "C1",
-      "communityId": 74773,
-      "size": 18055,
-      "papers": 3466,
-      "authors": 14589,
-      "representative": {
-        "arxiv_id": "2507.06261",
-        "title": "Gemini 2.5: Pushing the Frontier with Advanced Reasoning, Multimodality, Long Context, and Next Generation Agentic Capabilities",
-        "score": 261.6446961201118
-      }
+      "communityId": 48,
+      "size": 3874,
+      "papers": 3874,
+      "primary_category": "cs.AI",
+      "secondary_category": "cs.CL",
+      "authors": 0
     },
     {
       "label": "C2",
-      "communityId": 135535,
-      "size": 11099,
-      "papers": 3143,
-      "authors": 7956,
-      "representative": {
-        "arxiv_id": "2606.05405",
-        "title": "Agents' Last Exam",
-        "score": 21.30159036104528
-      }
+      "communityId": 100,
+      "size": 2725,
+      "papers": 2725,
+      "primary_category": "cs.CL",
+      "secondary_category": "cs.LG",
+      "authors": 0
     },
     {
       "label": "C3",
-      "communityId": 60007,
-      "size": 7956,
-      "papers": 1877,
-      "authors": 6079,
-      "representative": {
-        "arxiv_id": "2506.12103",
-        "title": "The Amazon Nova Family of Models: Technical Report and Model Card",
-        "score": 82.54584749378601
-      }
+      "communityId": 86,
+      "size": 2513,
+      "papers": 2513,
+      "primary_category": "cs.CV",
+      "secondary_category": "cs.CL",
+      "authors": 0
     },
     {
       "label": "C4",
-      "communityId": 68512,
-      "size": 5299,
-      "papers": 1492,
-      "authors": 3807,
-      "representative": {
-        "arxiv_id": "2606.19348",
-        "title": "DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence",
-        "score": 18.316384993089414
-      }
+      "communityId": 36,
+      "size": 2375,
+      "papers": 2375,
+      "primary_category": "cs.CL",
+      "secondary_category": "cs.AI",
+      "authors": 0
     },
     {
       "label": "C5",
-      "communityId": 78245,
-      "size": 5234,
-      "papers": 1327,
-      "authors": 3907,
-      "representative": {
-        "arxiv_id": "2606.04490",
-        "title": "Prioritization of Risks from Artificial Intelligence: A Delphi Study of 272 International Experts",
-        "score": 18.182647771672755
-      }
+      "communityId": 85,
+      "size": 1827,
+      "papers": 1827,
+      "primary_category": "cs.CV",
+      "secondary_category": "cs.RO",
+      "authors": 0
     }
   ],
   "community_citation_flow": {
     "C1": {
-      "C1": 4052,
-      "C2": 1386,
-      "C3": 171,
-      "C4": 1055,
-      "C5": 183,
-      "기타": 3064
+      "C1": 11403,
+      "C2": 963,
+      "C3": 442,
+      "C4": 491,
+      "C5": 218,
+      "기타": 3577
     },
     "C2": {
-      "C1": 1391,
-      "C2": 3475,
-      "C3": 154,
-      "C4": 653,
-      "C5": 72,
-      "기타": 2621
+      "C1": 561,
+      "C2": 4103,
+      "C3": 155,
+      "C4": 359,
+      "C5": 47,
+      "기타": 997
     },
     "C3": {
-      "C1": 532,
-      "C2": 558,
-      "C3": 332,
-      "C4": 373,
-      "C5": 36,
-      "기타": 1258
+      "C1": 161,
+      "C2": 95,
+      "C3": 3537,
+      "C4": 55,
+      "C5": 119,
+      "기타": 570
     },
     "C4": {
-      "C1": 635,
-      "C2": 469,
-      "C3": 49,
-      "C4": 1028,
-      "C5": 44,
-      "기타": 980
+      "C1": 313,
+      "C2": 274,
+      "C3": 99,
+      "C4": 3742,
+      "C5": 32,
+      "기타": 770
     },
     "C5": {
-      "C1": 671,
-      "C2": 293,
-      "C3": 49,
-      "C4": 150,
-      "C5": 422,
-      "기타": 831
+      "C1": 73,
+      "C2": 40,
+      "C3": 73,
+      "C4": 12,
+      "C5": 2622,
+      "기타": 211
     },
     "기타": {
-      "C1": 8591,
-      "C2": 6698,
-      "C3": 1063,
-      "C4": 3501,
-      "C5": 682,
-      "기타": 21916
+      "C1": 1559,
+      "C2": 802,
+      "C3": 492,
+      "C4": 678,
+      "C5": 369,
+      "기타": 29424
     }
   },
   "figures": [
-    "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\reports\\aura_community_overview.png",
-    "C:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\reports\\aura_community_hubs.png"
+    "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\reports\\aura_community_sizes.png",
+    "c:\\Users\\Playdata\\Desktop\\arxiv_graph_RAG\\reports\\aura_community_metagraph.png"
   ]
 }

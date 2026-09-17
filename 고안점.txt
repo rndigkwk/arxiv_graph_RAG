@@ -44,3 +44,5 @@ property		authors		id+title+abstract+published+pdf_url			categories
 		(:ArxivAuthorName) - [:AUTHORED] -> (:ArxivPaper) - [:IN_CATEGORY] -> (:ArxivCategory)	data=data/ai_refereces/arxiv_ai_references_oai_bulk/
 				|					|							|
 property		authors		id+title+abstract+published+pdf_url			categories
+
+ai 분야 전체 page rank, 질문에 대한 개인화 page rank
