@@ -46,3 +46,7 @@ property		authors		id+title+abstract+published+pdf_url			categories
 property		authors		id+title+abstract+published+pdf_url			categories
 
 ai 분야 전체 page rank, 질문에 대한 개인화 page rank
+
+APP_README.md 에이전트 섹션에 에이전트 도구, 답변 형식과 근거 검증 넣기
+	검색 알고리즘 색션을 추가하여 vector 검색, text2cypher 검색, page rank, 개인화 prage rank 넣기, 아래부분 지우기
+README.md 설계 구조 이미지화, 벡터 검색부분 중복되니 지우기, 온톨로지 이미지화

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="700" viewBox="0 0 1400 700" role="img" aria-labelledby="title desc">
+  <title id="title">arXiv GraphRAG project architecture</title>
+  <desc id="desc">Data collection flows into JSONL normalization, Neo4j Aura knowledge graph, embeddings and analytics, then the Streamlit GraphRAG application.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8fafc"/><stop offset="1" stop-color="#eef2ff"/></linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f766e"/><stop offset="1" stop-color="#0d9488"/></linearGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c3aed"/><stop offset="1" stop-color="#6d28d9"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#64748b" flood-opacity=".18"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 Z" fill="#64748b"/></marker>
+    <style>
+      .title{font:700 30px Inter,Segoe UI,sans-serif;fill:#0f172a}.subtitle{font:400 16px Inter,Segoe UI,sans-serif;fill:#475569}
+      .box-title{font:700 19px Inter,Segoe UI,sans-serif;fill:#fff}.box-text{font:400 15px Inter,Segoe UI,sans-serif;fill:#e0e7ff}
+      .section{font:700 14px Inter,Segoe UI,sans-serif;letter-spacing:1.4px;fill:#64748b}.label{font:600 14px Inter,Segoe UI,sans-serif;fill:#334155}
+    </style>
+  </defs>
+  <rect width="1400" height="700" rx="24" fill="url(#bg)"/>
+  <text x="70" y="62" class="title">arXiv GraphRAG · End-to-end architecture</text>
+  <text x="70" y="92" class="subtitle">수집한 논문 메타데이터를 그래프·벡터·분석 계층으로 연결해 Streamlit 질의로 제공합니다.</text>
+  <text x="80" y="145" class="section">DATA SOURCES</text>
+  <text x="450" y="145" class="section">PROCESSING</text>
+  <text x="820" y="145" class="section">KNOWLEDGE &amp; ANALYTICS</text>
+  <text x="1160" y="145" class="section">USER EXPERIENCE</text>
+
+  <g filter="url(#shadow)">
+    <rect x="60" y="180" width="270" height="145" rx="16" fill="url(#blue)"/>
+    <text x="88" y="218" class="box-title">arXiv OAI-PMH</text>
+    <text x="88" y="249" class="box-text">최근 3개월 CS·AI 논문</text>
+    <text x="88" y="276" class="box-text">title · abstract · authors</text>
+    <text x="88" y="303" class="box-text">categories · published</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="60" y="390" width="270" height="145" rx="16" fill="url(#blue)"/>
+    <text x="88" y="428" class="box-title">외부 인용 데이터</text>
+    <text x="88" y="459" class="box-text">Semantic Scholar API</text>
+    <text x="88" y="486" class="box-text">피인용·참고문헌 메타데이터</text>
+    <text x="88" y="513" class="box-text">arXiv reference API</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="405" y="255" width="285" height="205" rx="16" fill="url(#teal)"/>
+    <text x="435" y="298" class="box-title">JSONL normalization</text>
+    <text x="435" y="333" class="box-text">ID 정규화·중복 통합</text>
+    <text x="435" y="361" class="box-text">seed 우선 데이터 병합</text>
+    <text x="435" y="389" class="box-text">5,000행 단위 저장·재개</text>
+    <text x="435" y="417" class="box-text">품질·필수 필드 검증</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="775" y="205" width="310" height="180" rx="16" fill="url(#purple)"/>
+    <text x="805" y="248" class="box-title">Neo4j Aura knowledge graph</text>
+    <text x="805" y="283" class="box-text">ArxivPaper · ArxivAuthorName</text>
+    <text x="805" y="311" class="box-text">AUTHORED · REFERENCES</text>
+    <text x="805" y="339" class="box-text">primary_category 속성</text>
+    <text x="805" y="367" class="box-text">원천 근거를 보존한 Cypher 조회</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="775" y="435" width="310" height="145" rx="16" fill="#334155"/>
+    <text x="805" y="477" class="box-title">Embedding &amp; analytics</text>
+    <text x="805" y="512" class="box-text">title + abstract · 768D vector</text>
+    <text x="805" y="540" class="box-text">PageRank · Leiden communities</text>
+    <text x="805" y="568" class="box-text">quality report &amp; visualizations</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="1150" y="255" width="190" height="205" rx="16" fill="#f97316"/>
+    <text x="1180" y="298" class="box-title">Streamlit app</text>
+    <text x="1180" y="336" class="box-text">한국어 번역</text>
+    <text x="1180" y="364" class="box-text">Text2Cypher</text>
+    <text x="1180" y="392" class="box-text">Vector search</text>
+    <text x="1180" y="420" class="box-text">Personalized PageRank</text>
+  </g>
+
+  <path d="M330 252 C360 252 370 300 405 300" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M330 460 C360 460 370 415 405 415" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M690 350 L775 295" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M930 385 L930 435" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M1085 295 L1150 315" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M1085 500 L1150 410" fill="none" stroke="#64748b" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="347" y="237" class="label">metadata</text>
+  <text x="349" y="483" class="label">citations</text>
+  <text x="701" y="326" class="label">MERGE</text>
+  <text x="944" y="414" class="label">analysis</text>
+  <text x="1095" y="285" class="label">grounded answer</text>
+  <text x="1095" y="483" class="label">ranking</text>
+  <text x="70" y="650" class="subtitle">재현 가능한 수집 노트북 · Aura 적재 노트북 · 품질 리포트 노트북이 각 단계를 검증합니다.</text>
+</svg>
