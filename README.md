@@ -6,6 +6,8 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 [![Neo4j](https://img.shields.io/badge/Neo4j-Aura-008CC1?logo=neo4j&logoColor=white)](https://neo4j.com/cloud/aura/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 
+🌐 **Live demo:** [arXiv GraphRAG Streamlit 앱](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)
+
 ## Overview
 
 최근 3개월의 arXiv Computer Science AI 논문과 해당 논문이 인용한 1-hop 참고문헌을 수집해 Neo4j Aura에 적재했습니다. Streamlit 앱은 질문에 따라 한국어→영어 번역, Text2Cypher 관계 조회, 제목·초록 벡터 검색, 개인화 PageRank를 조합해 답변과 근거를 제공합니다.
@@ -54,6 +56,8 @@ uv run streamlit run app.py
 ```
 
 앱은 `홈`, `챗봇`, `PageRank 순위` 탭을 제공합니다. 앱의 상세 설정과 오류 대응은 [`APP_README.md`](APP_README.md)에 정리했습니다.
+
+배포된 앱은 [Streamlit 데모 주소](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)에서 바로 확인할 수 있습니다.
 
 ## Data
 
