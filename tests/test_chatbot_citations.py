@@ -1,10 +1,35 @@
+import logging
+
 import pytest
 
 from answer_validation import (
     direct_evidence_ids,
+    log_validation_failure,
     validate_evidence_ids,
     validate_mixed_candidates,
 )
+
+
+@pytest.mark.parametrize(("error", "expected_reason"), [
+    ("내용 조건을 확인하지 못한 논문: ['private-paper-id']", "citation_missing_content_match"),
+    ("그래프 조건을 통과하지 않은 논문: ['private-paper-id']", "citation_missing_graph_match"),
+    ("그래프 검색 조건이 질문의 모든 관계·속성 조건을 반영하지 않았습니다.",
+     "graph_conditions_not_covered"),
+])
+def test_validation_failure_log_uses_safe_reason_code(caplog, error, expected_reason):
+    with caplog.at_level(logging.WARNING):
+        log_validation_failure(
+            "abc123", 2, "mixed_candidate_conditions",
+            ValueError(error),
+        )
+
+    assert len(caplog.records) == 1
+    message = caplog.records[0].getMessage()
+    assert "request_id=abc123" in message
+    assert "attempt=2" in message
+    assert "stage=mixed_candidate_conditions" in message
+    assert f"reason={expected_reason}" in message
+    assert "private-paper-id" not in message
 
 
 def test_accepts_vector_and_graph_ids_as_direct_evidence():

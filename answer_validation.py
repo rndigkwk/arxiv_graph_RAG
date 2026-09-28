@@ -2,6 +2,35 @@
 
 from __future__ import annotations
 
+import logging
+
+validation_logger = logging.getLogger("arxiv_graph_rag.validation")
+
+_VALIDATION_REASON_CODES = (
+    ("조회 결과의 evidence_ids", "invalid_graph_evidence_shape"),
+    ("답변의 evidence_ids가", "invalid_answer_evidence_shape"),
+    ("답변의 evidence_ids에 중복", "duplicate_answer_evidence"),
+    ("직접 검색된 근거에 없는 인용 ID", "unsupported_citation_id"),
+    ("인용 논문의 내용 판정 결과가 불완전", "incomplete_content_verdict"),
+    ("인용 논문 정보를 모두 찾지 못", "cited_paper_lookup_incomplete"),
+    ("그래프 검색 조건이 질문의 모든", "graph_conditions_not_covered"),
+    ("그래프 조건을 통과하지 않은 논문", "citation_missing_graph_match"),
+    ("내용 조건을 확인하지 못한 논문", "citation_missing_content_match"),
+)
+
+
+def log_validation_failure(request_id: str, attempt: int, stage: str, error: ValueError) -> None:
+    """Log a safe reason code without recording question or retrieved-paper text."""
+    message = str(error)
+    reason = next(
+        (code for prefix, code in _VALIDATION_REASON_CODES if message.startswith(prefix)),
+        f"unclassified_{type(error).__name__}",
+    )
+    validation_logger.warning(
+        "answer_validation_failed request_id=%s attempt=%d stage=%s reason=%s",
+        request_id, attempt, stage, reason,
+    )
+
 
 def direct_evidence_ids(response: dict[str, object]) -> set[str]:
     """Collect answer evidence from graph rows and vector hits, never related suggestions."""

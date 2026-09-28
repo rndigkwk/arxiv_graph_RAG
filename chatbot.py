@@ -12,6 +12,7 @@ import atexit
 import json
 import os
 import threading
+import uuid
 from functools import partial
 from pathlib import Path
 
@@ -32,7 +33,11 @@ from neo4j_graphrag.types import RetrieverResultItem
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from scipy.sparse import csr_array
 
-from answer_validation import direct_evidence_ids, validate_evidence_ids
+from answer_validation import (
+    direct_evidence_ids,
+    log_validation_failure,
+    validate_evidence_ids,
+)
 from candidate_validation import QuestionVerdict, assess_and_validate, judge_content
 
 # 이 파일이 저장소 루트에 있든 하위 폴더에 있든, pyproject.toml이 있는 폴더를 루트로 봅니다.
@@ -457,6 +462,7 @@ def partial_answer(text):
 def ask(question, history, on_answer=None):
     """답변을 생성하는 동안 화면을 갱신하고, 검증한 결과와 새 대화 기록을 반환합니다."""
     messages = [*history, ("user", question)]
+    validation_request_id = uuid.uuid4().hex[:8]
     for attempt in range(2):
         result, message_id, buffer, displayed = {}, None, "", ""
         if on_answer is not None:
@@ -482,8 +488,10 @@ def ask(question, history, on_answer=None):
         # 과거 대화를 제외하고, 이번 질문의 검색과 수정 호출만 모읍니다.
         current = {**result, "messages": result["messages"][len(history):]}
         response = collect_response(current, question)
+        validation_stage = "answer_format_citation"
         try:
             validate_answer(response)
+            validation_stage = "mixed_candidate_conditions"
             response["condition_validation"] = assess_and_validate(
                 question, response,
                 lambda ids: run_read(
@@ -503,6 +511,9 @@ def ask(question, history, on_answer=None):
             )
             return response, result["messages"]
         except ValueError as exc:
+            log_validation_failure(
+                validation_request_id, attempt + 1, validation_stage, exc,
+            )
             if attempt == 1:
                 raise ValueError("답변의 형식·인용을 확인하지 못했습니다. 다시 질문해 주세요.") from exc
             # 검색한 근거와 실패 이유를 그대로 전달해 한 번만 수정하고 다시 검사합니다.
