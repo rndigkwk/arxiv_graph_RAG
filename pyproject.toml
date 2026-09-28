@@ -19,6 +19,7 @@ dependencies = [
     "graphviz>=0.19,<1",
     "numpy>=2.3,<2.5",
     "scipy>=1.15",
+    "networkx>=3.4",
     "plotly>=7.1.0",
     "tqdm>=4.70.0",
 ]
@@ -30,7 +31,6 @@ notebooks = [
     "jupyterlab>=4.6.2",
     "pandas>=2.3,<3",
     "matplotlib>=3.9",
-    "networkx>=3.4",
     "rdflib>=7.1",
     "sparqlwrapper>=2.0",
     "scikit-learn>=1.5",

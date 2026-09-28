@@ -17,6 +17,7 @@ jobs:
           python-version: "3.12"
       - run: uv lock --check
       - run: uv sync --locked --group dev
+      - run: uv run --locked python -c "import networkx, plotly, streamlit"
       - run: uv run --locked ruff check answer_validation.py candidate_validation.py evals tests
       - run: uv run --locked python -m pytest -q
       - run: uv run --locked python -m compileall -q app.py chatbot.py answer_validation.py candidate_validation.py gds_pagerank.py metagraph.py evals

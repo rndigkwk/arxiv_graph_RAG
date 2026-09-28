@@ -56,6 +56,7 @@ uv run python -m evals.run --mode compare --limit 31 --top-k 5 --output reports/
 
 - `pyproject.toml`의 프로젝트 이름을 `arxiv-graphrag`로 정리했습니다.
 - 앱 실행에 필요한 의존성을 기본 그룹에 두고, 노트북과 Aura Graph Analytics 의존성은 `notebooks`, `gds` 선택 extra로 분리했습니다. 기본 앱 설치에서는 Torch, Transformers, JupyterLab을 설치하지 않습니다.
+- 홈 탭의 `metagraph.py`가 사용하는 `networkx`는 기본 앱 의존성입니다. 2026-09-28 배포에서 누락으로 앱 실행이 중단되어 기본 의존성으로 옮겼고, 기본 설치 후 실제 Aura 연결과 Streamlit 홈 화면 실행을 확인했습니다.
 - `pytest`, `ruff`, 테스트 경로와 lint 설정을 추가했습니다. 비교 평가기는 벡터 검색 문맥 기반 답변과 GraphRAG를 같은 질의에서 측정하고, 분리된 근거 지표와 텔레메트리를 기록합니다.
 - 안전한 값만 담은 [`.env.example`](.env.example)과 GitHub Actions CI([`.github/workflows/ci.yml`](.github/workflows/ci.yml))를 추가했습니다. CI는 잠금 파일, lint, 테스트, Python 컴파일을 검사합니다.
 - 평가 및 데이터셋 테스트는 아래 검증 기록에서 전체 실행 결과를 확인할 수 있습니다. GitHub Actions 워크플로는 테스트, lint, 컴파일 단계를 실행합니다. 저장소의 실제 원격 실행 상태는 로컬 인증이 없어 확인하지 않습니다.
