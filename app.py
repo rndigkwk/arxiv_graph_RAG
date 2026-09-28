@@ -2,8 +2,11 @@
 import json
 import re
 from textwrap import fill
+from urllib.parse import quote
 
 import streamlit as st
+
+from paper_library import add_paper, compare_selection
 
 
 # 연결·검색기는 공유하고, 각 사용자의 대화는 아래 session_state에 따로 저장합니다.
@@ -202,11 +205,47 @@ def show_response(chatbot, response, index):
                 "제목": hit["title"], "대표 분류": hit["primary_category"],
                 "피인용": hit["cited_by"], "게재일": hit["published"][:10],
             } for hit in response["related"]], hide_index=True, column_config=SCORE_COLUMN)
+            seed_ids = [call.get("output", {}).get("seed_ids", [])
+                        for call in response["tool_calls"]
+                        if call.get("name") == "rank_related_papers"]
+            seeds = seed_ids[-1] if seed_ids else []
+            paths = chatbot.explain_citation_paths(
+                seeds, [hit["arxiv_id"] for hit in response["related"]]
+            )
+            st.markdown("##### 추천 경로")
+            for hit in response["related"]:
+                path = paths.get(hit["arxiv_id"])
+                if path is None:
+                    st.caption(
+                        f'{hit["arxiv_id"]}: 시드에서 4단계 이내 인용 경로를 찾지 못했습니다.'
+                    )
+                else:
+                    st.write(" → ".join(path["path"]))
+                    st.caption("; ".join(
+                        f'{edge["citing"]}가 {edge["cited"]}를 인용'
+                        for edge in path["references"]
+                    ))
+                if st.button("논문 저장", key=f'save-related:{index}:{hit["arxiv_id"]}'):
+                    paper = chatbot.fetch_paper_for_saving(hit["arxiv_id"])
+                    if paper:
+                        if _save_paper(paper):
+                            st.toast("저장 목록에 추가했습니다.")
+                            st.rerun()
+                        else:
+                            st.warning("저장 목록은 최대 20편입니다.")
+                    else:
+                        st.warning("논문 정보를 그래프에서 찾지 못했습니다.")
 
     if response["papers"]:
         with st.expander("벡터로 찾은 논문의 초록"):
             for hit in response["papers"]:
                 st.write(f'{hit["arxiv_id"]} · {hit["title"]}')
+                if st.button("논문 저장", key=f'save-search:{index}:{hit["arxiv_id"]}'):
+                    if _save_paper(hit):
+                        st.toast("저장 목록에 추가했습니다.")
+                        st.rerun()
+                    else:
+                        st.warning("저장 목록은 최대 20편입니다.")
                 st.caption(f'Neo4j 벡터 유사도: {hit["score"]:.3f} (클수록 유사함) / '
                            f'분류: {", ".join(hit["categories"])}')
                 st.write(hit["abstract"])
@@ -220,6 +259,180 @@ def show_response(chatbot, response, index):
                 "저자 수": paper["author_count"], "피인용": paper["cited_by"],
                 "인용": paper["references_out"], "출처": paper["source"],
             } for paper in subgraph["papers"]], hide_index=True)
+
+    show_paper_comparison(chatbot, response, index)
+
+
+def _save_paper(paper):
+    """현재 브라우저 세션의 저장 논문 목록에 추가합니다."""
+    saved = st.session_state.setdefault("saved_papers", [])
+    updated = add_paper(saved, paper)
+    if updated == saved and len(saved) >= 20 and not any(
+        item.get("arxiv_id") == paper.get("arxiv_id") for item in saved
+    ):
+        return False
+    st.session_state.saved_papers = updated
+    return True
+
+
+def show_saved_papers(chatbot):
+    """세션 저장 목록에서 논문을 관리하고 선택한 논문을 비교합니다."""
+    saved = st.session_state.setdefault("saved_papers", [])
+    with st.expander(f"저장한 논문 ({len(saved)}/20)", expanded=bool(saved)):
+        st.caption("이 목록은 현재 브라우저 세션에만 보관됩니다.")
+        if not saved:
+            st.info("검색 결과나 추천 논문에서 ‘논문 저장’을 눌러 추가하세요.")
+            return
+        st.dataframe([{
+            "arXiv ID": paper["arxiv_id"], "제목": paper.get("title", ""),
+            "분류": ", ".join(paper.get("categories") or []),
+            "초록": "있음" if paper.get("abstract") else "없음",
+        } for paper in saved], hide_index=True, width="stretch")
+        to_remove = st.multiselect(
+            "목록에서 제거할 논문", options=[p["arxiv_id"] for p in saved],
+            format_func=lambda paper_id: next(
+                f'{paper_id} · {p.get("title", "")}' for p in saved
+                if p["arxiv_id"] == paper_id
+            ), key="saved-paper-remove-selection",
+        )
+        remove_col, clear_col = st.columns(2)
+        if remove_col.button("선택 항목 제거", disabled=not to_remove,
+                             key="saved-paper-remove"):
+            st.session_state.saved_papers = [
+                paper for paper in saved if paper["arxiv_id"] not in to_remove
+            ]
+            st.rerun()
+        if clear_col.button("목록 전체 비우기", key="saved-paper-clear"):
+            st.session_state.saved_papers = []
+            st.rerun()
+
+        options = [p["arxiv_id"] for p in saved
+                   if isinstance(p.get("abstract"), str) and p["abstract"].strip()]
+        selected = st.multiselect(
+            "비교할 논문 (초록이 있는 논문 2~4편)", options=options,
+            format_func=lambda paper_id: next(
+                f'{paper_id} · {p.get("title", "")}' for p in saved
+                if p["arxiv_id"] == paper_id
+            ), max_selections=4, key="saved-paper-compare-selection",
+        )
+        selected_papers, selection_error = compare_selection(saved, selected)
+        if st.button("저장한 논문 비교", key="saved-paper-compare",
+                     disabled=bool(selection_error)):
+            try:
+                with st.spinner("초록을 바탕으로 저장한 논문을 비교하고 있습니다."):
+                    result = chatbot.compare_papers(selected_papers)
+                result_data = result.model_dump() if hasattr(result, "model_dump") else result
+                st.session_state.saved_paper_comparison = result_data
+                st.session_state.saved_paper_comparison_error = None
+            except Exception as exc:
+                st.session_state.saved_paper_comparison = None
+                st.session_state.saved_paper_comparison_error = type(exc).__name__
+        if selection_error and selected:
+            st.caption(selection_error)
+        if st.session_state.get("saved_paper_comparison_error"):
+            st.error("논문 비교를 완료하지 못했습니다. 선택을 확인하고 다시 시도해 주세요.")
+        result = st.session_state.get("saved_paper_comparison")
+        if result and {p["arxiv_id"] for p in result.get("papers", [])} == set(selected):
+            _show_comparison_result(result, saved)
+
+
+def _show_comparison_result(result, papers):
+    labels = {"research_question": "연구 질문", "method": "방법",
+              "data_and_evaluation": "데이터·실험 설정", "key_findings": "주요 결과"}
+    by_id = {paper["arxiv_id"]: paper for paper in papers}
+    st.dataframe([{
+        "arXiv ID": paper["arxiv_id"], "논문 제목": by_id[paper["arxiv_id"]].get("title", ""),
+        **{labels[field]: paper[field]["text"] for field in labels},
+    } for paper in result["papers"]], hide_index=True, width="stretch")
+
+
+def show_paper_comparison(chatbot, response, index):
+    """이 답변에서 벡터 검색된 논문을 선택해 초록 기반 비교를 보여 줍니다."""
+    candidates = []
+    seen_ids = set()
+    for paper in response.get("papers", []):
+        paper_id = paper.get("arxiv_id")
+        title, abstract = paper.get("title"), paper.get("abstract")
+        if (
+            isinstance(paper_id, str)
+            and paper_id.strip()
+            and paper_id not in seen_ids
+            and isinstance(title, str)
+            and title.strip()
+            and isinstance(abstract, str)
+            and abstract.strip()
+        ):
+            candidates.append(paper)
+            seen_ids.add(paper_id)
+    if len(candidates) < 2:
+        if response.get("papers"):
+            st.info("논문 비교를 하려면 초록이 있는 검색 결과가 두 편 이상 필요합니다.")
+        return
+
+    st.markdown("#### 논문 비교")
+    st.caption("검색 결과의 제목과 초록만 비교합니다. 초록에서 확인할 수 없는 내용은 별도로 표시합니다.")
+    papers_by_id = {paper["arxiv_id"]: paper for paper in candidates}
+    selected_ids = st.multiselect(
+        "비교할 논문 (2~4편)",
+        options=list(papers_by_id),
+        format_func=lambda paper_id: f"{paper_id} · {papers_by_id[paper_id]['title']}",
+        max_selections=4,
+        key=f"paper-comparison-selection:{index}",
+    )
+    selected_papers = [papers_by_id[paper_id] for paper_id in selected_ids]
+    comparisons = st.session_state.setdefault("paper_comparisons", {})
+    errors = st.session_state.setdefault("paper_comparison_errors", {})
+    if st.button(
+        "선택한 논문 비교",
+        key=f"paper-comparison-run:{index}",
+        disabled=not 2 <= len(selected_papers) <= 4,
+    ):
+        comparisons.pop(index, None)
+        errors.pop(index, None)
+        try:
+            with st.spinner("초록을 바탕으로 논문을 비교하고 있습니다."):
+                result = chatbot.compare_papers(selected_papers)
+            result_data = result.model_dump() if hasattr(result, "model_dump") else result
+            if not isinstance(result_data, dict) or not isinstance(result_data.get("papers"), list):
+                raise ValueError("비교 결과 형식이 올바르지 않습니다.")
+            comparisons[index] = {
+                "selected_ids": list(selected_ids),
+                "result": result_data,
+            }
+        except Exception as exc:
+            errors[index] = {
+                "selected_ids": list(selected_ids),
+                "message": f"논문 비교를 완료하지 못했습니다 ({type(exc).__name__}). 선택을 확인하고 다시 시도해 주세요.",
+            }
+
+    error = errors.get(index)
+    if error and error["selected_ids"] == selected_ids:
+        st.error(error["message"])
+    stored = comparisons.get(index)
+    if not stored or stored["selected_ids"] != selected_ids:
+        return
+
+    labels = {
+        "research_question": "연구 질문",
+        "method": "방법",
+        "data_and_evaluation": "데이터·실험 설정",
+        "key_findings": "주요 결과",
+    }
+    rows = []
+    for paper in stored["result"]["papers"]:
+        source = papers_by_id[paper["arxiv_id"]]
+        rows.append({
+            "arXiv ID": paper["arxiv_id"],
+            "논문 제목": source["title"],
+            "arXiv 페이지": f"https://arxiv.org/abs/{quote(paper['arxiv_id'], safe='./')}",
+            **{labels[field]: paper[field]["text"] for field in labels},
+        })
+    st.dataframe(
+        rows,
+        hide_index=True,
+        width="stretch",
+        column_config={"arXiv 페이지": st.column_config.LinkColumn("arXiv 페이지")},
+    )
 
 
 def show_home(chatbot):
@@ -489,8 +702,13 @@ def main():
         with st.spinner("그래프와 검색 저장소를 준비하고 있습니다."):
             chatbot = load_chatbot()
     except Exception as exc:
-        st.error(f"준비 에러: {type(exc).__name__}. 저장소 루트의 .env 연결 정보와 "
-                 f"Aura 인스턴스 상태, 적재 노트북 실행 여부를 확인하세요.")
+        st.error(f"실시간 그래프 연결을 준비하지 못했습니다 ({type(exc).__name__}).")
+        st.info("Aura 인스턴스가 일시 중지됐거나 접속 정보·벡터 인덱스가 준비되지 않았을 수 있습니다. "
+                "APP_README.md의 연결 점검 절차를 확인한 뒤 다시 시도하세요.")
+        st.markdown("#### 데이터베이스 없이 보는 데모 화면")
+        st.caption("아래는 저장소에 포함된 화면 캡처입니다. 실시간 검색 결과가 아닙니다.")
+        st.image("data/home.jpg", caption="홈 화면: 지식 그래프 구조와 적재 현황")
+        st.link_button("앱 설정 및 오류 대응", "https://github.com/rndigkwk/arxiv_graph_RAG/blob/main/APP_README.md")
         st.stop()
 
     sidebar()
@@ -545,6 +763,11 @@ def clear_chat():
     st.session_state.history = []
     st.session_state.korean = {}
     st.session_state.pending = None
+    st.session_state.paper_comparisons = {}
+    st.session_state.paper_comparison_errors = {}
+    for key in list(st.session_state.keys()):
+        if isinstance(key, str) and key.startswith("paper-comparison-selection:"):
+            del st.session_state[key]
 
 
 def chat(chatbot):
@@ -559,6 +782,7 @@ def chat(chatbot):
         clear_chat()
     if st.button("대화 지우기"):
         clear_chat()
+    show_saved_papers(chatbot)
 
     messages_area = st.container()
     input_area = st.container()

@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-09-26T15:02:59.115749+00:00",
+  "mode": "agent",
+  "top_k": 5,
+  "dataset": "evals\\cases.json",
+  "results": [
+    {
+      "id": "title-01",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.28632",
+        "2505.15155",
+        "2607.12455",
+        "2602.07085",
+        "2606.29194"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "answer_correct": 1.0,
+      "citation_precision": 1.0,
+      "citation_recall": 1.0,
+      "evidence_ids": [
+        "2608.28632"
+      ],
+      "answer": "I found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.28632 | AutoScientist-Quant: Self-Evolving Coding Agents for Automatic Research in Quantitative Investment | cs.AI |\n\nPDF: https://arxiv.org/pdf/2608.28632\n\n### Related papers\nNo related papers were found in the stored citation network around this paper."
+    }
+  ],
+  "summary": {
+    "case_count": 1,
+    "hit_at_k": 1.0,
+    "recall_at_k": 1.0,
+    "reciprocal_rank": 1.0,
+    "answer_correct": 1.0,
+    "citation_precision": 1.0,
+    "citation_recall": 1.0
+  }
+}

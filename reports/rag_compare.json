@@ -1,0 +1,1981 @@
+{
+  "generated_at": "2026-09-26T15:52:07.258979+00:00",
+  "mode": "compare",
+  "top_k": 5,
+  "dataset": "evals\\cases.json",
+  "results": [
+    {
+      "id": "topic-graph-neural-network",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-graph-neural-network",
+        "category": "topic",
+        "retrieved_ids": [
+          "2011.11288",
+          "1812.08434",
+          "1904.07785",
+          "1901.00596",
+          "1911.06455"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.009523809523809525,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.8,
+        "citation_recall": 0.009523809523809525,
+        "evidence_ids": [
+          "2011.11288",
+          "1812.08434",
+          "1904.07785",
+          "1901.00596",
+          "1911.06455"
+        ],
+        "answer": "Relevant arXiv papers about graph neural networks include:\n- 2011.11288 — *AutoGraph: Automated Graph Neural Network*\n- 1812.08434 — *Graph Neural Networks: A Review of Methods and Applications*\n- 1904.07785 — *Graph Wavelet Neural Network*\n- 1901.00596 — *A Comprehensive Survey on Graph Neural Networks*\n- 1911.06455 — *Graph Transformer Networks*",
+        "elapsed_seconds": 3.9897252999944612,
+        "chat_input_tokens": 1308,
+        "chat_output_tokens": 182
+      },
+      "graph_rag": {
+        "id": "topic-graph-neural-network",
+        "category": "topic",
+        "retrieved_ids": [
+          "2011.11288",
+          "1812.08434",
+          "1904.07785",
+          "1901.00596",
+          "1911.06455",
+          "2607.07984",
+          "2607.07422",
+          "2403.09742",
+          "2608.09921",
+          "2507.21873"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.009523809523809525,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.6,
+        "citation_recall": 0.014285714285714285,
+        "evidence_ids": [
+          "2011.11288",
+          "1812.08434",
+          "1904.07785",
+          "1901.00596",
+          "1911.06455",
+          "2607.07984",
+          "2607.07422",
+          "2403.09742",
+          "2608.09921",
+          "2507.21873"
+        ],
+        "answer": "Here are several arXiv papers about graph neural networks:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2011.11288 | AutoGraph: Automated Graph Neural Network | cs.LG |\n| 1812.08434 | Graph Neural Networks: A Review of Methods and Applications | cs.LG |\n| 1904.07785 | Graph Wavelet Neural Network | cs.LG |\n| 1901.00596 | A Comprehensive Survey on Graph Neural Networks | cs.LG |\n| 1911.06455 | Graph Transformer Networks | cs.LG |\n\n### Related papers\nThese are papers ranked by proximity in the stored citation network around the first three results, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2607.07984 | Agentic Neural Architecture Search | cs.AI |\n| 2607.07422 | InductWave: Inductive Multi-Hop Logical Query Answering on Knowledge Graphs | cs.AI |\n| 2403.09742 | A short review on the maximum clique problem algorithms with classical, AI, and quantum methods | cs.AI |\n| 2608.09921 | GENCO - A Unified Neural Solver Embedded in a Development Framework for Steady-State Grid Analysis | cs.AI |\n| 2507.21873 | A Neuro-Symbolic Approach for Probabilistic Reasoning on Graph Data | cs.AI |",
+        "elapsed_seconds": 25.596993900020607,
+        "chat_input_tokens": 9579,
+        "chat_output_tokens": 638
+      }
+    },
+    {
+      "id": "topic-retrieval-augmented-generation",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-retrieval-augmented-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2506.00054",
+          "2305.15294",
+          "2402.19473",
+          "2005.11401",
+          "2407.13193"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0057553956834532375,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.8,
+        "citation_recall": 0.0057553956834532375,
+        "evidence_ids": [
+          "2506.00054",
+          "2305.15294",
+          "2402.19473",
+          "2005.11401",
+          "2407.13193"
+        ],
+        "answer": "Relevant arXiv papers about retrieval-augmented generation include:\n- 2506.00054 — “Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers”\n- 2305.15294 — “Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy”\n- 2402.19473 — “Retrieval-Augmented Generation for AI-Generated Content: A Survey”\n- 2005.11401 — “Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks”\n- 2407.13193 — “Retrieval-Augmented Generation for Natural Language Processing: A Survey”",
+        "elapsed_seconds": 3.1430234001018107,
+        "chat_input_tokens": 1661,
+        "chat_output_tokens": 239
+      },
+      "graph_rag": {
+        "id": "topic-retrieval-augmented-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2404.13781",
+          "2405.07437",
+          "2506.00054",
+          "2309.15217",
+          "2507.18910",
+          "2608.11238",
+          "2609.07152",
+          "2004.04906",
+          "2210.03629",
+          "2005.11401"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0057553956834532375,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.6,
+        "citation_recall": 0.008633093525179856,
+        "evidence_ids": [
+          "2506.00054",
+          "2507.18910",
+          "2405.07437",
+          "2404.13781",
+          "2309.15217",
+          "2005.11401",
+          "2004.04906",
+          "2210.03629",
+          "2608.11238",
+          "2609.07152"
+        ],
+        "answer": "Here are several arXiv papers about retrieval-augmented generation (RAG), covering core methods, surveys, and evaluation.\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2506.00054 | Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers | cs.IR |\n| 2507.18910 | A Systematic Review of Key Retrieval-Augmented Generation (RAG) Systems: Progress, Gaps, and Future Directions | cs.CL |\n| 2405.07437 | Evaluation of Retrieval-Augmented Generation: A Survey | cs.CL |\n| 2404.13781 | Evaluating Retrieval Quality in Retrieval-Augmented Generation | cs.CL |\n| 2309.15217 | Ragas: Automated Evaluation of Retrieval Augmented Generation | cs.CL |\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the retrieved papers, not by overall popularity.\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2005.11401 | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks | cs.CL |\n| 2004.04906 | Dense Passage Retrieval for Open-Domain Question Answering | cs.CL |\n| 2210.03629 | ReAct: Synergizing Reasoning and Acting in Language Models | cs.CL |\n| 2608.11238 | Towards Query-Agnostic RAG Evaluation via Query Coverage and Claim Verifiability | cs.AI |\n| 2609.07152 | An Auditable Symbolic-RAG-Generative AI Architecture for Goal-Oriented Conversation Orchestration | cs.AI |",
+        "elapsed_seconds": 9.575683400034904,
+        "chat_input_tokens": 9876,
+        "chat_output_tokens": 727
+      }
+    },
+    {
+      "id": "topic-diffusion-model",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-diffusion-model",
+        "category": "topic",
+        "retrieved_ids": [
+          "2609.13047",
+          "2211.15089",
+          "2410.17891",
+          "2208.11970",
+          "2409.15816"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.006925207756232687,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 1.0,
+        "citation_recall": 0.006925207756232687,
+        "evidence_ids": [
+          "2609.13047",
+          "2211.15089",
+          "2410.17891",
+          "2208.11970",
+          "2409.15816"
+        ],
+        "answer": "Relevant papers about diffusion models include:\n- arXiv:2609.13047 — “Diffusion Models and Concept Formation”\n- arXiv:2211.15089 — “Continuous diffusion for categorical data”\n- arXiv:2410.17891 — “Scaling Diffusion Language Models via Adaptation from Autoregressive Models”\n- arXiv:2208.11970 — “Understanding Diffusion Models: A Unified Perspective”\n- arXiv:2409.15816 — “Diffusion Models for Intelligent Transportation Systems: A Survey”",
+        "elapsed_seconds": 3.529145000036806,
+        "chat_input_tokens": 1399,
+        "chat_output_tokens": 226
+      },
+      "graph_rag": {
+        "id": "topic-diffusion-model",
+        "category": "topic",
+        "retrieved_ids": [
+          "2404.07771",
+          "2209.00796",
+          "2208.11970",
+          "2302.07194",
+          "2212.09462",
+          "2602.05533",
+          "2609.00885",
+          "2609.07316",
+          "2411.10431",
+          "1706.03762"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.006925207756232687,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.8,
+        "citation_recall": 0.0110803324099723,
+        "evidence_ids": [
+          "2404.07771",
+          "2209.00796",
+          "2208.11970",
+          "2302.07194",
+          "2212.09462",
+          "2602.05533",
+          "2609.00885",
+          "2609.07316",
+          "2411.10431",
+          "1706.03762"
+        ],
+        "answer": "Here are several arXiv papers about diffusion models:\n\n| arXiv ID | Title | Primary category | Relevance |\n|---|---|---|---|\n| 2404.07771 | An Overview of Diffusion Models: Applications, Guided Generation, Statistical Rates and Optimization | cs.LG | Survey of applications, theory, guided generation, and optimization |\n| 2209.00796 | Diffusion Models: A Comprehensive Survey of Methods and Applications | cs.LG | Comprehensive survey covering methods, sampling, likelihood estimation, and applications |\n| 2208.11970 | Understanding Diffusion Models: A Unified Perspective | cs.LG | Unified explanation of variational and score-based diffusion models |\n| 2302.07194 | Score Approximation, Estimation and Distribution Recovery of Diffusion Models on Low-Dimensional Data | cs.LG | Theoretical analysis of score estimation and distribution recovery |\n| 2212.09462 | Latent Diffusion for Language Generation | cs.CL | Application of diffusion models to language generation in latent space |\n\n### Related papers\nThe following papers are ranked by proximity in the stored citation network around the papers above, not by overall popularity:\n\n- **2602.05533** — *Conditional Diffusion Guidance under Hard Constraint: A Stochastic Analysis Approach*\n- **2609.00885** — *Denoising Diffusion Generative Models Secretly Calculate Attentions*\n- **2609.07316** — *DGCPath: Distribution-Aware Generative Contrastive Framework for Self-supervised Path Representation Learning -- Extended Version*\n- **2411.10431** — *Diffusion Model-based Parameter Estimation in Dynamic Power Systems*\n- **1706.03762** — *Attention Is All You Need*",
+        "elapsed_seconds": 9.458894400042482,
+        "chat_input_tokens": 9499,
+        "chat_output_tokens": 677
+      }
+    },
+    {
+      "id": "topic-reinforcement-learning",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-reinforcement-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1611.05763",
+          "2002.12636",
+          "1611.08944",
+          "2405.10369",
+          "2509.01684"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0011956001912960307,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 1.0,
+        "citation_recall": 0.0011956001912960307,
+        "evidence_ids": [
+          "1611.05763",
+          "2002.12636",
+          "1611.08944",
+          "2405.10369",
+          "2509.01684"
+        ],
+        "answer": "The retrieved papers about reinforcement learning are arXiv:1611.05763, arXiv:2002.12636, arXiv:1611.08944, arXiv:2405.10369, and arXiv:2509.01684.",
+        "elapsed_seconds": 2.0148499000351876,
+        "chat_input_tokens": 1410,
+        "chat_output_tokens": 105
+      },
+      "graph_rag": {
+        "id": "topic-reinforcement-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1611.05763",
+          "2002.12636",
+          "1611.08944",
+          "2405.10369",
+          "2509.01684",
+          "2602.23242",
+          "2607.16981",
+          "2603.18272",
+          "2603.27611",
+          "2606.04935"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0011956001912960307,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.6,
+        "citation_recall": 0.0014347202295552368,
+        "evidence_ids": [
+          "1611.05763",
+          "2002.12636",
+          "1611.08944",
+          "2405.10369",
+          "2509.01684",
+          "2602.23242",
+          "2607.16981",
+          "2603.18272",
+          "2603.27611",
+          "2606.04935"
+        ],
+        "answer": "Here are several arXiv papers about reinforcement learning found by semantic search:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 1611.05763 | Learning to reinforcement learn | cs.LG |\n| 2002.12636 | Reinforcement Learning through Active Inference | cs.LG |\n| 1611.08944 | Nonparametric General Reinforcement Learning | cs.AI |\n| 2405.10369 | Reinforcement learning | astro-ph.IM |\n| 2509.01684 | Reinforcement Learning for Machine Learning Engineering Agents | cs.LG |\n\n### Related papers\n\nThese were ranked from the stored citation network around the first three papers, rather than by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2602.23242 | A Model-Free Universal AI | cs.AI |\n| 2607.16981 | Expected Free Energy as Belief-Dependent Utility for rho-POMDPs | cs.AI |\n| 2603.18272 | Retrieval-Augmented LLM Agents: Learning to Learn from Experience | cs.AI |\n| 2603.27611 | What Does a System Modify When It Modifies Itself? | cs.AI |\n| 2606.04935 | What Type of Inference is Active Inference? | cs.AI |",
+        "elapsed_seconds": 9.392021999927238,
+        "chat_input_tokens": 9761,
+        "chat_output_tokens": 621
+      }
+    },
+    {
+      "id": "topic-multimodal",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-multimodal",
+        "category": "topic",
+        "retrieved_ids": [
+          "2301.04856",
+          "1705.09406",
+          "2203.15332",
+          "2106.04538",
+          "2004.04917"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0013831258644536654,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.8,
+        "citation_recall": 0.0013831258644536654,
+        "evidence_ids": [
+          "2301.04856",
+          "1705.09406",
+          "2203.15332",
+          "2106.04538",
+          "2004.04917"
+        ],
+        "answer": "Relevant arXiv papers about multimodal learning include:\n- 2301.04856 — *Multimodal Deep Learning*\n- 1705.09406 — *Multimodal Machine Learning: A Survey and Taxonomy*\n- 2203.15332 — *Balanced Multimodal Learning via On-the-fly Gradient Modulation*\n- 2106.04538 — *What Makes Multi-modal Learning Better than Single (Provably)*\n- 2004.04917 — *Multimodal Categorization of Crisis Events in Social Media*",
+        "elapsed_seconds": 2.67173299996648,
+        "chat_input_tokens": 1347,
+        "chat_output_tokens": 213
+      },
+      "graph_rag": {
+        "id": "topic-multimodal",
+        "category": "topic",
+        "retrieved_ids": [
+          "1705.09406",
+          "2209.03430",
+          "2301.04856",
+          "2312.06647",
+          "2511.22826",
+          "2608.02238",
+          "2602.10635",
+          "2609.07409",
+          "2609.11607",
+          "2608.18110"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0017289073305670815,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.6,
+        "citation_recall": 0.002074688796680498,
+        "evidence_ids": [
+          "1705.09406",
+          "2209.03430",
+          "2301.04856",
+          "2312.06647",
+          "2511.22826",
+          "2608.02238",
+          "2602.10635",
+          "2609.07409",
+          "2609.11607",
+          "2608.18110"
+        ],
+        "answer": "Here are several arXiv papers about multimodal machine learning:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 1705.09406 | Multimodal Machine Learning: A Survey and Taxonomy | cs.LG |\n| 2209.03430 | Foundations and Trends in Multimodal Machine Learning: Principles, Challenges, and Open Questions | cs.LG |\n| 2301.04856 | Multimodal Deep Learning | cs.CL |\n| 2312.06647 | 4M: Massively Multimodal Masked Modeling | cs.CV |\n| 2511.22826 | Some Modalities are More Equal Than Others: Decoding and Architecting Multimodal Integration in MLLMs | cs.CV |\n\n**Related papers** — ranked using the stored citation network around the papers above, rather than overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.02238 | Trustworthy AI in Digital Health: A Comprehensive Review of Robustness and Explainability | cs.AI |\n| 2602.10635 | OmniSapiens: A Foundation Model for Social Behavior Processing via Heterogeneity-Aware Relative Policy Optimization | cs.AI |\n| 2609.07409 | RAFM-SER++: A Lightweight Multimodal Emotion Recognition Framework for Real-Time Behavioral Monitoring in Surveillance Systems | cs.AI |\n| 2609.11607 | Making Alternative Data Work: Context-Augmented LLMs for Financial Forecasting | cs.AI |\n| 2608.18110 | Emergence of Agentic AI: A Review on Evolution, Background, Working Principles, Applications, Adoption Factors, and Future Research Directions | cs.AI |",
+        "elapsed_seconds": 10.237136799958535,
+        "chat_input_tokens": 9866,
+        "chat_output_tokens": 722
+      }
+    },
+    {
+      "id": "topic-knowledge-graph",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-knowledge-graph",
+        "category": "topic",
+        "retrieved_ids": [
+          "2003.02320",
+          "2303.13948",
+          "2308.14217",
+          "2605.22093",
+          "2002.00388"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.006426735218508998,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 1.0,
+        "citation_recall": 0.006426735218508998,
+        "evidence_ids": [
+          "2003.02320",
+          "2002.00388",
+          "2303.13948",
+          "2308.14217",
+          "2605.22093"
+        ],
+        "answer": "Relevant arXiv papers about knowledge graphs include: “Knowledge Graphs” (2003.02320), “A Survey on Knowledge Graphs: Representation, Acquisition and Applications” (2002.00388), “Knowledge Graphs: Opportunities and Challenges” (2303.13948), “Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact” (2308.14217), and “Knowledge Graph Re-engineering Along the Ontological Continuum” (2605.22093).",
+        "elapsed_seconds": 3.211597500019707,
+        "chat_input_tokens": 1324,
+        "chat_output_tokens": 188
+      },
+      "graph_rag": {
+        "id": "topic-knowledge-graph",
+        "category": "topic",
+        "retrieved_ids": [
+          "2003.02320",
+          "2303.13948",
+          "2308.14217",
+          "2605.22093",
+          "2002.00388",
+          "2606.28076",
+          "2505.12369",
+          "2506.04571",
+          "2412.10390",
+          "2607.07422"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.006426735218508998,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 1.0,
+        "citation_recall": 0.010282776349614395,
+        "evidence_ids": [
+          "2003.02320",
+          "2303.13948",
+          "2308.14217",
+          "2605.22093",
+          "2002.00388",
+          "2606.28076",
+          "2505.12369",
+          "2506.04571"
+        ],
+        "answer": "Here are several arXiv papers about knowledge graphs, including surveys, overviews, and recent research:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2003.02320 | Knowledge Graphs | cs.AI |\n| 2303.13948 | Knowledge Graphs: Opportunities and Challenges | cs.AI |\n| 2308.14217 | Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact | cs.DB |\n| 2605.22093 | Knowledge Graph Re-engineering Along the Ontological Continuum (extended version) | cs.AI |\n| 2002.00388 | A Survey on Knowledge Graphs: Representation, Acquisition and Applications | cs.CL |\n\n### Related papers\nThese were identified by ranking the stored citation-network neighborhood around the first three papers, rather than by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.28076 | Ontology-Guided Evidence Path Inference for Multi-hop Knowledge Graph Question Answering | cs.AI |\n| 2505.12369 | Fully Geometric Multi-Hop Reasoning on Knowledge Graphs with Transitive Relations | cs.AI |\n| 2506.04571 | OpenAg: Democratizing Agricultural Intelligence | cs.AI |",
+        "elapsed_seconds": 9.833633800037205,
+        "chat_input_tokens": 9545,
+        "chat_output_tokens": 564
+      }
+    },
+    {
+      "id": "topic-code-generation",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-code-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2203.13474",
+          "2603.29088",
+          "2405.20092",
+          "2412.07822",
+          "2407.16237"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.007062146892655367,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 1.0,
+        "citation_recall": 0.007062146892655367,
+        "evidence_ids": [
+          "2203.13474",
+          "2603.29088",
+          "2405.20092",
+          "2412.07822",
+          "2407.16237"
+        ],
+        "answer": "Relevant arXiv papers about code generation include:\n- 2203.13474 — CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis\n- 2603.29088 — WybeCoder: Verified Imperative Code Generation\n- 2405.20092 — Divide-and-Conquer Meets Consensus: Unleashing the Power of Functions in Code Generation\n- 2412.07822 — MAGE: A Multi-Agent Engine for Automated RTL Code Generation\n- 2407.16237 — OriGen: Enhancing RTL Code Generation with Code-to-Code Augmentation and Self-Reflection",
+        "elapsed_seconds": 2.8228634000988677,
+        "chat_input_tokens": 1576,
+        "chat_output_tokens": 226
+      },
+      "graph_rag": {
+        "id": "topic-code-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2203.13474",
+          "2305.12050",
+          "2201.11227",
+          "2406.00515",
+          "2403.03997",
+          "2607.16845",
+          "2606.24414",
+          "2607.17917",
+          "2607.18961",
+          "2606.26173"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.005649717514124294,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.5,
+        "citation_recall": 0.007062146892655367,
+        "evidence_ids": [
+          "2203.13474",
+          "2305.12050",
+          "2201.11227",
+          "2406.00515",
+          "2403.03997",
+          "2607.16845",
+          "2606.24414",
+          "2607.17917",
+          "2607.18961",
+          "2606.26173"
+        ],
+        "answer": "Here are several arXiv papers about code generation:\n\n| arXiv ID | Title | Primary category | Focus |\n|---|---|---|---|\n| 2203.13474 | CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis | cs.LG | Open large language models for program synthesis and zero-shot Python code generation |\n| 2305.12050 | AI-assisted Code Authoring at Scale: Fine-tuning, deploying, and mixed methods evaluation | cs.SE | Large-scale AI-assisted code authoring and code completion in industry |\n| 2201.11227 | Synchromesh: Reliable code generation from pre-trained language models | cs.LG | Constrained and reliable code generation from natural-language specifications |\n| 2406.00515 | A Survey on Large Language Models for Code Generation | cs.CL | Survey of Code LLMs, benchmarks, applications, and research challenges |\n| 2403.03997 | Guiding Enumerative Program Synthesis with Large Language Models | cs.AI | Combining LLM guidance with enumerative formal program synthesis |\n\n### Related papers\nThe following papers were ranked using the stored citation network around the first three papers—not by overall popularity:\n\n| arXiv ID | Title | Primary category | Focus |\n|---|---|---|---|\n| 2607.16845 | From Overload to Insights: How AI Agents Can Support Scientists in Analyzing Complex Data | cs.AI | AI agents for scientific data analysis |\n| 2606.24414 | Cycle-Consistent Neural Explanation of Formal Verification Certificates | cs.AI | Neural explanations for formal verification certificates |\n| 2607.17917 | PEARL: Auditable Repair for Scientific Reasoning Graph Extraction | cs.AI | Auditable repair of extracted scientific reasoning graphs |\n| 2607.18961 | From Dependency to Compositionality: A Neurosymbolic Lifting of LLM Outputs via Combinatory Categorial Grammar | cs.AI | Neurosymbolic processing of LLM outputs |\n| 2606.26173 | AlgoEvolve: LLM-driven Meta-evolution of Algorithmic Trading Programs | cs.AI | LLM-driven generation and evolution of trading programs |",
+        "elapsed_seconds": 9.803884000051767,
+        "chat_input_tokens": 10425,
+        "chat_output_tokens": 806
+      }
+    },
+    {
+      "id": "topic-medical-imaging",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-medical-imaging",
+        "category": "topic",
+        "retrieved_ids": [
+          "2103.01938",
+          "2609.07719",
+          "1612.07003",
+          "2204.13258",
+          "1901.07042"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.029411764705882353,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.6,
+        "citation_recall": 0.029411764705882353,
+        "evidence_ids": [
+          "2103.01938",
+          "2609.07719",
+          "1612.07003",
+          "2204.13258",
+          "1901.07042"
+        ],
+        "answer": "Relevant papers about medical imaging include:\n- 2103.01938 — *Medical Imaging and Machine Learning*\n- 2609.07719 — *A radiographic world model for clinical reasoning and evidence generation*\n- 1612.07003 — *Image biomarker standardisation initiative*\n- 2204.13258 — *Cross-modal Memory Networks for Radiology Report Generation*\n- 1901.07042 — *MIMIC-CXR-JPG, a large publicly available database of labeled chest radiographs*",
+        "elapsed_seconds": 3.0273389000212774,
+        "chat_input_tokens": 1434,
+        "chat_output_tokens": 203
+      },
+      "graph_rag": {
+        "id": "topic-medical-imaging",
+        "category": "topic",
+        "retrieved_ids": [
+          "2103.01938",
+          "2609.07719",
+          "1612.07003",
+          "2204.13258",
+          "1901.07042",
+          "2608.30912",
+          "2606.26494",
+          "2607.27235",
+          "2212.13138",
+          "2210.03629"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.029411764705882353,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.3,
+        "citation_recall": 0.029411764705882353,
+        "evidence_ids": [
+          "2103.01938",
+          "2609.07719",
+          "1612.07003",
+          "2204.13258",
+          "1901.07042",
+          "2608.30912",
+          "2606.26494",
+          "2607.27235",
+          "2212.13138",
+          "2210.03629"
+        ],
+        "answer": "Here are several arXiv papers about medical imaging:\n\n| arXiv ID | Title | Primary category | Relevance |\n|---|---|---|---|\n| 2103.01938 | Medical Imaging and Machine Learning | eess.IV | Reviews machine learning challenges and clinical applications in medical imaging. |\n| 2609.07719 | A radiographic world model for clinical reasoning and evidence generation | cs.AI | Introduces a radiographic world model for diagnosis and evidence generation. |\n| 1612.07003 | Image biomarker standardisation initiative | cs.CV | Addresses standardization and reproducibility of quantitative image biomarkers. |\n| 2204.13258 | Cross-modal Memory Networks for Radiology Report Generation | cs.CL | Uses image-text alignment to generate radiology reports. |\n| 1901.07042 | MIMIC-CXR-JPG, a large publicly available database of labeled chest radiographs | cs.CV | Describes a large labeled chest-radiograph dataset for medical computer vision. |\n\n### Related papers\n\nThe following papers are highly related according to the stored citation network around the papers above, rather than overall popularity:\n\n| arXiv ID | Title | Primary category | Relevance |\n|---|---|---|---|\n| 2608.30912 | Responsible Integration of AI in Cancer Genomics: Barriers, Risks, and Pathways to Trustworthy Clinical Translation | cs.AI | Related to trustworthy clinical translation of AI. |\n| 2606.26494 | Clinical Harness for Governable Medical AI Skill Ecosystems | cs.AI | Related to governance and deployment of medical AI. |\n| 2607.27235 | RadHarmony: Radiological Data Handling in the Era of Agentic AI | cs.AI | Related to radiological data handling and AI. |\n| 2212.13138 | Large Language Models Encode Clinical Knowledge | cs.CL | Related to language models and clinical knowledge. |\n| 2210.03629 | ReAct: Synergizing Reasoning and Acting in Language Models | cs.CL | Related to reasoning and acting in language models.",
+        "elapsed_seconds": 10.22528080001939,
+        "chat_input_tokens": 9830,
+        "chat_output_tokens": 790
+      }
+    },
+    {
+      "id": "topic-federated-learning",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-federated-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1908.07873",
+          "1602.05629",
+          "1912.04977",
+          "1806.00582",
+          "2002.06440"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.02262443438914027,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 1.0,
+        "citation_recall": 0.02262443438914027,
+        "evidence_ids": [
+          "1908.07873",
+          "1602.05629",
+          "1912.04977",
+          "1806.00582",
+          "2002.06440"
+        ],
+        "answer": "The retrieved papers about federated learning are 1908.07873, 1602.05629, 1912.04977, 1806.00582, and 2002.06440.",
+        "elapsed_seconds": 2.206707200035453,
+        "chat_input_tokens": 1110,
+        "chat_output_tokens": 91
+      },
+      "graph_rag": {
+        "id": "topic-federated-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1908.07873",
+          "1602.05629",
+          "1912.04977",
+          "1806.00582",
+          "2002.06440",
+          "2608.07007",
+          "2402.02885",
+          "2608.06112",
+          "2409.06067",
+          "2608.15311"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.02262443438914027,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.9,
+        "citation_recall": 0.04072398190045249,
+        "evidence_ids": [
+          "1908.07873",
+          "1602.05629",
+          "1912.04977",
+          "1806.00582",
+          "2002.06440",
+          "2608.07007",
+          "2402.02885",
+          "2608.06112",
+          "2409.06067",
+          "2608.15311"
+        ],
+        "answer": "Here are several arXiv papers about federated learning:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [1908.07873](https://arxiv.org/abs/1908.07873) | Federated Learning: Challenges, Methods, and Future Directions | cs.LG |\n| [1602.05629](https://arxiv.org/abs/1602.05629) | Communication-Efficient Learning of Deep Networks from Decentralized Data | cs.LG |\n| [1912.04977](https://arxiv.org/abs/1912.04977) | Advances and Open Problems in Federated Learning | cs.LG |\n| [1806.00582](https://arxiv.org/abs/1806.00582) | Federated Learning with Non-IID Data | cs.LG |\n| [2002.06440](https://arxiv.org/abs/2002.06440) | Federated Learning with Matched Averaging | cs.LG |\n\n### Related papers\n\nThese papers were ranked using the stored citation network around the first three papers, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2608.07007](https://arxiv.org/abs/2608.07007) | FedLBW: A Loss-Based Weighting Strategy for Federated Learning on Non-IID Data in Wireless Networks | cs.AI |\n| [2402.02885](https://arxiv.org/abs/2402.02885) | A Review on Building Blocks of Decentralized Artificial Intelligence | cs.AI |\n| [2608.06112](https://arxiv.org/abs/2608.06112) | From Siloed Algorithms to Compliance-First Agentic Platforms: A Multi-Layered Architecture for Hospital AI Systems | cs.AI |\n| [2409.06067](https://arxiv.org/abs/2409.06067) | MLLM-LLaVA-FL: Multimodal Large Language Model Assisted Federated Learning | cs.AI |\n| [2608.15311](https://arxiv.org/abs/2608.15311) | MoE Router-Guided Clustering for Heterogeneous Federated Instruction Tuning | cs.AI |",
+        "elapsed_seconds": 9.098281199927442,
+        "chat_input_tokens": 9210,
+        "chat_output_tokens": 795
+      }
+    },
+    {
+      "id": "topic-AI-agents",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-AI-agents",
+        "category": "topic",
+        "retrieved_ids": [
+          "2502.18359",
+          "2505.10468",
+          "2503.12687",
+          "2601.01743",
+          "2506.15741"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.004459308807134894,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "citation_precision": 0.8,
+        "citation_recall": 0.004459308807134894,
+        "evidence_ids": [
+          "2502.18359",
+          "2505.10468",
+          "2503.12687",
+          "2601.01743",
+          "2506.15741"
+        ],
+        "answer": "Relevant arXiv papers about AI agents include:\n- **2502.18359** — *Responsible AI Agents*\n- **2505.10468** — *AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges*\n- **2503.12687** — *AI Agents: Evolution, Architecture, and Real-World Applications*\n- **2601.01743** — *AI Agent Systems: Architectures, Applications, and Evaluation*\n- **2506.15741** — *OAgents: An Empirical Study of Building Effective Agents*",
+        "elapsed_seconds": 3.353952100034803,
+        "chat_input_tokens": 1531,
+        "chat_output_tokens": 234
+      },
+      "graph_rag": {
+        "id": "topic-AI-agents",
+        "category": "topic",
+        "retrieved_ids": [
+          "2503.23037",
+          "2505.10468",
+          "2601.01743",
+          "2609.04894",
+          "2508.10146",
+          "2608.27044",
+          "2609.11018",
+          "2607.25076",
+          "2608.30685",
+          "2607.16845"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.002229654403567447,
+        "reciprocal_rank": 0.5,
+        "answer_correct": null,
+        "citation_precision": 0.4,
+        "citation_recall": 0.004459308807134894,
+        "evidence_ids": [
+          "2503.23037",
+          "2505.10468",
+          "2601.01743",
+          "2609.04894",
+          "2508.10146",
+          "2608.27044",
+          "2609.11018",
+          "2607.25076",
+          "2608.30685",
+          "2607.16845"
+        ],
+        "answer": "Here are several arXiv papers about AI agents:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2503.23037](https://arxiv.org/abs/2503.23037) | Agentic Large Language Models, a survey | cs.AI |\n| [2505.10468](https://arxiv.org/abs/2505.10468) | AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges | cs.AI |\n| [2601.01743](https://arxiv.org/abs/2601.01743) | AI Agent Systems: Architectures, Applications, and Evaluation | cs.AI |\n| [2609.04894](https://arxiv.org/abs/2609.04894) | From Language Models to World-Acting Systems: Progress and Limits of Agentic AI across Digital, Social, Virtual, and Physical Environments | cs.AI |\n| [2508.10146](https://arxiv.org/abs/2508.10146) | Agentic AI Frameworks: Architectures, Protocols, and Design Challenges | cs.AI |\n\nThe papers cover agentic LLMs, reasoning and tool use, multi-agent collaboration, agent architectures and evaluation, real-world action, and interoperability protocols.\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the papers above, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2608.27044](https://arxiv.org/abs/2608.27044) | Omni-Interactive Universal Embedder | cs.AI |\n| [2609.11018](https://arxiv.org/abs/2609.11018) | Defining AI Agents: A Compendium of Criteria, Metrics, and Benchmarks | cs.AI |\n| [2607.25076](https://arxiv.org/abs/2607.25076) | Towards an Agent Operating System - Lessons from Classical and Cloud OS | cs.AI |\n| [2608.30685](https://arxiv.org/abs/2608.30685) | ATLAS: Dual-Horizon Diagnostic Evaluation for Industrial Tool-Use Agents | cs.AI |\n| [2607.16845](https://arxiv.org/abs/2607.16845) | From Overload to Insights: How AI Agents Can Support Scientists in Analyzing Complex Data | cs.AI |",
+        "elapsed_seconds": 10.95246409997344,
+        "chat_input_tokens": 10400,
+        "chat_output_tokens": 904
+      }
+    },
+    {
+      "id": "title-01",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-01",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.28632",
+          "2505.15155",
+          "2602.07085",
+          "2607.12455",
+          "2605.28655"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.28632"
+        ],
+        "answer": "The paper is **“AutoScientist-Quant: Self-Evolving Coding Agents for Automatic Research in Quantitative Investment”** (arXiv: **2608.28632**).",
+        "elapsed_seconds": 1.8805055000120774,
+        "chat_input_tokens": 1702,
+        "chat_output_tokens": 62
+      },
+      "graph_rag": {
+        "id": "title-01",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.28632",
+          "2505.15155",
+          "2602.07085",
+          "2607.12455",
+          "2605.28655"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.28632"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2608.28632](https://arxiv.org/abs/2608.28632) | AutoScientist-Quant: Self-Evolving Coding Agents for Automatic Research in Quantitative Investment | cs.AI |\n\nThe stored citation network contains no related papers for this seed.",
+        "elapsed_seconds": 5.678954900009558,
+        "chat_input_tokens": 9901,
+        "chat_output_tokens": 255
+      }
+    },
+    {
+      "id": "title-02",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-02",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.12177",
+          "2601.16965",
+          "2510.18318",
+          "2512.24504",
+          "2606.08952"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2607.12177"
+        ],
+        "answer": "The paper is arXiv:2607.12177, titled “The Emerging Paradigm of Geospatial Foundation Models: From Pre-Training to Agentic Reasoning.”",
+        "elapsed_seconds": 2.182691799942404,
+        "chat_input_tokens": 1605,
+        "chat_output_tokens": 89
+      },
+      "graph_rag": {
+        "id": "title-02",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.12177",
+          "2601.16965",
+          "2510.18318",
+          "2512.24504",
+          "2606.08952",
+          "2103.00020",
+          "2010.11929",
+          "2106.09685",
+          "2111.06377"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.25,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2607.12177",
+          "2103.00020",
+          "2010.11929",
+          "2106.09685"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2607.12177](https://arxiv.org/pdf/2607.12177) | The Emerging Paradigm of Geospatial Foundation Models: From Pre-Training to Agentic Reasoning | cs.AI |\n\nThe paper discusses geospatial foundation models, their pre-training and adaptation strategies, operational considerations, and the future of agentic geospatial reasoning.\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the paper, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2103.00020 | Learning Transferable Visual Models From Natural Language Supervision | cs.CV |\n| 2010.11929 | An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale | cs.CV |\n| 2106.09685 | LoRA: Low-Rank Adaptation of Large Language Models | cs.CL |",
+        "elapsed_seconds": 9.55780860001687,
+        "chat_input_tokens": 10268,
+        "chat_output_tokens": 634
+      }
+    },
+    {
+      "id": "title-03",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-03",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.21610",
+          "2602.23978",
+          "2608.29951",
+          "2510.27419",
+          "2606.24467"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.21610"
+        ],
+        "answer": "The paper is **“Semantic Compression Trees: Multi-Resolution Knowledge Retrieval via Hierarchical Semantic Residuals”** (arXiv:2608.21610).",
+        "elapsed_seconds": 1.6403410999337211,
+        "chat_input_tokens": 1742,
+        "chat_output_tokens": 58
+      },
+      "graph_rag": {
+        "id": "title-03",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.21610",
+          "2602.23978",
+          "2608.29951",
+          "2603.21024",
+          "2607.06523"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.21610"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.21610 | Semantic Compression Trees: Multi-Resolution Knowledge Retrieval via Hierarchical Semantic Residuals | cs.AI |\n\nThe paper introduces Semantic Compression Trees, a hierarchical retrieval index based on storing semantic residuals at each node. Its reported results find that residual representations are useful, while top-down progressive routing is not supported by the experiments.\n\n### Related papers\nNo related papers were found in the stored citation network around this paper.",
+        "elapsed_seconds": 5.783694099984132,
+        "chat_input_tokens": 9694,
+        "chat_output_tokens": 287
+      }
+    },
+    {
+      "id": "title-04",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-04",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.18068",
+          "2501.13946",
+          "2608.07627",
+          "2608.07651",
+          "2607.08038"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2606.18068"
+        ],
+        "answer": "The paper is arXiv:2606.18068, titled “Agentic AI-based Framework for Mitigating Premature Diagnostic Handoff and Silent Hallucination in Healthcare Applications.”",
+        "elapsed_seconds": 1.9798560000490397,
+        "chat_input_tokens": 2192,
+        "chat_output_tokens": 62
+      },
+      "graph_rag": {
+        "id": "title-04",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.18068",
+          "2501.13946",
+          "2608.07627",
+          "2608.07651",
+          "2607.08038",
+          "2606.26879",
+          "2605.29055",
+          "2305.13523",
+          "2104.06523",
+          "2310.05694"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2606.18068",
+          "2606.26879",
+          "2605.29055",
+          "2305.13523",
+          "2104.06523",
+          "2310.05694"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category | PDF |\n|---|---|---|---|\n| [2606.18068](https://arxiv.org/abs/2606.18068) | Agentic AI-based Framework for Mitigating Premature Diagnostic Handoff and Silent Hallucination in Healthcare Applications | cs.AI | [PDF](https://arxiv.org/pdf/2606.18068) |\n\n### Related papers\nThese are the closest papers in the stored citation network around the matched paper, not an overall-popularity ranking:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.26879 | A Pipeline for Generating Longitudinal Synthetic Clinical Notes Using Large Language Models | cs.AI |\n| 2605.29055 | Hallucination Mitigation with Agentic AI, Nested Learning, and AI Sustainability via Semantic Caching | cs.AI |\n| 2305.13523 | A Study of Generative Large Language Model for Medical Research and Healthcare | cs.CL |\n| 2104.06523 | A Review of Anonymization for Healthcare Data | cs.CR |\n| 2310.05694 | A Survey of Large Language Models for Healthcare: from Data, Technology, and Applications to Accountability and Ethics | cs.CL |",
+        "elapsed_seconds": 9.198049700004049,
+        "chat_input_tokens": 11390,
+        "chat_output_tokens": 647
+      }
+    },
+    {
+      "id": "title-05",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-05",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.19408",
+          "2605.11609",
+          "2505.21067",
+          "2607.05184",
+          "2604.26573"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.19408"
+        ],
+        "answer": "The paper is **“Beyond Imitation: Filtering On-Policy Distillation by Reasoning Progress”** (arXiv:2608.19408).",
+        "elapsed_seconds": 2.1159352000104263,
+        "chat_input_tokens": 1600,
+        "chat_output_tokens": 57
+      },
+      "graph_rag": {
+        "id": "title-05",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.19408",
+          "2605.11609",
+          "2505.21067",
+          "2607.05184",
+          "2604.26573",
+          "2305.20050",
+          "2203.02155",
+          "1503.02531",
+          "2312.08935",
+          "2603.07079"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.19408",
+          "2305.20050",
+          "2203.02155",
+          "1503.02531",
+          "2312.08935",
+          "2603.07079"
+        ],
+        "answer": "I found the paper:\n\n| arXiv ID | Title | Primary category | PDF |\n|---|---|---|---|\n| [2608.19408](https://arxiv.org/abs/2608.19408) | Beyond Imitation: Filtering On-Policy Distillation by Reasoning Progress | cs.AI | [Open PDF](https://arxiv.org/pdf/2608.19408) |\n\nIt proposes R2-OPD, a reward-filtering method that suppresses distillation feedback when teacher-derived rewards disagree with independently estimated reasoning progress.\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the paper, not by overall popularity.\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2305.20050](https://arxiv.org/abs/2305.20050) | Let's Verify Step by Step | cs.LG |\n| [2203.02155](https://arxiv.org/abs/2203.02155) | Training language models to follow instructions with human feedback | cs.CL |\n| [1503.02531](https://arxiv.org/abs/1503.02531) | Distilling the Knowledge in a Neural Network | stat.ML |\n| [2312.08935](https://arxiv.org/abs/2312.08935) | Math-Shepherd: Verify and Reinforce LLMs Step-by-step without Human Annotations | cs.AI |\n| [2603.07079](https://arxiv.org/abs/2603.07079) | Entropy-Aware On-Policy Distillation of Language Models | cs.LG |",
+        "elapsed_seconds": 9.391854299930856,
+        "chat_input_tokens": 10176,
+        "chat_output_tokens": 674
+      }
+    },
+    {
+      "id": "title-06",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-06",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2609.12482",
+          "2602.12953",
+          "2606.18413",
+          "2606.16649",
+          "2607.14240"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2609.12482"
+        ],
+        "answer": "The paper is **“When Does AI Augment Work? A Workflow-Level Framework for Human-Agent Collaboration”** (arXiv: **2609.12482**).",
+        "elapsed_seconds": 1.8417119000805542,
+        "chat_input_tokens": 1236,
+        "chat_output_tokens": 59
+      },
+      "graph_rag": {
+        "id": "title-06",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2609.12482",
+          "2602.12953",
+          "2606.18413",
+          "2606.16649",
+          "2607.14240"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2609.12482"
+        ],
+        "answer": "The paper is:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2609.12482](https://arxiv.org/abs/2609.12482) | When Does AI Augment Work? A Workflow-Level Framework for Human-Agent Collaboration | cs.AI |\n\nAbstract: The paper defines AI augmentation through six conditions, including durable net value, meaningful human control, accountability and recovery, and long-term human development. It applies the framework to AI-mediated social surveys.\n\n**Related papers:** No related papers were found in the stored citation network around this paper.",
+        "elapsed_seconds": 5.404777599964291,
+        "chat_input_tokens": 8846,
+        "chat_output_tokens": 262
+      }
+    },
+    {
+      "id": "title-07",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-07",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2605.30664",
+          "2412.05196",
+          "2609.00738",
+          "2609.11061",
+          "2510.09988"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2605.30664"
+        ],
+        "answer": "The paper is arXiv:2605.30664, titled “Structure-Induced Information for Rerooting Levin Tree Search.”",
+        "elapsed_seconds": 1.730968500021845,
+        "chat_input_tokens": 1746,
+        "chat_output_tokens": 52
+      },
+      "graph_rag": {
+        "id": "title-07",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2605.30664",
+          "0803.0476",
+          "1901.03559",
+          "1810.08473",
+          "1912.01703",
+          "1512.03385"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2605.30664",
+          "0803.0476",
+          "1901.03559",
+          "1810.08473",
+          "1912.01703",
+          "1512.03385"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2605.30664 | Structure-Induced Information for Rerooting Levin Tree Search | cs.AI |\n\n### Related papers\nThese rankings come from the stored citation network around the paper, not from overall popularity.\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 0803.0476 | Fast unfolding of communities in large networks | physics.soc-ph |\n| 1901.03559 | An investigation of model-free planning | cs.LG |\n| 1810.08473 | From Louvain to Leiden: guaranteeing well-connected communities | cs.SI |\n| 1912.01703 | PyTorch: An Imperative Style, High-Performance Deep Learning Library | cs.LG |\n| 1512.03385 | Deep Residual Learning for Image Recognition | cs.CV |",
+        "elapsed_seconds": 7.6764246000675485,
+        "chat_input_tokens": 6997,
+        "chat_output_tokens": 534
+      }
+    },
+    {
+      "id": "title-08",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-08",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.10492",
+          "2508.05622",
+          "2502.02780",
+          "2601.04025",
+          "2608.21668"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.10492"
+        ],
+        "answer": "The paper is **“INSIDE the Student's Mind: Jointly Modeling Latent Reasoning and Action in LLM Student Simulators”** (arXiv:2608.10492).",
+        "elapsed_seconds": 1.7125839999644086,
+        "chat_input_tokens": 1519,
+        "chat_output_tokens": 64
+      },
+      "graph_rag": {
+        "id": "title-08",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.10492",
+          "2508.05622",
+          "2502.02780",
+          "2601.04025",
+          "2608.21668",
+          "2210.03629",
+          "2608.17150",
+          "2304.03442",
+          "2201.11903",
+          "2209.06899"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.10492",
+          "2210.03629",
+          "2608.17150",
+          "2304.03442",
+          "2201.11903",
+          "2209.06899"
+        ],
+        "answer": "Found it:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2608.10492](https://arxiv.org/abs/2608.10492) | INSIDE the Student's Mind: Jointly Modeling Latent Reasoning and Action in LLM Student Simulators | cs.AI |\n\nThe paper presents **INTERNAL STUDENT DIALOGUE (INSIDE)**, a framework for modeling both students’ observable actions and their latent reasoning using internal dialogue grounded in Bloom’s Taxonomy. It reports improved action fidelity and reasoning alignment, with alignment reaching up to 57.9%.\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the paper, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2210.03629](https://arxiv.org/abs/2210.03629) | ReAct: Synergizing Reasoning and Acting in Language Models | cs.CL |\n| [2608.17150](https://arxiv.org/abs/2608.17150) | KnowSim: Evaluating Information Calibration in LLM Assistants with User Simulators that Learn | cs.AI |\n| [2304.03442](https://arxiv.org/abs/2304.03442) | Generative Agents: Interactive Simulacra of Human Behavior | cs.HC |\n| [2201.11903](https://arxiv.org/abs/2201.11903) | Chain-of-Thought Prompting Elicits Reasoning in Large Language Models | cs.CL |\n| [2209.06899](https://arxiv.org/abs/2209.06899) | Out of One, Many: Using Language Models to Simulate Human Samples | cs.LG |",
+        "elapsed_seconds": 9.50556860002689,
+        "chat_input_tokens": 10053,
+        "chat_output_tokens": 706
+      }
+    },
+    {
+      "id": "title-09",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-09",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.11136",
+          "2012.13635",
+          "2409.16045",
+          "2606.29972",
+          "1705.08968"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.11136"
+        ],
+        "answer": "The paper titled “sLTN: Structural Logic Tensor Networks” is arXiv:2608.11136.",
+        "elapsed_seconds": 1.7384100999915972,
+        "chat_input_tokens": 1477,
+        "chat_output_tokens": 47
+      },
+      "graph_rag": {
+        "id": "title-09",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.11136",
+          "2012.13635",
+          "2409.16045",
+          "2606.29972",
+          "1705.08968",
+          "2604.05539",
+          "2503.18509",
+          "1907.08194"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.25,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.11136",
+          "2606.29972",
+          "2604.05539",
+          "2503.18509"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2608.11136](https://arxiv.org/abs/2608.11136) | sLTN: Structural Logic Tensor Networks | cs.AI |\n\nPDF: https://arxiv.org/pdf/2608.11136\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the paper, not by overall popularity.\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2606.29972](https://arxiv.org/abs/2606.29972) | First-Order Temporal Logic Tensor Networks | cs.AI |\n| [2604.05539](https://arxiv.org/abs/2604.05539) | From Large Language Model Predicates to Logic Tensor Networks: Neurosymbolic Offer Validation in Regulated Procurement | cs.AI |\n| [2503.18509](https://arxiv.org/abs/2503.18509) | Neuro-symbolic Weak Supervision: Theory and Semantics | cs.AI |",
+        "elapsed_seconds": 9.898467399994843,
+        "chat_input_tokens": 9875,
+        "chat_output_tokens": 652
+      }
+    },
+    {
+      "id": "title-10",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-10",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.19932",
+          "2509.05754",
+          "2603.28711",
+          "2607.01952",
+          "2512.19316"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.19932"
+        ],
+        "answer": "The paper is **“A Strong Linear Baseline for Whole-Heart Cardiac Shape Completion on CT, with an Open Eleven-Structure Statistical Shape Model”** (arXiv:2608.19932).",
+        "elapsed_seconds": 1.7471789000555873,
+        "chat_input_tokens": 1810,
+        "chat_output_tokens": 67
+      },
+      "graph_rag": {
+        "id": "title-10",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.19932",
+          "2509.05754",
+          "2603.28711",
+          "2607.01952",
+          "2512.19316",
+          "2606.26718",
+          "1911.05856",
+          "1807.06843",
+          "2409.13825",
+          "2102.07899"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.19932",
+          "2606.26718",
+          "1911.05856",
+          "1807.06843",
+          "2409.13825",
+          "2102.07899"
+        ],
+        "answer": "Found it:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2608.19932](https://arxiv.org/pdf/2608.19932) | A Strong Linear Baseline for Whole-Heart Cardiac Shape Completion on CT, with an Open Eleven-Structure Statistical Shape Model | cs.AI |\n\nThe paper presents an eleven-structure cardiac CT statistical shape model and evaluates a closed-form conditional-Gaussian completion estimator against graph-based and nearest-neighbor baselines.\n\n### Related papers\nThese are ranked from the stored citation network around the paper, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2606.26718](https://arxiv.org/pdf/2606.26718) | A Latent ODE Approach to Spatiotemporal Modeling of Cine Cardiac MRI | cs.AI |\n| [1911.05856](https://arxiv.org/pdf/1911.05856) | SpiralNet++: A Fast and Highly Efficient Mesh Convolution Operator | cs.CV |\n| [1807.06843](https://arxiv.org/pdf/1807.06843) | Learning Interpretable Anatomical Features Through Deep Generative Models: Application to Cardiac Remodeling | cs.CV |\n| [2409.13825](https://arxiv.org/pdf/2409.13825) | A personalized time-resolved 3D mesh generative model for unveiling normal heart dynamics | cs.AI |\n| [2102.07899](https://arxiv.org/pdf/2102.07899) | A Deep-Learning Approach For Direct Whole-Heart Mesh Reconstruction | eess.IV |",
+        "elapsed_seconds": 10.165010700002313,
+        "chat_input_tokens": 10623,
+        "chat_output_tokens": 675
+      }
+    },
+    {
+      "id": "title-11",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-11",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.05389",
+          "2412.17184",
+          "2410.15704",
+          "2409.05357",
+          "2406.04112"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2606.05389"
+        ],
+        "answer": "The paper is arXiv:2606.05389, titled “Residual Modeling for High-Fidelity Learned Compression of Scientific Data.”",
+        "elapsed_seconds": 1.823028799961321,
+        "chat_input_tokens": 1672,
+        "chat_output_tokens": 51
+      },
+      "graph_rag": {
+        "id": "title-11",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.05389",
+          "2412.17184",
+          "2410.15704",
+          "2409.05357",
+          "2406.04112",
+          "2111.02925",
+          "2507.02129",
+          "2105.11730",
+          "2003.02324",
+          "1606.05328"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2606.05389",
+          "2111.02925",
+          "2507.02129",
+          "2105.11730",
+          "2003.02324",
+          "1606.05328"
+        ],
+        "answer": "Found it:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2606.05389](https://arxiv.org/pdf/2606.05389) | Residual Modeling for High-Fidelity Learned Compression of Scientific Data | cs.AI |\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the paper, not by overall popularity.\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2111.02925 | SZ3: A Modular Framework for Composing Prediction-Based Error-Bounded Lossy Compressors | cs.DC |\n| 2507.02129 | Generative Latent Diffusion for Efficient Spatiotemporal Data Reduction | cs.LG |\n| 2105.11730 | Exploring Autoencoder-based Error-bounded Compression for Scientific Data | cs.LG |\n| 2003.02324 | Stability Analysis of Inline ZFP Compression for Floating-Point Data in Iterative Methods | math.NA |\n| 1606.05328 | Conditional Image Generation with PixelCNN Decoders | cs.CV |",
+        "elapsed_seconds": 10.370819500065409,
+        "chat_input_tokens": 10828,
+        "chat_output_tokens": 782
+      }
+    },
+    {
+      "id": "title-12",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-12",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.05359",
+          "2210.01426",
+          "1709.05448",
+          "1802.08705",
+          "2310.19848"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2607.05359"
+        ],
+        "answer": "The paper is **“Graph Sparse Sampling: Breaking the Curse of the Horizon in Continuous MDP Planning”** (arXiv:2607.05359).",
+        "elapsed_seconds": 1.7343965000472963,
+        "chat_input_tokens": 1451,
+        "chat_output_tokens": 57
+      },
+      "graph_rag": {
+        "id": "title-12",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.05359",
+          "2210.01426",
+          "1709.05448",
+          "1802.08705",
+          "2310.19848",
+          "2407.00388",
+          "2310.01791",
+          "2210.05015",
+          "2010.03597"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2607.05359",
+          "2407.00388",
+          "2310.01791",
+          "2210.05015",
+          "2210.01426",
+          "2010.03597"
+        ],
+        "answer": "Found it:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2607.05359](https://arxiv.org/abs/2607.05359) | Graph Sparse Sampling: Breaking the Curse of the Horizon in Continuous MDP Planning | cs.AI |\n\n[PDF](https://arxiv.org/pdf/2607.05359)\n\n### Related papers\nThe following papers are ranked using the stored citation network around the found paper, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2407.00388](https://arxiv.org/abs/2407.00388) | Weighted mesh algorithms for general Markov decision processes: Convergence and tractability | math.OC |\n| [2310.01791](https://arxiv.org/abs/2310.01791) | Online POMDP Planning with Anytime Deterministic Optimality Guarantees | cs.AI |\n| [2210.05015](https://arxiv.org/abs/2210.05015) | Optimality Guarantees for Particle Belief Approximation of POMDPs | cs.AI |\n| [2210.01426](https://arxiv.org/abs/2210.01426) | Continuous Monte Carlo Graph Search | cs.AI |\n| [2010.03597](https://arxiv.org/abs/2010.03597) | Bayesian Optimized Monte Carlo Planning | cs.AI |",
+        "elapsed_seconds": 8.520620899973437,
+        "chat_input_tokens": 9875,
+        "chat_output_tokens": 586
+      }
+    },
+    {
+      "id": "title-13",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-13",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.05716",
+          "2607.20709",
+          "2603.05344",
+          "2407.16741",
+          "2309.14534"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.05716"
+        ],
+        "answer": "The paper is **“BlockPython: A Process-Aware Agent-Supported Platform for the Transition from Block-Based to Python Programming”** (arXiv:2608.05716).",
+        "elapsed_seconds": 1.7566534000216052,
+        "chat_input_tokens": 1613,
+        "chat_output_tokens": 62
+      },
+      "graph_rag": {
+        "id": "title-13",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.05716",
+          "2607.20709",
+          "2603.05344",
+          "2407.16741",
+          "2309.14534",
+          "2302.05708"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.5,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.05716",
+          "2302.05708"
+        ],
+        "answer": "I found the paper **“BlockPython: A Process-Aware Agent-Supported Platform for the Transition from Block-Based to Python Programming.”**\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2608.05716](https://arxiv.org/abs/2608.05716) | BlockPython: A Process-Aware Agent-Supported Platform for the Transition from Block-Based to Python Programming | cs.AI |\n\nPDF: https://arxiv.org/pdf/2608.05716\n\n**Related papers**\n\nThe following paper is ranked as related in the stored citation network around BlockPython, rather than by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2302.05708](https://arxiv.org/abs/2302.05708) | Scaffolding Progress: How Structured Editors Shape Novice Errors When Transitioning from Blocks to Text | cs.HC |",
+        "elapsed_seconds": 6.819481999962591,
+        "chat_input_tokens": 9721,
+        "chat_output_tokens": 352
+      }
+    },
+    {
+      "id": "title-14",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-14",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.21174",
+          "2507.17657",
+          "2607.20524",
+          "2508.00367",
+          "2510.20787"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.21174"
+        ],
+        "answer": "The paper is arXiv:2608.21174, titled “From Attention Masks to Inert Zero-Vector Tokens: OAttention and O-Closure for Token Dynamics.”",
+        "elapsed_seconds": 1.6901894001057371,
+        "chat_input_tokens": 1733,
+        "chat_output_tokens": 60
+      },
+      "graph_rag": {
+        "id": "title-14",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.21174",
+          "2507.17657",
+          "2607.20524",
+          "2508.00367",
+          "2510.20787"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.21174"
+        ],
+        "answer": "Found it:\n\n| arXiv ID | Title | Primary category | PDF |\n|---|---|---|---|\n| [2608.21174](https://arxiv.org/abs/2608.21174) | From Attention Masks to Inert Zero-Vector Tokens: OAttention and O-Closure for Token Dynamics | cs.AI | [Download PDF](https://arxiv.org/pdf/2608.21174) |\n\n### Related papers\nNo related papers were returned because the stored citation network contains no citation relationships for this seed paper.",
+        "elapsed_seconds": 6.986291700042784,
+        "chat_input_tokens": 9909,
+        "chat_output_tokens": 388
+      }
+    },
+    {
+      "id": "title-15",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-15",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.28126",
+          "2604.03312",
+          "2510.27176",
+          "2608.21976",
+          "2511.19669"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2606.28126"
+        ],
+        "answer": "The paper is **“AI-Driven Synthesis for High-Tech System Design: Automating Innovation”** (arXiv:2606.28126).",
+        "elapsed_seconds": 1.9011201000539586,
+        "chat_input_tokens": 1374,
+        "chat_output_tokens": 56
+      },
+      "graph_rag": {
+        "id": "title-15",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.28126",
+          "2605.17424",
+          "2605.17387"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.3333333333333333,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2606.28126",
+          "2605.17424",
+          "2605.17387"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.28126 | AI-Driven Synthesis for High-Tech System Design: Automating Innovation | cs.AI |\n\n**Related papers** — ranked by proximity in the stored citation network around this paper, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2605.17424 | A Hybrid Optimization Framework for Spatial Packaging of Interconnected Systems | cs.CE |\n| 2605.17387 | Spatial Optimization of Interconnected Systems in Non-Convex Design Spaces | cs.CE |",
+        "elapsed_seconds": 6.026504099951126,
+        "chat_input_tokens": 6672,
+        "chat_output_tokens": 332
+      }
+    },
+    {
+      "id": "title-16",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-16",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.28677",
+          "2502.04381",
+          "2607.10275",
+          "2309.10895",
+          "2312.07399"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2607.28677"
+        ],
+        "answer": "The paper is **“Reasoning in Real World Clinical Care: Why Large Language Models Are Not Yet Safe for Autonomous Clinical Decision Support”** (arXiv:2607.28677).",
+        "elapsed_seconds": 1.6070463999640197,
+        "chat_input_tokens": 1556,
+        "chat_output_tokens": 63
+      },
+      "graph_rag": {
+        "id": "title-16",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.28677",
+          "2502.04381",
+          "2607.10275",
+          "2309.10895",
+          "2312.07399"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2607.28677"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| [2607.28677](https://arxiv.org/abs/2607.28677) | Reasoning in Real World Clinical Care: Why Large Language Models Are Not Yet Safe for Autonomous Clinical Decision Support | cs.AI |\n\nThe stored citation network contains no related-paper results for this paper.",
+        "elapsed_seconds": 6.01591900002677,
+        "chat_input_tokens": 9521,
+        "chat_output_tokens": 280
+      }
+    },
+    {
+      "id": "title-17",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-17",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.18017",
+          "2605.12332",
+          "2312.00812",
+          "2608.04697",
+          "2609.04021"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.18017"
+        ],
+        "answer": "The paper is **“Can Large Language Models Explain Flight Safety Events? A Prior-Guided Semantic LLM-based Approach”** (arXiv:2608.18017).",
+        "elapsed_seconds": 1.7833785000257194,
+        "chat_input_tokens": 1616,
+        "chat_output_tokens": 61
+      },
+      "graph_rag": {
+        "id": "title-17",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.18017",
+          "2605.12332",
+          "2312.00812",
+          "2608.04697",
+          "2609.04021",
+          "2201.11903",
+          "2310.01728",
+          "2312.09390",
+          "2502.11418",
+          "2306.11025"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2608.18017",
+          "2201.11903",
+          "2310.01728",
+          "2312.09390",
+          "2502.11418",
+          "2306.11025"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category | PDF |\n|---|---|---|---|\n| 2608.18017 | Can Large Language Models Explain Flight Safety Events? A Prior-Guided Semantic LLM-based Approach | cs.AI | [PDF](https://arxiv.org/pdf/2608.18017) |\n\nThe paper proposes FlightLLM, which combines semantic discretization, CatBoost-based prior guidance, contrastive few-shot learning, and aviation-specific prompting to explain flight-safety events. It evaluates the method on 704 real-world A320 flight samples involving hard-landing events.\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the paper, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2201.11903 | Chain-of-Thought Prompting Elicits Reasoning in Large Language Models | cs.CL |\n| 2310.01728 | Time-LLM: Time Series Forecasting by Reprogramming Large Language Models | cs.LG |\n| 2312.09390 | Weak-to-Strong Generalization: Eliciting Strong Capabilities With Weak Supervision | cs.CL |\n| 2502.11418 | TimeCAP: Learning to Contextualize, Augment, and Predict Time Series Events with Large Language Model Agents | cs.AI |\n| 2306.11025 | Temporal Data Meets LLM -- Explainable Financial Time Series Forecasting | cs.LG |",
+        "elapsed_seconds": 10.25768090004567,
+        "chat_input_tokens": 10239,
+        "chat_output_tokens": 709
+      }
+    },
+    {
+      "id": "title-18",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-18",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2601.13591",
+          "2608.10366",
+          "2607.01647",
+          "2512.04324",
+          "2601.16344"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2601.13591"
+        ],
+        "answer": "The paper is **DSAEval: Evaluating Data Science Agents on a Wide Range of Real-World Data Science Problems** (arXiv:2601.13591).",
+        "elapsed_seconds": 2.4693985000485554,
+        "chat_input_tokens": 1845,
+        "chat_output_tokens": 60
+      },
+      "graph_rag": {
+        "id": "title-18",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2601.13591",
+          "2608.10366",
+          "2607.01647",
+          "2512.04324",
+          "2601.16344"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2601.13591"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2601.13591 | DSAEval: Evaluating Data Science Agents on a Wide Range of Real-World Data Science Problems | cs.AI |\n\nThe paper introduces a benchmark of 641 real-world data-science problems grounded in 285 datasets, covering structured and unstructured data. It evaluates multimodal perception, multi-query interactions, and reasoning, code, and result quality.\n\n### Related papers\nNo related papers were found in the stored citation network around this paper.",
+        "elapsed_seconds": 7.812146300100721,
+        "chat_input_tokens": 10104,
+        "chat_output_tokens": 293
+      }
+    },
+    {
+      "id": "title-19",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-19",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2604.14221",
+          "2307.08390",
+          "2009.07769",
+          "2009.02040",
+          "2111.08095"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2604.14221"
+        ],
+        "answer": "The paper is **“Fun-TSG: A Function-Driven Multivariate Time Series Generator with Variable-Level Anomaly Labeling”**, arXiv: **2604.14221**.",
+        "elapsed_seconds": 1.8479415000183508,
+        "chat_input_tokens": 1578,
+        "chat_output_tokens": 63
+      },
+      "graph_rag": {
+        "id": "title-19",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2604.14221",
+          "2307.08390",
+          "2009.07769",
+          "2009.02040",
+          "2111.08095"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2604.14221"
+        ],
+        "answer": "Found it:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2604.14221 | Fun-TSG: A Function-Driven Multivariate Time Series Generator with Variable-Level Anomaly Labeling | cs.AI |\n\nNo related papers were returned from the stored citation network around this paper.",
+        "elapsed_seconds": 6.3277391999727115,
+        "chat_input_tokens": 10062,
+        "chat_output_tokens": 362
+      }
+    },
+    {
+      "id": "title-20",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-20",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2609.02057",
+          "2604.00356",
+          "2606.15673",
+          "2609.09448",
+          "2606.29472"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2609.02057"
+        ],
+        "answer": "The paper is **“Monitoring Web Agents Without Internal Signals: Observable Trajectories and Key-Step Supervision”** (arXiv:2609.02057).",
+        "elapsed_seconds": 11.922206799965352,
+        "chat_input_tokens": 1694,
+        "chat_output_tokens": 58
+      },
+      "graph_rag": {
+        "id": "title-20",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2609.02057",
+          "2608.02291",
+          "2210.03629",
+          "2207.05221",
+          "2305.14975",
+          "2406.15927"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2609.02057",
+          "2608.02291",
+          "2210.03629",
+          "2207.05221",
+          "2305.14975",
+          "2406.15927"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2609.02057 | Monitoring Web Agents Without Internal Signals: Observable Trajectories and Key-Step Supervision | cs.AI |\n\n### Related papers\nThese are ranked by proximity in the stored citation network around the paper, not by overall popularity:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.02291 | Shared Prefixes, Better Credit: Adaptive Routing for Multi-Agent Reasoning | cs.AI |\n| 2210.03629 | ReAct: Synergizing Reasoning and Acting in Language Models | cs.CL |\n| 2207.05221 | Language Models (Mostly) Know What They Know | cs.CL |\n| 2305.14975 | Just Ask for Calibration: Strategies for Eliciting Calibrated Confidence Scores from Language Models Fine-Tuned with Human Feedback | cs.CL |\n| 2406.15927 | Semantic Entropy Probes: Robust and Cheap Hallucination Detection in LLMs | cs.CL |",
+        "elapsed_seconds": 8.239011400029995,
+        "chat_input_tokens": 7070,
+        "chat_output_tokens": 571
+      }
+    },
+    {
+      "id": "title-21",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-21",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2604.11741",
+          "2601.18077",
+          "2310.10701",
+          "2609.06563",
+          "2410.02603"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 1.0,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2604.11741"
+        ],
+        "answer": "The paper is **“Collaborative Multi-Agent Scripts Generation for Enhancing Imperfect-Information Reasoning in Murder Mystery Games”** (arXiv:2604.11741).",
+        "elapsed_seconds": 3.0374328000470996,
+        "chat_input_tokens": 1528,
+        "chat_output_tokens": 61
+      },
+      "graph_rag": {
+        "id": "title-21",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2604.11741",
+          "2607.24082",
+          "2607.26465",
+          "2608.26291",
+          "2607.27798",
+          "2609.00570"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "citation_precision": 0.16666666666666666,
+        "citation_recall": 1.0,
+        "evidence_ids": [
+          "2604.11741",
+          "2607.24082",
+          "2607.26465",
+          "2608.26291",
+          "2607.27798",
+          "2609.00570"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2604.11741 | Collaborative Multi-Agent Scripts Generation for Enhancing Imperfect-Information Reasoning in Murder Mystery Games | cs.AI |\n\n**Related papers** (ranked using the stored citation network around this paper, not overall popularity):\n- 2607.24082 — *Towards High-Level Semantic Intelligence*\n- 2607.26465 — *MultivationBench: A Benchmark for Multimodal Sequential Motivation Reasoning*\n- 2608.26291 — *Assessing mentalization in humans and large language models*\n- 2607.27798 — *MemeBench: What LVLMs Miss When Interpreting Culture-Dependent Memes*\n- 2609.00570 — *VoiceLongMemEval: Do Assistants Remember How You Sounded?*",
+        "elapsed_seconds": 8.247741699917242,
+        "chat_input_tokens": 7174,
+        "chat_output_tokens": 553
+      }
+    }
+  ],
+  "summary": {
+    "case_count": 31,
+    "vector_only": {
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.6804763719042763,
+      "reciprocal_rank": 1.0,
+      "answer_correct": 1.0,
+      "citation_precision": 0.9612903225806452,
+      "citation_recall": 0.6804763719042763,
+      "elapsed_seconds": 2.584319722602114,
+      "chat_input_tokens": 1560.9354838709678,
+      "chat_output_tokens": 102.45161290322581,
+      "chat_tokens_total": 51565
+    },
+    "graph_rag": {
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.6803700395715027,
+      "reciprocal_rank": 0.9838709677419355,
+      "answer_correct": 1.0,
+      "citation_precision": 0.5258064516129033,
+      "citation_recall": 0.6815951138033175,
+      "elapsed_seconds": 9.09867230968009,
+      "chat_input_tokens": 9580.290322580646,
+      "chat_output_tokens": 573.483870967742,
+      "chat_tokens_total": 314767
+    },
+    "by_category": {
+      "exact-title": {
+        "vector_only": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "answer_correct": 1.0,
+          "citation_precision": 1.0,
+          "citation_recall": 1.0,
+          "elapsed_seconds": 2.387760747634318,
+          "chat_input_tokens": 1632.8095238095239,
+          "chat_output_tokens": 60.42857142857143,
+          "chat_tokens_total": 35558
+        },
+        "graph_rag": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "answer_correct": 1.0,
+          "citation_precision": 0.47619047619047616,
+          "citation_recall": 1.0,
+          "elapsed_seconds": 7.994503200004276,
+          "chat_input_tokens": 9476.095238095239,
+          "chat_output_tokens": 501.6190476190476,
+          "chat_tokens_total": 209532
+        }
+      },
+      "topic": {
+        "vector_only": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.009476752903256702,
+          "reciprocal_rank": 1.0,
+          "citation_precision": 0.8800000000000001,
+          "citation_recall": 0.009476752903256702,
+          "elapsed_seconds": 2.9970935700344854,
+          "chat_input_tokens": 1410.0,
+          "chat_output_tokens": 190.7,
+          "chat_tokens_total": 16007
+        },
+        "graph_rag": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.009147122671658191,
+          "reciprocal_rank": 0.95,
+          "citation_precision": 0.63,
+          "citation_recall": 0.012944852790284168,
+          "elapsed_seconds": 11.417427439999301,
+          "chat_input_tokens": 9799.1,
+          "chat_output_tokens": 724.4,
+          "chat_tokens_total": 105235
+        }
+      }
+    },
+    "cost_usd": null,
+    "cost_note": "Not calculated: this report excludes embedding usage, provider pricing, and Neo4j costs."
+  }
+}

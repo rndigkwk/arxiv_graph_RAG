@@ -1,0 +1,448 @@
+{
+  "generated_at": "2026-09-26T14:19:34.885481+00:00",
+  "mode": "retrieval",
+  "top_k": 5,
+  "dataset": "evals\\cases.json",
+  "results": [
+    {
+      "id": "topic-graph-neural-network",
+      "category": "topic",
+      "retrieved_ids": [
+        "2011.11288",
+        "1812.08434",
+        "1904.07785",
+        "1901.00596",
+        "1911.06455"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.009523809523809525,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-retrieval-augmented-generation",
+      "category": "topic",
+      "retrieved_ids": [
+        "2506.00054",
+        "2305.15294",
+        "2402.19473",
+        "2005.11401",
+        "2407.13193"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.0057553956834532375,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-diffusion-model",
+      "category": "topic",
+      "retrieved_ids": [
+        "2609.13047",
+        "2211.15089",
+        "2410.17891",
+        "2208.11970",
+        "2409.15816"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.006925207756232687,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-reinforcement-learning",
+      "category": "topic",
+      "retrieved_ids": [
+        "1611.05763",
+        "2002.12636",
+        "1611.08944",
+        "2405.10369",
+        "2509.01684"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.0011956001912960307,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-multimodal",
+      "category": "topic",
+      "retrieved_ids": [
+        "2301.04856",
+        "1705.09406",
+        "2203.15332",
+        "2106.04538",
+        "2004.04917"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.0013831258644536654,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-knowledge-graph",
+      "category": "topic",
+      "retrieved_ids": [
+        "2003.02320",
+        "2303.13948",
+        "2308.14217",
+        "2605.22093",
+        "2002.00388"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.006426735218508998,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-code-generation",
+      "category": "topic",
+      "retrieved_ids": [
+        "2203.13474",
+        "2603.29088",
+        "2405.20092",
+        "2412.07822",
+        "2407.16237"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.007062146892655367,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-medical-imaging",
+      "category": "topic",
+      "retrieved_ids": [
+        "2103.01938",
+        "2609.07719",
+        "1612.07003",
+        "2204.13258",
+        "1901.07042"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.029411764705882353,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-federated-learning",
+      "category": "topic",
+      "retrieved_ids": [
+        "1908.07873",
+        "1602.05629",
+        "1912.04977",
+        "1806.00582",
+        "2002.06440"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.02262443438914027,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "topic-AI-agents",
+      "category": "topic",
+      "retrieved_ids": [
+        "2502.18359",
+        "2505.10468",
+        "2503.12687",
+        "2601.01743",
+        "2506.15741"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.004459308807134894,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-01",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.28632",
+        "2505.15155",
+        "2602.07085",
+        "2607.12455",
+        "2605.28655"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-02",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2607.12177",
+        "2601.16965",
+        "2510.18318",
+        "2512.24504",
+        "2606.08952"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-03",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.21610",
+        "2602.23978",
+        "2608.29951",
+        "2510.27419",
+        "2606.24467"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-04",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2606.18068",
+        "2501.13946",
+        "2608.07627",
+        "2608.07651",
+        "2607.08038"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-05",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.19408",
+        "2605.11609",
+        "2505.21067",
+        "2607.05184",
+        "2604.26573"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-06",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2609.12482",
+        "2602.12953",
+        "2606.18413",
+        "2606.16649",
+        "2607.14240"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-07",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2605.30664",
+        "2412.05196",
+        "2609.00738",
+        "2609.11061",
+        "2510.09988"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-08",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.10492",
+        "2508.05622",
+        "2502.02780",
+        "2601.04025",
+        "2608.21668"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-09",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.11136",
+        "2012.13635",
+        "2409.16045",
+        "2606.29972",
+        "1705.08968"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-10",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.19932",
+        "2509.05754",
+        "2603.28711",
+        "2607.01952",
+        "2512.19316"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-11",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2606.05389",
+        "2412.17184",
+        "2410.15704",
+        "2409.05357",
+        "2406.04112"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-12",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2607.05359",
+        "2210.01426",
+        "1709.05448",
+        "1802.08705",
+        "2310.19848"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-13",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.05716",
+        "2607.20709",
+        "2603.05344",
+        "2407.16741",
+        "2309.14534"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-14",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.21174",
+        "2507.17657",
+        "2607.20524",
+        "2508.00367",
+        "2510.20787"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-15",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2606.28126",
+        "2604.03312",
+        "2510.27176",
+        "2608.21976",
+        "2511.19669"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-16",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2607.28677",
+        "2502.04381",
+        "2607.10275",
+        "2309.10895",
+        "2312.07399"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-17",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2608.18017",
+        "2605.12332",
+        "2312.00812",
+        "2608.04697",
+        "2609.04021"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-18",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2601.13591",
+        "2608.10366",
+        "2607.01647",
+        "2512.04324",
+        "2601.16344"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-19",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2604.14221",
+        "2307.08390",
+        "2009.07769",
+        "2009.02040",
+        "2111.08095"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-20",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2609.02057",
+        "2604.00356",
+        "2606.15673",
+        "2609.09448",
+        "2606.29472"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    },
+    {
+      "id": "title-21",
+      "category": "exact-title",
+      "retrieved_ids": [
+        "2604.11741",
+        "2601.18077",
+        "2310.10701",
+        "2609.06563",
+        "2410.02603"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0
+    }
+  ],
+  "summary": {
+    "case_count": 31,
+    "hit_at_k": 1.0,
+    "recall_at_k": 0.6804763719042763,
+    "reciprocal_rank": 1.0
+  }
+}

@@ -1,0 +1,438 @@
+{
+  "dataset_version": 1,
+  "review_status": "pending_human_review",
+  "source_files": [
+    "data/ai/arxiv_cs_recent_3months_oai_part1.jsonl",
+    "data/ai/arxiv_cs_recent_3months_oai_part2.jsonl",
+    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part5.jsonl",
+    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl"
+  ],
+  "label_scope": "Source-backed candidate labels; not human-reviewed relevance judgments.",
+  "cases": [
+    {
+      "id": "curated-topic-graph-neural-network",
+      "category": "topic",
+      "question": "Find arXiv papers about graph neural network.",
+      "search_query": "graph neural network",
+      "expected_ids": [
+        "2011.11288",
+        "1812.08434",
+        "1904.07785"
+      ],
+      "expected_answer_contains": [
+        "achieved promising results in graph analysis tasks"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "2011.11288",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+          "field": "title",
+          "excerpt": "AutoGraph: Automated Graph Neural Network"
+        },
+        {
+          "arxiv_id": "1812.08434",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Graph Neural Networks: A Review of Methods and Applications"
+        },
+        {
+          "arxiv_id": "1904.07785",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+          "field": "title",
+          "excerpt": "Graph Wavelet Neural Network"
+        },
+        {
+          "arxiv_id": "2011.11288",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+          "field": "abstract",
+          "excerpt": "achieved promising results in graph analysis tasks"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-retrieval-augmented-generation",
+      "category": "topic",
+      "question": "Find arXiv papers about retrieval augmented generation.",
+      "search_query": "retrieval augmented generation",
+      "expected_ids": [
+        "2506.00054",
+        "2305.15294",
+        "2402.19473"
+      ],
+      "expected_answer_contains": [
+        "conditioning generation on external evidence retrieved at inference time"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "2506.00054",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
+          "field": "title",
+          "excerpt": "Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers"
+        },
+        {
+          "arxiv_id": "2305.15294",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+          "field": "title",
+          "excerpt": "Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy"
+        },
+        {
+          "arxiv_id": "2402.19473",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Retrieval-Augmented Generation for AI-Generated Content: A Survey"
+        },
+        {
+          "arxiv_id": "2506.00054",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
+          "field": "abstract",
+          "excerpt": "conditioning generation on external evidence retrieved at inference time"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-diffusion-model",
+      "category": "topic",
+      "question": "Find arXiv papers about diffusion model.",
+      "search_query": "diffusion model",
+      "expected_ids": [
+        "2211.15089",
+        "2410.17891",
+        "2208.11970"
+      ],
+      "expected_answer_contains": [
+        "modelling categorical data with diffusion models"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "2211.15089",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+          "field": "title",
+          "excerpt": "Continuous diffusion for categorical data"
+        },
+        {
+          "arxiv_id": "2410.17891",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+          "field": "title",
+          "excerpt": "Scaling Diffusion Language Models via Adaptation from Autoregressive Models"
+        },
+        {
+          "arxiv_id": "2208.11970",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+          "field": "title",
+          "excerpt": "Understanding Diffusion Models: A Unified Perspective"
+        },
+        {
+          "arxiv_id": "2211.15089",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+          "field": "abstract",
+          "excerpt": "modelling categorical data with diffusion models"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-reinforcement-learning",
+      "category": "topic",
+      "question": "Find arXiv papers about reinforcement learning.",
+      "search_query": "reinforcement learning",
+      "expected_ids": [
+        "1611.05763",
+        "2002.12636",
+        "1611.08944"
+      ],
+      "expected_answer_contains": [
+        "deep RL methods that can adapt rapidly to new tasks"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "1611.05763",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+          "field": "title",
+          "excerpt": "Learning to reinforcement learn"
+        },
+        {
+          "arxiv_id": "2002.12636",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+          "field": "title",
+          "excerpt": "Reinforcement Learning through Active Inference"
+        },
+        {
+          "arxiv_id": "1611.08944",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Nonparametric General Reinforcement Learning"
+        },
+        {
+          "arxiv_id": "1611.05763",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+          "field": "abstract",
+          "excerpt": "deep RL methods that can adapt rapidly to new tasks"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-multimodal",
+      "category": "topic",
+      "question": "Find arXiv papers about multimodal.",
+      "search_query": "multimodal",
+      "expected_ids": [
+        "2301.04856",
+        "1705.09406",
+        "2203.15332"
+      ],
+      "expected_answer_contains": [
+        "process and relate information from multiple modalities"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "2301.04856",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+          "field": "title",
+          "excerpt": "Multimodal Deep Learning"
+        },
+        {
+          "arxiv_id": "1705.09406",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+          "field": "title",
+          "excerpt": "Multimodal Machine Learning: A Survey and Taxonomy"
+        },
+        {
+          "arxiv_id": "2203.15332",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Balanced Multimodal Learning via On-the-fly Gradient Modulation"
+        },
+        {
+          "arxiv_id": "1705.09406",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+          "field": "abstract",
+          "excerpt": "process and relate information from multiple modalities"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-knowledge-graph",
+      "category": "topic",
+      "question": "Find arXiv papers about knowledge graph.",
+      "search_query": "knowledge graph",
+      "expected_ids": [
+        "2003.02320",
+        "2303.13948",
+        "2308.14217"
+      ],
+      "expected_answer_contains": [
+        "creation, enrichment, quality assessment, refinement, and publication"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "2003.02320",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Knowledge Graphs"
+        },
+        {
+          "arxiv_id": "2303.13948",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Knowledge Graphs: Opportunities and Challenges"
+        },
+        {
+          "arxiv_id": "2308.14217",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+          "field": "title",
+          "excerpt": "Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact"
+        },
+        {
+          "arxiv_id": "2003.02320",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "abstract",
+          "excerpt": "creation, enrichment, quality assessment, refinement, and publication"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-code-generation",
+      "category": "topic",
+      "question": "Find arXiv papers about code generation.",
+      "search_query": "code generation",
+      "expected_ids": [
+        "2203.13474",
+        "2603.29088",
+        "2405.20092"
+      ],
+      "expected_answer_contains": [
+        "multi-step paradigm for program synthesis"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "2203.13474",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+          "field": "title",
+          "excerpt": "CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis"
+        },
+        {
+          "arxiv_id": "2603.29088",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part5.jsonl",
+          "field": "title",
+          "excerpt": "WybeCoder: Verified Imperative Code Generation"
+        },
+        {
+          "arxiv_id": "2405.20092",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
+          "field": "title",
+          "excerpt": "Divide-and-Conquer Meets Consensus: Unleashing the Power of Functions in Code Generation"
+        },
+        {
+          "arxiv_id": "2203.13474",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+          "field": "abstract",
+          "excerpt": "multi-step paradigm for program synthesis"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-medical-imaging",
+      "category": "topic",
+      "question": "Find arXiv papers about medical imaging.",
+      "search_query": "medical imaging",
+      "expected_ids": [
+        "2103.01938",
+        "2609.07719",
+        "1612.07003"
+      ],
+      "expected_answer_contains": [
+        "research in image acquisition, algorithms, data standardization"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "2103.01938",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+          "field": "title",
+          "excerpt": "Medical Imaging and Machine Learning"
+        },
+        {
+          "arxiv_id": "2609.07719",
+          "source_file": "data/ai/arxiv_cs_recent_3months_oai_part2.jsonl",
+          "field": "title",
+          "excerpt": "A radiographic world model for clinical reasoning and evidence generation"
+        },
+        {
+          "arxiv_id": "1612.07003",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+          "field": "title",
+          "excerpt": "Image biomarker standardisation initiative"
+        },
+        {
+          "arxiv_id": "2103.01938",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+          "field": "abstract",
+          "excerpt": "research in image acquisition, algorithms, data standardization"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-federated-learning",
+      "category": "topic",
+      "question": "Find arXiv papers about federated learning.",
+      "search_query": "federated learning",
+      "expected_ids": [
+        "1908.07873",
+        "1602.05629",
+        "1912.04977"
+      ],
+      "expected_answer_contains": [
+        "training statistical models over remote devices"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "1908.07873",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Federated Learning: Challenges, Methods, and Future Directions"
+        },
+        {
+          "arxiv_id": "1602.05629",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Communication-Efficient Learning of Deep Networks from Decentralized Data"
+        },
+        {
+          "arxiv_id": "1912.04977",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "title",
+          "excerpt": "Advances and Open Problems in Federated Learning"
+        },
+        {
+          "arxiv_id": "1908.07873",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+          "field": "abstract",
+          "excerpt": "training statistical models over remote devices"
+        }
+      ]
+    },
+    {
+      "id": "curated-topic-AI-agents",
+      "category": "topic",
+      "question": "Find arXiv papers about AI agents.",
+      "search_query": "AI agents",
+      "expected_ids": [
+        "2502.18359",
+        "2505.10468",
+        "2503.12687"
+      ],
+      "expected_answer_contains": [
+        "modules for perception, planning, and tool use"
+      ],
+      "review_status": "pending_human_review",
+      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+      "source_evidence": [
+        {
+          "arxiv_id": "2502.18359",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+          "field": "title",
+          "excerpt": "Responsible AI Agents"
+        },
+        {
+          "arxiv_id": "2505.10468",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+          "field": "title",
+          "excerpt": "AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges"
+        },
+        {
+          "arxiv_id": "2503.12687",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+          "field": "title",
+          "excerpt": "AI Agents: Evolution, Architecture, and Real-World Applications"
+        },
+        {
+          "arxiv_id": "2503.12687",
+          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+          "field": "abstract",
+          "excerpt": "modules for perception, planning, and tool use"
+        }
+      ]
+    }
+  ]
+}

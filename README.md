@@ -10,7 +10,7 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 
 ## Overview
 
-최근 3개월의 arXiv Computer Science AI 논문과 해당 논문이 인용한 1-hop 참고문헌을 수집해 Neo4j Aura에 적재했습니다. Streamlit 앱은 질문에 따라 한국어→영어 번역, Text2Cypher 관계 조회, 제목·초록 벡터 검색, 개인화 PageRank를 조합해 답변과 근거를 제공합니다.
+수집 스냅샷(2026-06-15~2026-09-14)의 arXiv Computer Science AI 논문과 해당 논문이 인용한 1-hop 참고문헌을 Neo4j Aura에 적재했습니다. Streamlit 앱은 질문에 따라 한국어→영어 번역, Text2Cypher 관계 조회, 제목·초록 벡터 검색, 개인화 PageRank를 조합해 답변과 근거를 제공합니다.
 
 > Streamlit 앱의 탭·도구별 상세 기능과 PageRank 계산 방식은 [`APP_README.md`](APP_README.md)를 참고하세요.
 
@@ -19,6 +19,7 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 - 저자·논문·인용 관계를 조회하는 GraphRAG 질의
 - 제목과 abstract 기반 768차원 벡터 검색
 - 질문 논문 주변의 관련 문헌을 찾는 개인화 PageRank
+- 추천 논문의 인용 경로 설명과 논문 저장·비교
 - PageRank 순위, 커뮤니티, 스키마 메타그래프 시각화
 - 답변에 사용된 arXiv ID·Cypher·도구 호출 순서 확인
 
@@ -48,16 +49,18 @@ Semantic Scholar ┘                         │
 
 ### Run
 
-프로젝트 루트에 `.env`를 만들고 `NEO4J_URI`, `NEO4J_USER` 또는 `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `OPENAI_API_KEY`를 설정합니다.
+`.env.example`을 `.env`로 복사한 뒤 Neo4j Aura와 OpenAI 접속 정보를 채웁니다. 앱은 실행 시 Aura와 벡터 인덱스에 연결합니다. 개발 테스트는 DB/API 연결 없이 실행할 수 있습니다. 노트북 의존성은 `uv sync --locked --extra notebooks --extra gds`로 설치합니다. Aura Graph Analytics를 사용하지 않는다면 기본 앱 설치만으로 충분합니다.
 
 ```bash
-uv sync
+uv sync --locked --group dev
 uv run streamlit run app.py
 ```
 
 앱은 `홈`, `챗봇`, `PageRank 순위` 탭을 제공합니다. 앱의 상세 설정과 오류 대응은 [`APP_README.md`](APP_README.md)에 정리했습니다.
 
 배포된 앱은 [Streamlit 데모 주소](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)에서 바로 확인할 수 있습니다.
+
+Streamlit Community Cloud 앱은 한동안 사용하지 않으면 잠들 수 있습니다. `Zzzz` 안내가 보이면 **Yes, get this app back up!**을 누르고 시작될 때까지 기다리세요. 2026-09-27 확인 시 앱이 깨어난 뒤 Aura에 연결되어 홈 화면과 그래프 지표를 표시했습니다.
 
 ## Data
 
@@ -161,6 +164,9 @@ Leiden 분석에서는 방향성이 있는 `REFERENCES` 관계를 커뮤니티 �
 ![관련 논문 탐색](data/chatbot2.jpg)
 
 질문 또는 검색 결과 논문을 시드로 삼아 인용 네트워크에서 가까운 논문을 찾습니다.
+추천 표에는 시드와 추천 논문 사이의 최단 인용 경로도 표시됩니다. 추천 논문을 세션 목록에
+저장한 뒤 초록이 있는 2~4편을 골라 비교할 수 있으며, 화면 구성과 보존 범위는
+[`APP_README.md`](APP_README.md)에서 설명합니다.
 
 ### Chatbot — 답변 번역
 
@@ -204,13 +210,15 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 .
 ├── app.py                         # Streamlit 진입점
 ├── chatbot.py                     # 검색 도구·에이전트·개인화 PageRank
+├── paper_library.py               # 세션 논문 저장·비교 선택 처리
 ├── gds_pagerank.py                # Aura Graph Analytics PageRank
 ├── metagraph.py                  # 스키마·커뮤니티 시각화
 ├── APP_README.md                 # 앱 상세 문서
 ├── data/                         # JSONL 및 데모 이미지
 ├── notebooks/                    # 수집·적재·품질 분석 노트북
-├── reports/                      # 품질 리포트 JSON·시각화
-└── tests/                        # 노트북·수집 로직 테스트
+├── reports/                      # 그래프 품질·검색 평가 결과
+├── evals/                        # 검색·답변 평가 데이터와 실행기
+└── tests/                        # 평가 지표·실행기 단위 테스트
 ```
 
 ## Limitations and retrospective
@@ -220,6 +228,10 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 - AI 관련 논문이 인용한 1-hop 논문만 수집해 더 깊은 인용망은 포함하지 못했습니다.
 - 컴퓨터 용량 제약으로 PDF를 청킹·임베딩하지 못하고 제목과 abstract만 사용했습니다.
 
+## Advanced evaluation
+
+RAG 검색·답변 평가 방법과 이번 개선 변경점은 [`advanced.md`](advanced.md)에 정리했습니다.
+
 ## Verification
 
-README의 링크와 이미지 경로는 현재 저장소의 노트북·리포트·이미지를 기준으로 작성했습니다. 품질 수치는 [`reports/aura_graph_rag_quality_report.json`](reports/aura_graph_rag_quality_report.json)의 생성 결과를 따릅니다.
+GitHub Actions에서 잠금 파일, Ruff, 단위 테스트, Python 구문을 확인합니다. README의 링크와 이미지 경로는 현재 저장소의 노트북·리포트·이미지를 기준으로 작성했습니다. 품질 수치는 [`reports/aura_graph_rag_quality_report.json`](reports/aura_graph_rag_quality_report.json)의 생성 결과를 따릅니다.

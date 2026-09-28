@@ -2,7 +2,7 @@
 
 Neo4j Aura에 적재한 arXiv 지식 그래프에 자연어로 질문하는 Streamlit 앱의 기술 문서입니다.
 한국어 질문을 영어로 번역해 **Text2Cypher 관계 조회**와 **초록 벡터 검색**을 선택적으로 실행하고,
-답변에 쓴 근거를 arXiv ID로 검증해 그래프와 함께 보여 줍니다.
+답변 근거·개인화 PageRank 추천 경로·세션에 저장한 논문 비교를 화면에서 확인할 수 있습니다.
 
 프로젝트 전체 소개(데이터 수집, 온톨로지, 품질 리포트, 데모 화면)는 [`README.md`](README.md)에 있습니다.
 
@@ -53,7 +53,7 @@ Neo4j Aura에 적재한 arXiv 지식 그래프에 자연어로 질문하는 Stre
 저장소 루트에서 실행합니다.
 
 ```bash
-uv sync
+uv sync --locked
 uv run streamlit run app.py --server.fileWatcherType none
 ```
 
@@ -62,7 +62,7 @@ uv run streamlit run app.py --server.fileWatcherType none
 
 ### 환경 변수
 
-저장소 루트 `.env`를 `python-dotenv`로 읽습니다. 적재 노트북과 같은 키입니다.
+저장소 루트 `.env`를 `python-dotenv`로 읽습니다. 적재 노트북과 같은 키입니다. 키 이름은 `.env.example`을 참고해 `.env`에 설정하세요. 접속할 수 없는 경우 앱은 연결 원인과 함께 저장된 데모 화면을 보여 주며, 해당 이미지는 실시간 검색 결과가 아닙니다.
 
 | 환경변수 | 필수 | 용도 |
 |---|---|---|
@@ -71,7 +71,7 @@ uv run streamlit run app.py --server.fileWatcherType none
 | `NEO4J_PASSWORD` | ✅ | 비밀번호 |
 | `OPENAI_API_KEY` | ✅ | 임베딩·LLM API 키 |
 | `NEO4J_DATABASE` | | 생략하면 `neo4j` |
-| `OPENAI_MODEL` | | 생략하면 `gpt-5.6-luna` |
+| `OPENAI_MODEL` | | 생략하면 `gpt-6-luna` |
 | `CLIENT_ID`·`CLIENT_SECRET` | | Aura API 자격증명. GDS 세션 엔진을 쓸 때만 필요합니다 |
 | `AURA_PROJECT_ID` | | Aura 프로젝트가 둘 이상일 때만 지정합니다 |
 
@@ -88,6 +88,7 @@ uv run streamlit run app.py --server.fileWatcherType none
 |---|---|---|
 | [`chatbot.py`](chatbot.py) | 연결·인덱스 확인 → 도구 4개 → 에이전트 → 답변 검증 → PageRank 계산 | 앱 시작 시 1회 |
 | [`app.py`](app.py) | 세 탭의 화면 구성과 상태 관리 | 매 렌더 |
+| [`paper_library.py`](paper_library.py) | 세션 저장 논문 중복 제거·상한·비교 선택 검증 | 저장 목록 사용 시 |
 | [`metagraph.py`](metagraph.py) | 홈 탭의 Plotly 메타그래프(스키마·커뮤니티) | 홈 탭 렌더 시 |
 | [`gds_pagerank.py`](gds_pagerank.py) | (선택) Aura Graph Analytics 세션 PageRank 엔진 | GDS 엔진을 고를 때만 |
 
@@ -157,7 +158,7 @@ uv run streamlit run app.py --server.fileWatcherType none
 
 #### 추가 기능
 
-첫 칸은 항상 나오고, 나머지 셋은 해당 결과가 있을 때만 나옵니다.
+검색 과정과 근거 확인은 항상 나오며, 나머지 기능은 해당 결과가 있을 때만 표시됩니다.
 
 <details>
 <summary><b><code>검색 과정과 근거 확인</code> — 항상</b></summary>
@@ -181,6 +182,11 @@ uv run streamlit run app.py --server.fileWatcherType none
 PageRank 점수는 1e-4 수준이라 지수 표기로 보여 줍니다.
 이 순위는 전체에서 유명한 논문이 아니라 **시드 논문 주변에서** 중요한 논문입니다.
 
+각 추천 논문 아래 **추천 경로**는 시드에서 최단 4단계 이내로 이어지는 인용 경로입니다.
+탐색은 개인화 PageRank와 동일하게 인용 관계를 양방향으로 따라가고, 설명에는 실제 방향을
+`A가 B를 인용`으로 표시합니다. 경로가 없거나 4단계를 넘으면 그 사실을 알립니다.
+`논문 저장`을 누르면 세션 저장 목록으로 보낼 수 있습니다.
+
 </details>
 
 <details>
@@ -192,6 +198,26 @@ PageRank 점수는 1e-4 수준이라 지수 표기로 보여 줍니다.
 2. `Neo4j 벡터 유사도: 0.xxx (클수록 유사함) / 분류: cs.AI, cs.LG`
 3. **초록 전문**
 4. `arXiv PDF` 링크 버튼
+
+</details>
+
+<details>
+<summary><b><code>논문 비교</code> — 초록 벡터 검색 결과가 두 편 이상일 때</b></summary>
+
+벡터 검색으로 나온 논문 중 **2~4편**을 선택해 연구 질문, 방법, 데이터·실험 설정, 주요 결과를
+해당 답변 아래 한 표에서 비교합니다. 입력은 저장된 제목과 초록뿐이며 PDF 전문을 읽지 않습니다. 초록에서 근거를
+확인할 수 없는 항목은 `초록에서 확인할 수 없음`으로 표시하고, 각 논문 행의 arXiv ID와 페이지 링크를
+함께 제공합니다. 비교는 답변별로 분리되어 저장되고, 대화를 지우면 같이 초기화됩니다.
+
+</details>
+
+<details>
+<summary><b><code>저장한 논문</code> — 챗봇 탭</b></summary>
+
+벡터 검색 결과나 개인화 PageRank 추천에서 **논문 저장**을 눌러 최대 20편을 모읍니다.
+arXiv ID가 같으면 중복으로 추가하지 않습니다. 저장한 논문 표에서 항목을 제거하거나 전체 목록을
+비울 수 있습니다. 이 목록은 현재 브라우저 세션에만 보관되며 대화 지우기에는 영향을 받지 않습니다.
+초록이 있는 논문 2~4편은 목록에서도 비교할 수 있습니다. 모델에는 ID·제목·초록만 전달됩니다.
 
 </details>
 
@@ -263,11 +289,15 @@ LLM의 최종 출력은 두 필드입니다(`ProviderStrategy(GroundedAnswer, st
 | `evidence_ids` | 답변에 사용한 `ArxivPaper.arxiv_id` 목록 |
 
 `ask`는 `agent.stream(..., stream_mode=["messages", "values"])`로 생성 중인 답변을 받아 화면을 바로
-갱신하고, 생성이 끝나면 **이번 질문의 호출 기록만** 모아 인용 ID를 검사합니다. 검색 결과에 없는 ID가
-있으면 같은 근거로 한 번 수정하고 다시 검사합니다. 계속 실패하면 답변을 대화에 저장하지 않습니다.
+갱신하고, 생성이 끝나면 **이번 질문의 호출 기록만** 모아 인용 ID를 검사합니다. 이어서 인용 논문의
+제목·초록을 Aura에서 다시 읽고, 별도 구조화 모델 판정으로 질문의 내용 조건과 그래프 조건을 식별합니다.
+복합 질문이라면 각 인용 ID가 그래프 조회 결과에 있고 제목·초록이 내용 조건을 뒷받침하는지 확인합니다.
+생성된 Cypher가 질문의 관계·속성 조건을 반영했는지도 판정합니다. 검증 실패 시 에이전트에 한 번 수정을
+요청하며, 계속 실패하면 답변을 대화에 저장하지 않습니다. 그래프에서만 발견된 후보도 검토하므로
+벡터 상위 10편과의 단순 교집합 때문에 정답을 버리지 않습니다.
 
-> **ID가 존재하는지만 보는 검사입니다.** 답변 내용이 맞는지까지 판정하지 않으므로,
-> 근거 표와 초록으로 직접 대조하세요.
+> **한계** — 내용 적합성과 Cypher의 조건 충실도는 모델 판정이므로 오판할 수 있습니다.
+> 초록에 없는 PDF 전문의 사실은 확인하지 못하며, 인용 ID에 없는 답변 문장의 사실성도 보장하지 않습니다.
 
 Cypher는 `answer_value`(답할 값)와 `evidence_ids`(그 값의 근거 `arxiv_id` 목록)를 반환해야 합니다.
 논문을 특정할 수 없는 순수 집계라면 두 곳 모두 빈 목록이어도 됩니다.
