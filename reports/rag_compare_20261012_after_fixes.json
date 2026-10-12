@@ -1,0 +1,2347 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-12T12:32:12.201997+00:00",
+  "mode": "compare",
+  "top_k": 5,
+  "dataset": "cases.json",
+  "metadata": {
+    "timestamp_utc": "2026-10-12T12:32:12.201997+00:00",
+    "dataset_file": "cases.json",
+    "dataset_sha256": "0983c239dff53f107469dd268ad629a83c4d87f39d145e3b14c8bccc498b8094",
+    "mode": "compare",
+    "top_k": 5,
+    "case_ids": [
+      "topic-graph-neural-network",
+      "topic-retrieval-augmented-generation",
+      "topic-diffusion-model",
+      "topic-reinforcement-learning",
+      "topic-multimodal",
+      "topic-knowledge-graph",
+      "topic-code-generation",
+      "topic-medical-imaging",
+      "topic-federated-learning",
+      "topic-AI-agents",
+      "title-01",
+      "title-02",
+      "title-03",
+      "title-04",
+      "title-05",
+      "title-06",
+      "title-07",
+      "title-08",
+      "title-09",
+      "title-10",
+      "title-11",
+      "title-12",
+      "title-13",
+      "title-14",
+      "title-15",
+      "title-16",
+      "title-17",
+      "title-18",
+      "title-19",
+      "title-20",
+      "title-21"
+    ],
+    "model": "gpt-6-luna",
+    "embedding_model": "text-embedding-3-large",
+    "python_version": "3.12.13",
+    "platform": {
+      "system": "Windows",
+      "release": "11",
+      "machine": "AMD64"
+    },
+    "packages": {
+      "openai": "3.8.0",
+      "langchain": "1.3.16",
+      "neo4j-graphrag": "1.18.0",
+      "tiktoken": "0.14.0"
+    },
+    "git_sha": "8ea1e0beb62573bcc9a1233201472900ba3364ba",
+    "git_dirty": false
+  },
+  "pricing": null,
+  "results": [
+    {
+      "id": "topic-graph-neural-network",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-graph-neural-network",
+        "category": "topic",
+        "retrieved_ids": [
+          "2011.11288",
+          "1812.08434",
+          "1904.07785",
+          "1901.00596",
+          "1911.06455"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.009523809523809525,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.8,
+        "answer_evidence_recall": 0.009523809523809525,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2011.11288",
+          "1812.08434",
+          "1904.07785",
+          "1901.00596",
+          "1911.06455"
+        ],
+        "answer": "Relevant papers include “AutoGraph: Automated Graph Neural Network” (2011.11288), “Graph Neural Networks: A Review of Methods and Applications” (1812.08434), “Graph Wavelet Neural Network” (1904.07785), “A Comprehensive Survey on Graph Neural Networks” (1901.00596), and “Graph Transformer Networks” (1911.06455).",
+        "elapsed_seconds": 7.355145199995604,
+        "chat_input_tokens": 1321,
+        "chat_output_tokens": 129,
+        "embedding_tokens_estimate": 3,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-graph-neural-network",
+        "category": "topic",
+        "retrieved_ids": [
+          "1812.08434",
+          "1904.09981",
+          "1901.00596",
+          "2003.00330",
+          "2102.09544"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.011904761904761904,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.011904761904761904,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2607.07984",
+          "2403.09742",
+          "2608.09921",
+          "2507.21873",
+          "2607.26023"
+        ],
+        "evidence_ids": [
+          "1812.08434",
+          "1904.09981",
+          "1901.00596",
+          "2003.00330",
+          "2102.09544"
+        ],
+        "answer": "Here are several arXiv papers about graph neural networks:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 1812.08434 | Graph Neural Networks: A Review of Methods and Applications | cs.LG |\n| 1904.09981 | GraphNAS: Graph Neural Architecture Search with Reinforcement Learning | cs.LG |\n| 1901.00596 | A Comprehensive Survey on Graph Neural Networks | cs.LG |\n| 2003.00330 | Graph Neural Networks Meet Neural-Symbolic Computing: A Survey and Perspective | cs.AI |\n| 2102.09544 | Combinatorial optimization and reasoning with graph neural networks | cs.LG |",
+        "elapsed_seconds": 30.49213400000008,
+        "chat_input_tokens": 13176,
+        "chat_output_tokens": 521,
+        "embedding_tokens_estimate": 10,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-retrieval-augmented-generation",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-retrieval-augmented-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2506.00054",
+          "2305.15294",
+          "2402.19473",
+          "2005.11401",
+          "2407.13193"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0057553956834532375,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.8,
+        "answer_evidence_recall": 0.0057553956834532375,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2506.00054",
+          "2305.15294",
+          "2402.19473",
+          "2005.11401",
+          "2407.13193"
+        ],
+        "answer": "Retrieved papers about retrieval-augmented generation include:\n- arXiv:2506.00054 — *Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers*\n- arXiv:2305.15294 — *Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy*\n- arXiv:2402.19473 — *Retrieval-Augmented Generation for AI-Generated Content: A Survey*\n- arXiv:2005.11401 — *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks*\n- arXiv:2407.13193 — *Retrieval-Augmented Generation for Natural Language Processing: A Survey*",
+        "elapsed_seconds": 4.028141899994807,
+        "chat_input_tokens": 1674,
+        "chat_output_tokens": 242,
+        "embedding_tokens_estimate": 5,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-retrieval-augmented-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2506.00054",
+          "2305.15294",
+          "2402.19473",
+          "2005.11401",
+          "2407.13193",
+          "2502.00848",
+          "2407.01219",
+          "2009.08553",
+          "2305.06983",
+          "2503.10150"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0057553956834532375,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.7,
+        "answer_evidence_recall": 0.010071942446043165,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2609.07152",
+          "2505.02271",
+          "2608.11584",
+          "2609.00967",
+          "2608.11238"
+        ],
+        "evidence_ids": [
+          "2506.00054",
+          "2305.15294",
+          "2402.19473",
+          "2005.11401",
+          "2407.13193",
+          "2502.00848",
+          "2407.01219",
+          "2009.08553",
+          "2305.06983",
+          "2503.10150"
+        ],
+        "answer": "Here are several papers about retrieval-augmented generation:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2506.00054 | Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers | cs.IR |\n| 2305.15294 | Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy | cs.CL |\n| 2402.19473 | Retrieval-Augmented Generation for AI-Generated Content: A Survey | cs.CV |\n| 2005.11401 | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks | cs.CL |\n| 2407.13193 | Retrieval-Augmented Generation for Natural Language Processing: A Survey | cs.CL |\n| 2407.01219 | Searching for Best Practices in Retrieval-Augmented Generation | cs.CL |\n| 2305.06983 | Active Retrieval Augmented Generation | cs.CL |\n| 2503.10150 | Retrieval-Augmented Generation with Hierarchical Knowledge | cs.CL |",
+        "elapsed_seconds": 12.85808299999917,
+        "chat_input_tokens": 16148,
+        "chat_output_tokens": 726,
+        "embedding_tokens_estimate": 5,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-diffusion-model",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-diffusion-model",
+        "category": "topic",
+        "retrieved_ids": [
+          "2609.13047",
+          "2211.15089",
+          "2410.17891",
+          "2208.11970",
+          "2409.15816"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.006925207756232687,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.006925207756232687,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2609.13047",
+          "2211.15089",
+          "2410.17891",
+          "2208.11970",
+          "2409.15816"
+        ],
+        "answer": "Papers about diffusion models include “Diffusion Models and Concept Formation,” “Continuous diffusion for categorical data,” “Scaling Diffusion Language Models via Adaptation from Autoregressive Models,” “Understanding Diffusion Models: A Unified Perspective,” and “Diffusion Models for Intelligent Transportation Systems: A Survey.”",
+        "elapsed_seconds": 3.306361700000707,
+        "chat_input_tokens": 1412,
+        "chat_output_tokens": 149,
+        "embedding_tokens_estimate": 3,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-diffusion-model",
+        "category": "topic",
+        "retrieved_ids": [
+          "2209.00796",
+          "2404.07771",
+          "2410.11795",
+          "2408.10266",
+          "2609.13047"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.006925207756232687,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.006925207756232687,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2602.05533",
+          "2609.07316",
+          "2411.10431",
+          "2507.21802",
+          "2006.11239"
+        ],
+        "evidence_ids": [
+          "2209.00796",
+          "2404.07771",
+          "2410.11795",
+          "2408.10266",
+          "2609.13047"
+        ],
+        "answer": "Here are several arXiv papers about diffusion models:\n\n| arXiv ID | Title | Primary category | What it covers |\n|---|---|---|---|\n| 2209.00796 | Diffusion Models: A Comprehensive Survey of Methods and Applications | cs.LG | Survey of methods, applications, efficient sampling, likelihood estimation, and structured data. |\n| 2404.07771 | An Overview of Diffusion Models: Applications, Guided Generation, Statistical Rates and Optimization | cs.LG | Applications and theory, including guided generation, statistical properties, and optimization. |\n| 2410.11795 | Efficient Diffusion Models: A Comprehensive Survey from Principles to Practices | cs.CV | Efficiency in diffusion-model architectures, training, inference, and deployment. |\n| 2408.10266 | Diffusion Model for Planning: A Systematic Literature Review | cs.LG | Uses of diffusion models in planning, including guided planning, safety, and applications. |\n| 2609.13047 | Diffusion Models and Concept Formation | cs.AI | Examines connections between diffusion models and hierarchical concept formation. |",
+        "elapsed_seconds": 15.164722599991364,
+        "chat_input_tokens": 13723,
+        "chat_output_tokens": 643,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-reinforcement-learning",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-reinforcement-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1611.05763",
+          "2002.12636",
+          "1611.08944",
+          "2405.10369",
+          "2509.01684"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0011956001912960307,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.0011956001912960307,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "1611.05763",
+          "2002.12636",
+          "1611.08944",
+          "2405.10369",
+          "2509.01684"
+        ],
+        "answer": "Retrieved papers about reinforcement learning include: “Learning to Reinforcement Learn” (1611.05763), “Reinforcement Learning through Active Inference” (2002.12636), “Nonparametric General Reinforcement Learning” (1611.08944), “Reinforcement Learning” (2405.10369), and “Reinforcement Learning for Machine Learning Engineering Agents” (2509.01684).",
+        "elapsed_seconds": 4.128693099992233,
+        "chat_input_tokens": 1423,
+        "chat_output_tokens": 191,
+        "embedding_tokens_estimate": 4,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-reinforcement-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "cs/9605103",
+          "2607.17560",
+          "2112.04553",
+          "1707.06887",
+          "2509.08827"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0011956001912960307,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.0011956001912960307,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2403.04931",
+          "2606.26173",
+          "2201.11903",
+          "2608.23058",
+          "2303.17564"
+        ],
+        "evidence_ids": [
+          "cs/9605103",
+          "2607.17560",
+          "2112.04553",
+          "1707.06887",
+          "2509.08827"
+        ],
+        "answer": "Here are several arXiv papers about reinforcement learning:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| cs/9605103 | Reinforcement Learning: A Survey | cs.AI |\n| 2607.17560 | Reinforcement Learning: From Algorithms To Foundation Models | cs.AI |\n| 2112.04553 | Recent Advances in Reinforcement Learning in Finance | q-fin.MF |\n| 1707.06887 | A Distributional Perspective on Reinforcement Learning | cs.LG |\n| 2509.08827 | A Survey of Reinforcement Learning for Large Reasoning Models | cs.CL |",
+        "elapsed_seconds": 13.247786199994152,
+        "chat_input_tokens": 13791,
+        "chat_output_tokens": 481,
+        "embedding_tokens_estimate": 7,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-multimodal",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-multimodal",
+        "category": "topic",
+        "retrieved_ids": [
+          "2301.04856",
+          "1705.09406",
+          "2203.15332",
+          "2106.04538",
+          "2004.04917"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0013831258644536654,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.001037344398340249,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2301.04856",
+          "1705.09406",
+          "2203.15332"
+        ],
+        "answer": "Retrieved papers about multimodal include “Multimodal Deep Learning” (2301.04856), “Multimodal Machine Learning: A Survey and Taxonomy” (1705.09406), and “Balanced Multimodal Learning via On-the-fly Gradient Modulation” (2203.15332).",
+        "elapsed_seconds": 2.8416437999985646,
+        "chat_input_tokens": 1360,
+        "chat_output_tokens": 99,
+        "embedding_tokens_estimate": 3,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-multimodal",
+        "category": "topic",
+        "retrieved_ids": [
+          "1705.09406",
+          "2301.04856",
+          "2106.04538",
+          "2306.04539",
+          "1702.01992",
+          "2411.02571",
+          "2209.03430",
+          "2408.01319",
+          "2601.07856",
+          "2306.13549"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0013831258644536654,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.9,
+        "answer_evidence_recall": 0.0031120331950207467,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2608.02238",
+          "2609.11341",
+          "2609.07409",
+          "2609.11607",
+          "2608.18110"
+        ],
+        "evidence_ids": [
+          "1705.09406",
+          "2301.04856",
+          "2106.04538",
+          "2306.04539",
+          "1702.01992",
+          "2411.02571",
+          "2209.03430",
+          "2408.01319",
+          "2601.07856",
+          "2306.13549"
+        ],
+        "answer": "Here are several papers about multimodal learning and related topics:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 1705.09406 | Multimodal Machine Learning: A Survey and Taxonomy | cs.LG |\n| 2301.04856 | Multimodal Deep Learning | cs.CL |\n| 2106.04538 | What Makes Multi-modal Learning Better than Single (Provably) | cs.LG |\n| 2306.04539 | Multimodal Learning Without Labeled Multimodal Data: Guarantees and Applications | cs.LG |\n| 1702.01992 | Gated Multimodal Units for Information Fusion | stat.ML |\n| 2411.02571 | MM-Embed: Universal Multimodal Retrieval with Multimodal LLMs | cs.CL |\n| 2209.03430 | Foundations and Trends in Multimodal Machine Learning: Principles, Challenges, and Open Questions | cs.LG |\n| 2408.01319 | A Comprehensive Review of Multimodal Large Language Models: Performance and Challenges Across Different Tasks | cs.AI |\n| 2601.07856 | Feature Entanglement-based Quantum Multimodal Fusion Neural Network | quant-ph |\n| 2306.13549 | A Survey on Multimodal Large Language Models | cs.CV |",
+        "elapsed_seconds": 12.070186500001,
+        "chat_input_tokens": 16299,
+        "chat_output_tokens": 769,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-knowledge-graph",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-knowledge-graph",
+        "category": "topic",
+        "retrieved_ids": [
+          "2003.02320",
+          "2303.13948",
+          "2308.14217",
+          "2605.22093",
+          "2002.00388"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.006426735218508998,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.005141388174807198,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2003.02320",
+          "2002.00388",
+          "2303.13948",
+          "2308.14217"
+        ],
+        "answer": "Relevant papers about knowledge graphs include “Knowledge Graphs” (arXiv:2003.02320), “A Survey on Knowledge Graphs: Representation, Acquisition and Applications” (arXiv:2002.00388), “Knowledge Graphs: Opportunities and Challenges” (arXiv:2303.13948), and “Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact” (arXiv:2308.14217).",
+        "elapsed_seconds": 2.8639545000041835,
+        "chat_input_tokens": 1337,
+        "chat_output_tokens": 137,
+        "embedding_tokens_estimate": 2,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-knowledge-graph",
+        "category": "topic",
+        "retrieved_ids": [
+          "2003.02320",
+          "2002.00388",
+          "2303.13948",
+          "2308.14217",
+          "2302.05019"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.006426735218508998,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.006426735218508998,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2505.12369",
+          "2506.04571",
+          "2607.07422",
+          "2608.17443",
+          "2609.12746"
+        ],
+        "evidence_ids": [
+          "2003.02320",
+          "2002.00388",
+          "2303.13948",
+          "2308.14217",
+          "2302.05019"
+        ],
+        "answer": "Here are five arXiv papers about knowledge graphs:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2003.02320 | Knowledge Graphs | cs.AI |\n| 2002.00388 | A Survey on Knowledge Graphs: Representation, Acquisition and Applications | cs.CL |\n| 2303.13948 | Knowledge Graphs: Opportunities and Challenges | cs.AI |\n| 2308.14217 | Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact | cs.DB |\n| 2302.05019 | A Comprehensive Survey on Automatic Knowledge Graph Construction | cs.IR |",
+        "elapsed_seconds": 16.01552200000151,
+        "chat_input_tokens": 13429,
+        "chat_output_tokens": 513,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-code-generation",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-code-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2203.13474",
+          "2603.29088",
+          "2405.20092",
+          "2412.07822",
+          "2407.16237"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.007062146892655367,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.007062146892655367,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2203.13474",
+          "2405.20092",
+          "2412.07822",
+          "2407.16237",
+          "2603.29088"
+        ],
+        "answer": "Retrieved papers about code generation include CodeGen (2203.13474), FunCoder (2405.20092), MAGE (2412.07822), OriGen (2407.16237), and WybeCoder (2603.29088).",
+        "elapsed_seconds": 2.3759111000108533,
+        "chat_input_tokens": 1589,
+        "chat_output_tokens": 101,
+        "embedding_tokens_estimate": 2,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-code-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2504.17192",
+          "2407.16237",
+          "2203.13474",
+          "2407.02742",
+          "2212.11140",
+          "2301.13816",
+          "2508.03558",
+          "2501.17725",
+          "1711.03543",
+          "2603.29088"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.007062146892655367,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.9,
+        "answer_evidence_recall": 0.012711864406779662,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2607.17063",
+          "2608.02878",
+          "2607.02134",
+          "2608.24291",
+          "2607.02931"
+        ],
+        "evidence_ids": [
+          "2504.17192",
+          "2407.16237",
+          "2203.13474",
+          "2407.02742",
+          "2212.11140",
+          "2301.13816",
+          "2508.03558",
+          "2501.17725",
+          "1711.03543",
+          "2603.29088"
+        ],
+        "answer": "Here are several papers about code generation:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2504.17192 | Paper2Code: Automating Code Generation from Scientific Papers in Machine Learning | cs.CL |\n| 2407.16237 | OriGen:Enhancing RTL Code Generation with Code-to-Code Augmentation and Self-Reflection | cs.AR |\n| 2203.13474 | CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis | cs.LG |\n| 2407.02742 | A Comparative Study of DSL Code Generation: Fine-Tuning vs. Optimized Retrieval Augmentation | cs.SE |\n| 2212.11140 | Benchmarking Large Language Models for Automated Verilog RTL Code Generation | cs.PL |\n| 2301.13816 | Execution-based Code Generation using Deep Reinforcement Learning | cs.LG |\n| 2508.03558 | SAGE-HLS: Syntax-Aware AST-Guided LLM for High-Level Synthesis Code Generation | cs.PL |\n| 2501.17725 | Using Code Generation to Solve Open Instances of Combinatorial Design Problems | cs.AI |\n| 1711.03543 | DLPaper2Code: Auto-generation of Code from Deep Learning Research Papers | cs.LG |\n| 2603.29088 | WybeCoder: Verified Imperative Code Generation | cs.SE |",
+        "elapsed_seconds": 11.810806699999375,
+        "chat_input_tokens": 16954,
+        "chat_output_tokens": 716,
+        "embedding_tokens_estimate": 7,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-medical-imaging",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-medical-imaging",
+        "category": "topic",
+        "retrieved_ids": [
+          "2103.01938",
+          "2609.07719",
+          "1612.07003",
+          "2204.13258",
+          "1901.07042"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.029411764705882353,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 0.029411764705882353,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2103.01938",
+          "2609.07719",
+          "1612.07003",
+          "2204.13258",
+          "1901.07042"
+        ],
+        "answer": "Papers about medical imaging include “Medical Imaging and Machine Learning” (2103.01938), “A radiographic world model for clinical reasoning and evidence generation” (2609.07719), “Image biomarker standardisation initiative” (1612.07003), “Cross-modal Memory Networks for Radiology Report Generation” (2204.13258), and “MIMIC-CXR-JPG, a large publicly available database of labeled chest radiographs” (1901.07042).",
+        "elapsed_seconds": 3.5421392999996897,
+        "chat_input_tokens": 1447,
+        "chat_output_tokens": 193,
+        "embedding_tokens_estimate": 2,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-medical-imaging",
+        "category": "topic",
+        "retrieved_ids": [
+          "2103.01938",
+          "2008.09104",
+          "2210.13462",
+          "2201.09873",
+          "2206.05498",
+          "2403.06801",
+          "2010.16056",
+          "2507.05201",
+          "2604.05081",
+          "1702.05747"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.049019607843137254,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.75,
+        "answer_evidence_recall": 0.058823529411764705,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2608.23643",
+          "2608.25261",
+          "2606.26494",
+          "2101.03961",
+          "1701.06538"
+        ],
+        "evidence_ids": [
+          "2103.01938",
+          "2008.09104",
+          "2201.09873",
+          "2206.05498",
+          "2403.06801",
+          "2507.05201",
+          "2604.05081",
+          "1702.05747"
+        ],
+        "answer": "Here are several arXiv papers related to medical imaging:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2103.01938 | Medical Imaging and Machine Learning | eess.IV |\n| 2008.09104 | A review of deep learning in medical imaging: Imaging traits, technology trends, case studies with progress highlights, and future promises | cs.CV |\n| 2201.09873 | Transformers in Medical Imaging: A Survey | eess.IV |\n| 2206.05498 | A Review of Causality for Learning Algorithms in Medical Image Analysis | cs.CV |\n| 2403.06801 | CT2Rep: Automated Radiology Report Generation for 3D Medical Imaging | eess.IV |\n| 2507.05201 | MedGemma Technical Report | cs.AI |\n| 2604.05081 | MedGemma 1.5 Technical Report | cs.AI |\n| 1702.05747 | A Survey on Deep Learning in Medical Image Analysis | cs.CV |",
+        "elapsed_seconds": 18.276542199993855,
+        "chat_input_tokens": 18154,
+        "chat_output_tokens": 882,
+        "embedding_tokens_estimate": 7,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-federated-learning",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-federated-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1908.07873",
+          "1602.05629",
+          "1912.04977",
+          "1806.00582",
+          "2002.06440"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.02262443438914027,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.02262443438914027,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "1908.07873",
+          "1602.05629",
+          "1912.04977",
+          "1806.00582",
+          "2002.06440"
+        ],
+        "answer": "Papers about federated learning include “Federated Learning: Challenges, Methods, and Future Directions,” “Communication-Efficient Learning of Deep Networks from Decentralized Data,” “Advances and Open Problems in Federated Learning,” “Federated Learning with Non-IID Data,” and “Federated Learning with Matched Averaging.”",
+        "elapsed_seconds": 2.773833100000047,
+        "chat_input_tokens": 1123,
+        "chat_output_tokens": 155,
+        "embedding_tokens_estimate": 4,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-federated-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1908.07873",
+          "1912.04977",
+          "1907.09693",
+          "2007.13518",
+          "2103.00710",
+          "2402.06954",
+          "2503.12226",
+          "1602.05629",
+          "1912.13445",
+          "1910.01991"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.02262443438914027,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 0.04524886877828054,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2608.07007",
+          "2402.02885",
+          "2608.06112",
+          "2606.27005",
+          "2409.06067"
+        ],
+        "evidence_ids": [
+          "1908.07873",
+          "1912.04977",
+          "1907.09693",
+          "2007.13518",
+          "2103.00710",
+          "2402.06954",
+          "2503.12226",
+          "1602.05629",
+          "1912.13445",
+          "1910.01991"
+        ],
+        "answer": "Here are several arXiv papers about federated learning:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 1908.07873 | Federated Learning: Challenges, Methods, and Future Directions | cs.LG |\n| 1912.04977 | Advances and Open Problems in Federated Learning | cs.LG |\n| 1907.09693 | A Survey on Federated Learning Systems: Vision, Hype and Reality for Data Privacy and Protection | cs.LG |\n| 2007.13518 | FedML: A Research Library and Benchmark for Federated Machine Learning | cs.LG |\n| 2103.00710 | Towards Personalized Federated Learning | cs.LG |\n| 2402.06954 | OpenFedLLM: Training Large Language Models on Decentralized Private Data via Federated Learning | cs.LG |\n| 2503.12226 | Research on Large Language Model Cross-Cloud Privacy Protection and Collaborative Training based on Federated Learning | cs.CR |\n| 1602.05629 | Communication-Efficient Learning of Deep Networks from Decentralized Data | cs.LG |\n| 1912.13445 | Robust Aggregation for Federated Learning | stat.ML |\n| 1910.01991 | Clustered Federated Learning: Model-Agnostic Distributed Multi-Task Optimization under Privacy Constraints | cs.LG |",
+        "elapsed_seconds": 16.8127714000002,
+        "chat_input_tokens": 17413,
+        "chat_output_tokens": 890,
+        "embedding_tokens_estimate": 10,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "topic-AI-agents",
+      "category": "topic",
+      "vector_only": {
+        "id": "topic-AI-agents",
+        "category": "topic",
+        "retrieved_ids": [
+          "2502.18359",
+          "2505.10468",
+          "2503.12687",
+          "2601.01743",
+          "2506.15741"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.004459308807134894,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.8,
+        "answer_evidence_recall": 0.004459308807134894,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2502.18359",
+          "2505.10468",
+          "2503.12687",
+          "2601.01743",
+          "2506.15741"
+        ],
+        "answer": "Papers about AI agents include “Responsible AI Agents” (2502.18359), “AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges” (2505.10468), “AI Agents: Evolution, Architecture, and Real-World Applications” (2503.12687), “AI Agent Systems: Architectures, Applications, and Evaluation” (2601.01743), and “OAgents: An Empirical Study of Building Effective Agents” (2506.15741).",
+        "elapsed_seconds": 5.283334100007778,
+        "chat_input_tokens": 1544,
+        "chat_output_tokens": 188,
+        "embedding_tokens_estimate": 2,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "topic-AI-agents",
+        "category": "topic",
+        "retrieved_ids": [
+          "2503.12687",
+          "2608.05179",
+          "2601.01743",
+          "2503.18102",
+          "2404.11584",
+          "2607.27191",
+          "2506.15741",
+          "2603.11088",
+          "2606.09550",
+          "2510.05743"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0033444816053511705,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 0.006688963210702341,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2609.07713",
+          "2609.07910",
+          "2603.29139",
+          "2608.19072",
+          "2608.27044"
+        ],
+        "evidence_ids": [
+          "2503.12687",
+          "2608.05179",
+          "2601.01743",
+          "2503.18102",
+          "2404.11584",
+          "2607.27191",
+          "2506.15741",
+          "2603.11088",
+          "2606.09550",
+          "2510.05743"
+        ],
+        "answer": "Here are several arXiv papers about AI agents, covering agent architectures, evaluation, collaborative research, and security:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2503.12687 | AI Agents: Evolution, Architecture, and Real-World Applications | cs.AI |\n| 2608.05179 | Autonomous Research Agents: A Survey of AI Scientists and the Verification Gap | cs.CY |\n| 2601.01743 | AI Agent Systems: Architectures, Applications, and Evaluation | cs.AI |\n| 2503.18102 | AgentRxiv: Towards Collaborative Autonomous Research | cs.AI |\n| 2404.11584 | The Landscape of Emerging AI Agent Architectures for Reasoning, Planning, and Tool Calling: A Survey | cs.AI |\n| 2607.27191 | Can AI agents conduct open-ended AI research? Early evidence from two case studies | cs.AI |\n| 2506.15741 | OAgents: An Empirical Study of Building Effective Agents | cs.AI |\n| 2603.11088 | The Attack and Defense Landscape of Agentic AI: A Comprehensive Survey | cs.CR |\n| 2606.09550 | InquiTree: Evaluating AI Agents in the Scientific Inquiry Loop with Paper-Derived Research Trees | cs.DB |\n| 2510.05743 | Artificially intelligent agents in the social and behavioral sciences: A history and outlook | cs.AI |",
+        "elapsed_seconds": 15.884040599994478,
+        "chat_input_tokens": 18080,
+        "chat_output_tokens": 747,
+        "embedding_tokens_estimate": 7,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-01",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-01",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.28632",
+          "2505.15155",
+          "2602.07085",
+          "2607.12455",
+          "2605.28655"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.28632"
+        ],
+        "answer": "The paper is arXiv:2608.28632, titled “AutoScientist-Quant: Self-Evolving Coding Agents for Automatic Research in Quantitative Investment.”",
+        "elapsed_seconds": 3.8897343999997247,
+        "chat_input_tokens": 1715,
+        "chat_output_tokens": 58,
+        "embedding_tokens_estimate": 19,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-01",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.28632",
+          "2505.15155",
+          "2602.07085",
+          "2607.12455",
+          "2605.28655"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.28632"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.28632 | AutoScientist-Quant: Self-Evolving Coding Agents for Automatic Research in Quantitative Investment | cs.AI |\n\n[View the paper on arXiv](https://arxiv.org/abs/2608.28632)",
+        "elapsed_seconds": 12.493189500004519,
+        "chat_input_tokens": 10639,
+        "chat_output_tokens": 355,
+        "embedding_tokens_estimate": 19,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-02",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-02",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.12177",
+          "2601.16965",
+          "2510.18318",
+          "2512.24504",
+          "2606.08952"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2607.12177"
+        ],
+        "answer": "The paper is “The Emerging Paradigm of Geospatial Foundation Models: From Pre-Training to Agentic Reasoning” (arXiv:2607.12177).",
+        "elapsed_seconds": 3.9585863999964204,
+        "chat_input_tokens": 1618,
+        "chat_output_tokens": 59,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-02",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.12177"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2103.00020",
+          "2010.11929",
+          "2106.09685",
+          "2510.18318",
+          "2111.06377"
+        ],
+        "evidence_ids": [
+          "2607.12177"
+        ],
+        "answer": "The paper is **The Emerging Paradigm of Geospatial Foundation Models: From Pre-Training to Agentic Reasoning** (arXiv: **2607.12177**), in primary category **cs.AI**.",
+        "elapsed_seconds": 9.301295899989782,
+        "chat_input_tokens": 8004,
+        "chat_output_tokens": 282,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-03",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-03",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.21610",
+          "2602.23978",
+          "2608.29951",
+          "2510.27419",
+          "2606.24467"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.21610"
+        ],
+        "answer": "The paper is “Semantic Compression Trees: Multi-Resolution Knowledge Retrieval via Hierarchical Semantic Residuals” (arXiv:2608.21610).",
+        "elapsed_seconds": 3.0208907000051113,
+        "chat_input_tokens": 1755,
+        "chat_output_tokens": 75,
+        "embedding_tokens_estimate": 17,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-03",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.21610"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.21610"
+        ],
+        "answer": "Found: **Semantic Compression Trees: Multi-Resolution Knowledge Retrieval via Hierarchical Semantic Residuals** (arXiv: 2608.21610), primary category **cs.AI**.",
+        "elapsed_seconds": 8.041313199995784,
+        "chat_input_tokens": 7600,
+        "chat_output_tokens": 287,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-04",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-04",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.18068",
+          "2501.13946",
+          "2608.07627",
+          "2608.07651",
+          "2607.08038"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2606.18068"
+        ],
+        "answer": "The paper is titled “Agentic AI-based Framework for Mitigating Premature Diagnostic Handoff and Silent Hallucination in Healthcare Applications” (arXiv:2606.18068).",
+        "elapsed_seconds": 2.3765697999915574,
+        "chat_input_tokens": 2205,
+        "chat_output_tokens": 63,
+        "embedding_tokens_estimate": 22,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-04",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.18068"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2606.18068"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.18068 | Agentic AI-based Framework for Mitigating Premature Diagnostic Handoff and Silent Hallucination in Healthcare Applications | cs.AI |",
+        "elapsed_seconds": 8.023296599989408,
+        "chat_input_tokens": 7472,
+        "chat_output_tokens": 301,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-05",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-05",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.19408",
+          "2605.11609",
+          "2505.21067",
+          "2607.05184",
+          "2604.26573"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.19408"
+        ],
+        "answer": "The paper is “Beyond Imitation: Filtering On-Policy Distillation by Reasoning Progress,” arXiv:2608.19408.",
+        "elapsed_seconds": 2.284521199995652,
+        "chat_input_tokens": 1613,
+        "chat_output_tokens": 53,
+        "embedding_tokens_estimate": 15,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-05",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.19408"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2305.20050",
+          "2203.02155",
+          "1503.02531",
+          "2312.08935",
+          "2603.07079"
+        ],
+        "evidence_ids": [
+          "2608.19408"
+        ],
+        "answer": "**Beyond Imitation: Filtering On-Policy Distillation by Reasoning Progress** — arXiv: 2608.19408 (primary category: cs.AI).",
+        "elapsed_seconds": 8.766379200009396,
+        "chat_input_tokens": 7859,
+        "chat_output_tokens": 226,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-06",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-06",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2609.12482",
+          "2602.12953",
+          "2606.18413",
+          "2606.16649",
+          "2607.14240"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2609.12482"
+        ],
+        "answer": "The paper is “When Does AI Augment Work? A Workflow-Level Framework for Human-Agent Collaboration” (arXiv:2609.12482).",
+        "elapsed_seconds": 2.0492347000108566,
+        "chat_input_tokens": 1249,
+        "chat_output_tokens": 55,
+        "embedding_tokens_estimate": 15,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-06",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2609.12482"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2609.12482"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2609.12482 | When Does AI Augment Work? A Workflow-Level Framework for Human-Agent Collaboration | cs.AI |",
+        "elapsed_seconds": 8.02006490000349,
+        "chat_input_tokens": 7328,
+        "chat_output_tokens": 302,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-07",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-07",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2605.30664",
+          "2412.05196",
+          "2609.00738",
+          "2609.11061",
+          "2510.09988"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2605.30664"
+        ],
+        "answer": "The paper is “Structure-Induced Information for Rerooting Levin Tree Search” (arXiv:2605.30664).",
+        "elapsed_seconds": 2.555770599996322,
+        "chat_input_tokens": 1759,
+        "chat_output_tokens": 79,
+        "embedding_tokens_estimate": 12,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-07",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2605.30664",
+          "2412.05196",
+          "2609.00738",
+          "2609.11061",
+          "2510.09988"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "0803.0476",
+          "1901.03559",
+          "1810.08473",
+          "1912.01703",
+          "1512.03385"
+        ],
+        "evidence_ids": [
+          "2605.30664"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2605.30664 | Structure-Induced Information for Rerooting Levin Tree Search | cs.AI |\n\n[View the paper on arXiv](https://arxiv.org/pdf/2605.30664).",
+        "elapsed_seconds": 12.461003899996285,
+        "chat_input_tokens": 11174,
+        "chat_output_tokens": 389,
+        "embedding_tokens_estimate": 12,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-08",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-08",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.10492",
+          "2508.05622",
+          "2502.02780",
+          "2601.04025",
+          "2608.21668"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.10492"
+        ],
+        "answer": "The paper is “INSIDE the Student's Mind: Jointly Modeling Latent Reasoning and Action in LLM Student Simulators” (arXiv:2608.10492).",
+        "elapsed_seconds": 3.083646199986106,
+        "chat_input_tokens": 1532,
+        "chat_output_tokens": 81,
+        "embedding_tokens_estimate": 22,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-08",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.10492",
+          "2508.05622",
+          "2502.02780",
+          "2601.04025",
+          "2608.21668"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2210.03629",
+          "2608.17150",
+          "2304.03442",
+          "2201.11903",
+          "2209.06899"
+        ],
+        "evidence_ids": [
+          "2608.10492"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.10492 | INSIDE the Student's Mind: Jointly Modeling Latent Reasoning and Action in LLM Student Simulators | cs.AI |",
+        "elapsed_seconds": 8.88270879999618,
+        "chat_input_tokens": 10799,
+        "chat_output_tokens": 235,
+        "embedding_tokens_estimate": 22,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-09",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-09",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.11136",
+          "2012.13635",
+          "2409.16045",
+          "2606.29972",
+          "1705.08968"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.11136"
+        ],
+        "answer": "The paper titled “sLTN: Structural Logic Tensor Networks” is arXiv:2608.11136.",
+        "elapsed_seconds": 2.317193299997598,
+        "chat_input_tokens": 1490,
+        "chat_output_tokens": 47,
+        "embedding_tokens_estimate": 8,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-09",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.11136",
+          "2012.13635",
+          "2409.16045",
+          "2606.29972",
+          "1705.08968"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2606.29972",
+          "2604.05539",
+          "2503.18509",
+          "2012.13635",
+          "1907.08194"
+        ],
+        "evidence_ids": [
+          "2608.11136"
+        ],
+        "answer": "Found the paper: [sLTN: Structural Logic Tensor Networks](https://arxiv.org/abs/2608.11136) (arXiv:2608.11136), primary category cs.AI.",
+        "elapsed_seconds": 9.215656200001831,
+        "chat_input_tokens": 10611,
+        "chat_output_tokens": 274,
+        "embedding_tokens_estimate": 8,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-10",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-10",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.19932",
+          "2509.05754",
+          "2603.28711",
+          "2607.01952",
+          "2512.19316"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 0.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.19932"
+        ],
+        "answer": "The paper is arXiv:2608.19932.",
+        "elapsed_seconds": 2.3919797999988077,
+        "chat_input_tokens": 1823,
+        "chat_output_tokens": 55,
+        "embedding_tokens_estimate": 25,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-10",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.19932",
+          "2509.05754",
+          "2603.28711",
+          "2607.01952",
+          "2512.19316"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2606.26718",
+          "1911.05856",
+          "1807.06843",
+          "2409.13825",
+          "2102.07899"
+        ],
+        "evidence_ids": [
+          "2608.19932"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.19932 | A Strong Linear Baseline for Whole-Heart Cardiac Shape Completion on CT, with an Open Eleven-Structure Statistical Shape Model | cs.AI |",
+        "elapsed_seconds": 8.449661899998318,
+        "chat_input_tokens": 11541,
+        "chat_output_tokens": 208,
+        "embedding_tokens_estimate": 25,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-11",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-11",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.05389",
+          "2412.17184",
+          "2410.15704",
+          "2409.05357",
+          "2406.04112"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2606.05389"
+        ],
+        "answer": "The paper is arXiv:2606.05389, “Residual Modeling for High-Fidelity Learned Compression of Scientific Data.”",
+        "elapsed_seconds": 2.2996740999951726,
+        "chat_input_tokens": 1685,
+        "chat_output_tokens": 76,
+        "embedding_tokens_estimate": 12,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-11",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.05389",
+          "2412.17184",
+          "2410.15704",
+          "2409.05357",
+          "2406.04112"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2111.02925",
+          "2507.02129",
+          "2105.11730",
+          "2003.02324",
+          "1606.05328"
+        ],
+        "evidence_ids": [
+          "2606.05389"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.05389 | Residual Modeling for High-Fidelity Learned Compression of Scientific Data | cs.AI |\n\n[View the paper on arXiv](https://arxiv.org/abs/2606.05389).",
+        "elapsed_seconds": 8.92624380000052,
+        "chat_input_tokens": 11167,
+        "chat_output_tokens": 237,
+        "embedding_tokens_estimate": 12,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-12",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-12",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.05359",
+          "2210.01426",
+          "1709.05448",
+          "1802.08705",
+          "2310.19848"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2607.05359"
+        ],
+        "answer": "The paper is *Graph Sparse Sampling: Breaking the Curse of the Horizon in Continuous MDP Planning* (arXiv:2607.05359).",
+        "elapsed_seconds": 2.195672400004696,
+        "chat_input_tokens": 1464,
+        "chat_output_tokens": 55,
+        "embedding_tokens_estimate": 15,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-12",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.05359"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2407.00388",
+          "2310.01791",
+          "2210.05015",
+          "2210.01426",
+          "2010.03597"
+        ],
+        "evidence_ids": [
+          "2607.05359"
+        ],
+        "answer": "Found it: **Graph Sparse Sampling: Breaking the Curse of the Horizon in Continuous MDP Planning** — arXiv ID **2607.05359** (primary category: **cs.AI**).",
+        "elapsed_seconds": 10.706783200002974,
+        "chat_input_tokens": 8017,
+        "chat_output_tokens": 255,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-13",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-13",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.05716",
+          "2607.20709",
+          "2603.05344",
+          "2407.16741",
+          "2309.14534"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.05716"
+        ],
+        "answer": "The paper is **“BlockPython: A Process-Aware Agent-Supported Platform for the Transition from Block-Based to Python Programming”** (arXiv:2608.05716).",
+        "elapsed_seconds": 2.402753999995184,
+        "chat_input_tokens": 1626,
+        "chat_output_tokens": 62,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-13",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.05716"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2302.05708"
+        ],
+        "evidence_ids": [
+          "2608.05716"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.05716 | BlockPython: A Process-Aware Agent-Supported Platform for the Transition from Block-Based to Python Programming | cs.AI |",
+        "elapsed_seconds": 9.541477599996142,
+        "chat_input_tokens": 7483,
+        "chat_output_tokens": 288,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-14",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-14",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.21174",
+          "2507.17657",
+          "2607.20524",
+          "2508.00367",
+          "2510.20787"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.21174"
+        ],
+        "answer": "The paper is arXiv:2608.21174, “From Attention Masks to Inert Zero-Vector Tokens: OAttention and O-Closure for Token Dynamics.”",
+        "elapsed_seconds": 2.364621399989119,
+        "chat_input_tokens": 1746,
+        "chat_output_tokens": 59,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-14",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.21174"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.21174"
+        ],
+        "answer": "Found the paper: **From Attention Masks to Inert Zero-Vector Tokens: OAttention and O-Closure for Token Dynamics** (arXiv: 2608.21174), primary category **cs.AI**.",
+        "elapsed_seconds": 9.550846300000558,
+        "chat_input_tokens": 7599,
+        "chat_output_tokens": 287,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-15",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-15",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.28126",
+          "2604.03312",
+          "2510.27176",
+          "2608.21976",
+          "2511.19669"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2606.28126"
+        ],
+        "answer": "The paper titled “AI-Driven Synthesis for High-Tech System Design: Automating Innovation” is arXiv:2606.28126.",
+        "elapsed_seconds": 2.328681200000574,
+        "chat_input_tokens": 1387,
+        "chat_output_tokens": 53,
+        "embedding_tokens_estimate": 15,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-15",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2606.28126",
+          "2604.03312",
+          "2510.27176",
+          "2608.21976",
+          "2511.19669"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2605.17424",
+          "2605.17387"
+        ],
+        "evidence_ids": [
+          "2606.28126"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.28126 | AI-Driven Synthesis for High-Tech System Design: Automating Innovation | cs.AI |\n\n[View the paper on arXiv](https://arxiv.org/abs/2606.28126).",
+        "elapsed_seconds": 10.36792369998875,
+        "chat_input_tokens": 10021,
+        "chat_output_tokens": 304,
+        "embedding_tokens_estimate": 15,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-16",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-16",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.28677",
+          "2502.04381",
+          "2607.10275",
+          "2309.10895",
+          "2312.07399"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2607.28677"
+        ],
+        "answer": "The paper is “Reasoning in Real World Clinical Care: Why Large Language Models Are Not Yet Safe for Autonomous Clinical Decision Support” (arXiv:2607.28677).",
+        "elapsed_seconds": 2.4652717000135453,
+        "chat_input_tokens": 1569,
+        "chat_output_tokens": 61,
+        "embedding_tokens_estimate": 21,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-16",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2607.28677",
+          "2502.04381",
+          "2607.10275",
+          "2309.10895",
+          "2312.07399"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2607.28677"
+        ],
+        "answer": "| arXiv ID | Title | Primary category | PDF |\n|---|---|---|---|\n| 2607.28677 | Reasoning in Real World Clinical Care: Why Large Language Models Are Not Yet Safe for Autonomous Clinical Decision Support | cs.AI | [Download PDF](https://arxiv.org/pdf/2607.28677) |",
+        "elapsed_seconds": 10.960844499990344,
+        "chat_input_tokens": 10421,
+        "chat_output_tokens": 422,
+        "embedding_tokens_estimate": 21,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-17",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-17",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.18017",
+          "2605.12332",
+          "2312.00812",
+          "2608.04697",
+          "2609.04021"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2608.18017"
+        ],
+        "answer": "The paper is “Can Large Language Models Explain Flight Safety Events? A Prior-Guided Semantic LLM-based Approach” (arXiv:2608.18017).",
+        "elapsed_seconds": 2.660312400010298,
+        "chat_input_tokens": 1629,
+        "chat_output_tokens": 59,
+        "embedding_tokens_estimate": 19,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-17",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2608.18017",
+          "2605.12332",
+          "2312.00812",
+          "2608.04697",
+          "2609.04021"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2201.11903",
+          "2310.01728",
+          "2312.09390",
+          "2502.11418",
+          "2306.11025"
+        ],
+        "evidence_ids": [
+          "2608.18017"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.18017 | Can Large Language Models Explain Flight Safety Events? A Prior-Guided Semantic LLM-based Approach | cs.AI |\n\n[View the paper on arXiv](https://arxiv.org/abs/2608.18017).",
+        "elapsed_seconds": 9.905150199992931,
+        "chat_input_tokens": 11085,
+        "chat_output_tokens": 346,
+        "embedding_tokens_estimate": 19,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-18",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-18",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2601.13591",
+          "2608.10366",
+          "2607.01647",
+          "2512.04324",
+          "2601.16344"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2601.13591"
+        ],
+        "answer": "The paper is “DSAEval: Evaluating Data Science Agents on a Wide Range of Real-World Data Science Problems” (arXiv:2601.13591).",
+        "elapsed_seconds": 2.999009599996498,
+        "chat_input_tokens": 1858,
+        "chat_output_tokens": 60,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-18",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2601.13591",
+          "2608.10366",
+          "2607.01647",
+          "2512.04324",
+          "2601.16344"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2601.13591"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2601.13591 | DSAEval: Evaluating Data Science Agents on a Wide Range of Real-World Data Science Problems | cs.AI |",
+        "elapsed_seconds": 9.818290999988676,
+        "chat_input_tokens": 10963,
+        "chat_output_tokens": 220,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-19",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-19",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2604.14221",
+          "2307.08390",
+          "2009.07769",
+          "2009.02040",
+          "2111.08095"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2604.14221"
+        ],
+        "answer": "The paper is titled “Fun-TSG: A Function-Driven Multivariate Time Series Generator with Variable-Level Anomaly Labeling.”",
+        "elapsed_seconds": 2.721334999994724,
+        "chat_input_tokens": 1591,
+        "chat_output_tokens": 51,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-19",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2604.14221",
+          "2307.08390",
+          "2009.07769",
+          "2009.02040",
+          "2111.08095"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2604.14221"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2604.14221 | Fun-TSG: A Function-Driven Multivariate Time Series Generator with Variable-Level Anomaly Labeling | cs.AI |\n\n[View the paper on arXiv](https://arxiv.org/pdf/2604.14221)",
+        "elapsed_seconds": 9.057864200003678,
+        "chat_input_tokens": 10311,
+        "chat_output_tokens": 321,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-20",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-20",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2609.02057",
+          "2604.00356",
+          "2606.15673",
+          "2609.09448",
+          "2606.29472"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2609.02057"
+        ],
+        "answer": "The paper is “Monitoring Web Agents Without Internal Signals: Observable Trajectories and Key-Step Supervision” (arXiv:2609.02057).",
+        "elapsed_seconds": 2.6076565999974264,
+        "chat_input_tokens": 1707,
+        "chat_output_tokens": 56,
+        "embedding_tokens_estimate": 16,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-20",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2609.02057"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2608.02291",
+          "2210.03629",
+          "2207.05221",
+          "2305.14975",
+          "2406.15927"
+        ],
+        "evidence_ids": [
+          "2609.02057"
+        ],
+        "answer": "Found the paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2609.02057 | Monitoring Web Agents Without Internal Signals: Observable Trajectories and Key-Step Supervision | cs.AI |",
+        "elapsed_seconds": 8.55007119999209,
+        "chat_input_tokens": 7855,
+        "chat_output_tokens": 240,
+        "embedding_tokens_estimate": 0,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "title-21",
+      "category": "exact-title",
+      "vector_only": {
+        "id": "title-21",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2604.11741",
+          "2601.18077",
+          "2310.10701",
+          "2609.06563",
+          "2410.02603"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2604.11741"
+        ],
+        "answer": "The paper is “Collaborative Multi-Agent Scripts Generation for Enhancing Imperfect-Information Reasoning in Murder Mystery Games” (arXiv:2604.11741).",
+        "elapsed_seconds": 3.68591309999465,
+        "chat_input_tokens": 1541,
+        "chat_output_tokens": 59,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "title-21",
+        "category": "exact-title",
+        "retrieved_ids": [
+          "2604.11741",
+          "2601.18077",
+          "2310.10701",
+          "2609.06563",
+          "2410.02603"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": 1.0,
+        "answer_evidence_precision": 1.0,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2607.24082",
+          "2609.11489",
+          "2608.11354",
+          "2506.06843",
+          "2608.23552"
+        ],
+        "evidence_ids": [
+          "2604.11741"
+        ],
+        "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2604.11741 | Collaborative Multi-Agent Scripts Generation for Enhancing Imperfect-Information Reasoning in Murder Mystery Games | cs.AI |\n\n[View the paper on arXiv](https://arxiv.org/pdf/2604.11741).",
+        "elapsed_seconds": 15.975125899989507,
+        "chat_input_tokens": 13215,
+        "chat_output_tokens": 417,
+        "embedding_tokens_estimate": 20,
+        "estimated_api_cost_usd": null
+      }
+    }
+  ],
+  "summary": {
+    "case_count": 31,
+    "vector_only": {
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.6804763719042763,
+      "reciprocal_rank": 1.0,
+      "answer_correct": 0.9523809523809523,
+      "answer_evidence_precision": 0.967741935483871,
+      "answer_evidence_recall": 0.6804237548555726,
+      "elapsed_seconds": 3.06961891612821,
+      "chat_input_tokens": 1573.9354838709678,
+      "chat_output_tokens": 92.25806451612904,
+      "embedding_tokens_estimate": 13.0,
+      "chat_tokens_total": 51652,
+      "embedding_tokens_total_estimate": 403,
+      "latency_seconds": {
+        "mean_seconds": 3.06961891612821,
+        "p50_seconds": 2.721334999994724,
+        "p95_seconds": 5.283334100007778
+      },
+      "estimated_api_cost_usd_total": null
+    },
+    "graph_rag": {
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.6811497257209352,
+      "reciprocal_rank": 1.0,
+      "answer_correct": 1.0,
+      "answer_evidence_precision": 0.9629032258064517,
+      "answer_evidence_recall": 0.6826809518232061,
+      "elapsed_seconds": 11.924122158061495,
+      "chat_input_tokens": 11559.064516129032,
+      "chat_output_tokens": 422.06451612903226,
+      "embedding_tokens_estimate": 9.451612903225806,
+      "chat_tokens_total": 371415,
+      "embedding_tokens_total_estimate": 293,
+      "latency_seconds": {
+        "mean_seconds": 11.924122158061495,
+        "p50_seconds": 10.36792369998875,
+        "p95_seconds": 18.276542199993855
+      },
+      "estimated_api_cost_usd_total": null
+    },
+    "by_category": {
+      "exact-title": {
+        "vector_only": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "answer_correct": 0.9523809523809523,
+          "answer_evidence_precision": 1.0,
+          "answer_evidence_recall": 1.0,
+          "elapsed_seconds": 2.6980489809509542,
+          "chat_input_tokens": 1645.8095238095239,
+          "chat_output_tokens": 60.76190476190476,
+          "embedding_tokens_estimate": 17.761904761904763,
+          "chat_tokens_total": 35838,
+          "embedding_tokens_total_estimate": 373,
+          "latency_seconds": {
+            "mean_seconds": 2.6980489809509542,
+            "p50_seconds": 2.4652717000135453,
+            "p95_seconds": 3.8897343999997247
+          },
+          "estimated_api_cost_usd_total": null
+        },
+        "graph_rag": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "answer_correct": 1.0,
+          "answer_evidence_precision": 1.0,
+          "answer_evidence_recall": 1.0,
+          "elapsed_seconds": 9.857866271425294,
+          "chat_input_tokens": 9579.238095238095,
+          "chat_output_tokens": 295.04761904761904,
+          "embedding_tokens_estimate": 10.142857142857142,
+          "chat_tokens_total": 207360,
+          "embedding_tokens_total_estimate": 213,
+          "latency_seconds": {
+            "mean_seconds": 9.857866271425294,
+            "p50_seconds": 9.301295899989782,
+            "p95_seconds": 12.493189500004519
+          },
+          "estimated_api_cost_usd_total": null
+        }
+      },
+      "topic": {
+        "vector_only": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.009476752903256702,
+          "reciprocal_rank": 1.0,
+          "answer_evidence_precision": 0.9,
+          "answer_evidence_recall": 0.00931364005227518,
+          "elapsed_seconds": 3.8499157800004467,
+          "chat_input_tokens": 1423.0,
+          "chat_output_tokens": 158.4,
+          "embedding_tokens_estimate": 3.0,
+          "chat_tokens_total": 15814,
+          "embedding_tokens_total_estimate": 30,
+          "latency_seconds": {
+            "mean_seconds": 3.8499157800004467,
+            "p50_seconds": 3.306361700000707,
+            "p95_seconds": 7.355145199995604
+          },
+          "estimated_api_cost_usd_total": null
+        },
+        "graph_rag": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.011564149734899058,
+          "reciprocal_rank": 1.0,
+          "answer_evidence_precision": 0.885,
+          "answer_evidence_recall": 0.016310950651939077,
+          "elapsed_seconds": 16.26325951999752,
+          "chat_input_tokens": 15716.7,
+          "chat_output_tokens": 688.8,
+          "embedding_tokens_estimate": 8.0,
+          "chat_tokens_total": 164055,
+          "embedding_tokens_total_estimate": 80,
+          "latency_seconds": {
+            "mean_seconds": 16.26325951999752,
+            "p50_seconds": 15.164722599991364,
+            "p95_seconds": 30.49213400000008
+          },
+          "estimated_api_cost_usd_total": null
+        }
+      }
+    },
+    "cost_usd": null,
+    "cost_note": "Includes configured chat and estimated embedding API charges only; excludes Neo4j costs. Null means usage or sourced pricing is unavailable."
+  }
+}
