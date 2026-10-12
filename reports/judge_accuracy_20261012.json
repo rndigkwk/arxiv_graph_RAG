@@ -1,0 +1,331 @@
+{
+  "generated_at": "2026-10-12T11:10:43.074102+00:00",
+  "what_this_measures": "candidate_validation.judge_content의 내용 판정을 exact-title 21건의 원천 ground truth로 채점했습니다. 한 호출에 정답 논문(양성)과 다른 케이스의 정답 논문(음성)을 함께 넣어 구분 능력을 봅니다. 사람 라벨링이 필요하지 않습니다.",
+  "limitations": [
+    "쉬운 과제입니다. 제목이 그대로 일치하는 논문과 무관한 논문을 구분하는 것뿐입니다.",
+    "topic 질문의 등급화된 관련성은 검증하지 않습니다.",
+    "graph_conditions_covered는 graph_queries를 비워 호출했으므로 측정하지 않았습니다.",
+    "논문 2편만 넣었습니다. 실제 ask()는 인용 논문 수만큼 넣습니다."
+  ],
+  "dataset": "evals/cases.json (category=exact-title, 21건)",
+  "model": "chatbot.llm_model",
+  "summary": {
+    "scored_cases": 21,
+    "positives": {
+      "true_positive": 21,
+      "false_negative": 0,
+      "recall": 1.0
+    },
+    "negatives": {
+      "true_negative": 21,
+      "false_positive": 0,
+      "specificity": 1.0
+    },
+    "accuracy": 1.0,
+    "requires_content_true": 21,
+    "errors": 0
+  },
+  "requires_graph_false_positives": {
+    "count": 1,
+    "case_ids": [
+      "title-12"
+    ],
+    "note": "exact-title 질문에는 그래프 조건이 없으므로 requires_graph는 모두 False여야 합니다. True로 판정되면 validate_mixed_candidates가 Cypher 커버리지를 요구해 정상 답변에 재시도를 걸 수 있습니다."
+  },
+  "observed_retries": {
+    "compare_31_cases_1911": 0,
+    "exact_title_rerun_21_cases": 2,
+    "note": "두 실행 모두 reason=graph_conditions_not_covered. 실행마다 건수가 달라집니다."
+  },
+  "judge_call_tokens": {
+    "samples": 21,
+    "papers_per_call": 2,
+    "input_mean": 982.8,
+    "input_median": 960.0,
+    "input_min": 815,
+    "input_max": 1171,
+    "output_mean": 219.9,
+    "output_median": 183.0,
+    "output_min": 62,
+    "output_max": 491
+  },
+  "environment": {
+    "python": "3.12.13",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "results": [
+    {
+      "id": "title-01",
+      "gold_id": "2608.28632",
+      "gold_content_matches": true,
+      "distractor_id": "2607.12177",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 970,
+        "output_tokens": 234
+      }
+    },
+    {
+      "id": "title-02",
+      "gold_id": "2607.12177",
+      "gold_content_matches": true,
+      "distractor_id": "2608.21610",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 1140,
+        "output_tokens": 188
+      }
+    },
+    {
+      "id": "title-03",
+      "gold_id": "2608.21610",
+      "gold_content_matches": true,
+      "distractor_id": "2606.18068",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 1138,
+        "output_tokens": 177
+      }
+    },
+    {
+      "id": "title-04",
+      "gold_id": "2606.18068",
+      "gold_content_matches": true,
+      "distractor_id": "2608.19408",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 954,
+        "output_tokens": 180
+      }
+    },
+    {
+      "id": "title-05",
+      "gold_id": "2608.19408",
+      "gold_content_matches": true,
+      "distractor_id": "2609.12482",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 815,
+        "output_tokens": 165
+      }
+    },
+    {
+      "id": "title-06",
+      "gold_id": "2609.12482",
+      "gold_content_matches": true,
+      "distractor_id": "2605.30664",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 833,
+        "output_tokens": 491
+      }
+    },
+    {
+      "id": "title-07",
+      "gold_id": "2605.30664",
+      "gold_content_matches": true,
+      "distractor_id": "2608.10492",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 851,
+        "output_tokens": 332
+      }
+    },
+    {
+      "id": "title-08",
+      "gold_id": "2608.10492",
+      "gold_content_matches": true,
+      "distractor_id": "2608.11136",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 882,
+        "output_tokens": 143
+      }
+    },
+    {
+      "id": "title-09",
+      "gold_id": "2608.11136",
+      "gold_content_matches": true,
+      "distractor_id": "2608.19932",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 1033,
+        "output_tokens": 162
+      }
+    },
+    {
+      "id": "title-10",
+      "gold_id": "2608.19932",
+      "gold_content_matches": true,
+      "distractor_id": "2606.05389",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 1171,
+        "output_tokens": 142
+      }
+    },
+    {
+      "id": "title-11",
+      "gold_id": "2606.05389",
+      "gold_content_matches": true,
+      "distractor_id": "2607.05359",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 1044,
+        "output_tokens": 135
+      }
+    },
+    {
+      "id": "title-12",
+      "gold_id": "2607.05359",
+      "gold_content_matches": true,
+      "distractor_id": "2608.05716",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": true,
+      "usage": {
+        "input_tokens": 920,
+        "output_tokens": 62
+      }
+    },
+    {
+      "id": "title-13",
+      "gold_id": "2608.05716",
+      "gold_content_matches": true,
+      "distractor_id": "2608.21174",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 1109,
+        "output_tokens": 195
+      }
+    },
+    {
+      "id": "title-14",
+      "gold_id": "2608.21174",
+      "gold_content_matches": true,
+      "distractor_id": "2606.28126",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 980,
+        "output_tokens": 235
+      }
+    },
+    {
+      "id": "title-15",
+      "gold_id": "2606.28126",
+      "gold_content_matches": true,
+      "distractor_id": "2607.28677",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 892,
+        "output_tokens": 183
+      }
+    },
+    {
+      "id": "title-16",
+      "gold_id": "2607.28677",
+      "gold_content_matches": true,
+      "distractor_id": "2608.18017",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 1118,
+        "output_tokens": 454
+      }
+    },
+    {
+      "id": "title-17",
+      "gold_id": "2608.18017",
+      "gold_content_matches": true,
+      "distractor_id": "2601.13591",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 1078,
+        "output_tokens": 206
+      }
+    },
+    {
+      "id": "title-18",
+      "gold_id": "2601.13591",
+      "gold_content_matches": true,
+      "distractor_id": "2604.14221",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 960,
+        "output_tokens": 182
+      }
+    },
+    {
+      "id": "title-19",
+      "gold_id": "2604.14221",
+      "gold_content_matches": true,
+      "distractor_id": "2609.02057",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 861,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "title-20",
+      "gold_id": "2609.02057",
+      "gold_content_matches": true,
+      "distractor_id": "2604.11741",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 938,
+        "output_tokens": 198
+      }
+    },
+    {
+      "id": "title-21",
+      "gold_id": "2604.11741",
+      "gold_content_matches": true,
+      "distractor_id": "2608.28632",
+      "distractor_content_matches": false,
+      "requires_content": true,
+      "requires_graph": false,
+      "usage": {
+        "input_tokens": 951,
+        "output_tokens": 389
+      }
+    }
+  ]
+}
