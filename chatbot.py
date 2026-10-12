@@ -459,10 +459,38 @@ def partial_answer(text):
     return answer if isinstance(answer, str) else ""
 
 
+def judging_model(usage):
+    """조건 판정용 구조화 모델 호출을 감싸 토큰 사용량을 `usage`에 누적합니다.
+
+    이 호출은 에이전트 메시지 스트림 밖에서 일어납니다. 따로 기록해 두지 않으면
+    평가 리포트의 토큰 합계에서 빠져 비용이 과소 보고됩니다.
+    """
+    structured = llm.with_structured_output(QuestionVerdict, strict=True, include_raw=True)
+
+    def invoke(messages):
+        result = structured.invoke(messages)
+        if not isinstance(result, dict):
+            return result
+        reported = getattr(result.get("raw"), "usage_metadata", None)
+        if isinstance(reported, dict):
+            for key in ("input_tokens", "output_tokens"):
+                value = reported.get(key)
+                if isinstance(value, int):
+                    usage[key] = (usage.get(key) or 0) + value
+        parsed = result.get("parsed")
+        if parsed is None:
+            raise ValueError("인용 논문의 내용 판정 결과가 불완전합니다.")
+        return parsed
+
+    return invoke
+
+
 def ask(question, history, on_answer=None):
     """답변을 생성하는 동안 화면을 갱신하고, 검증한 결과와 새 대화 기록을 반환합니다."""
     messages = [*history, ("user", question)]
     validation_request_id = uuid.uuid4().hex[:8]
+    # 재시도가 일어나면 판정 호출도 두 번이므로, 루프 밖에서 누적합니다.
+    validation_usage = {}
     for attempt in range(2):
         result, message_id, buffer, displayed = {}, None, "", ""
         if on_answer is not None:
@@ -501,7 +529,7 @@ def ask(question, history, on_answer=None):
                 ),
                 lambda user_question, papers: judge_content(
                     user_question, papers,
-                    llm.with_structured_output(QuestionVerdict, strict=True).invoke,
+                    judging_model(validation_usage),
                     graph_queries=[
                         call["args"]["cypher"] for call in response["tool_calls"]
                         if call["name"] == "search_graph" and call.get("status") == "success"
@@ -509,6 +537,8 @@ def ask(question, history, on_answer=None):
                     ],
                 ),
             )
+            # 공급자가 사용량을 주지 않았거나 판정을 건너뛰었으면 None으로 남깁니다.
+            response["validation_usage"] = validation_usage or None
             return response, result["messages"]
         except ValueError as exc:
             log_validation_failure(

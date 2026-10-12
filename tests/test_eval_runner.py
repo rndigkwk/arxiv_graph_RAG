@@ -160,3 +160,108 @@ def test_compare_summary_keeps_missing_usage_and_latency_visible_as_unknown():
     assert summary["vector_only"]["latency_seconds"]["p95_seconds"] == 2.0
     assert summary["graph_rag"]["chat_tokens_total"] == 4
     assert summary["cost_usd"] is None
+
+
+def test_compare_case_counts_the_condition_validation_call(monkeypatch):
+    """The judge runs outside the agent stream, so its tokens must be folded in."""
+    import evals.run
+
+    monkeypatch.setattr(evals.run, "count_embedding_tokens", lambda queries, model: 0)
+    case = {
+        "id": "title-01",
+        "category": "exact-title",
+        "question": "Find a known paper",
+        "search_query": "known paper",
+        "expected_ids": ["a"],
+        "expected_answer_contains": ["known paper"],
+    }
+
+    class FakeMessage:
+        usage_metadata = {"input_tokens": 100, "output_tokens": 10}
+
+    class FakeChatbot:
+        GroundedAnswer = object
+
+        class StructuredModel:
+            def invoke(self, messages):
+                return {
+                    "raw": FakeMessage(),
+                    "parsed": type(
+                        "Answer", (), {"answer": "Known paper", "evidence_ids": ["a"]}
+                    )(),
+                }
+
+        llm = type(
+            "LLM",
+            (),
+            {"with_structured_output": lambda self, *a, **kw: FakeChatbot.StructuredModel()},
+        )()
+        search_papers = type(
+            "Search", (), {"invoke": lambda self, values: {"papers": [{"arxiv_id": "a"}]}}
+        )()
+
+        @staticmethod
+        def ask(question, history):
+            return {
+                "papers": [{"arxiv_id": "a"}],
+                "answer": "Known paper",
+                "evidence_ids": ["a"],
+                "validation_usage": {"input_tokens": 400, "output_tokens": 20},
+            }, [FakeMessage()]
+
+    result = compare_case(FakeChatbot, case, top_k=1)
+
+    assert result["graph_rag"]["chat_input_tokens"] == 500
+    assert result["graph_rag"]["chat_output_tokens"] == 30
+    # The vector-only baseline never calls the judge, so it stays at the stream total.
+    assert result["vector_only"]["chat_input_tokens"] == 100
+
+
+def test_compare_case_keeps_unreported_validation_usage_as_unknown(monkeypatch):
+    import evals.run
+
+    monkeypatch.setattr(evals.run, "count_embedding_tokens", lambda queries, model: 0)
+    case = {
+        "id": "title-02",
+        "category": "exact-title",
+        "question": "Find a known paper",
+        "search_query": "known paper",
+        "expected_ids": ["a"],
+        "expected_answer_contains": [],
+    }
+
+    class Bare:
+        pass
+
+    class FakeChatbot:
+        GroundedAnswer = object
+
+        class StructuredModel:
+            def invoke(self, messages):
+                return {
+                    "raw": Bare(),
+                    "parsed": type("Answer", (), {"answer": "x", "evidence_ids": ["a"]})(),
+                }
+
+        llm = type(
+            "LLM",
+            (),
+            {"with_structured_output": lambda self, *a, **kw: FakeChatbot.StructuredModel()},
+        )()
+        search_papers = type(
+            "Search", (), {"invoke": lambda self, values: {"papers": [{"arxiv_id": "a"}]}}
+        )()
+
+        @staticmethod
+        def ask(question, history):
+            return {
+                "papers": [{"arxiv_id": "a"}],
+                "answer": "x",
+                "evidence_ids": ["a"],
+                "validation_usage": None,
+            }, [Bare()]
+
+    result = compare_case(FakeChatbot, case, top_k=1)
+
+    assert result["graph_rag"]["chat_input_tokens"] is None
+    assert result["graph_rag"]["chat_output_tokens"] is None

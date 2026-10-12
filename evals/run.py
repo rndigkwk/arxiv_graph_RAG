@@ -79,6 +79,30 @@ def _token_totals(messages: Any) -> tuple[int | None, int | None]:
     return input_tokens if saw_input else None, output_tokens if saw_output else None
 
 
+def _add_usage(total: int | None, extra: Any) -> int | None:
+    """Add a separately recorded token count, keeping None when nothing was reported."""
+    if not isinstance(extra, int) or isinstance(extra, bool):
+        return total
+    return extra if total is None else total + extra
+
+
+def _with_validation_usage(
+    input_tokens: int | None, output_tokens: int | None, response: dict[str, Any]
+) -> tuple[int | None, int | None]:
+    """Fold in the condition-validation call, which runs outside the agent message stream.
+
+    `chatbot.ask` records it under `validation_usage`; without this the reported token
+    totals understate what the answer actually cost.
+    """
+    usage = response.get("validation_usage")
+    if not isinstance(usage, dict):
+        return input_tokens, output_tokens
+    return (
+        _add_usage(input_tokens, usage.get("input_tokens")),
+        _add_usage(output_tokens, usage.get("output_tokens")),
+    )
+
+
 def _answer_from_vector_context(chatbot: Any, case: dict[str, Any], papers: list[dict[str, Any]]):
     context = "\n\n".join(
         f"arXiv ID: {paper.get('arxiv_id', '')}\nTitle: {paper.get('title', '')}\n"
@@ -140,7 +164,9 @@ def compare_case(
     graph_response, graph_messages = chatbot.ask(case["question"], [])
     graph_seconds = perf_counter() - start
     graph_row = evaluate_case(case, graph_response, mode="agent", top_k=top_k)
-    graph_input, graph_output = _token_totals(graph_messages)
+    graph_input, graph_output = _with_validation_usage(
+        *_token_totals(graph_messages), graph_response
+    )
     graph_queries = [
         call.get("args", {}).get("query", "")
         for call in graph_response.get("tool_calls", [])
@@ -275,7 +301,7 @@ def main() -> None:
         case_ids=[case["id"] for case in cases],
         mode=args.mode,
         top_k=args.top_k,
-        model=os.environ.get("OPENAI_MODEL", "gpt-5.6-luna"),
+        model=getattr(chatbot, "llm_model", os.environ.get("OPENAI_MODEL", "")),
         embedding_model=getattr(chatbot, "EMBEDDING_MODEL", "text-embedding-3-large"),
     )
     report = {
