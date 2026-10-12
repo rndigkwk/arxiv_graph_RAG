@@ -1,5 +1,6 @@
 import pytest
 
+from answer_validation import validate_mixed_candidates
 from candidate_validation import (
     CandidateVerdict,
     QuestionVerdict,
@@ -67,7 +68,8 @@ def test_topic_judge_returns_one_verdict_per_cited_paper():
         assert "p1" in messages[1][1]
         assert "REFERENCES" in messages[1][1]
         return QuestionVerdict(
-            requires_content=True, requires_graph=True, graph_conditions_covered=True,
+            requires_content=True, graph_conditions=["citing AutoGen"],
+            graph_conditions_covered=True,
             candidates=[CandidateVerdict(arxiv_id="p1", content_matches=True)],
         )
 
@@ -76,6 +78,7 @@ def test_topic_judge_returns_one_verdict_per_cited_paper():
         graph_queries=["MATCH (p)-[:REFERENCES]->(autogen) RETURN p"],
     ) == {
         "requires_content": True, "requires_graph": True,
+        "graph_conditions": ["citing AutoGen"],
         "graph_conditions_covered": True,
         "content_matches": {"p1": True},
     }
@@ -83,7 +86,59 @@ def test_topic_judge_returns_one_verdict_per_cited_paper():
 
 def test_topic_judge_rejects_missing_candidate_verdict():
     papers = [{"arxiv_id": "p1", "title": "Shared Memory", "abstract": "For LLM agents"}]
-    verdict = QuestionVerdict(requires_content=True, requires_graph=True,
+    verdict = QuestionVerdict(requires_content=True, graph_conditions=["citing AutoGen"],
                               graph_conditions_covered=True, candidates=[])
     with pytest.raises(ValueError, match="판정 결과"):
         judge_content("shared memory papers citing AutoGen", papers, lambda messages: verdict)
+
+
+def test_unnamed_graph_condition_does_not_trigger_the_coverage_check():
+    """A bare boolean used to invent a condition and force a retry on content-only questions."""
+    papers = [{"arxiv_id": "p1", "title": "Semantic Compression Trees", "abstract": "Retrieval"}]
+
+    def invoke(messages):
+        return QuestionVerdict(
+            requires_content=True, graph_conditions=[], graph_conditions_covered=False,
+            candidates=[CandidateVerdict(arxiv_id="p1", content_matches=True)],
+        )
+
+    assessment = judge_content("Find the paper titled: Semantic Compression Trees", papers,
+                               invoke, graph_queries=[])
+
+    assert assessment["requires_graph"] is False
+    assert assessment["graph_conditions"] == []
+    # Nothing to enforce, so the coverage flag must not stay false and fail validation.
+    assert assessment["graph_conditions_covered"] is True
+    validate_mixed_candidates(
+        {"rows": [], "evidence_ids": ["p1"]}, assessment
+    )
+
+
+def test_blank_condition_strings_do_not_count_as_a_graph_condition():
+    papers = [{"arxiv_id": "p1", "title": "T", "abstract": "A"}]
+
+    def invoke(messages):
+        return QuestionVerdict(
+            requires_content=True, graph_conditions=["", "   "], graph_conditions_covered=False,
+            candidates=[CandidateVerdict(arxiv_id="p1", content_matches=True)],
+        )
+
+    assessment = judge_content("Find a paper", papers, invoke, graph_queries=[])
+    assert assessment["requires_graph"] is False
+    assert assessment["graph_conditions"] == []
+
+
+def test_named_graph_condition_without_covering_cypher_still_fails():
+    papers = [{"arxiv_id": "p1", "title": "T", "abstract": "A"}]
+
+    def invoke(messages):
+        return QuestionVerdict(
+            requires_content=True, graph_conditions=["published in 2024"],
+            graph_conditions_covered=False,
+            candidates=[CandidateVerdict(arxiv_id="p1", content_matches=True)],
+        )
+
+    assessment = judge_content("2024 papers about agents", papers, invoke, graph_queries=[])
+    assert assessment["requires_graph"] is True
+    with pytest.raises(ValueError, match="그래프 검색 조건"):
+        validate_mixed_candidates({"rows": [], "evidence_ids": ["p1"]}, assessment)
