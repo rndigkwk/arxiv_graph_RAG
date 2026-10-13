@@ -1,0 +1,950 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-13T11:58:15.792894+00:00",
+  "mode": "compare",
+  "top_k": 5,
+  "dataset": "cases_curated.json",
+  "metadata": {
+    "timestamp_utc": "2026-10-13T11:58:15.792894+00:00",
+    "dataset_file": "cases_curated.json",
+    "dataset_sha256": "31121b6ba2357d113c4347fd61be5afe03a25c5ae7b93cff6fc2531dcac9a1ba",
+    "mode": "compare",
+    "top_k": 5,
+    "case_ids": [
+      "curated-topic-graph-neural-network",
+      "curated-topic-retrieval-augmented-generation",
+      "curated-topic-diffusion-model",
+      "curated-topic-reinforcement-learning",
+      "curated-topic-multimodal",
+      "curated-topic-knowledge-graph",
+      "curated-topic-code-generation",
+      "curated-topic-medical-imaging",
+      "curated-topic-federated-learning",
+      "curated-topic-AI-agents"
+    ],
+    "model": "gpt-6-luna",
+    "embedding_model": "text-embedding-3-large",
+    "python_version": "3.12.13",
+    "platform": {
+      "system": "Windows",
+      "release": "11",
+      "machine": "AMD64"
+    },
+    "packages": {
+      "openai": "3.8.0",
+      "langchain": "1.3.16",
+      "neo4j-graphrag": "1.18.0",
+      "tiktoken": "0.14.0"
+    },
+    "git_sha": "f20eb3c413cc4856a7be45555525eb0ebcb9cf2b",
+    "git_dirty": true
+  },
+  "pricing": null,
+  "results": [
+    {
+      "id": "curated-topic-graph-neural-network",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-graph-neural-network",
+        "category": "topic",
+        "retrieved_ids": [
+          "2011.11288",
+          "1812.08434",
+          "1904.07785",
+          "1901.00596",
+          "1911.06455"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2011.11288",
+          "1812.08434",
+          "1904.07785",
+          "1901.00596",
+          "1911.06455"
+        ],
+        "answer": "Retrieved papers about graph neural networks include “AutoGraph: Automated Graph Neural Network,” “Graph Neural Networks: A Review of Methods and Applications,” “Graph Wavelet Neural Network,” “A Comprehensive Survey on Graph Neural Networks,” and “Graph Transformer Networks.”",
+        "elapsed_seconds": 6.946189300011611,
+        "chat_input_tokens": 1321,
+        "chat_output_tokens": 98,
+        "embedding_tokens_estimate": 3,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-graph-neural-network",
+        "category": "topic",
+        "retrieved_ids": [
+          "1812.08434",
+          "1904.09981",
+          "1901.00596",
+          "2003.00330",
+          "2102.09544"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.3333333333333333,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.2,
+        "answer_evidence_recall": 0.3333333333333333,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2607.07984",
+          "2403.09742",
+          "2608.09921",
+          "2507.21873",
+          "2607.26023"
+        ],
+        "evidence_ids": [
+          "1812.08434",
+          "1904.09981",
+          "1901.00596",
+          "2003.00330",
+          "2102.09544"
+        ],
+        "answer": "Here are five arXiv papers about graph neural networks:\n\n| arXiv ID | Title | Primary category | Focus |\n|---|---|---|---|\n| 1812.08434 | Graph Neural Networks: A Review of Methods and Applications | cs.LG | Survey of GNN methods, applications, and open problems. |\n| 1904.09981 | GraphNAS: Graph Neural Architecture Search with Reinforcement Learning | cs.LG | Automatically searches for graph neural network architectures using reinforcement learning. |\n| 1901.00596 | A Comprehensive Survey on Graph Neural Networks | cs.LG | Overview and taxonomy of GNNs, applications, benchmarks, and research directions. |\n| 2003.00330 | Graph Neural Networks Meet Neural-Symbolic Computing: A Survey and Perspective | cs.AI | Reviews GNNs in neural-symbolic computing and related applications. |\n| 2102.09544 | Combinatorial optimization and reasoning with graph neural networks | cs.LG | Conceptual review of GNNs for combinatorial optimization and reasoning.",
+        "elapsed_seconds": 39.267143599980045,
+        "chat_input_tokens": 13176,
+        "chat_output_tokens": 587,
+        "embedding_tokens_estimate": 10,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-retrieval-augmented-generation",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-retrieval-augmented-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2506.00054",
+          "2305.15294",
+          "2402.19473",
+          "2005.11401",
+          "2407.13193"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2005.11401",
+          "2305.15294",
+          "2402.19473",
+          "2407.13193",
+          "2506.00054"
+        ],
+        "answer": "Relevant arXiv papers include the foundational work *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks* (2005.11401), the iterative retrieval-generation method *Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy* (2305.15294), and surveys on RAG (2402.19473, 2407.13193, 2506.00054).",
+        "elapsed_seconds": 3.380961599992588,
+        "chat_input_tokens": 1674,
+        "chat_output_tokens": 134,
+        "embedding_tokens_estimate": 5,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-retrieval-augmented-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2402.19473",
+          "2506.00054",
+          "2407.13193",
+          "2404.05970",
+          "2410.12837",
+          "2407.01219",
+          "2404.10981",
+          "2005.11401",
+          "2305.15294",
+          "2312.10997"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.6666666666666666,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.3,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2609.07152",
+          "2608.03161",
+          "2608.03910",
+          "2505.02271",
+          "2608.11584"
+        ],
+        "evidence_ids": [
+          "2402.19473",
+          "2506.00054",
+          "2407.13193",
+          "2404.05970",
+          "2410.12837",
+          "2407.01219",
+          "2404.10981",
+          "2005.11401",
+          "2305.15294",
+          "2312.10997"
+        ],
+        "answer": "Here are relevant arXiv papers on retrieval-augmented generation, including surveys, foundational work, and methods for improving RAG systems.\n\n| arXiv ID | Title | Primary category | Focus |\n|---|---|---|---|\n| 2402.19473 | Retrieval-Augmented Generation for AI-Generated Content: A Survey | cs.CV | Survey of RAG methods, applications, benchmarks, and challenges for AI-generated content. |\n| 2506.00054 | Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers | cs.IR | Survey of RAG architectures, optimization, evaluation, and robustness. |\n| 2407.13193 | Retrieval-Augmented Generation for Natural Language Processing: A Survey | cs.CL | Survey of RAG techniques and applications in NLP. |\n| 2404.05970 | Optimization Methods for Personalizing Large Language Models through Retrieval Augmentation | cs.CL | Methods for optimizing retrieval to support personalized LLM generation. |\n| 2410.12837 | A Comprehensive Survey of Retrieval-Augmented Generation (RAG): Evolution, Current Landscape and Future Directions | cs.CL | Overview of RAG development, applications, challenges, and future directions. |\n| 2407.01219 | Searching for Best Practices in Retrieval-Augmented Generation | cs.CL | Experiments on RAG workflows and strategies balancing performance and efficiency. |\n| 2404.10981 | A Survey on Retrieval-Augmented Text Generation for Large Language Models | cs.IR | Survey organizing RAG around pre-retrieval, retrieval, post-retrieval, and generation. |\n| 2005.11401 | Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks | cs.CL | Foundational RAG approach combining a seq2seq model with retrieved passages for knowledge-intensive tasks. |\n| 2305.15294 | Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy | cs.CL | Iterative retrieval and generation for tasks such as multi-hop question answering. |\n| 2312.10997 | Retrieval-Augmented Generation for Large Language Models: A Survey | cs.CL | Survey of RAG paradigms, system components, evaluation, and open challenges. |",
+        "elapsed_seconds": 21.536858599982224,
+        "chat_input_tokens": 18477,
+        "chat_output_tokens": 1128,
+        "embedding_tokens_estimate": 12,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-diffusion-model",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-diffusion-model",
+        "category": "topic",
+        "retrieved_ids": [
+          "2609.13047",
+          "2211.15089",
+          "2410.17891",
+          "2208.11970",
+          "2409.15816"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 0.5,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2609.13047",
+          "2211.15089",
+          "2410.17891",
+          "2208.11970",
+          "2409.15816"
+        ],
+        "answer": "Retrieved papers about diffusion models include: “Diffusion Models and Concept Formation” (2609.13047), “Continuous diffusion for categorical data” (2211.15089), “Scaling Diffusion Language Models via Adaptation from Autoregressive Models” (2410.17891), “Understanding Diffusion Models: A Unified Perspective” (2208.11970), and “Diffusion Models for Intelligent Transportation Systems: A Survey” (2409.15816).",
+        "elapsed_seconds": 3.776799300016137,
+        "chat_input_tokens": 1412,
+        "chat_output_tokens": 203,
+        "embedding_tokens_estimate": 3,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-diffusion-model",
+        "category": "topic",
+        "retrieved_ids": [
+          "2209.00796",
+          "2404.07771",
+          "2410.11795",
+          "2408.10266",
+          "2609.13047"
+        ],
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.0,
+        "answer_evidence_recall": 0.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2602.05533",
+          "2609.07316",
+          "2411.10431",
+          "2507.21802",
+          "2006.11239"
+        ],
+        "evidence_ids": [
+          "2209.00796",
+          "2404.07771",
+          "2410.11795",
+          "2408.10266",
+          "2609.13047"
+        ],
+        "answer": "Here are several arXiv papers about diffusion models:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2209.00796 | Diffusion Models: A Comprehensive Survey of Methods and Applications | cs.LG |\n| 2404.07771 | An Overview of Diffusion Models: Applications, Guided Generation, Statistical Rates and Optimization | cs.LG |\n| 2410.11795 | Efficient Diffusion Models: A Comprehensive Survey from Principles to Practices | cs.CV |\n| 2408.10266 | Diffusion Model for Planning: A Systematic Literature Review | cs.LG |\n| 2609.13047 | Diffusion Models and Concept Formation | cs.AI |",
+        "elapsed_seconds": 13.927244699996663,
+        "chat_input_tokens": 13710,
+        "chat_output_tokens": 415,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-reinforcement-learning",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-reinforcement-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1611.05763",
+          "2002.12636",
+          "1611.08944",
+          "2405.10369",
+          "2509.01684"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "1611.05763",
+          "2002.12636",
+          "1611.08944",
+          "2405.10369",
+          "2509.01684"
+        ],
+        "answer": "Retrieved papers about reinforcement learning include “Learning to reinforcement learn,” “Reinforcement Learning through Active Inference,” “Nonparametric General Reinforcement Learning,” “Reinforcement learning,” and “Reinforcement Learning for Machine Learning Engineering Agents.”",
+        "elapsed_seconds": 3.502165600017179,
+        "chat_input_tokens": 1423,
+        "chat_output_tokens": 171,
+        "embedding_tokens_estimate": 4,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-reinforcement-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "cs/9605103",
+          "2112.04553",
+          "2411.18892",
+          "2509.08827",
+          "2007.03750",
+          "2607.17560",
+          "2509.06733",
+          "2510.16724",
+          "2412.10400",
+          "1611.05763"
+        ],
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.1,
+        "answer_evidence_recall": 0.3333333333333333,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2403.04931",
+          "2606.24842",
+          "2606.26173",
+          "2201.11903",
+          "2608.23058"
+        ],
+        "evidence_ids": [
+          "cs/9605103",
+          "2112.04553",
+          "2411.18892",
+          "2509.08827",
+          "2007.03750",
+          "2607.17560",
+          "2509.06733",
+          "2510.16724",
+          "2412.10400",
+          "1611.05763"
+        ],
+        "answer": "Here are papers about reinforcement learning returned by the search:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| cs/9605103 | Reinforcement Learning: A Survey | cs.AI |\n| 2112.04553 | Recent Advances in Reinforcement Learning in Finance | q-fin.MF |\n| 2411.18892 | A Comprehensive Survey of Reinforcement Learning: From Algorithms to Practical Challenges | cs.AI |\n| 2509.08827 | A Survey of Reinforcement Learning for Large Reasoning Models | cs.CL |\n| 2007.03750 | Deep Reinforcement Learning and its Neuroscientific Implications | cs.AI |\n| 2607.17560 | Reinforcement Learning: From Algorithms To Foundation Models | cs.AI |\n| 2509.06733 | Reinforcement Learning Foundations for Deep Research Systems: A Survey | cs.AI |\n| 2510.16724 | A Comprehensive Survey on Reinforcement Learning-based Agentic Search: Foundations, Roles, Optimizations, Evaluations, and Applications | cs.AI |\n| 2412.10400 | Reinforcement Learning Enhanced LLMs: A Survey | cs.CL |\n| 1611.05763 | Learning to reinforcement learn | cs.LG |",
+        "elapsed_seconds": 17.79970560001675,
+        "chat_input_tokens": 16635,
+        "chat_output_tokens": 775,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-multimodal",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-multimodal",
+        "category": "topic",
+        "retrieved_ids": [
+          "2301.04856",
+          "1705.09406",
+          "2203.15332",
+          "2106.04538",
+          "2004.04917"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2301.04856",
+          "1705.09406",
+          "2203.15332",
+          "2106.04538",
+          "2004.04917"
+        ],
+        "answer": "Retrieved papers about multimodal include “Multimodal Deep Learning” (2301.04856), “Multimodal Machine Learning: A Survey and Taxonomy” (1705.09406), “Balanced Multimodal Learning via On-the-fly Gradient Modulation” (2203.15332), “What Makes Multi-modal Learning Better than Single (Provably)” (2106.04538), and “Multimodal Categorization of Crisis Events in Social Media” (2004.04917).",
+        "elapsed_seconds": 3.5532379999931436,
+        "chat_input_tokens": 1360,
+        "chat_output_tokens": 198,
+        "embedding_tokens_estimate": 3,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-multimodal",
+        "category": "topic",
+        "retrieved_ids": [
+          "1705.09406",
+          "2301.04856",
+          "2106.04538",
+          "2306.04539",
+          "1702.01992",
+          "2411.02571",
+          "2209.03430",
+          "2408.01319",
+          "2601.07856",
+          "2306.13549"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.6666666666666666,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.2,
+        "answer_evidence_recall": 0.6666666666666666,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2608.02238",
+          "2609.11341",
+          "2609.07409",
+          "2609.11607",
+          "2608.18110"
+        ],
+        "evidence_ids": [
+          "1705.09406",
+          "2301.04856",
+          "2106.04538",
+          "2306.04539",
+          "1702.01992",
+          "2411.02571",
+          "2209.03430",
+          "2408.01319",
+          "2306.13549",
+          "2601.07856"
+        ],
+        "answer": "Here are several arXiv papers about multimodal learning and related topics:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 1705.09406 | Multimodal Machine Learning: A Survey and Taxonomy | cs.LG |\n| 2301.04856 | Multimodal Deep Learning | cs.CL |\n| 2106.04538 | What Makes Multi-modal Learning Better than Single (Provably) | cs.LG |\n| 2306.04539 | Multimodal Learning Without Labeled Multimodal Data: Guarantees and Applications | cs.LG |\n| 1702.01992 | Gated Multimodal Units for Information Fusion | stat.ML |\n| 2411.02571 | MM-Embed: Universal Multimodal Retrieval with Multimodal LLMs | cs.CL |\n| 2209.03430 | Foundations and Trends in Multimodal Machine Learning: Principles, Challenges, and Open Questions | cs.LG |\n| 2408.01319 | A Comprehensive Review of Multimodal Large Language Models: Performance and Challenges Across Different Tasks | cs.AI |\n| 2306.13549 | A Survey on Multimodal Large Language Models | cs.CV |\n| 2601.07856 | Feature Entanglement-based Quantum Multimodal Fusion Neural Network | quant-ph |",
+        "elapsed_seconds": 14.24532040001941,
+        "chat_input_tokens": 18490,
+        "chat_output_tokens": 783,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-knowledge-graph",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-knowledge-graph",
+        "category": "topic",
+        "retrieved_ids": [
+          "2003.02320",
+          "2303.13948",
+          "2308.14217",
+          "2605.22093",
+          "2002.00388"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2003.02320",
+          "2303.13948",
+          "2308.14217",
+          "2605.22093",
+          "2002.00388"
+        ],
+        "answer": "Papers about knowledge graphs include: “Knowledge Graphs” (2003.02320); “Knowledge Graphs: Opportunities and Challenges” (2303.13948); “Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact” (2308.14217); “Knowledge Graph Re-engineering Along the Ontological Continuum (extended version)” (2605.22093); and “A Survey on Knowledge Graphs: Representation, Acquisition and Applications” (2002.00388).",
+        "elapsed_seconds": 5.196961200010264,
+        "chat_input_tokens": 1337,
+        "chat_output_tokens": 212,
+        "embedding_tokens_estimate": 2,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-knowledge-graph",
+        "category": "topic",
+        "retrieved_ids": [
+          "2003.02320",
+          "2002.00388",
+          "2303.13948",
+          "2308.14217",
+          "2302.05019",
+          "2606.29180",
+          "2003.00911",
+          "2605.16568",
+          "2605.22093",
+          "2412.10390"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.3,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2505.12369",
+          "2506.04571",
+          "2607.07422",
+          "2608.17443",
+          "2609.12746"
+        ],
+        "evidence_ids": [
+          "2003.02320",
+          "2002.00388",
+          "2303.13948",
+          "2308.14217",
+          "2302.05019",
+          "2606.29180",
+          "2003.00911",
+          "2605.16568",
+          "2605.22093",
+          "2412.10390"
+        ],
+        "answer": "Here are arXiv papers about knowledge graphs, including surveys and papers on construction, reasoning, recommendations, and semantic similarity.\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2003.02320 | Knowledge Graphs | cs.AI |\n| 2002.00388 | A Survey on Knowledge Graphs: Representation, Acquisition and Applications | cs.CL |\n| 2303.13948 | Knowledge Graphs: Opportunities and Challenges | cs.AI |\n| 2308.14217 | Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact | cs.DB |\n| 2302.05019 | A Comprehensive Survey on Automatic Knowledge Graph Construction | cs.IR |\n| 2606.29180 | Measuring Graph-to-Graph Semantic Similarity in Knowledge Graphs: An Empirical Evaluation of Knowledge Graph Embeddings | cs.AI |\n| 2003.00911 | A Survey on Knowledge Graph-Based Recommender Systems | cs.IR |\n| 2605.16568 | Scalable Uncertainty Reasoning in Knowledge Graphs | cs.AI |\n| 2605.22093 | Knowledge Graph Re-engineering Along the Ontological Continuum (extended version) | cs.AI |\n| 2412.10390 | Neural-Symbolic Reasoning over Knowledge Graphs: A Survey from a Query Perspective | cs.AI |",
+        "elapsed_seconds": 17.90054629999213,
+        "chat_input_tokens": 18175,
+        "chat_output_tokens": 926,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-code-generation",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-code-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2203.13474",
+          "2603.29088",
+          "2405.20092",
+          "2412.07822",
+          "2407.16237"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2203.13474",
+          "2603.29088",
+          "2405.20092",
+          "2412.07822",
+          "2407.16237"
+        ],
+        "answer": "Papers about code generation include: CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis; WybeCoder: Verified Imperative Code Generation; Divide-and-Conquer Meets Consensus: Unleashing the Power of Functions in Code Generation; MAGE: A Multi-Agent Engine for Automated RTL Code Generation; and OriGen: Enhancing RTL Code Generation with Code-to-Code Augmentation and Self-Reflection.",
+        "elapsed_seconds": 4.5919133000134025,
+        "chat_input_tokens": 1589,
+        "chat_output_tokens": 199,
+        "embedding_tokens_estimate": 2,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-code-generation",
+        "category": "topic",
+        "retrieved_ids": [
+          "2501.17725",
+          "2212.11140",
+          "2407.02742",
+          "2308.00708",
+          "2603.29088",
+          "2606.32007",
+          "2504.17192",
+          "2203.13474",
+          "2407.16237",
+          "1711.03543"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.3333333333333333,
+        "reciprocal_rank": 0.2,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.2,
+        "answer_evidence_recall": 0.6666666666666666,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2602.16807",
+          "2607.08740",
+          "2607.17063",
+          "2608.02878",
+          "2210.03629"
+        ],
+        "evidence_ids": [
+          "2501.17725",
+          "2212.11140",
+          "2407.02742",
+          "2308.00708",
+          "2603.29088",
+          "2606.32007",
+          "2504.17192",
+          "2203.13474",
+          "2407.16237",
+          "1711.03543"
+        ],
+        "answer": "Here are several arXiv papers on code generation, spanning general-purpose program synthesis, hardware description languages, domain-specific languages, and code generation from research papers.\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2501.17725 | Using Code Generation to Solve Open Instances of Combinatorial Design Problems | cs.AI |\n| 2212.11140 | Benchmarking Large Language Models for Automated Verilog RTL Code Generation | cs.PL |\n| 2407.02742 | A Comparative Study of DSL Code Generation: Fine-Tuning vs. Optimized Retrieval Augmentation | cs.SE |\n| 2308.00708 | VeriGen: A Large Language Model for Verilog Code Generation | cs.PL |\n| 2603.29088 | WybeCoder: Verified Imperative Code Generation | cs.SE |\n| 2606.32007 | AxDafny: Agentic Verified Code Generation in Dafny | cs.AI |\n| 2504.17192 | Paper2Code: Automating Code Generation from Scientific Papers in Machine Learning | cs.CL |\n| 2203.13474 | CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis | cs.LG |\n| 2407.16237 | OriGen:Enhancing RTL Code Generation with Code-to-Code Augmentation and Self-Reflection | cs.AR |\n| 1711.03543 | DLPaper2Code: Auto-generation of Code from Deep Learning Research Papers | cs.LG |",
+        "elapsed_seconds": 19.137042499991367,
+        "chat_input_tokens": 18645,
+        "chat_output_tokens": 847,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-medical-imaging",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-medical-imaging",
+        "category": "topic",
+        "retrieved_ids": [
+          "2103.01938",
+          "2609.07719",
+          "1612.07003",
+          "2204.13258",
+          "1901.07042"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2103.01938",
+          "2609.07719",
+          "1612.07003",
+          "2204.13258",
+          "1901.07042"
+        ],
+        "answer": "Relevant papers include “Medical Imaging and Machine Learning” (2103.01938), “A radiographic world model for clinical reasoning and evidence generation” (2609.07719), “Image biomarker standardisation initiative” (1612.07003), “Cross-modal Memory Networks for Radiology Report Generation” (2204.13258), and “MIMIC-CXR-JPG, a large publicly available database of labeled chest radiographs” (1901.07042).",
+        "elapsed_seconds": 3.5910794000083115,
+        "chat_input_tokens": 1447,
+        "chat_output_tokens": 183,
+        "embedding_tokens_estimate": 2,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-medical-imaging",
+        "category": "topic",
+        "retrieved_ids": [
+          "2103.01938",
+          "2008.09104",
+          "2201.09873",
+          "2010.16056",
+          "1702.05747"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.3333333333333333,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.2,
+        "answer_evidence_recall": 0.3333333333333333,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2608.23643",
+          "2606.24313",
+          "2606.26494",
+          "2210.03629",
+          "2303.11366"
+        ],
+        "evidence_ids": [
+          "2103.01938",
+          "2008.09104",
+          "2201.09873",
+          "2010.16056",
+          "1702.05747"
+        ],
+        "answer": "Here are several arXiv papers about medical imaging:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2103.01938 | Medical Imaging and Machine Learning | eess.IV |\n| 2008.09104 | A review of deep learning in medical imaging: Imaging traits, technology trends, case studies with progress highlights, and future promises | cs.CV |\n| 2201.09873 | Transformers in Medical Imaging: A Survey | eess.IV |\n| 2010.16056 | Generating Radiology Reports via Memory-driven Transformer | cs.CL |\n| 1702.05747 | A Survey on Deep Learning in Medical Image Analysis | cs.CV |",
+        "elapsed_seconds": 19.166127700009383,
+        "chat_input_tokens": 13450,
+        "chat_output_tokens": 659,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-federated-learning",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-federated-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1908.07873",
+          "1602.05629",
+          "1912.04977",
+          "1806.00582",
+          "2002.06440"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "1908.07873",
+          "1602.05629",
+          "1912.04977",
+          "1806.00582",
+          "2002.06440"
+        ],
+        "answer": "Papers about federated learning include “Federated Learning: Challenges, Methods, and Future Directions” (1908.07873), “Communication-Efficient Learning of Deep Networks from Decentralized Data” (1602.05629), “Advances and Open Problems in Federated Learning” (1912.04977), “Federated Learning with Non-IID Data” (1806.00582), and “Federated Learning with Matched Averaging” (2002.06440).",
+        "elapsed_seconds": 2.8547777000057977,
+        "chat_input_tokens": 1123,
+        "chat_output_tokens": 149,
+        "embedding_tokens_estimate": 4,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-federated-learning",
+        "category": "topic",
+        "retrieved_ids": [
+          "1908.07873",
+          "1912.04977",
+          "1907.09693",
+          "2007.13518",
+          "2103.00710",
+          "2402.06954",
+          "2503.12226",
+          "1602.05629",
+          "1912.13445",
+          "1910.01991"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.6666666666666666,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.3,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2608.07007",
+          "2402.02885",
+          "2608.06112",
+          "2606.27005",
+          "2409.06067"
+        ],
+        "evidence_ids": [
+          "1908.07873",
+          "1912.04977",
+          "1907.09693",
+          "2007.13518",
+          "2103.00710",
+          "2402.06954",
+          "2503.12226",
+          "1602.05629",
+          "1912.13445",
+          "1910.01991"
+        ],
+        "answer": "Here are relevant arXiv papers about federated learning:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 1908.07873 | Federated Learning: Challenges, Methods, and Future Directions | cs.LG |\n| 1912.04977 | Advances and Open Problems in Federated Learning | cs.LG |\n| 1907.09693 | A Survey on Federated Learning Systems: Vision, Hype and Reality for Data Privacy and Protection | cs.LG |\n| 2007.13518 | FedML: A Research Library and Benchmark for Federated Machine Learning | cs.LG |\n| 2103.00710 | Towards Personalized Federated Learning | cs.LG |\n| 2402.06954 | OpenFedLLM: Training Large Language Models on Decentralized Private Data via Federated Learning | cs.LG |\n| 2503.12226 | Research on Large Language Model Cross-Cloud Privacy Protection and Collaborative Training based on Federated Learning | cs.CR |\n| 1602.05629 | Communication-Efficient Learning of Deep Networks from Decentralized Data | cs.LG |\n| 1912.13445 | Robust Aggregation for Federated Learning | stat.ML |\n| 1910.01991 | Clustered Federated Learning: Model-Agnostic Distributed Multi-Task Optimization under Privacy Constraints | cs.LG |",
+        "elapsed_seconds": 16.14280040000449,
+        "chat_input_tokens": 17413,
+        "chat_output_tokens": 809,
+        "embedding_tokens_estimate": 10,
+        "estimated_api_cost_usd": null
+      }
+    },
+    {
+      "id": "curated-topic-AI-agents",
+      "category": "topic",
+      "vector_only": {
+        "id": "curated-topic-AI-agents",
+        "category": "topic",
+        "retrieved_ids": [
+          "2502.18359",
+          "2505.10468",
+          "2503.12687",
+          "2601.01743",
+          "2506.15741"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.6,
+        "answer_evidence_recall": 1.0,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [],
+        "evidence_ids": [
+          "2502.18359",
+          "2505.10468",
+          "2503.12687",
+          "2601.01743",
+          "2506.15741"
+        ],
+        "answer": "Relevant arXiv papers about AI agents include “Responsible AI Agents” (2502.18359), “AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges” (2505.10468), “AI Agents: Evolution, Architecture, and Real-World Applications” (2503.12687), “AI Agent Systems: Architectures, Applications, and Evaluation” (2601.01743), and “OAgents: An Empirical Study of Building Effective Agents” (2506.15741).",
+        "elapsed_seconds": 4.001153199991677,
+        "chat_input_tokens": 1544,
+        "chat_output_tokens": 205,
+        "embedding_tokens_estimate": 2,
+        "estimated_api_cost_usd": null
+      },
+      "graph_rag": {
+        "id": "curated-topic-AI-agents",
+        "category": "topic",
+        "retrieved_ids": [
+          "2503.12687",
+          "2601.01743",
+          "2404.11584",
+          "2605.27905",
+          "2503.18102"
+        ],
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.3333333333333333,
+        "reciprocal_rank": 1.0,
+        "answer_correct": null,
+        "answer_evidence_precision": 0.2,
+        "answer_evidence_recall": 0.3333333333333333,
+        "related_retrieval_precision": null,
+        "related_retrieval_recall": null,
+        "related_ids": [
+          "2603.29139",
+          "2607.25066",
+          "2608.19072",
+          "2607.27578",
+          "2608.27044"
+        ],
+        "evidence_ids": [
+          "2503.12687",
+          "2601.01743",
+          "2404.11584",
+          "2605.27905",
+          "2503.18102"
+        ],
+        "answer": "Here are five arXiv papers about AI agents:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2503.12687 | AI Agents: Evolution, Architecture, and Real-World Applications | cs.AI |\n| 2601.01743 | AI Agent Systems: Architectures, Applications, and Evaluation | cs.AI |\n| 2404.11584 | The Landscape of Emerging AI Agent Architectures for Reasoning, Planning, and Tool Calling: A Survey | cs.AI |\n| 2605.27905 | AI Research Agents Narrow Scientific Exploration | cs.CL |\n| 2503.18102 | AgentRxiv: Towards Collaborative Autonomous Research | cs.AI |",
+        "elapsed_seconds": 13.718409900000552,
+        "chat_input_tokens": 13342,
+        "chat_output_tokens": 525,
+        "embedding_tokens_estimate": 9,
+        "estimated_api_cost_usd": null
+      }
+    }
+  ],
+  "summary": {
+    "case_count": 10,
+    "vector_only": {
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.95,
+      "answer_evidence_precision": 0.6,
+      "answer_evidence_recall": 1.0,
+      "elapsed_seconds": 4.139523860006011,
+      "chat_input_tokens": 1423.0,
+      "chat_output_tokens": 175.2,
+      "embedding_tokens_estimate": 3.0,
+      "chat_tokens_total": 15982,
+      "embedding_tokens_total_estimate": 30,
+      "latency_seconds": {
+        "mean_seconds": 4.139523860006011,
+        "p50_seconds": 3.5910794000083115,
+        "p95_seconds": 6.946189300011611
+      },
+      "estimated_api_cost_usd_total": null
+    },
+    "graph_rag": {
+      "hit_at_k": 0.8,
+      "recall_at_k": 0.4333333333333333,
+      "reciprocal_rank": 0.72,
+      "answer_evidence_precision": 0.2,
+      "answer_evidence_recall": 0.5666666666666667,
+      "elapsed_seconds": 19.284119969999303,
+      "chat_input_tokens": 16151.3,
+      "chat_output_tokens": 745.4,
+      "embedding_tokens_estimate": 9.5,
+      "chat_tokens_total": 168967,
+      "embedding_tokens_total_estimate": 95,
+      "latency_seconds": {
+        "mean_seconds": 19.284119969999303,
+        "p50_seconds": 17.79970560001675,
+        "p95_seconds": 39.267143599980045
+      },
+      "estimated_api_cost_usd_total": null
+    },
+    "by_category": {
+      "topic": {
+        "vector_only": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.95,
+          "answer_evidence_precision": 0.6,
+          "answer_evidence_recall": 1.0,
+          "elapsed_seconds": 4.139523860006011,
+          "chat_input_tokens": 1423.0,
+          "chat_output_tokens": 175.2,
+          "embedding_tokens_estimate": 3.0,
+          "chat_tokens_total": 15982,
+          "embedding_tokens_total_estimate": 30,
+          "latency_seconds": {
+            "mean_seconds": 4.139523860006011,
+            "p50_seconds": 3.5910794000083115,
+            "p95_seconds": 6.946189300011611
+          },
+          "estimated_api_cost_usd_total": null
+        },
+        "graph_rag": {
+          "hit_at_k": 0.8,
+          "recall_at_k": 0.4333333333333333,
+          "reciprocal_rank": 0.72,
+          "answer_evidence_precision": 0.2,
+          "answer_evidence_recall": 0.5666666666666667,
+          "elapsed_seconds": 19.284119969999303,
+          "chat_input_tokens": 16151.3,
+          "chat_output_tokens": 745.4,
+          "embedding_tokens_estimate": 9.5,
+          "chat_tokens_total": 168967,
+          "embedding_tokens_total_estimate": 95,
+          "latency_seconds": {
+            "mean_seconds": 19.284119969999303,
+            "p50_seconds": 17.79970560001675,
+            "p95_seconds": 39.267143599980045
+          },
+          "estimated_api_cost_usd_total": null
+        }
+      }
+    },
+    "cost_usd": null,
+    "cost_note": "Includes configured chat and estimated embedding API charges only; excludes Neo4j costs. Null means usage or sourced pricing is unavailable."
+  }
+}

@@ -1,0 +1,525 @@
+{
+  "dataset": "cases_curated.json",
+  "pool_size": 20,
+  "k": 5,
+  "weights": [
+    0.0,
+    0.05,
+    0.1,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "pagerank_scale": 2.5446437465197314e-05,
+  "note": "같은 후보에 가중치만 바꿔 비교했습니다. weight=0이 벡터 단독 기준선입니다. ceiling_recall_in_pool은 후보 안에서 완벽히 재정렬했을 때의 상한이고, ceiling_recall_by_k는 k가 강제하는 상한입니다. 둘이 같으면 순서가 아니라 k가 상한을 정하고 있다는 뜻입니다.",
+  "overall": {
+    "case_count": 10,
+    "hit_in_pool": 1.0,
+    "ceiling_recall_in_pool": 1.0,
+    "ceiling_recall_by_k": 1.0,
+    "by_weight": {
+      "0.0": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 0.95
+      },
+      "0.05": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 0.9
+      },
+      "0.1": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.9666666666666666,
+        "reciprocal_rank": 0.8333333333333334
+      },
+      "0.25": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.8333333333333334,
+        "reciprocal_rank": 0.77
+      },
+      "0.5": {
+        "hit_at_k": 0.9,
+        "recall_at_k": 0.7,
+        "reciprocal_rank": 0.6833333333333333
+      },
+      "1.0": {
+        "hit_at_k": 0.9,
+        "recall_at_k": 0.6666666666666666,
+        "reciprocal_rank": 0.7333333333333333
+      }
+    }
+  },
+  "by_category": {
+    "topic": {
+      "case_count": 10,
+      "hit_in_pool": 1.0,
+      "ceiling_recall_in_pool": 1.0,
+      "ceiling_recall_by_k": 1.0,
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.95
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.9
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.9666666666666666,
+          "reciprocal_rank": 0.8333333333333334
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.8333333333333334,
+          "reciprocal_rank": 0.77
+        },
+        "0.5": {
+          "hit_at_k": 0.9,
+          "recall_at_k": 0.7,
+          "reciprocal_rank": 0.6833333333333333
+        },
+        "1.0": {
+          "hit_at_k": 0.9,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.7333333333333333
+        }
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "curated-topic-graph-neural-network",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.3333333333333333
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.3333333333333333,
+          "reciprocal_rank": 0.2
+        },
+        "0.5": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0
+        },
+        "1.0": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0
+        }
+      }
+    },
+    {
+      "id": "curated-topic-retrieval-augmented-generation",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.3333333333333333
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.3333333333333333,
+          "reciprocal_rank": 0.3333333333333333
+        }
+      }
+    },
+    {
+      "id": "curated-topic-diffusion-model",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        }
+      }
+    },
+    {
+      "id": "curated-topic-reinforcement-learning",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.5
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.5
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.5
+        }
+      }
+    },
+    {
+      "id": "curated-topic-multimodal",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        }
+      }
+    },
+    {
+      "id": "curated-topic-knowledge-graph",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        }
+      }
+    },
+    {
+      "id": "curated-topic-code-generation",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        }
+      }
+    },
+    {
+      "id": "curated-topic-medical-imaging",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.5
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.5
+        }
+      }
+    },
+    {
+      "id": "curated-topic-federated-learning",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        }
+      }
+    },
+    {
+      "id": "curated-topic-AI-agents",
+      "category": "topic",
+      "gold_size": 3,
+      "ceiling": {
+        "hit_in_pool": 1.0,
+        "found_in_pool": 3.0,
+        "ceiling_recall_in_pool": 1.0,
+        "ceiling_recall_by_k": 1.0
+      },
+      "by_weight": {
+        "0.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.05": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.1": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "0.25": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        },
+        "0.5": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        },
+        "1.0": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 1.0
+        }
+      }
+    }
+  ]
+}

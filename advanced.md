@@ -436,6 +436,97 @@ Day 48 교안의 "후보 안에 정답이 있는가"와 "순서가 맞는가"를
 마지막 둘이 핵심입니다. 검토자를 적지 않고 승격하거나, 사람 검토가 아닌 것을 사람 검토처럼
 표기하는 것을 테스트가 막습니다.
 
+### 넓은 주제 질문에 ID 기반 precision·recall은 품질을 재지 못합니다 (2026-10-13)
+
+큐레이션 10건을 `--mode compare`로 돌려 변별력을 확인하려 했습니다
+([`reports/rag_curated_compare.json`](reports/rag_curated_compare.json)). 결과가 지표 자체의
+무효를 드러냈습니다.
+
+#### 같은 질문, 정답 집합만 바꿨을 때
+
+`cases.json`의 topic 10건과 `cases_curated.json` 10건은 **질문과 검색어가 10/10 완전히
+동일합니다.** 다른 것은 정답 집합 크기뿐입니다.
+
+| 정답 집합 | 크기 (평균) | GraphRAG 인용 precision |
+|---|---:|---:|
+| `cases.json` topic | 1,161.7편 | **0.885** |
+| `cases_curated.json` | 3편 | **0.200** |
+
+같은 시스템이 같은 질문에 같은 답을 내는데 precision이 **0.885와 0.200**으로 갈립니다. 이 지표는
+답변의 품질이 아니라 **정답 집합의 크기**를 재고 있습니다.
+
+#### 0점을 받은 답변을 열어 보면
+
+`curated-topic-diffusion-model`은 precision 0.0 / recall 0.0을 받았습니다. 질문은
+`Find arXiv papers about diffusion model.`이고 에이전트가 인용한 5편은 이렇습니다.
+
+```
+Diffusion Models: A Comprehensive Survey of Methods and Applications
+An Overview of Diffusion Models: Applications, Guided Generation, Statistics
+Efficient Diffusion Models: A Comprehensive Survey from Principles to Practices
+Diffusion Model for Planning: A Systematic Literature Review
+Diffusion Models and Concept Formation
+```
+
+**다섯 편 모두 diffusion model 논문입니다.** 질문에 정확히 답했고 0점입니다. 정답 3편이 수천 편
+중 임의 표본이라, precision은 "다른 유효한 논문을 인용한 것"을 벌하고 recall은 "그 3편을 고르지
+않은 것"을 벌합니다.
+
+`curated-topic-graph-neural-network`도 같습니다. `A Comprehensive Survey on Graph Neural
+Networks`, `GraphNAS`, `Graph Neural Networks Meet Neural-Symbolic Computing`을 인용해
+precision 0.2를 받았습니다.
+
+#### 그래서 "GraphRAG가 벡터 검색보다 나쁘다"는 결과는 사실이 아닙니다
+
+큐레이션 비교의 표면 수치는 이렇게 나왔습니다.
+
+| | 벡터 단독 | GraphRAG | 차이 |
+|---|---:|---:|---:|
+| recall@5 | 1.0000 | 0.4333 | −0.5667 |
+| 인용 precision | 0.6000 | 0.2000 | −0.4000 |
+| 평균 지연 | 4.14초 | 19.28초 | +15.14초 |
+
+**이 표를 품질 비교로 읽으면 안 됩니다.** recall@5 1.0000은 큐레이션 정답이 애초에 "질의어가
+제목·초록에 나타나는 대표 논문"으로 선정됐기 때문입니다. 그것은 벡터 검색이 1위로 올리는 바로
+그 논문들이고, 라벨이 검색기와 같은 신호(어휘 중첩)에서 파생된 순환 구조입니다. 지연 차이는
+벽시계라 유효합니다.
+
+#### 어느 수치가 유효한가
+
+| 구간 | 정답 집합 | precision | recall | 유효성 |
+|---|---|---:|---:|---|
+| `cases.json` exact-title 21건 | 1편 (질문이 그 논문을 지정) | 1.0000 | 1.0000 | **유효** |
+| `cases.json` topic 10건 | 1,162편 | 0.8850 | 0.0163 | **무효** |
+| `cases_curated.json` 10건 | 3편 | 0.2000 | 0.4333 | **무효** |
+| 혼합 전체 31건 | – | 0.9629 | 0.6827 | 유효·무효 혼재 |
+
+**유효한 것은 exact-title 구간뿐입니다.** 질문이 논문 하나를 지정하므로 정답이 객관적이고, 다른
+논문을 인용하면 실제로 틀린 것입니다.
+
+그래서 이 문서 앞부분의 `인용 precision 0.526 → 0.961`은 혼합 수치입니다. **같은 변경의 유효한
+근거는 exact-title 구간의 0.476 → 1.000**이며, 그 개선은 이 분석 뒤에도 그대로 성립합니다.
+topic 구간의 수치는 품질 주장으로 쓰지 않습니다.
+
+#### 6번(Day 57 변형 비교)의 실질적 선행 조건
+
+세 평가 세트 모두 변별력이 없습니다. exact-title은 포화(1.000), topic은 k가 상한, 큐레이션은
+순환입니다. **이 상태로 LightRAG·Microsoft GraphRAG·PPR을 비교하면 "전부 1.000, 차이 없음"으로
+끝나거나, 위처럼 무효 지표가 엉뚱한 승자를 가립니다.**
+
+필요한 것은 **그래프 없이는 답할 수 없고 정답을 Cypher로 결정론적으로 계산할 수 있는 케이스**입니다.
+LLM 라벨링도 사람 검토도 필요 없습니다.
+
+| 질문 유형 | 정답 산출 |
+|---|---|
+| 인용 + 분류 교집합 | `(p)-[:REFERENCES]->(seed)` 에 `primary_category` 조건 |
+| 멀티홉 | 2-hop `REFERENCES` 패턴 |
+| 집계 | `ORDER BY COUNT { (p)<-[:REFERENCES]-() } DESC LIMIT 1` |
+| 공저 경로 | `AUTHORED` 2-hop |
+| 어휘 불일치 | 질의어가 제목·초록에 **없고** 관계로만 도달 가능한 논문 |
+
+마지막 유형이 핵심입니다. 지금 세트는 전부 어휘가 일치해 벡터가 이깁니다. 어휘가 어긋나고 관계로만
+도달 가능한 케이스에서 벡터는 실패하고 Text2Cypher·PPR이 성공합니다. 거기서 비로소 변별력이 생깁니다.
+
 ## 이번 개선 변경점
 
 ### 평가 데이터와 재현성

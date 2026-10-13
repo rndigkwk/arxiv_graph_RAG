@@ -4,8 +4,10 @@ Day 49 교안의 "PageRank 포화 점수로 검색 순위를 재정렬"과 Day 4
 있는가와 순서가 맞는가를 나눠 평가"를 한 번에 돌립니다.
 
     uv run --group dev python -m evals.rerank_study
+    uv run --group dev python -m evals.rerank_study
+        --cases evals/cases_curated.json --output reports/rerank_study_curated.json
 
-모델 호출은 질의 임베딩 31건뿐입니다. 답변을 생성하지 않아 비용이 거의 들지 않습니다.
+모델 호출은 케이스마다 질의 임베딩 하나뿐입니다. 답변을 생성하지 않아 비용이 거의 들지 않습니다.
 후보를 한 번만 가져와 모든 가중치에 같은 후보를 쓰므로, 검색 변동이 비교에 끼지 않습니다.
 
 재정렬은 여기에만 있고 `chatbot`에는 넣지 않았습니다. 측정 결과 채택하지 않았기 때문입니다
@@ -14,6 +16,7 @@ Day 49 교안의 "PageRank 포화 점수로 검색 순위를 재정렬"과 Day 4
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 from statistics import fmean
@@ -90,9 +93,14 @@ def summarize(rows: list[dict]) -> dict:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="재정렬 여지와 PageRank 가중치를 측정합니다.")
+    parser.add_argument("--cases", type=Path, default=CASES)
+    parser.add_argument("--output", type=Path, default=OUTPUT)
+    args = parser.parse_args()
+
     import chatbot
 
-    raw = json.loads(CASES.read_text(encoding="utf-8-sig"))
+    raw = json.loads(args.cases.read_text(encoding="utf-8-sig"))
     cases = raw["cases"] if isinstance(raw, dict) else raw
     scale = pagerank_scale(chatbot)
 
@@ -116,6 +124,7 @@ def main() -> None:
         })
 
     report = {
+        "dataset": args.cases.name,
         "pool_size": POOL,
         "k": K,
         "weights": list(WEIGHTS),
@@ -133,8 +142,10 @@ def main() -> None:
         },
         "results": rows,
     }
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(json.dumps({"overall": report["overall"], "by_category": report["by_category"]},
                      ensure_ascii=False, indent=2))
 
