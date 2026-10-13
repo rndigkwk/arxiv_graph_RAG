@@ -1,4 +1,12 @@
-from evals.metrics import score_answer, score_related, score_retrieval, summarize
+import pytest
+
+from evals.metrics import (
+    score_answer,
+    score_ceiling,
+    score_related,
+    score_retrieval,
+    summarize,
+)
 
 
 def test_retrieval_reports_hit_recall_and_reciprocal_rank():
@@ -87,3 +95,35 @@ def test_summary_averages_only_defined_answer_metrics():
         "answer_evidence_precision": 0.5,
         "answer_evidence_recall": 1.0,
     }
+
+
+def test_ceiling_separates_pool_membership_from_rank_position():
+    # The gold paper sits at rank 9, outside k=5: retrieval found it, ranking did not surface it.
+    pool = [f"p{n}" for n in range(1, 21)]
+    scores = score_ceiling(["p9"], pool, k=5)
+    assert scores["hit_in_pool"] == 1.0
+    assert scores["ceiling_recall_in_pool"] == 1.0
+    assert score_retrieval(["p9"], pool, k=5)["recall_at_k"] == 0.0
+
+
+def test_ceiling_by_k_binds_when_a_case_lists_more_relevant_papers_than_k():
+    gold = [f"g{n}" for n in range(100)]
+    scores = score_ceiling(gold, gold[:20], k=5)
+    # Twenty are in the pool, but only five can be reported, so k is the binding limit.
+    assert scores["found_in_pool"] == 20.0
+    assert scores["ceiling_recall_in_pool"] == 0.05
+    assert scores["ceiling_recall_by_k"] == 0.05
+
+
+def test_ceiling_reports_a_miss_without_pretending_it_is_zero_recall():
+    scores = score_ceiling(["a"], ["b", "c"], k=5)
+    assert scores["hit_in_pool"] == 0.0
+    assert scores["found_in_pool"] == 0.0
+    assert scores["ceiling_recall_in_pool"] == 0.0
+    assert scores["ceiling_recall_by_k"] == 1.0
+
+
+@pytest.mark.parametrize("k", [0, -1])
+def test_ceiling_rejects_a_nonpositive_k(k):
+    with pytest.raises(ValueError, match="at least 1"):
+        score_ceiling(["a"], ["a"], k=k)

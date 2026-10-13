@@ -81,3 +81,27 @@ def summarize(rows: Iterable[dict[str, float | None]]) -> dict[str, int | float]
         if values:
             summary[metric] = fmean(values)
     return summary
+
+
+def score_ceiling(
+    expected_ids: Sequence[str], candidate_ids: Sequence[str], *, k: int = 5
+) -> dict[str, float]:
+    """Separate "is a relevant paper among the candidates" from "is it ranked into the top k".
+
+    Reranking can only reorder what retrieval already found, so measuring its headroom needs
+    both limits. `ceiling_recall_in_pool` is the recall a perfect reranker would reach from this
+    candidate set; `ceiling_recall_by_k` is what k allows no matter how good the ranking is,
+    which binds hard when a case lists far more than k relevant papers.
+    """
+    if k < 1:
+        raise ValueError("k must be at least 1")
+    expected = set(expected_ids)
+    if not expected:
+        raise ValueError("expected_ids must not be empty")
+    found = len(expected & set(candidate_ids))
+    return {
+        "hit_in_pool": float(bool(found)),
+        "found_in_pool": float(found),
+        "ceiling_recall_in_pool": min(found, k) / len(expected),
+        "ceiling_recall_by_k": min(k, len(expected)) / len(expected),
+    }
