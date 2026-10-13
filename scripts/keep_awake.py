@@ -35,6 +35,21 @@ for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", errors="replace")
 
 
+def load_local_env() -> None:
+    """로컬 실행 편의로 저장소 루트의 `.env`를 읽습니다.
+
+    CI에서는 Secrets가 환경변수로 들어오고 `uvx`로 최소 의존성만 설치하므로 python-dotenv가
+    없습니다. 그래서 import를 감싸고, 이미 들어온 환경변수를 덮어쓰지 않습니다.
+    """
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+    from pathlib import Path
+
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=False)
+
+
 def env(*names: str, default: str = "") -> str:
     """같은 뜻으로 쓰이는 이름들 중 먼저 채워진 값을 씁니다."""
     for name in names:
@@ -121,6 +136,7 @@ def main() -> int:
     parser.add_argument("--app-url", help="배포된 Streamlit 앱 주소. 주면 트래픽도 보냅니다.")
     args = parser.parse_args()
 
+    load_local_env()
     uri = env("NEO4J_URI")
     user = env("NEO4J_USERNAME", "NEO4J_USER")
     password = os.getenv("NEO4J_PASSWORD") or ""

@@ -72,11 +72,62 @@ uv run streamlit run app.py --server.fileWatcherType none
 | `OPENAI_API_KEY` | ✅ | 임베딩·LLM API 키 |
 | `NEO4J_DATABASE` | | 생략하면 `neo4j` |
 | `OPENAI_MODEL` | | 생략하면 `gpt-6-luna` |
-| `CLIENT_ID`·`CLIENT_SECRET` | | Aura API 자격증명. GDS 세션 엔진을 쓸 때만 필요합니다 |
+| `CLIENT_ID`·`CLIENT_SECRET` | | **Aura API 키.** GDS 세션 엔진과 일시정지 재개에 씁니다. 아래 참고 |
+| `AURA_INSTANCEID` | | 재개할 인스턴스. 인스턴스가 하나면 생략해도 자동으로 찾습니다 |
 | `AURA_PROJECT_ID` | | Aura 프로젝트가 둘 이상일 때만 지정합니다 |
 
 질문 임베딩은 적재 때와 같은 `text-embedding-3-large` **768차원**이고, 저장된 논문 벡터는 다시 만들지
 않습니다. 준비 단계에서 벡터 인덱스가 `ONLINE`이 아니면 에러로 알리고 멈춥니다.
+
+#### Aura API 키는 DB 접속 정보와 다릅니다
+
+`.env`에는 성격이 전혀 다른 두 종류의 자격증명이 들어 있습니다. 헷갈리기 쉬워 구분해 둡니다.
+
+| | `NEO4J_URI`·`USERNAME`·`PASSWORD` | `CLIENT_ID`·`CLIENT_SECRET` |
+|---|---|---|
+| 접속 대상 | **데이터베이스 안** | **Aura 계정의 관리 기능** |
+| 프로토콜 | Bolt (`neo4j+s://`) | HTTPS REST (`api.neo4j.io`) |
+| 할 수 있는 일 | Cypher 실행 — 논문 조회, 벡터 검색 | 인스턴스 조회·일시정지·**재개**·생성·삭제, GDS 세션 생성 |
+| 할 수 없는 일 | 인스턴스를 켜고 끄기 | **Cypher 실행** |
+
+`CLIENT_ID`·`CLIENT_SECRET`·`CLIENT_NAME`은 Aura 콘솔에서 **API 키를 만들면** 함께 내려오는 값입니다.
+
+멈춘 인스턴스는 Bolt로 접속할 수 없으므로, 재개는 관리 API로만 가능합니다. 그래서
+[`scripts/keep_awake.py`](scripts/keep_awake.py)가 이 키를 씁니다.
+
+> **권한 범위 주의** — 같은 키로 인스턴스 **삭제**도 가능합니다. 범위를 재개만으로 좁힐 수는
+> 없습니다. GitHub Secrets에 넣으면 그 권한이 CI 환경에 들어가므로, 넣기 전에 판단하세요.
+> 넣지 않아도 keep-alive의 본래 목적(유휴 타이머 초기화)은 그대로 동작합니다. 아래 표를 참고하세요.
+
+#### 일시정지 방지 (`keep-alive` 워크플로)
+
+Aura Free는 **3일간 접속이 없으면 멈추고**, 멈추면 인스턴스의 DNS 레코드가 내려가
+`<id>.databases.neo4j.io`가 아예 해석되지 않습니다. 앱과 평가 모두 연결에 실패합니다.
+
+[`.github/workflows/keep-alive.yml`](.github/workflows/keep-alive.yml)이 12시간마다
+[`scripts/keep_awake.py`](scripts/keep_awake.py)를 돌려 읽기 쿼리 하나로 유휴 타이머를 되돌립니다.
+3일 한도에 4배 여유를 둔 주기입니다.
+
+| 등록한 Secrets | 동작 |
+|---|---|
+| `NEO4J_URI`·`NEO4J_USERNAME`·`NEO4J_PASSWORD` | 12시간마다 읽기 쿼리 → **유휴 타이머 초기화.** 실질적으로 멈추지 않습니다 |
+| + `CLIENT_ID`·`CLIENT_SECRET` | 위와 같고, **이미 멈춘 경우 자동 재개**까지 합니다 |
+
+읽기 쿼리가 주 메커니즘이고 재개는 복구 경로입니다. 워크플로가 꺼졌거나 실패해 3일이 지난 경우에만
+재개가 필요합니다. `CLIENT_*`가 없으면 워크플로는 경고만 남기고 계속 진행합니다.
+
+로컬에서 직접 돌릴 수도 있습니다. 저장소 루트의 `.env`를 자동으로 읽으므로 인자가 필요 없습니다
+(이미 설정된 환경변수는 덮어쓰지 않습니다). `requests`는 `gds` extra에 있어 함께 넣어 줍니다.
+
+```bash
+uv run --with requests python scripts/keep_awake.py
+```
+
+CI는 앱 의존성 없이 `uvx --with neo4j --with requests`로 돌립니다. 그 환경에는 python-dotenv가
+없으므로 스크립트는 dotenv import를 감싸 두었고, 값은 Secrets에서 환경변수로 들어옵니다.
+
+`--app-url`을 주면 배포 앱에도 트래픽을 보냅니다. 다만 그것은 Streamlit의 잠들기를 **늦출 뿐,
+이미 잠든 앱을 깨우지는 못합니다**(깨우기는 화면의 버튼을 눌러야 합니다).
 
 ---
 
