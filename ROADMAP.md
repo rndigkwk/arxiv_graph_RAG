@@ -420,7 +420,7 @@ Day 57에서 추출 그래프를 Cypher로 다루고 싶다면 두 번째 Aura �
 | 3a | ~~LLM 심판 정확도 측정~~ | – | **✅ 2026-10-12 완료.** exact-title 21건 ground truth로 채점: 구분 21/21, 단 `requires_graph` 오판으로 가짜 재시도 발생 |
 | ~~3b~~ | ~~`requires_graph` 오판으로 생기는 가짜 재시도 수정~~ | – | **✅ 2026-10-12 완료.** 조건을 이름으로 적게 해 `requires_graph`를 파생값으로 변경. 실패 양식을 구조로 제거. 지연 개선은 실행 간 변동에 묻혀 측정되지 않음(31건 전체 11.24→11.92초) |
 | 3c | 큐레이션 10건 **사람** 검토 | 없음 | 시트 준비 완료([`evals/curated_review.md`](evals/curated_review.md)). LLM이 대신할 수 없는 판단 |
-| 4 | keep-alive 워크플로 추가 | 없음 | 6·7번의 선행 조건. 2026-10-12에 실제로 일시정지에 걸림(8-4절) |
+| ~~4~~ | ~~keep-alive 워크플로 추가~~ | – | **✅ 2026-10-13 완료.** [`scripts/keep_awake.py`](scripts/keep_awake.py) + [`keep-alive.yml`](.github/workflows/keep-alive.yml). 12시간마다 읽기 쿼리로 유휴 타이머를 되돌리고, 멈춰 있으면 Aura API로 재개 |
 | 5 | Day 49 PageRank 재정렬 + Day 48 후보/순서 분리 측정 | 1번 ✅ | 제약 영향 0, 효과 측정 가능 |
 | 6 | Day 57 변형 비교 (PPR / LightRAG / GraphRAG 부분 색인) | 4번 | 프로젝트 정체성 확립 |
 | 7 | Day 74 인용 쌍 임베딩 파인튜닝 (오프라인 측정까지) | 3번 | 이 프로젝트만 가능한 ML 작업 |

@@ -1,0 +1,69 @@
+name: Keep Aura awake
+
+# Aura Free pauses after three days without a connection, and a paused instance loses its DNS
+# record, so nothing can reach it until someone resumes it. On 2026-10-12 an evaluation run hit
+# exactly that. A read query every 12 hours resets the idle timer; if the instance is already
+# paused the script resumes it through the Aura API and waits for it to come back
+# (scripts/keep_awake.py). The weekly regression evaluation depends on this job existing.
+#
+# The same visit sends traffic to the deployed app, which delays Streamlit Community Cloud's
+# sleep but cannot wake an app that is already asleep — that needs a click in the browser.
+#
+# GitHub disables scheduled workflows in a repository with no activity for 60 days; re-enable it
+# from the Actions tab if that happens.
+on:
+  schedule:
+    - cron: "37 */12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: false
+
+jobs:
+  keep-awake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEO4J_URI: ${{ secrets.NEO4J_URI }}
+      NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+      NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+      NEO4J_DATABASE: ${{ secrets.NEO4J_DATABASE }}
+      # Optional: without these the job reports a paused instance instead of resuming it.
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      AURA_INSTANCEID: ${{ secrets.AURA_INSTANCEID }}
+    steps:
+      - name: Check secrets
+        run: |
+          if [ -z "$NEO4J_URI" ] || [ -z "$NEO4J_USERNAME" ] || [ -z "$NEO4J_PASSWORD" ]; then
+            echo "::error::Set NEO4J_URI, NEO4J_USERNAME and NEO4J_PASSWORD as repository secrets."
+            exit 1
+          fi
+          if [ -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
+            echo "::warning::CLIENT_ID/CLIENT_SECRET are unset, so a paused instance cannot be resumed."
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # The script only needs the driver and an HTTP client, not the Streamlit app's dependencies.
+      - name: Keep Aura awake
+        run: >
+          uvx --with neo4j --with requests
+          python scripts/keep_awake.py
+          --app-url https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/
