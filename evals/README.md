@@ -21,6 +21,10 @@ A one-case live agent smoke result is checked in at `reports/rag_agent_smoke.jso
 
 ## Curated topic candidates
 
-`cases_curated.json` adds ten source-backed topic candidates with a small gold ID set, a required answer phrase, source file/field/excerpt provenance, and a written label rationale. Every candidate is marked `pending_human_review`; these are not human-reviewed relevance judgments and their scores must not be presented as validated quality claims. Dataset tests verify that every cited excerpt is present in the bundled source record.
+`cases_curated.json` adds ten source-backed topic candidates with a small gold ID set, source file/field/excerpt provenance, and a written label rationale. Dataset tests verify that every cited excerpt is present in the bundled source record.
+
+Each candidate is now `assistant_reviewed`, recorded in `review`: 27 of the 30 gold IDs were confirmed mechanically by matching the query against the title and abstract, three were settled by judgment, and one is flagged for a human to check. **This is not human review**, so their scores still must not be presented as validated quality claims; `evals/curated_review.md` lists what a reviewer needs to look at to promote them to `human_reviewed`.
+
+That review retired every `expected_answer_contains` phrase. Each was a five-to-ten word fragment lifted from one of the three gold abstracts, so requiring it measured whether the answer quoted that one paper rather than whether the answer was right, a failure already observed on the exact-title cases. The phrases are preserved under `review.retired_answer_phrase`; with the list empty, `answer_correct` reports null and scoring relies on the source-backed evidence IDs.
 
 After reviewing the labels, run a subset with `uv run python -m evals.run --mode compare --cases evals/cases_curated.json --limit 10 --top-k 5 --output reports/rag_curated_compare.json`.

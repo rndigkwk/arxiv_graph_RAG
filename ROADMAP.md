@@ -425,7 +425,7 @@ Day 57에서 추출 그래프를 Cypher로 다루고 싶다면 두 번째 Aura �
 | ~~2~~ | ~~`_token_totals()` 집계 수정~~ | – | **✅ 2026-10-12 완료.** 누락 규모 실측: 입력 +13.4%, 출력 +107.5%(8-3절) |
 | 3a | ~~LLM 심판 정확도 측정~~ | – | **✅ 2026-10-12 완료.** exact-title 21건 ground truth로 채점: 구분 21/21, 단 `requires_graph` 오판으로 가짜 재시도 발생 |
 | ~~3b~~ | ~~`requires_graph` 오판으로 생기는 가짜 재시도 수정~~ | – | **✅ 2026-10-12 완료.** 조건을 이름으로 적게 해 `requires_graph`를 파생값으로 변경. 실패 양식을 구조로 제거. 지연 개선은 실행 간 변동에 묻혀 측정되지 않음(31건 전체 11.24→11.92초) |
-| 3c | 큐레이션 10건 **사람** 검토 | 없음 | 시트 준비 완료([`evals/curated_review.md`](evals/curated_review.md)). LLM이 대신할 수 없는 판단 |
+| 3c | 큐레이션 10건 검토 | – | **◐ 2026-10-13 부분 완료.** 정답 ID 27/30 기계 검증, 필수 답변 문구 10건 전부 폐기(한 편의 초록 조각이라 정답을 탈락시킴). `assistant_reviewed`이며 **사람 확인 1건 남음** — [`evals/curated_review.md`](evals/curated_review.md) |
 | ~~4~~ | ~~keep-alive 워크플로 추가~~ | – | **✅ 2026-10-13 완료.** [`scripts/keep_awake.py`](scripts/keep_awake.py) + [`keep-alive.yml`](.github/workflows/keep-alive.yml). 12시간마다 읽기 쿼리로 유휴 타이머를 되돌리고, 멈춰 있으면 Aura API로 재개 |
 | ~~5~~ | ~~Day 49 PageRank 재정렬 + Day 48 후보/순서 분리 측정~~ | – | **✅ 2026-10-13 완료.** Day 48 상한 측정은 채택(`score_ceiling`), Day 49 재정렬은 **재보고 기각** — 검색이 이미 k=5 상한의 99.9%를 달성해 여지가 없고 MRR만 떨어짐 |
 | 6 | Day 57 변형 비교 (PPR / LightRAG / GraphRAG 부분 색인) | 4번 | 프로젝트 정체성 확립 |

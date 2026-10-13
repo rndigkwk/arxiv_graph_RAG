@@ -39,15 +39,36 @@ def test_curated_topic_candidates_have_verifiable_source_evidence():
 
     for case in topic_cases:
         assert 1 <= len(case["expected_ids"]) <= 5
-        assert case["expected_answer_contains"]
-        assert case["review_status"] == "pending_human_review"
         assert case["label_rationale"].strip()
         assert case["source_evidence"]
-        fact = case["expected_answer_contains"][0]
-        assert any(
-            evidence["field"] == "abstract" and fact.casefold() in evidence["excerpt"].casefold()
-            for evidence in case["source_evidence"]
-        )
+
+        # The status may only claim as much review as the file can show, so that nobody
+        # promotes these to human_reviewed without recording who did it.
+        assert case["review_status"] in {
+            "pending_human_review",
+            "assistant_reviewed",
+            "human_reviewed",
+        }
+        if case["review_status"] != "pending_human_review":
+            review = case["review"]
+            assert review["reviewed_on"] and review["reviewed_by"] and review["method"]
+            # Every gold ID carries a verdict, and a judgment call must say why.
+            assert set(review["gold_id_checks"]) == set(case["expected_ids"])
+            for check in review["gold_id_checks"].values():
+                assert check["verdict"] in {"keep", "flag", "drop"}
+                assert check["method"] in {"mechanical", "judgment"}
+                assert check["evidence"].strip()
+            assert not (case["expected_answer_contains"] and review.get("retired_answer_phrase"))
+        if case["review_status"] == "assistant_reviewed":
+            assert "사람 검토가 아니" in review["reviewed_by"]
+
+        # A required phrase, where one remains, still has to be backed by an abstract excerpt.
+        for fact in case["expected_answer_contains"]:
+            assert any(
+                evidence["field"] == "abstract"
+                and fact.casefold() in evidence["excerpt"].casefold()
+                for evidence in case["source_evidence"]
+            )
         for evidence in case["source_evidence"]:
             source, source_file = source_records[evidence["arxiv_id"]]
             assert evidence["field"] in {"title", "abstract"}

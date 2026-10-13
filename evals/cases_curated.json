@@ -1,438 +1,708 @@
 {
-  "dataset_version": 1,
-  "review_status": "pending_human_review",
-  "source_files": [
-    "data/ai/arxiv_cs_recent_3months_oai_part1.jsonl",
-    "data/ai/arxiv_cs_recent_3months_oai_part2.jsonl",
-    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
-    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
-    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part5.jsonl",
-    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
-    "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl"
-  ],
-  "label_scope": "Source-backed candidate labels; not human-reviewed relevance judgments.",
-  "cases": [
+ "dataset_version": 1,
+ "review_status": "pending_human_review",
+ "source_files": [
+  "data/ai/arxiv_cs_recent_3months_oai_part1.jsonl",
+  "data/ai/arxiv_cs_recent_3months_oai_part2.jsonl",
+  "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+  "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+  "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+  "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+  "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part5.jsonl",
+  "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+  "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl"
+ ],
+ "label_scope": "Source-backed candidate labels; not human-reviewed relevance judgments.",
+ "cases": [
+  {
+   "id": "curated-topic-graph-neural-network",
+   "category": "topic",
+   "question": "Find arXiv papers about graph neural network.",
+   "search_query": "graph neural network",
+   "expected_ids": [
+    "2011.11288",
+    "1812.08434",
+    "1904.07785"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
     {
-      "id": "curated-topic-graph-neural-network",
-      "category": "topic",
-      "question": "Find arXiv papers about graph neural network.",
-      "search_query": "graph neural network",
-      "expected_ids": [
-        "2011.11288",
-        "1812.08434",
-        "1904.07785"
-      ],
-      "expected_answer_contains": [
-        "achieved promising results in graph analysis tasks"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "2011.11288",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
-          "field": "title",
-          "excerpt": "AutoGraph: Automated Graph Neural Network"
-        },
-        {
-          "arxiv_id": "1812.08434",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Graph Neural Networks: A Review of Methods and Applications"
-        },
-        {
-          "arxiv_id": "1904.07785",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
-          "field": "title",
-          "excerpt": "Graph Wavelet Neural Network"
-        },
-        {
-          "arxiv_id": "2011.11288",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
-          "field": "abstract",
-          "excerpt": "achieved promising results in graph analysis tasks"
-        }
-      ]
+     "arxiv_id": "2011.11288",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+     "field": "title",
+     "excerpt": "AutoGraph: Automated Graph Neural Network"
     },
     {
-      "id": "curated-topic-retrieval-augmented-generation",
-      "category": "topic",
-      "question": "Find arXiv papers about retrieval augmented generation.",
-      "search_query": "retrieval augmented generation",
-      "expected_ids": [
-        "2506.00054",
-        "2305.15294",
-        "2402.19473"
-      ],
-      "expected_answer_contains": [
-        "conditioning generation on external evidence retrieved at inference time"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "2506.00054",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
-          "field": "title",
-          "excerpt": "Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers"
-        },
-        {
-          "arxiv_id": "2305.15294",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-          "field": "title",
-          "excerpt": "Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy"
-        },
-        {
-          "arxiv_id": "2402.19473",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Retrieval-Augmented Generation for AI-Generated Content: A Survey"
-        },
-        {
-          "arxiv_id": "2506.00054",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
-          "field": "abstract",
-          "excerpt": "conditioning generation on external evidence retrieved at inference time"
-        }
-      ]
+     "arxiv_id": "1812.08434",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Graph Neural Networks: A Review of Methods and Applications"
     },
     {
-      "id": "curated-topic-diffusion-model",
-      "category": "topic",
-      "question": "Find arXiv papers about diffusion model.",
-      "search_query": "diffusion model",
-      "expected_ids": [
-        "2211.15089",
-        "2410.17891",
-        "2208.11970"
-      ],
-      "expected_answer_contains": [
-        "modelling categorical data with diffusion models"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "2211.15089",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
-          "field": "title",
-          "excerpt": "Continuous diffusion for categorical data"
-        },
-        {
-          "arxiv_id": "2410.17891",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-          "field": "title",
-          "excerpt": "Scaling Diffusion Language Models via Adaptation from Autoregressive Models"
-        },
-        {
-          "arxiv_id": "2208.11970",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
-          "field": "title",
-          "excerpt": "Understanding Diffusion Models: A Unified Perspective"
-        },
-        {
-          "arxiv_id": "2211.15089",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
-          "field": "abstract",
-          "excerpt": "modelling categorical data with diffusion models"
-        }
-      ]
+     "arxiv_id": "1904.07785",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+     "field": "title",
+     "excerpt": "Graph Wavelet Neural Network"
     },
     {
-      "id": "curated-topic-reinforcement-learning",
-      "category": "topic",
-      "question": "Find arXiv papers about reinforcement learning.",
-      "search_query": "reinforcement learning",
-      "expected_ids": [
-        "1611.05763",
-        "2002.12636",
-        "1611.08944"
-      ],
-      "expected_answer_contains": [
-        "deep RL methods that can adapt rapidly to new tasks"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "1611.05763",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-          "field": "title",
-          "excerpt": "Learning to reinforcement learn"
-        },
-        {
-          "arxiv_id": "2002.12636",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
-          "field": "title",
-          "excerpt": "Reinforcement Learning through Active Inference"
-        },
-        {
-          "arxiv_id": "1611.08944",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Nonparametric General Reinforcement Learning"
-        },
-        {
-          "arxiv_id": "1611.05763",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-          "field": "abstract",
-          "excerpt": "deep RL methods that can adapt rapidly to new tasks"
-        }
-      ]
-    },
-    {
-      "id": "curated-topic-multimodal",
-      "category": "topic",
-      "question": "Find arXiv papers about multimodal.",
-      "search_query": "multimodal",
-      "expected_ids": [
-        "2301.04856",
-        "1705.09406",
-        "2203.15332"
-      ],
-      "expected_answer_contains": [
-        "process and relate information from multiple modalities"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "2301.04856",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
-          "field": "title",
-          "excerpt": "Multimodal Deep Learning"
-        },
-        {
-          "arxiv_id": "1705.09406",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
-          "field": "title",
-          "excerpt": "Multimodal Machine Learning: A Survey and Taxonomy"
-        },
-        {
-          "arxiv_id": "2203.15332",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Balanced Multimodal Learning via On-the-fly Gradient Modulation"
-        },
-        {
-          "arxiv_id": "1705.09406",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
-          "field": "abstract",
-          "excerpt": "process and relate information from multiple modalities"
-        }
-      ]
-    },
-    {
-      "id": "curated-topic-knowledge-graph",
-      "category": "topic",
-      "question": "Find arXiv papers about knowledge graph.",
-      "search_query": "knowledge graph",
-      "expected_ids": [
-        "2003.02320",
-        "2303.13948",
-        "2308.14217"
-      ],
-      "expected_answer_contains": [
-        "creation, enrichment, quality assessment, refinement, and publication"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "2003.02320",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Knowledge Graphs"
-        },
-        {
-          "arxiv_id": "2303.13948",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Knowledge Graphs: Opportunities and Challenges"
-        },
-        {
-          "arxiv_id": "2308.14217",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
-          "field": "title",
-          "excerpt": "Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact"
-        },
-        {
-          "arxiv_id": "2003.02320",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "abstract",
-          "excerpt": "creation, enrichment, quality assessment, refinement, and publication"
-        }
-      ]
-    },
-    {
-      "id": "curated-topic-code-generation",
-      "category": "topic",
-      "question": "Find arXiv papers about code generation.",
-      "search_query": "code generation",
-      "expected_ids": [
-        "2203.13474",
-        "2603.29088",
-        "2405.20092"
-      ],
-      "expected_answer_contains": [
-        "multi-step paradigm for program synthesis"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "2203.13474",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-          "field": "title",
-          "excerpt": "CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis"
-        },
-        {
-          "arxiv_id": "2603.29088",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part5.jsonl",
-          "field": "title",
-          "excerpt": "WybeCoder: Verified Imperative Code Generation"
-        },
-        {
-          "arxiv_id": "2405.20092",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
-          "field": "title",
-          "excerpt": "Divide-and-Conquer Meets Consensus: Unleashing the Power of Functions in Code Generation"
-        },
-        {
-          "arxiv_id": "2203.13474",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-          "field": "abstract",
-          "excerpt": "multi-step paradigm for program synthesis"
-        }
-      ]
-    },
-    {
-      "id": "curated-topic-medical-imaging",
-      "category": "topic",
-      "question": "Find arXiv papers about medical imaging.",
-      "search_query": "medical imaging",
-      "expected_ids": [
-        "2103.01938",
-        "2609.07719",
-        "1612.07003"
-      ],
-      "expected_answer_contains": [
-        "research in image acquisition, algorithms, data standardization"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "2103.01938",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
-          "field": "title",
-          "excerpt": "Medical Imaging and Machine Learning"
-        },
-        {
-          "arxiv_id": "2609.07719",
-          "source_file": "data/ai/arxiv_cs_recent_3months_oai_part2.jsonl",
-          "field": "title",
-          "excerpt": "A radiographic world model for clinical reasoning and evidence generation"
-        },
-        {
-          "arxiv_id": "1612.07003",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
-          "field": "title",
-          "excerpt": "Image biomarker standardisation initiative"
-        },
-        {
-          "arxiv_id": "2103.01938",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
-          "field": "abstract",
-          "excerpt": "research in image acquisition, algorithms, data standardization"
-        }
-      ]
-    },
-    {
-      "id": "curated-topic-federated-learning",
-      "category": "topic",
-      "question": "Find arXiv papers about federated learning.",
-      "search_query": "federated learning",
-      "expected_ids": [
-        "1908.07873",
-        "1602.05629",
-        "1912.04977"
-      ],
-      "expected_answer_contains": [
-        "training statistical models over remote devices"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "1908.07873",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Federated Learning: Challenges, Methods, and Future Directions"
-        },
-        {
-          "arxiv_id": "1602.05629",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Communication-Efficient Learning of Deep Networks from Decentralized Data"
-        },
-        {
-          "arxiv_id": "1912.04977",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "title",
-          "excerpt": "Advances and Open Problems in Federated Learning"
-        },
-        {
-          "arxiv_id": "1908.07873",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
-          "field": "abstract",
-          "excerpt": "training statistical models over remote devices"
-        }
-      ]
-    },
-    {
-      "id": "curated-topic-AI-agents",
-      "category": "topic",
-      "question": "Find arXiv papers about AI agents.",
-      "search_query": "AI agents",
-      "expected_ids": [
-        "2502.18359",
-        "2505.10468",
-        "2503.12687"
-      ],
-      "expected_answer_contains": [
-        "modules for perception, planning, and tool use"
-      ],
-      "review_status": "pending_human_review",
-      "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
-      "source_evidence": [
-        {
-          "arxiv_id": "2502.18359",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
-          "field": "title",
-          "excerpt": "Responsible AI Agents"
-        },
-        {
-          "arxiv_id": "2505.10468",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
-          "field": "title",
-          "excerpt": "AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges"
-        },
-        {
-          "arxiv_id": "2503.12687",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-          "field": "title",
-          "excerpt": "AI Agents: Evolution, Architecture, and Real-World Applications"
-        },
-        {
-          "arxiv_id": "2503.12687",
-          "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
-          "field": "abstract",
-          "excerpt": "modules for perception, planning, and tool use"
-        }
-      ]
+     "arxiv_id": "2011.11288",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+     "field": "abstract",
+     "excerpt": "achieved promising results in graph analysis tasks"
     }
-  ]
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "2011.11288": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "AutoGraph: Automated Graph Neural Network"
+     },
+     "1812.08434": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Graph Neural Networks: A Review of Methods and Applications"
+     },
+     "1904.07785": {
+      "verdict": "keep",
+      "method": "judgment",
+      "evidence": "제목이 'Graph Wavelet Neural Network'로 질의어가 연속으로 나오지 않지만 그래프 신경망 연구다. 자동 규칙의 한계이고 라벨은 맞다.",
+      "title": "Graph Wavelet Neural Network"
+     }
+    },
+    "retired_answer_phrase": [
+     "achieved promising results in graph analysis tasks"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-retrieval-augmented-generation",
+   "category": "topic",
+   "question": "Find arXiv papers about retrieval augmented generation.",
+   "search_query": "retrieval augmented generation",
+   "expected_ids": [
+    "2506.00054",
+    "2305.15294",
+    "2402.19473"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "2506.00054",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
+     "field": "title",
+     "excerpt": "Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers"
+    },
+    {
+     "arxiv_id": "2305.15294",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+     "field": "title",
+     "excerpt": "Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy"
+    },
+    {
+     "arxiv_id": "2402.19473",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Retrieval-Augmented Generation for AI-Generated Content: A Survey"
+    },
+    {
+     "arxiv_id": "2506.00054",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
+     "field": "abstract",
+     "excerpt": "conditioning generation on external evidence retrieved at inference time"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "2506.00054": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Retrieval-Augmented Generation: A Comprehensive Survey of Architectures, Enhancements, and Robustness Frontiers"
+     },
+     "2305.15294": {
+      "verdict": "keep",
+      "method": "judgment",
+      "evidence": "제목이 'Retrieval-Augmented Large Language Models'와 'Retrieval-Generation Synergy'로 쪼개져 질의어가 연속으로 없지만 RAG 연구다.",
+      "title": "Enhancing Retrieval-Augmented Large Language Models with Iterative Retrieval-Generation Synergy"
+     },
+     "2402.19473": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Retrieval-Augmented Generation for AI-Generated Content: A Survey"
+     }
+    },
+    "retired_answer_phrase": [
+     "conditioning generation on external evidence retrieved at inference time"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-diffusion-model",
+   "category": "topic",
+   "question": "Find arXiv papers about diffusion model.",
+   "search_query": "diffusion model",
+   "expected_ids": [
+    "2211.15089",
+    "2410.17891",
+    "2208.11970"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "2211.15089",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+     "field": "title",
+     "excerpt": "Continuous diffusion for categorical data"
+    },
+    {
+     "arxiv_id": "2410.17891",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+     "field": "title",
+     "excerpt": "Scaling Diffusion Language Models via Adaptation from Autoregressive Models"
+    },
+    {
+     "arxiv_id": "2208.11970",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+     "field": "title",
+     "excerpt": "Understanding Diffusion Models: A Unified Perspective"
+    },
+    {
+     "arxiv_id": "2211.15089",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+     "field": "abstract",
+     "excerpt": "modelling categorical data with diffusion models"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "2211.15089": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 초록에 나타남",
+      "title": "Continuous diffusion for categorical data"
+     },
+     "2410.17891": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 초록에 나타남",
+      "title": "Scaling Diffusion Language Models via Adaptation from Autoregressive Models"
+     },
+     "2208.11970": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Understanding Diffusion Models: A Unified Perspective"
+     }
+    },
+    "retired_answer_phrase": [
+     "modelling categorical data with diffusion models"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-reinforcement-learning",
+   "category": "topic",
+   "question": "Find arXiv papers about reinforcement learning.",
+   "search_query": "reinforcement learning",
+   "expected_ids": [
+    "1611.05763",
+    "2002.12636",
+    "1611.08944"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "1611.05763",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+     "field": "title",
+     "excerpt": "Learning to reinforcement learn"
+    },
+    {
+     "arxiv_id": "2002.12636",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+     "field": "title",
+     "excerpt": "Reinforcement Learning through Active Inference"
+    },
+    {
+     "arxiv_id": "1611.08944",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Nonparametric General Reinforcement Learning"
+    },
+    {
+     "arxiv_id": "1611.05763",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+     "field": "abstract",
+     "excerpt": "deep RL methods that can adapt rapidly to new tasks"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "1611.05763": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 초록에 나타남",
+      "title": "Learning to reinforcement learn"
+     },
+     "2002.12636": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Reinforcement Learning through Active Inference"
+     },
+     "1611.08944": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Nonparametric General Reinforcement Learning"
+     }
+    },
+    "retired_answer_phrase": [
+     "deep RL methods that can adapt rapidly to new tasks"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-multimodal",
+   "category": "topic",
+   "question": "Find arXiv papers about multimodal.",
+   "search_query": "multimodal",
+   "expected_ids": [
+    "2301.04856",
+    "1705.09406",
+    "2203.15332"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "2301.04856",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part4.jsonl",
+     "field": "title",
+     "excerpt": "Multimodal Deep Learning"
+    },
+    {
+     "arxiv_id": "1705.09406",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+     "field": "title",
+     "excerpt": "Multimodal Machine Learning: A Survey and Taxonomy"
+    },
+    {
+     "arxiv_id": "2203.15332",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Balanced Multimodal Learning via On-the-fly Gradient Modulation"
+    },
+    {
+     "arxiv_id": "1705.09406",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+     "field": "abstract",
+     "excerpt": "process and relate information from multiple modalities"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "2301.04856": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Multimodal Deep Learning"
+     },
+     "1705.09406": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Multimodal Machine Learning: A Survey and Taxonomy"
+     },
+     "2203.15332": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Balanced Multimodal Learning via On-the-fly Gradient Modulation"
+     }
+    },
+    "retired_answer_phrase": [
+     "process and relate information from multiple modalities"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-knowledge-graph",
+   "category": "topic",
+   "question": "Find arXiv papers about knowledge graph.",
+   "search_query": "knowledge graph",
+   "expected_ids": [
+    "2003.02320",
+    "2303.13948",
+    "2308.14217"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "2003.02320",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Knowledge Graphs"
+    },
+    {
+     "arxiv_id": "2303.13948",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Knowledge Graphs: Opportunities and Challenges"
+    },
+    {
+     "arxiv_id": "2308.14217",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+     "field": "title",
+     "excerpt": "Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact"
+    },
+    {
+     "arxiv_id": "2003.02320",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "abstract",
+     "excerpt": "creation, enrichment, quality assessment, refinement, and publication"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "2003.02320": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Knowledge Graphs"
+     },
+     "2303.13948": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Knowledge Graphs: Opportunities and Challenges"
+     },
+     "2308.14217": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Generations of Knowledge Graphs: The Crazy Ideas and the Business Impact"
+     }
+    },
+    "retired_answer_phrase": [
+     "creation, enrichment, quality assessment, refinement, and publication"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-code-generation",
+   "category": "topic",
+   "question": "Find arXiv papers about code generation.",
+   "search_query": "code generation",
+   "expected_ids": [
+    "2203.13474",
+    "2603.29088",
+    "2405.20092"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "2203.13474",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+     "field": "title",
+     "excerpt": "CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis"
+    },
+    {
+     "arxiv_id": "2603.29088",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part5.jsonl",
+     "field": "title",
+     "excerpt": "WybeCoder: Verified Imperative Code Generation"
+    },
+    {
+     "arxiv_id": "2405.20092",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part7.jsonl",
+     "field": "title",
+     "excerpt": "Divide-and-Conquer Meets Consensus: Unleashing the Power of Functions in Code Generation"
+    },
+    {
+     "arxiv_id": "2203.13474",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+     "field": "abstract",
+     "excerpt": "multi-step paradigm for program synthesis"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "2203.13474": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 초록에 나타남",
+      "title": "CodeGen: An Open Large Language Model for Code with Multi-Turn Program Synthesis"
+     },
+     "2603.29088": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "WybeCoder: Verified Imperative Code Generation"
+     },
+     "2405.20092": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Divide-and-Conquer Meets Consensus: Unleashing the Power of Functions in Code Generation"
+     }
+    },
+    "retired_answer_phrase": [
+     "multi-step paradigm for program synthesis"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-medical-imaging",
+   "category": "topic",
+   "question": "Find arXiv papers about medical imaging.",
+   "search_query": "medical imaging",
+   "expected_ids": [
+    "2103.01938",
+    "2609.07719",
+    "1612.07003"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "2103.01938",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+     "field": "title",
+     "excerpt": "Medical Imaging and Machine Learning"
+    },
+    {
+     "arxiv_id": "2609.07719",
+     "source_file": "data/ai/arxiv_cs_recent_3months_oai_part2.jsonl",
+     "field": "title",
+     "excerpt": "A radiographic world model for clinical reasoning and evidence generation"
+    },
+    {
+     "arxiv_id": "1612.07003",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+     "field": "title",
+     "excerpt": "Image biomarker standardisation initiative"
+    },
+    {
+     "arxiv_id": "2103.01938",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+     "field": "abstract",
+     "excerpt": "research in image acquisition, algorithms, data standardization"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "2103.01938": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Medical Imaging and Machine Learning"
+     },
+     "2609.07719": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 초록에 나타남",
+      "title": "A radiographic world model for clinical reasoning and evidence generation"
+     },
+     "1612.07003": {
+      "verdict": "flag",
+      "method": "judgment",
+      "evidence": "'Image biomarker standardisation initiative'. 라디오믹스 영상 바이오마커 표준화로 의료영상에 인접하지만 질의어가 제목·초록에 전혀 없고 다른 두 논문보다 주제 중심성이 낮다. 사람 확인 권장.",
+      "title": "Image biomarker standardisation initiative"
+     }
+    },
+    "retired_answer_phrase": [
+     "research in image acquisition, algorithms, data standardization"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-federated-learning",
+   "category": "topic",
+   "question": "Find arXiv papers about federated learning.",
+   "search_query": "federated learning",
+   "expected_ids": [
+    "1908.07873",
+    "1602.05629",
+    "1912.04977"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "1908.07873",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Federated Learning: Challenges, Methods, and Future Directions"
+    },
+    {
+     "arxiv_id": "1602.05629",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Communication-Efficient Learning of Deep Networks from Decentralized Data"
+    },
+    {
+     "arxiv_id": "1912.04977",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "title",
+     "excerpt": "Advances and Open Problems in Federated Learning"
+    },
+    {
+     "arxiv_id": "1908.07873",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1.jsonl",
+     "field": "abstract",
+     "excerpt": "training statistical models over remote devices"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "1908.07873": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Federated Learning: Challenges, Methods, and Future Directions"
+     },
+     "1602.05629": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 초록에 나타남",
+      "title": "Communication-Efficient Learning of Deep Networks from Decentralized Data"
+     },
+     "1912.04977": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Advances and Open Problems in Federated Learning"
+     }
+    },
+    "retired_answer_phrase": [
+     "training statistical models over remote devices"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  },
+  {
+   "id": "curated-topic-AI-agents",
+   "category": "topic",
+   "question": "Find arXiv papers about AI agents.",
+   "search_query": "AI agents",
+   "expected_ids": [
+    "2502.18359",
+    "2505.10468",
+    "2503.12687"
+   ],
+   "expected_answer_contains": [],
+   "review_status": "assistant_reviewed",
+   "label_rationale": "대표 arXiv 논문의 제목·초록에서 ID와 근거 문구를 확인한 자동 평가 후보. 주제 관련성과 답변 사실 라벨은 사람의 검토가 필요함.",
+   "source_evidence": [
+    {
+     "arxiv_id": "2502.18359",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part6.jsonl",
+     "field": "title",
+     "excerpt": "Responsible AI Agents"
+    },
+    {
+     "arxiv_id": "2505.10468",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part3.jsonl",
+     "field": "title",
+     "excerpt": "AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges"
+    },
+    {
+     "arxiv_id": "2503.12687",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+     "field": "title",
+     "excerpt": "AI Agents: Evolution, Architecture, and Real-World Applications"
+    },
+    {
+     "arxiv_id": "2503.12687",
+     "source_file": "data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part2.jsonl",
+     "field": "abstract",
+     "excerpt": "modules for perception, planning, and tool use"
+    }
+   ],
+   "review": {
+    "reviewed_on": "2026-10-13",
+    "reviewed_by": "assistant (LLM). 사람 검토가 아니며 human_reviewed로 승격할 근거가 아니다.",
+    "method": "정답 ID는 질의어가 제목·초록에 나타나는지 기계적으로 확인하고, 통과하지 못한 항목만 판단으로 기록했다. 필수 답변 문구는 아래 이유로 폐기했다.",
+    "gold_id_checks": {
+     "2502.18359": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "Responsible AI Agents"
+     },
+     "2505.10468": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges"
+     },
+     "2503.12687": {
+      "verdict": "keep",
+      "method": "mechanical",
+      "evidence": "질의어가 제목+초록에 나타남",
+      "title": "AI Agents: Evolution, Architecture, and Real-World Applications"
+     }
+    },
+    "retired_answer_phrase": [
+     "modules for perception, planning, and tool use"
+    ],
+    "retired_reason": "폐기한 문구는 정답 3편 중 한 편의 초록에서 그대로 떼어 온 5~10단어 조각이다. 그 문구를 요구하면 '정답이 맞는가'가 아니라 '그 한 편의 초록을 그대로 인용했는가'를 재게 된다. cases.json의 title-03·title-10에서 정답 ID를 맞혔는데도 답변이 짧아져 문구 검사에 탈락한 사례가 실제로 측정됐고, 재실행하면 결과가 뒤집히기도 했다. 빈 목록으로 두면 answer_correct가 None이 되어 집계에서 빠지고, 채점은 원천으로 뒷받침되는 근거 ID(answer_evidence_precision/recall)에 의존한다."
+   }
+  }
+ ]
 }

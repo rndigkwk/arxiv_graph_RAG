@@ -363,6 +363,79 @@ Day 48 교안의 "후보 안에 정답이 있는가"와 "순서가 맞는가"를
 진단에 이제 수치가 붙었고, 큐레이션 10건의 사람 검토([`evals/curated_review.md`](evals/curated_review.md))가
 필요한 이유도 같습니다.
 
+### 큐레이션 10건 검토와 필수 답변 문구 폐기 (2026-10-13)
+
+`cases_curated.json` 10건은 자동 규칙으로 만든 라벨이라 `pending_human_review`로 묶여 있었습니다.
+검토 기록은 [`evals/curated_review.md`](evals/curated_review.md)입니다.
+
+> **이 검토는 사람 검토가 아닙니다.** `review_status`를 `assistant_reviewed`로 두었고, 그 자체로
+> 이 케이스의 점수를 검증된 품질 지표로 제시할 근거가 되지 않습니다. `human_reviewed`로 승격하는
+> 데 필요한 확인 항목은 위 기록에 따로 모았습니다.
+
+판단을 최소화하려고, 가능한 것은 **기계적으로 확인 가능한 사실**로 검증했습니다. 질의어를 하이픈과
+복수형까지 정규화해 제목·초록에 나타나는지 봤습니다.
+
+| 항목 | 결과 |
+|---|---|
+| 정답 ID 기계 검증 통과 | **27 / 30** |
+| 판단으로 유지 | 2건 |
+| **사람 확인 권장** | **1건** |
+| 제외 | 0건 |
+
+판단으로 유지한 둘은 자동 규칙의 한계였습니다. `1904.07785`는 제목이
+`Graph Wavelet Neural Network`라서 "graph neural network"가 연속으로 나오지 않고, `2305.15294`는
+`Retrieval-Augmented Large Language Models`와 `Retrieval-Generation Synergy`로 쪼개져 있습니다.
+둘 다 해당 주제 연구입니다.
+
+사람 확인을 권한 하나는 `curated-topic-medical-imaging`의 `1612.07003`
+(`Image biomarker standardisation initiative`)입니다. 라디오믹스 영상 바이오마커 표준화로
+의료영상에 인접하지만 질의어가 제목·초록에 전혀 없고 다른 두 논문보다 주제 중심성이 낮습니다.
+
+> **첫 검사가 틀렸던 것도 기록해 둡니다.** 처음 돌린 일치 검사는 하이픈·복수형을 정규화하지 않아
+> `retrieval-augmented generation` 케이스 3건 전부를 "둘 다 없음"으로 보고했습니다. 라벨 결함이
+> 아니라 **검사 쪽 결함**이었습니다. 정규화 후 2건이 정상 통과로 바뀌었습니다. 라벨을 의심하기 전에
+> 검사를 의심해야 하는 사례입니다.
+
+#### 필수 답변 문구 10건을 전부 폐기했습니다
+
+이게 이번 검토의 실질적 결과입니다. `expected_answer_contains`의 10개 문구가 **모두 정답 3편 중
+한 편의 초록에서 그대로 떼어 온 5~10단어 조각**이었습니다.
+
+| 케이스 | 폐기한 문구 | 길이 |
+|---|---|---|
+| graph-neural-network | `achieved promising results in graph analysis tasks` | 7단어 |
+| retrieval-augmented-generation | `conditioning generation on external evidence retrieved at inference time` | 9단어 |
+| federated-learning | `training statistical models over remote devices` | 6단어 |
+
+정답이 3편인데 문구는 그중 **한 편**의 표현입니다. 다른 두 편을 근거로 올바르게 답해도 탈락합니다.
+즉 이 기준은 "답이 맞는가"가 아니라 **"그 한 편의 초록을 그대로 인용했는가"** 를 재고 있었습니다.
+
+이것은 추측이 아닙니다. `cases.json`의 `title-03`·`title-10`에서 **정답 arXiv ID를 정확히 맞혔는데도
+답변이 짧아져 문구 검사에 탈락한 사례가 측정됐고, 재실행하면 `title-03`이 통과로 뒤집혔습니다**
+(위 "복합 조건 검증 적용 후 재측정" 참고).
+
+빈 목록으로 두면 `answer_correct`가 `None`이 되어 집계에서 빠집니다. 0점으로 처리하지 않는다는
+기존 원칙과 같습니다. 채점은 원천으로 뒷받침되는 근거 ID
+(`answer_evidence_precision`/`recall`)에 의존합니다. 폐기한 문구는
+`review.retired_answer_phrase`에 보존했습니다.
+
+문구 기준이 필요하면 특정 논문의 표현이 아니라 주제 자체를 담은 문구로 다시 써야 합니다. 지금
+상태로 되살리지 않습니다.
+
+#### 테스트 계약을 강화했습니다
+
+기존 테스트는 `review_status == "pending_human_review"`를 못 박아 두었습니다. 거짓 주장을 막는
+좋은 가드였으므로 없애지 않고 계약을 넓혔습니다.
+
+- `review_status`는 `pending_human_review`·`assistant_reviewed`·`human_reviewed` 중 하나만 허용
+- `pending_human_review`가 아니면 `review` 블록에 검토일·검토자·방법이 있어야 함
+- 정답 ID마다 판정이 있어야 하고, 판정 근거가 비어 있으면 안 됨
+- `assistant_reviewed`이면 `reviewed_by`에 **사람 검토가 아니라는 문구가 반드시 포함**돼야 함
+- 문구가 남아 있으면 여전히 초록 발췌로 뒷받침돼야 함
+
+마지막 둘이 핵심입니다. 검토자를 적지 않고 승격하거나, 사람 검토가 아닌 것을 사람 검토처럼
+표기하는 것을 테스트가 막습니다.
+
 ## 이번 개선 변경점
 
 ### 평가 데이터와 재현성
