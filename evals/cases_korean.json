@@ -1,0 +1,495 @@
+{
+  "generated_at": "2026-10-15T11:47:21.191881+00:00",
+  "generated_by": "model=gpt-6-luna",
+  "note": "모델이 생성한 한국어입니다. 같은 계열 모델이 영어로 되돌리므로 실제 사용자 한국어보다 왕복이 쉽고, 측정되는 손실은 하한입니다.",
+  "cases": [
+    {
+      "id": "topic-graph-neural-network",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "graph neural network",
+      "search_query_ko_mixed": "graph neural network",
+      "search_query_ko_pure": "그래프 신경망"
+    },
+    {
+      "id": "topic-retrieval-augmented-generation",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "retrieval augmented generation",
+      "search_query_ko_mixed": "retrieval augmented generation 관련 논문",
+      "search_query_ko_pure": "검색 증강 생성"
+    },
+    {
+      "id": "topic-diffusion-model",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "diffusion model",
+      "search_query_ko_mixed": "diffusion model",
+      "search_query_ko_pure": "확산 모델"
+    },
+    {
+      "id": "topic-reinforcement-learning",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "reinforcement learning",
+      "search_query_ko_mixed": "reinforcement learning 관련 연구",
+      "search_query_ko_pure": "강화 학습"
+    },
+    {
+      "id": "topic-multimodal",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "multimodal",
+      "search_query_ko_mixed": "multimodal 관련 논문",
+      "search_query_ko_pure": "다중 양식"
+    },
+    {
+      "id": "topic-knowledge-graph",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "knowledge graph",
+      "search_query_ko_mixed": "knowledge graph 관련 연구",
+      "search_query_ko_pure": "지식 그래프"
+    },
+    {
+      "id": "topic-code-generation",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "code generation",
+      "search_query_ko_mixed": "code generation 관련 연구",
+      "search_query_ko_pure": "코드 생성"
+    },
+    {
+      "id": "topic-medical-imaging",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "medical imaging",
+      "search_query_ko_mixed": "medical imaging 분야",
+      "search_query_ko_pure": "의료 영상"
+    },
+    {
+      "id": "topic-federated-learning",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "federated learning",
+      "search_query_ko_mixed": "federated learning 관련 연구",
+      "search_query_ko_pure": "연합 학습"
+    },
+    {
+      "id": "topic-AI-agents",
+      "dataset": "cases.json",
+      "category": "topic",
+      "search_query": "AI agents",
+      "search_query_ko_mixed": "AI agents 관련 연구",
+      "search_query_ko_pure": "인공지능 행위자"
+    },
+    {
+      "id": "title-01",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "AutoScientist-Quant: Self-Evolving Coding Agents for Automatic Research in Quantitative Investment",
+      "search_query_ko_mixed": "AutoScientist-Quant: 정량 투자 분야의 자동 연구를 위한 자기 진화형 코딩 에이전트",
+      "search_query_ko_pure": "자동 과학자-정량 투자: 정량 투자 연구 자동화를 위한 자기 진화형 프로그래밍 행위자"
+    },
+    {
+      "id": "title-02",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "The Emerging Paradigm of Geospatial Foundation Models: From Pre-Training to Agentic Reasoning",
+      "search_query_ko_mixed": "Geospatial Foundation Models의 새로운 패러다임: Pre-Training부터 Agentic Reasoning까지",
+      "search_query_ko_pure": "지리공간 기반 모델의 새로운 패러다임: 사전 학습에서 에이전트형 추론까지"
+    },
+    {
+      "id": "title-03",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Semantic Compression Trees: Multi-Resolution Knowledge Retrieval via Hierarchical Semantic Residuals",
+      "search_query_ko_mixed": "Hierarchical Semantic Residuals를 활용한 Multi-Resolution Knowledge Retrieval을 다루는 Semantic Compression Trees 논문 찾아줘.",
+      "search_query_ko_pure": "의미 압축 트리: 계층적 의미 잔차를 통한 다중 해상도 지식 검색"
+    },
+    {
+      "id": "title-04",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Agentic AI-based Framework for Mitigating Premature Diagnostic Handoff and Silent Hallucination in Healthcare Applications",
+      "search_query_ko_mixed": "의료 애플리케이션에서 Premature Diagnostic Handoff와 Silent Hallucination을 완화하기 위한 Agentic AI 기반 프레임워크",
+      "search_query_ko_pure": "의료 분야 응용에서 성급한 진단 업무 인계와 탐지되지 않는 환각을 완화하기 위한 자율형 인공지능 기반 체계"
+    },
+    {
+      "id": "title-05",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Beyond Imitation: Filtering On-Policy Distillation by Reasoning Progress",
+      "search_query_ko_mixed": "모방을 넘어: Reasoning Progress를 기준으로 On-Policy Distillation을 필터링하는 방법",
+      "search_query_ko_pure": "모방을 넘어: 추론 진척도에 따른 정책 내 증류 선별"
+    },
+    {
+      "id": "title-06",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "When Does AI Augment Work? A Workflow-Level Framework for Human-Agent Collaboration",
+      "search_query_ko_mixed": "AI는 언제 업무를 증강하는가? Human-Agent Collaboration을 위한 Workflow-Level Framework",
+      "search_query_ko_pure": "인공지능은 언제 업무를 증강하는가? 인간과 인공지능 행위자의 협업을 위한 업무 흐름 수준의 틀"
+    },
+    {
+      "id": "title-07",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Structure-Induced Information for Rerooting Levin Tree Search",
+      "search_query_ko_mixed": "Rerooting Levin Tree Search를 위한 Structure-Induced Information",
+      "search_query_ko_pure": "레빈 트리 탐색의 루트 재설정을 위한 구조 유도 정보"
+    },
+    {
+      "id": "title-08",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "INSIDE the Student's Mind: Jointly Modeling Latent Reasoning and Action in LLM Student Simulators",
+      "search_query_ko_mixed": "학생의 마음속을 들여다보다: LLM Student Simulators에서 잠재적 추론과 행동을 공동으로 모델링하기",
+      "search_query_ko_pure": "학생의 마음속을 들여다보다: 대규모 언어 모델 학생 시뮬레이터에서 잠재적 추론과 행동을 공동으로 모델링하기"
+    },
+    {
+      "id": "title-09",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "sLTN: Structural Logic Tensor Networks",
+      "search_query_ko_mixed": "sLTN: Structural Logic Tensor Networks 논문 찾아줘",
+      "search_query_ko_pure": "구조적 논리 텐서망"
+    },
+    {
+      "id": "title-10",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "A Strong Linear Baseline for Whole-Heart Cardiac Shape Completion on CT, with an Open Eleven-Structure Statistical Shape Model",
+      "search_query_ko_mixed": "CT 기반 whole-heart cardiac shape completion을 위한 강력한 linear baseline과 공개된 11-structure Statistical Shape Model",
+      "search_query_ko_pure": "컴퓨터 단층촬영 기반 심장 전체 형상 완성을 위한 강력한 선형 기준 모델과 공개된 11개 구조 통계적 형상 모델"
+    },
+    {
+      "id": "title-11",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Residual Modeling for High-Fidelity Learned Compression of Scientific Data",
+      "search_query_ko_mixed": "과학 데이터의 고충실도 학습 기반 압축을 위한 Residual Modeling",
+      "search_query_ko_pure": "과학 데이터의 고충실도 학습 기반 압축을 위한 잔차 모델링"
+    },
+    {
+      "id": "title-12",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Graph Sparse Sampling: Breaking the Curse of the Horizon in Continuous MDP Planning",
+      "search_query_ko_mixed": "Graph Sparse Sampling: continuous MDP planning에서 horizon의 저주 극복",
+      "search_query_ko_pure": "그래프 희소 표본 추출: 연속 마르코프 결정 과정 계획에서 지평선의 저주 깨기"
+    },
+    {
+      "id": "title-13",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "BlockPython: A Process-Aware Agent-Supported Platform for the Transition from Block-Based to Python Programming",
+      "search_query_ko_mixed": "BlockPython: 블록 기반 프로그래밍에서 Python 프로그래밍으로의 전환을 위한 프로세스 인식 에이전트 지원 플랫폼",
+      "search_query_ko_pure": "블록파이썬: 블록 기반 프로그래밍에서 파이썬 프로그래밍으로의 전환을 위한 과정 인식형 에이전트 지원 플랫폼"
+    },
+    {
+      "id": "title-14",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "From Attention Masks to Inert Zero-Vector Tokens: OAttention and O-Closure for Token Dynamics",
+      "search_query_ko_mixed": "Attention Masks에서 Inert Zero-Vector Tokens까지: Token Dynamics를 위한 OAttention과 O-Closure",
+      "search_query_ko_pure": "주의 마스크에서 비활성 영벡터 토큰까지: 토큰 동역학을 위한 O-주의와 O-폐포"
+    },
+    {
+      "id": "title-15",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "AI-Driven Synthesis for High-Tech System Design: Automating Innovation",
+      "search_query_ko_mixed": "첨단 기술 시스템 설계를 위한 AI 기반 합성: 혁신 자동화",
+      "search_query_ko_pure": "첨단 기술 시스템 설계를 위한 인공지능 기반 합성: 혁신 자동화"
+    },
+    {
+      "id": "title-16",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Reasoning in Real World Clinical Care: Why Large Language Models Are Not Yet Safe for Autonomous Clinical Decision Support",
+      "search_query_ko_mixed": "실제 임상 진료에서의 추론: Large Language Models는 왜 아직 자율적 임상 의사결정 지원에 안전하지 않은가?",
+      "search_query_ko_pure": "실제 임상 진료에서의 추론: 대규모 언어 모델은 왜 아직 자율적 임상 의사결정 지원에 안전하지 않은가"
+    },
+    {
+      "id": "title-17",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Can Large Language Models Explain Flight Safety Events? A Prior-Guided Semantic LLM-based Approach",
+      "search_query_ko_mixed": "대규모 언어 모델은 항공 안전 사건을 설명할 수 있을까? 사전 정보 기반 의미론적 LLM 접근법",
+      "search_query_ko_pure": "대규모 언어 모델은 항공 안전 사건을 설명할 수 있는가? 사전 지식 유도 의미론 기반 대규모 언어 모델 접근법"
+    },
+    {
+      "id": "title-18",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "DSAEval: Evaluating Data Science Agents on a Wide Range of Real-World Data Science Problems",
+      "search_query_ko_mixed": "DSAEval: 다양한 실제 Data Science 문제에서 Data Science Agents를 평가하는 연구",
+      "search_query_ko_pure": "데이터 과학 에이전트 평가: 광범위한 실제 데이터 과학 문제를 대상으로 한 평가"
+    },
+    {
+      "id": "title-19",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Fun-TSG: A Function-Driven Multivariate Time Series Generator with Variable-Level Anomaly Labeling",
+      "search_query_ko_mixed": "Fun-TSG: 변수 수준 anomaly labeling을 지원하는 function-driven multivariate time series generator",
+      "search_query_ko_pure": "함수 기반 다변량 시계열 생성기: 변수 수준 이상치 표지화"
+    },
+    {
+      "id": "title-20",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Monitoring Web Agents Without Internal Signals: Observable Trajectories and Key-Step Supervision",
+      "search_query_ko_mixed": "내부 신호 없이 Web Agents를 모니터링하는 방법: Observable Trajectories와 Key-Step Supervision",
+      "search_query_ko_pure": "내부 신호 없이 웹 에이전트를 감시하기: 관찰 가능한 궤적과 핵심 단계 지도"
+    },
+    {
+      "id": "title-21",
+      "dataset": "cases.json",
+      "category": "exact-title",
+      "search_query": "Collaborative Multi-Agent Scripts Generation for Enhancing Imperfect-Information Reasoning in Murder Mystery Games",
+      "search_query_ko_mixed": "Murder Mystery 게임에서 불완전 정보 추론 향상을 위한 협력적 멀티에이전트 스크립트 생성",
+      "search_query_ko_pure": "살인 미스터리 게임에서 불완전 정보 추론 능력 향상을 위한 협력적 다중 행위자 대본 생성"
+    },
+    {
+      "id": "author-01",
+      "dataset": "cases_graph.json",
+      "category": "author",
+      "search_query": "Yuquan Deng",
+      "search_query_ko_mixed": "Yuquan Deng의 arXiv 논문을 찾아줘.",
+      "search_query_ko_pure": "Yuquan Deng"
+    },
+    {
+      "id": "author-02",
+      "dataset": "cases_graph.json",
+      "category": "author",
+      "search_query": "Finbarr Timbers",
+      "search_query_ko_mixed": "Finbarr Timbers의 논문",
+      "search_query_ko_pure": "Finbarr Timbers"
+    },
+    {
+      "id": "author-03",
+      "dataset": "cases_graph.json",
+      "category": "author",
+      "search_query": "Evgenia Nitishinskaya",
+      "search_query_ko_mixed": "Evgenia Nitishinskaya 논문",
+      "search_query_ko_pure": "Evgenia Nitishinskaya의 논문"
+    },
+    {
+      "id": "author-04",
+      "dataset": "cases_graph.json",
+      "category": "author",
+      "search_query": "Limin Sun",
+      "search_query_ko_mixed": "Limin Sun",
+      "search_query_ko_pure": "Limin Sun"
+    },
+    {
+      "id": "author-05",
+      "dataset": "cases_graph.json",
+      "category": "author",
+      "search_query": "Matteo Gallici",
+      "search_query_ko_mixed": "Matteo Gallici",
+      "search_query_ko_pure": "Matteo Gallici"
+    },
+    {
+      "id": "author-06",
+      "dataset": "cases_graph.json",
+      "category": "author",
+      "search_query": "Adina Yakefu",
+      "search_query_ko_mixed": "Adina Yakefu가 저자인 arXiv 논문 찾아줘",
+      "search_query_ko_pure": "Adina Yakefu"
+    },
+    {
+      "id": "citing-01",
+      "dataset": "cases_graph.json",
+      "category": "citing",
+      "search_query": "The Alignment Problem from a Deep Learning Perspective",
+      "search_query_ko_mixed": "딥러닝 관점에서 본 Alignment Problem",
+      "search_query_ko_pure": "딥러닝 관점에서 본 정렬 문제"
+    },
+    {
+      "id": "citing-02",
+      "dataset": "cases_graph.json",
+      "category": "citing",
+      "search_query": "Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities",
+      "search_query_ko_mixed": "불확실한 모달리티 결측 상황에서 Tag-assisted Multimodal Sentiment Analysis’ 연구 찾아줘",
+      "search_query_ko_pure": "불확실한 양식 누락 상황에서의 태그 보조 다중양식 감성 분석"
+    },
+    {
+      "id": "citing-03",
+      "dataset": "cases_graph.json",
+      "category": "citing",
+      "search_query": "Needle in the Haystack for Memory Based Large Language Models",
+      "search_query_ko_mixed": "Memory Based Large Language Models를 위한 Needle in the Haystack",
+      "search_query_ko_pure": "기억 기반 대규모 언어 모델을 위한 건초 더미 속 바늘"
+    },
+    {
+      "id": "citing-04",
+      "dataset": "cases_graph.json",
+      "category": "citing",
+      "search_query": "DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback",
+      "search_query_ko_mixed": "Teacher Environments에서 Student Feedback을 활용하는 DataEnvGym의 Data Generation Agents",
+      "search_query_ko_pure": "자료환경 훈련장: 교사 환경에서 학생 피드백을 활용하는 자료 생성 에이전트"
+    },
+    {
+      "id": "citing-05",
+      "dataset": "cases_graph.json",
+      "category": "citing",
+      "search_query": "Deeply-Supervised Nets",
+      "search_query_ko_mixed": "Deeply-Supervised Nets 논문",
+      "search_query_ko_pure": "심층 감독 신경망"
+    },
+    {
+      "id": "citing-06",
+      "dataset": "cases_graph.json",
+      "category": "citing",
+      "search_query": "Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing",
+      "search_query_ko_mixed": "커밋하기 전에 검증하기: Self-Auditing을 통한 LLM Agents의 Faithful Reasoning을 향하여",
+      "search_query_ko_pure": "확정하기 전에 검증하라: 자기 감사를 통한 대규모 언어 모델 에이전트의 충실한 추론을 향하여"
+    },
+    {
+      "id": "reference-01",
+      "dataset": "cases_graph.json",
+      "category": "reference",
+      "search_query": "PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation",
+      "search_query_ko_mixed": "PCBWorld: 엔진 기반 PCB 설계 자동화를 위한 벤치마크 환경",
+      "search_query_ko_pure": "인쇄회로기판 세계: 엔진 기반 인쇄회로기판 설계 자동화를 위한 벤치마크 환경"
+    },
+    {
+      "id": "reference-02",
+      "dataset": "cases_graph.json",
+      "category": "reference",
+      "search_query": "Forethought: Verifiable Reasoning from Neurosymbolic Primitive Programming",
+      "search_query_ko_mixed": "Forethought: Neurosymbolic Primitive Programming을 통한 Verifiable Reasoning 논문 찾아줘",
+      "search_query_ko_pure": "사전 숙고: 신경기호적 원시 프로그래밍을 통한 검증 가능한 추론"
+    },
+    {
+      "id": "reference-03",
+      "dataset": "cases_graph.json",
+      "category": "reference",
+      "search_query": "Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning",
+      "search_query_ko_mixed": "LLM을 더 객관적으로 만들기: Trait-Invariant Safety Tuning으로 다양한 특성 전반에서 LLM 안전성 행동 안정화하기",
+      "search_query_ko_pure": "대규모 언어 모델을 더 객관적으로 만들기: 특성 불변 안전성 미세 조정을 통한 특성 전반에 걸친 대규모 언어 모델의 안전 행동 안정화"
+    },
+    {
+      "id": "reference-04",
+      "dataset": "cases_graph.json",
+      "category": "reference",
+      "search_query": "StagedWorkspace: A Versioned Workspace for Knowledge-Work Agents",
+      "search_query_ko_mixed": "StagedWorkspace: 지식 업무 에이전트를 위한 버전 관리 워크스페이스",
+      "search_query_ko_pure": "단계적 작업 공간: 지식 업무 에이전트를 위한 버전 관리형 작업 공간"
+    },
+    {
+      "id": "reference-05",
+      "dataset": "cases_graph.json",
+      "category": "reference",
+      "search_query": "Reinforcement learning for Quantum Tiq-Taq-Toe",
+      "search_query_ko_mixed": "Quantum Tiq-Taq-Toe를 위한 강화학습",
+      "search_query_ko_pure": "양자 틱택토를 위한 강화 학습"
+    },
+    {
+      "id": "reference-06",
+      "dataset": "cases_graph.json",
+      "category": "reference",
+      "search_query": "BRIDGE: Predicting Human Task Completion Time From Model Performance",
+      "search_query_ko_mixed": "BRIDGE: 모델 성능을 바탕으로 인간의 작업 완료 시간 예측",
+      "search_query_ko_pure": "브리지: 모델 성능을 바탕으로 인간의 과업 완료 시간 예측"
+    },
+    {
+      "id": "coauthor-01",
+      "dataset": "cases_graph.json",
+      "category": "coauthor",
+      "search_query": "Fuzzy K-Means Clustering without Cluster Centroids",
+      "search_query_ko_mixed": "Cluster Centroids 없이 수행하는 Fuzzy K-Means Clustering",
+      "search_query_ko_pure": "군집 중심점이 없는 퍼지 케이-평균 군집화"
+    },
+    {
+      "id": "coauthor-02",
+      "dataset": "cases_graph.json",
+      "category": "coauthor",
+      "search_query": "Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study",
+      "search_query_ko_mixed": "Double Machine Learning을 활용한 Causal Inference의 Hyperparameter Tuning: Simulation Study",
+      "search_query_ko_pure": "이중 기계학습을 이용한 인과 추론의 초매개변수 조정: 모의실험 연구"
+    },
+    {
+      "id": "coauthor-03",
+      "dataset": "cases_graph.json",
+      "category": "coauthor",
+      "search_query": "When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference",
+      "search_query_ko_mixed": "Multi-Sample LLM Inference에서 Delegation-Based Aggregator는 언제 Majority보다 나은가?",
+      "search_query_ko_pure": "위임은 언제 다수결보다 나은가? 다중 표본 대규모 언어 모델 추론을 위한 위임 기반 집계기"
+    },
+    {
+      "id": "coauthor-04",
+      "dataset": "cases_graph.json",
+      "category": "coauthor",
+      "search_query": "When to Plan: Learning to Select Between Reactive Control and Deliberative Planning",
+      "search_query_ko_mixed": "Reactive Control과 Deliberative Planning 중 선택하는 시점을 학습하는 방법",
+      "search_query_ko_pure": "언제 계획할 것인가: 반응적 제어와 숙고적 계획 중에서 선택하는 법 학습"
+    },
+    {
+      "id": "coauthor-05",
+      "dataset": "cases_graph.json",
+      "category": "coauthor",
+      "search_query": "Lifted Variable Elimination: Decoupling the Operators from the Constraint Language",
+      "search_query_ko_mixed": "Lifted Variable Elimination: Operators와 Constraint Language를 분리하는 방법",
+      "search_query_ko_pure": "리프티드 변수 제거: 연산자와 제약 언어의 분리"
+    },
+    {
+      "id": "coauthor-06",
+      "dataset": "cases_graph.json",
+      "category": "coauthor",
+      "search_query": "Hyperbolic Neural Networks",
+      "search_query_ko_mixed": "Hyperbolic Neural Networks 관련 논문 찾아줘",
+      "search_query_ko_pure": "쌍곡 신경망"
+    },
+    {
+      "id": "topcited-01",
+      "dataset": "cases_graph.json",
+      "category": "topcited",
+      "search_query": "cs.CL highly cited papers",
+      "search_query_ko_mixed": "cs.CL 분야에서 많이 인용된 논문",
+      "search_query_ko_pure": "cs.CL 분야에서 많이 인용된 논문"
+    },
+    {
+      "id": "topcited-02",
+      "dataset": "cases_graph.json",
+      "category": "topcited",
+      "search_query": "cs.LG highly cited papers",
+      "search_query_ko_mixed": "cs.LG에서 인용 수가 많은 논문",
+      "search_query_ko_pure": "cs.LG 분야에서 인용 횟수가 많은 논문"
+    },
+    {
+      "id": "topcited-03",
+      "dataset": "cases_graph.json",
+      "category": "topcited",
+      "search_query": "cs.AI highly cited papers",
+      "search_query_ko_mixed": "cs.AI 분야에서 인용 수가 높은 논문",
+      "search_query_ko_pure": "cs.AI에서 인용 횟수가 많은 논문"
+    },
+    {
+      "id": "topcited-04",
+      "dataset": "cases_graph.json",
+      "category": "topcited",
+      "search_query": "cs.CV highly cited papers",
+      "search_query_ko_mixed": "cs.CV 분야에서 많이 인용된 논문",
+      "search_query_ko_pure": "cs.CV 분야에서 많이 인용된 논문"
+    },
+    {
+      "id": "topcited-05",
+      "dataset": "cases_graph.json",
+      "category": "topcited",
+      "search_query": "cs.RO highly cited papers",
+      "search_query_ko_mixed": "cs.RO에서 많이 인용된 논문",
+      "search_query_ko_pure": "cs.RO 분야에서 많이 인용된 논문"
+    },
+    {
+      "id": "topcited-06",
+      "dataset": "cases_graph.json",
+      "category": "topcited",
+      "search_query": "cs.SE highly cited papers",
+      "search_query_ko_mixed": "cs.SE에서 인용 수가 높은 논문",
+      "search_query_ko_pure": "cs.SE에서 인용 횟수가 많은 논문"
+    }
+  ]
+}
