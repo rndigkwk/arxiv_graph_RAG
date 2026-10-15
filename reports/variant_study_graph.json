@@ -1,0 +1,2096 @@
+{
+  "generated_at": "2026-10-15T09:16:46.205417+00:00",
+  "dataset": "cases_graph.json",
+  "snapshot_version": "2026-10-14",
+  "top_k": 5,
+  "pool": 20,
+  "seeds": 3,
+  "hybrid_weight": 0.5,
+  "note": "네 변형이 같은 후보·같은 질의 임베딩을 봅니다. 답변은 생성하지 않으므로 검색 성능만 비교합니다.",
+  "overall": {
+    "case_count": 30,
+    "vector": {
+      "hit_at_k": 0.0333,
+      "recall_at_k": 0.0111,
+      "reciprocal_rank": 0.0167,
+      "elapsed_seconds": 0.5079
+    },
+    "ppr": {
+      "hit_at_k": 0.2,
+      "recall_at_k": 0.1222,
+      "reciprocal_rank": 0.055,
+      "elapsed_seconds": 0.6352
+    },
+    "ppr_no_seeds": {
+      "hit_at_k": 0.3667,
+      "recall_at_k": 0.2828,
+      "reciprocal_rank": 0.1733,
+      "elapsed_seconds": 0.6368
+    },
+    "hybrid": {
+      "hit_at_k": 0.1,
+      "recall_at_k": 0.0556,
+      "reciprocal_rank": 0.0317,
+      "elapsed_seconds": 0.6285
+    }
+  },
+  "by_category": {
+    "author": {
+      "case_count": 6,
+      "vector": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.6442
+      },
+      "ppr": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.7813
+      },
+      "ppr_no_seeds": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.7785
+      },
+      "hybrid": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.7765
+      }
+    },
+    "citing": {
+      "case_count": 6,
+      "vector": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.4584
+      },
+      "ppr": {
+        "hit_at_k": 0.6667,
+        "recall_at_k": 0.5,
+        "reciprocal_rank": 0.1583,
+        "elapsed_seconds": 0.5904
+      },
+      "ppr_no_seeds": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.9,
+        "reciprocal_rank": 0.5972,
+        "elapsed_seconds": 0.5946
+      },
+      "hybrid": {
+        "hit_at_k": 0.1667,
+        "recall_at_k": 0.1667,
+        "reciprocal_rank": 0.0417,
+        "elapsed_seconds": 0.5808
+      }
+    },
+    "coauthor": {
+      "case_count": 6,
+      "vector": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.4498
+      },
+      "ppr": {
+        "hit_at_k": 0.1667,
+        "recall_at_k": 0.0556,
+        "reciprocal_rank": 0.0333,
+        "elapsed_seconds": 0.5753
+      },
+      "ppr_no_seeds": {
+        "hit_at_k": 0.1667,
+        "recall_at_k": 0.1111,
+        "reciprocal_rank": 0.0833,
+        "elapsed_seconds": 0.5755
+      },
+      "hybrid": {
+        "hit_at_k": 0.1667,
+        "recall_at_k": 0.0556,
+        "reciprocal_rank": 0.0333,
+        "elapsed_seconds": 0.5683
+      }
+    },
+    "reference": {
+      "case_count": 6,
+      "vector": {
+        "hit_at_k": 0.1667,
+        "recall_at_k": 0.0556,
+        "reciprocal_rank": 0.0833,
+        "elapsed_seconds": 0.5289
+      },
+      "ppr": {
+        "hit_at_k": 0.1667,
+        "recall_at_k": 0.0556,
+        "reciprocal_rank": 0.0833,
+        "elapsed_seconds": 0.6442
+      },
+      "ppr_no_seeds": {
+        "hit_at_k": 0.6667,
+        "recall_at_k": 0.4028,
+        "reciprocal_rank": 0.1861,
+        "elapsed_seconds": 0.6454
+      },
+      "hybrid": {
+        "hit_at_k": 0.1667,
+        "recall_at_k": 0.0556,
+        "reciprocal_rank": 0.0833,
+        "elapsed_seconds": 0.6352
+      }
+    },
+    "topcited": {
+      "case_count": 6,
+      "vector": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.4583
+      },
+      "ppr": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.585
+      },
+      "ppr_no_seeds": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.5899
+      },
+      "hybrid": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.582
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "author-01",
+      "category": "author",
+      "gold_size": 2,
+      "seed_ids": [
+        "2505.09388",
+        "2312.16248",
+        "2407.10671"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 1.4874,
+          "retrieved": [
+            "2505.09388",
+            "2312.16248",
+            "2407.10671",
+            "2412.15115",
+            "2406.01721"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 1.6156,
+          "retrieved": [
+            "2607.27967",
+            "2505.09388",
+            "2312.16248",
+            "2407.10671",
+            "2608.10720"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 1.6167,
+          "retrieved": [
+            "2607.27967",
+            "2608.10720",
+            "2507.10142",
+            "2606.16118",
+            "2603.01152"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 1.6198,
+          "retrieved": [
+            "2505.09388",
+            "2312.16248",
+            "2407.10671",
+            "2412.15115",
+            "2309.16609"
+          ]
+        }
+      }
+    },
+    {
+      "id": "author-02",
+      "category": "author",
+      "gold_size": 3,
+      "seed_ids": [
+        "2512.13168",
+        "2502.18834",
+        "2608.22842"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4285,
+          "retrieved": [
+            "2512.13168",
+            "2502.18834",
+            "2608.22842",
+            "2608.11683",
+            "1908.10063"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5509,
+          "retrieved": [
+            "2606.26549",
+            "2512.13168",
+            "2502.18834",
+            "2608.22842",
+            "2608.18534"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5521,
+          "retrieved": [
+            "2606.26549",
+            "2608.18534",
+            "2609.07603",
+            "2607.19865",
+            "2608.19966"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5448,
+          "retrieved": [
+            "2512.13168",
+            "2502.18834",
+            "2608.22842",
+            "2608.11683",
+            "2606.15949"
+          ]
+        }
+      }
+    },
+    {
+      "id": "author-03",
+      "category": "author",
+      "gold_size": 3,
+      "seed_ids": [
+        "2101.03164",
+        "2511.20645",
+        "1709.05424"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6314,
+          "retrieved": [
+            "2101.03164",
+            "2511.20645",
+            "1709.05424",
+            "2103.14024",
+            "2506.06185"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.7969,
+          "retrieved": [
+            "2608.02502",
+            "2608.04285",
+            "2101.03164",
+            "1709.05424",
+            "2511.20645"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.783,
+          "retrieved": [
+            "2608.02502",
+            "2608.04285",
+            "2609.00646",
+            "2608.02218",
+            "2609.00226"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.7747,
+          "retrieved": [
+            "2101.03164",
+            "2511.20645",
+            "1709.05424",
+            "2608.03244",
+            "1503.03585"
+          ]
+        }
+      }
+    },
+    {
+      "id": "author-04",
+      "category": "author",
+      "gold_size": 3,
+      "seed_ids": [
+        "2411.15211",
+        "2509.21875",
+        "2211.17106"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.435,
+          "retrieved": [
+            "2411.15211",
+            "2509.21875",
+            "2211.17106",
+            "2511.08892",
+            "2512.07584"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5812,
+          "retrieved": [
+            "2607.20545",
+            "2607.06349",
+            "2603.21607",
+            "2411.15211",
+            "2211.17106"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.585,
+          "retrieved": [
+            "2607.20545",
+            "2607.06349",
+            "2603.21607",
+            "2012.07436",
+            "2606.26769"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5946,
+          "retrieved": [
+            "2411.15211",
+            "2509.21875",
+            "2211.17106",
+            "2310.04378",
+            "2606.06869"
+          ]
+        }
+      }
+    },
+    {
+      "id": "author-05",
+      "category": "author",
+      "gold_size": 2,
+      "seed_ids": [
+        "2412.03555",
+        "2407.07726",
+        "2312.12337"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.419,
+          "retrieved": [
+            "2412.03555",
+            "2407.07726",
+            "2312.12337",
+            "2203.15270",
+            "2504.00741"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5507,
+          "retrieved": [
+            "2609.12395",
+            "2608.19891",
+            "2608.11616",
+            "2412.03555",
+            "2407.07726"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5428,
+          "retrieved": [
+            "2609.12395",
+            "2608.19891",
+            "2608.11616",
+            "2609.07174",
+            "2210.03629"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5375,
+          "retrieved": [
+            "2412.03555",
+            "2407.07726",
+            "2312.12337",
+            "2304.04012",
+            "2607.02770"
+          ]
+        }
+      }
+    },
+    {
+      "id": "author-06",
+      "category": "author",
+      "gold_size": 2,
+      "seed_ids": [
+        "2402.06619",
+        "2103.00993",
+        "2606.19079"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.464,
+          "retrieved": [
+            "2402.06619",
+            "2103.00993",
+            "2606.19079",
+            "1212.5701",
+            "2103.11078"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5926,
+          "retrieved": [
+            "2608.15411",
+            "2606.16501",
+            "2103.00993",
+            "2402.06619",
+            "2606.19079"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5916,
+          "retrieved": [
+            "2608.15411",
+            "2606.16501",
+            "2606.20532",
+            "2606.26902",
+            "2609.02273"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5875,
+          "retrieved": [
+            "2402.06619",
+            "2103.00993",
+            "2606.19079",
+            "2609.11372",
+            "1212.5701"
+          ]
+        }
+      }
+    },
+    {
+      "id": "citing-01",
+      "category": "citing",
+      "gold_size": 5,
+      "seed_ids": [
+        "2209.00626",
+        "2211.01201",
+        "2310.13018"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4617,
+          "retrieved": [
+            "2209.00626",
+            "2211.01201",
+            "2310.13018",
+            "2409.06509",
+            "2407.02477"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5908,
+          "retrieved": [
+            "2502.20502",
+            "2505.19333",
+            "2211.01201",
+            "2310.13018",
+            "2209.00626"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.4,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 0.5952,
+          "retrieved": [
+            "2502.20502",
+            "2505.19333",
+            "2609.12704",
+            "2507.08249",
+            "2607.03478"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6014,
+          "retrieved": [
+            "2209.00626",
+            "2211.01201",
+            "2310.13018",
+            "2409.06509",
+            "2606.19527"
+          ]
+        }
+      }
+    },
+    {
+      "id": "citing-02",
+      "category": "citing",
+      "gold_size": 2,
+      "seed_ids": [
+        "2204.13707",
+        "2608.09986",
+        "2608.03611"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4696,
+          "retrieved": [
+            "2204.13707",
+            "2608.09986",
+            "2608.03611",
+            "2404.16456",
+            "1707.07250"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 0.593,
+          "retrieved": [
+            "2608.09986",
+            "2608.03611",
+            "2204.13707",
+            "2507.05624",
+            "2608.20019"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5925,
+          "retrieved": [
+            "2507.05624",
+            "2608.20019",
+            "1810.04805",
+            "2102.04830",
+            "2409.20012"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 0.5965,
+          "retrieved": [
+            "2204.13707",
+            "2608.09986",
+            "2608.03611",
+            "2507.05624",
+            "2608.20019"
+          ]
+        }
+      }
+    },
+    {
+      "id": "citing-03",
+      "category": "citing",
+      "gold_size": 2,
+      "seed_ids": [
+        "2407.01437",
+        "2411.05000",
+        "2408.10151"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4522,
+          "retrieved": [
+            "2407.01437",
+            "2411.05000",
+            "2408.10151",
+            "2502.05167",
+            "2608.22137"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.5,
+          "reciprocal_rank": 0.2,
+          "elapsed_seconds": 0.5784,
+          "retrieved": [
+            "2607.08284",
+            "2411.05000",
+            "2408.10151",
+            "2407.01437",
+            "2608.08634"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5,
+          "elapsed_seconds": 0.5799,
+          "retrieved": [
+            "2607.08284",
+            "2608.08634",
+            "2603.04191",
+            "2608.05141",
+            "2404.06654"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5659,
+          "retrieved": [
+            "2407.01437",
+            "2411.05000",
+            "2408.10151",
+            "2502.05167",
+            "2411.19360"
+          ]
+        }
+      }
+    },
+    {
+      "id": "citing-04",
+      "category": "citing",
+      "gold_size": 2,
+      "seed_ids": [
+        "2410.06215",
+        "2512.19682",
+        "1910.07224"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4856,
+          "retrieved": [
+            "2410.06215",
+            "2512.19682",
+            "1910.07224",
+            "2404.07963",
+            "2501.10332"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6094,
+          "retrieved": [
+            "1910.07224",
+            "2512.19682",
+            "2410.06215",
+            "2608.16164",
+            "2506.14990"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 0.6257,
+          "retrieved": [
+            "2608.16164",
+            "2506.14990",
+            "2606.25996",
+            "2608.20318",
+            "2608.19880"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6016,
+          "retrieved": [
+            "2410.06215",
+            "2512.19682",
+            "1910.07224",
+            "2511.09586",
+            "2412.21139"
+          ]
+        }
+      }
+    },
+    {
+      "id": "citing-05",
+      "category": "citing",
+      "gold_size": 2,
+      "seed_ids": [
+        "1409.5185",
+        "1409.1556",
+        "1606.00915"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4354,
+          "retrieved": [
+            "1409.5185",
+            "1409.1556",
+            "1606.00915",
+            "1512.03385",
+            "1608.06993"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.5,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 0.6038,
+          "retrieved": [
+            "2607.01870",
+            "1409.1556",
+            "1409.5185",
+            "2606.24722",
+            "1606.00915"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5,
+          "elapsed_seconds": 0.6051,
+          "retrieved": [
+            "2607.01870",
+            "2606.24722",
+            "2607.20379",
+            "2608.20240",
+            "2410.16089"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5562,
+          "retrieved": [
+            "1409.5185",
+            "1409.1556",
+            "1606.00915",
+            "1512.03385",
+            "1409.4842"
+          ]
+        }
+      }
+    },
+    {
+      "id": "citing-06",
+      "category": "citing",
+      "gold_size": 2,
+      "seed_ids": [
+        "2604.08401",
+        "2606.00476",
+        "2608.04066"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4459,
+          "retrieved": [
+            "2604.08401",
+            "2606.00476",
+            "2608.04066",
+            "2510.05156",
+            "2608.20670"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 0.5667,
+          "retrieved": [
+            "2608.04066",
+            "2606.00476",
+            "2604.08401",
+            "2607.25076",
+            "2607.25045"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5689,
+          "retrieved": [
+            "2607.25076",
+            "2607.25045",
+            "2307.03172",
+            "2506.02153",
+            "2410.14641"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5631,
+          "retrieved": [
+            "2604.08401",
+            "2606.00476",
+            "2608.04066",
+            "2609.00652",
+            "2604.05485"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reference-01",
+      "category": "reference",
+      "gold_size": 3,
+      "seed_ids": [
+        "2607.05915",
+        "2503.12946",
+        "2602.00510"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.9551,
+          "retrieved": [
+            "2607.05915",
+            "2503.12946",
+            "2602.00510",
+            "2605.06936",
+            "2608.09296"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 1.076,
+          "retrieved": [
+            "2607.05915",
+            "2608.03738",
+            "2602.00510",
+            "2503.12946",
+            "2210.03629"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 1.0765,
+          "retrieved": [
+            "2608.03738",
+            "2210.03629",
+            "2506.08332",
+            "2311.00176",
+            "2307.16789"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 1.0644,
+          "retrieved": [
+            "2607.05915",
+            "2503.12946",
+            "2602.00510",
+            "2608.09296",
+            "2607.17528"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reference-02",
+      "category": "reference",
+      "gold_size": 3,
+      "seed_ids": [
+        "2607.04096",
+        "2409.17270",
+        "2510.25497"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.3333333333333333,
+          "reciprocal_rank": 0.5,
+          "elapsed_seconds": 0.4583,
+          "retrieved": [
+            "2607.04096",
+            "2409.17270",
+            "2510.25497",
+            "2607.21185",
+            "2608.28421"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.3333333333333333,
+          "reciprocal_rank": 0.5,
+          "elapsed_seconds": 0.5797,
+          "retrieved": [
+            "2607.04096",
+            "2409.17270",
+            "2609.12247",
+            "2510.25497",
+            "2305.12295"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 0.5819,
+          "retrieved": [
+            "2609.12247",
+            "2305.12295",
+            "2310.03714",
+            "2508.01780",
+            "2606.21565"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.3333333333333333,
+          "reciprocal_rank": 0.5,
+          "elapsed_seconds": 0.5689,
+          "retrieved": [
+            "2607.04096",
+            "2409.17270",
+            "2510.25497",
+            "2607.21185",
+            "2608.17741"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reference-03",
+      "category": "reference",
+      "gold_size": 4,
+      "seed_ids": [
+        "2608.11705",
+        "2507.17075",
+        "2605.29396"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4309,
+          "retrieved": [
+            "2608.11705",
+            "2507.17075",
+            "2605.29396",
+            "2309.07875",
+            "2606.16808"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5546,
+          "retrieved": [
+            "2606.16808",
+            "2608.11705",
+            "2507.17075",
+            "2605.29396",
+            "2608.17202"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.25,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 0.5545,
+          "retrieved": [
+            "2606.16808",
+            "2608.17202",
+            "2406.05946",
+            "2310.06987",
+            "2406.18510"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5483,
+          "retrieved": [
+            "2608.11705",
+            "2507.17075",
+            "2605.29396",
+            "2606.16808",
+            "2607.02510"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reference-04",
+      "category": "reference",
+      "gold_size": 2,
+      "seed_ids": [
+        "2608.18050",
+        "2605.03596",
+        "2607.22917"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4437,
+          "retrieved": [
+            "2608.18050",
+            "2605.03596",
+            "2607.22917",
+            "2605.09650",
+            "2608.00122"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5437,
+          "retrieved": [
+            "2608.18050",
+            "2605.03596",
+            "2607.22917",
+            "2608.26546",
+            "2606.25836"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5438,
+          "retrieved": [
+            "2608.26546",
+            "2606.25836",
+            "2608.17800",
+            "2210.03629",
+            "2404.07972"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5387,
+          "retrieved": [
+            "2608.18050",
+            "2605.03596",
+            "2607.22917",
+            "2608.23283",
+            "2608.16381"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reference-05",
+      "category": "reference",
+      "gold_size": 2,
+      "seed_ids": [
+        "2411.06429",
+        "1811.12338",
+        "2206.05825"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4579,
+          "retrieved": [
+            "2411.06429",
+            "1811.12338",
+            "2206.05825",
+            "2506.00458",
+            "2204.09052"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5818,
+          "retrieved": [
+            "2411.06429",
+            "1811.12338",
+            "2206.05825",
+            "2607.06514",
+            "2607.17543"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 0.5845,
+          "retrieved": [
+            "2607.06514",
+            "2607.17543",
+            "1707.06347",
+            "1706.03762",
+            "2312.00752"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.573,
+          "retrieved": [
+            "2411.06429",
+            "1811.12338",
+            "2206.05825",
+            "1812.08451",
+            "2206.15378"
+          ]
+        }
+      }
+    },
+    {
+      "id": "reference-06",
+      "category": "reference",
+      "gold_size": 2,
+      "seed_ids": [
+        "2602.07267",
+        "2503.14499",
+        "2606.07157"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4274,
+          "retrieved": [
+            "2602.07267",
+            "2503.14499",
+            "2606.07157",
+            "2503.17354",
+            "2509.20645"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5295,
+          "retrieved": [
+            "2602.07267",
+            "2503.14499",
+            "2606.07157",
+            "2606.30182",
+            "2608.25286"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.5,
+          "reciprocal_rank": 0.2,
+          "elapsed_seconds": 0.5312,
+          "retrieved": [
+            "2606.30182",
+            "2608.25286",
+            "2604.00594",
+            "2310.06770",
+            "2411.15114"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.518,
+          "retrieved": [
+            "2602.07267",
+            "2503.14499",
+            "2606.07157",
+            "2503.17354",
+            "2512.00193"
+          ]
+        }
+      }
+    },
+    {
+      "id": "coauthor-01",
+      "category": "coauthor",
+      "gold_size": 4,
+      "seed_ids": [
+        "2404.04940",
+        "2608.29102",
+        "2203.14309"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4432,
+          "retrieved": [
+            "2404.04940",
+            "2608.29102",
+            "2203.14309",
+            "1910.01991",
+            "2010.06870"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5654,
+          "retrieved": [
+            "2608.29102",
+            "2607.17264",
+            "2404.04940",
+            "2203.14309",
+            "0711.0189"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5642,
+          "retrieved": [
+            "2607.17264",
+            "0711.0189",
+            "1901.10204",
+            "physics/9806030",
+            "1301.2603"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.557,
+          "retrieved": [
+            "2404.04940",
+            "2608.29102",
+            "2203.14309",
+            "1301.2603",
+            "2410.08589"
+          ]
+        }
+      }
+    },
+    {
+      "id": "coauthor-02",
+      "category": "coauthor",
+      "gold_size": 3,
+      "seed_ids": [
+        "2402.04674",
+        "2004.10337",
+        "1711.07137"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.455,
+          "retrieved": [
+            "2402.04674",
+            "2004.10337",
+            "1711.07137",
+            "2609.00071",
+            "2004.14497"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.3333333333333333,
+          "reciprocal_rank": 0.2,
+          "elapsed_seconds": 0.586,
+          "retrieved": [
+            "2609.00071",
+            "1711.07137",
+            "2402.04674",
+            "2004.10337",
+            "2504.08324"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.6666666666666666,
+          "reciprocal_rank": 0.5,
+          "elapsed_seconds": 0.5849,
+          "retrieved": [
+            "2609.00071",
+            "2504.08324",
+            "1510.04740",
+            "1809.05224",
+            "2601.04770"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.3333333333333333,
+          "reciprocal_rank": 0.2,
+          "elapsed_seconds": 0.5792,
+          "retrieved": [
+            "2609.00071",
+            "2402.04674",
+            "2004.10337",
+            "1711.07137",
+            "2504.08324"
+          ]
+        }
+      }
+    },
+    {
+      "id": "coauthor-03",
+      "category": "coauthor",
+      "gold_size": 4,
+      "seed_ids": [
+        "2606.08098",
+        "2509.06870",
+        "2510.01499"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4481,
+          "retrieved": [
+            "2606.08098",
+            "2509.06870",
+            "2510.01499",
+            "2605.29116",
+            "2603.20324"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5666,
+          "retrieved": [
+            "2606.08098",
+            "2606.25996",
+            "2510.01499",
+            "2509.06870",
+            "2609.11709"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5673,
+          "retrieved": [
+            "2606.25996",
+            "2609.11709",
+            "2608.24001",
+            "2608.15303",
+            "2305.14325"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5627,
+          "retrieved": [
+            "2606.08098",
+            "2509.06870",
+            "2510.01499",
+            "2609.11709",
+            "2607.04389"
+          ]
+        }
+      }
+    },
+    {
+      "id": "coauthor-04",
+      "category": "coauthor",
+      "gold_size": 2,
+      "seed_ids": [
+        "2607.16421",
+        "1712.02441",
+        "2509.03581"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4742,
+          "retrieved": [
+            "2607.16421",
+            "1712.02441",
+            "2509.03581",
+            "2304.12046",
+            "2606.16995"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5949,
+          "retrieved": [
+            "2607.16421",
+            "2509.03581",
+            "1712.02441",
+            "2608.10030",
+            "2602.16902"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.595,
+          "retrieved": [
+            "2608.10030",
+            "2602.16902",
+            "2609.07247",
+            "1707.06347",
+            "1612.01474"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5867,
+          "retrieved": [
+            "2607.16421",
+            "1712.02441",
+            "2509.03581",
+            "2304.12046",
+            "2606.16995"
+          ]
+        }
+      }
+    },
+    {
+      "id": "coauthor-05",
+      "category": "coauthor",
+      "gold_size": 2,
+      "seed_ids": [
+        "1402.0565",
+        "1205.2635",
+        "2004.01649"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4384,
+          "retrieved": [
+            "1402.0565",
+            "1205.2635",
+            "2004.01649",
+            "2403.00329",
+            "2608.24713"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5703,
+          "retrieved": [
+            "2606.28024",
+            "2608.15335",
+            "2608.17749",
+            "1402.0565",
+            "1205.2635"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5735,
+          "retrieved": [
+            "2606.28024",
+            "2608.15335",
+            "2608.17749",
+            "1401.1247",
+            "2608.24713"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5636,
+          "retrieved": [
+            "1402.0565",
+            "1205.2635",
+            "2004.01649",
+            "2606.28024",
+            "2608.24713"
+          ]
+        }
+      }
+    },
+    {
+      "id": "coauthor-06",
+      "category": "coauthor",
+      "gold_size": 3,
+      "seed_ids": [
+        "1805.09112",
+        "1805.09786",
+        "1910.12933"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4397,
+          "retrieved": [
+            "1805.09112",
+            "1805.09786",
+            "1910.12933",
+            "1609.09106",
+            "1412.8690"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5687,
+          "retrieved": [
+            "2608.11768",
+            "2609.00513",
+            "1805.09112",
+            "1805.09786",
+            "1910.12933"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5678,
+          "retrieved": [
+            "2608.11768",
+            "2609.00513",
+            "1006.5169",
+            "2412.01023",
+            "2510.21441"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5603,
+          "retrieved": [
+            "1805.09112",
+            "1805.09786",
+            "1910.12933",
+            "2608.11768",
+            "2510.21441"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topcited-01",
+      "category": "topcited",
+      "gold_size": 3,
+      "seed_ids": [
+        "2406.08587",
+        "2305.14627",
+        "2607.00738"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4412,
+          "retrieved": [
+            "2406.08587",
+            "2305.14627",
+            "2607.00738",
+            "2606.31461",
+            "2602.05891"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5668,
+          "retrieved": [
+            "2608.30214",
+            "2607.14399",
+            "2305.14627",
+            "2406.08587",
+            "2607.00738"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5707,
+          "retrieved": [
+            "2608.30214",
+            "2607.14399",
+            "2609.07559",
+            "2609.08094",
+            "2609.00453"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5583,
+          "retrieved": [
+            "2406.08587",
+            "2305.14627",
+            "2607.00738",
+            "2509.21557",
+            "2606.09426"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topcited-02",
+      "category": "topcited",
+      "gold_size": 3,
+      "seed_ids": [
+        "2405.15739",
+        "2506.00074",
+        "2410.09112"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5203,
+          "retrieved": [
+            "2405.15739",
+            "2506.00074",
+            "2410.09112",
+            "2606.24892",
+            "2606.03144"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6498,
+          "retrieved": [
+            "2609.00248",
+            "2608.02775",
+            "2405.15739",
+            "2506.00074",
+            "2410.09112"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6782,
+          "retrieved": [
+            "2609.00248",
+            "2608.02775",
+            "2411.15594",
+            "2005.11401",
+            "2203.02155"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6662,
+          "retrieved": [
+            "2405.15739",
+            "2506.00074",
+            "2410.09112",
+            "2508.02740",
+            "2603.17588"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topcited-03",
+      "category": "topcited",
+      "gold_size": 3,
+      "seed_ids": [
+        "2601.01743",
+        "2608.23875",
+        "2607.00527"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.448,
+          "retrieved": [
+            "2601.01743",
+            "2608.23875",
+            "2607.00527",
+            "2608.05179",
+            "2606.09550"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5653,
+          "retrieved": [
+            "2601.01743",
+            "2607.00527",
+            "2608.23875",
+            "2608.27044",
+            "2607.25076"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5644,
+          "retrieved": [
+            "2608.27044",
+            "2607.25076",
+            "2608.30685",
+            "2606.05872",
+            "2210.03629"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5572,
+          "retrieved": [
+            "2601.01743",
+            "2608.23875",
+            "2607.00527",
+            "2504.08066",
+            "2407.01502"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topcited-04",
+      "category": "topcited",
+      "gold_size": 3,
+      "seed_ids": [
+        "1704.05519",
+        "2109.08880",
+        "1403.6382"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4844,
+          "retrieved": [
+            "1704.05519",
+            "2109.08880",
+            "1403.6382",
+            "1311.2524",
+            "2312.12848"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6148,
+          "retrieved": [
+            "2607.08745",
+            "2410.16089",
+            "2607.07189",
+            "1704.05519",
+            "1403.6382"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6144,
+          "retrieved": [
+            "2607.08745",
+            "2410.16089",
+            "2607.07189",
+            "2608.04776",
+            "1903.11027"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6017,
+          "retrieved": [
+            "1704.05519",
+            "2109.08880",
+            "1403.6382",
+            "2308.15985",
+            "2006.16923"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topcited-05",
+      "category": "topcited",
+      "gold_size": 3,
+      "seed_ids": [
+        "2604.04347",
+        "2512.15699",
+        "2606.04220"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4176,
+          "retrieved": [
+            "2604.04347",
+            "2512.15699",
+            "2606.04220",
+            "2605.04135",
+            "2606.26294"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5435,
+          "retrieved": [
+            "2607.07663",
+            "2608.16207",
+            "2604.04347",
+            "2512.15699",
+            "2606.04220"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5426,
+          "retrieved": [
+            "2607.07663",
+            "2608.16207",
+            "2609.02749",
+            "2604.01658",
+            "2210.03629"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5517,
+          "retrieved": [
+            "2604.04347",
+            "2512.15699",
+            "2606.04220",
+            "2607.02329",
+            "2606.26294"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topcited-06",
+      "category": "topcited",
+      "gold_size": 3,
+      "seed_ids": [
+        "2406.08587",
+        "2607.00738",
+        "1805.02262"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4384,
+          "retrieved": [
+            "2406.08587",
+            "2607.00738",
+            "1805.02262",
+            "2410.09112",
+            "2602.05930"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5699,
+          "retrieved": [
+            "2608.30214",
+            "2607.14399",
+            "1805.02262",
+            "2406.08587",
+            "2607.00738"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5691,
+          "retrieved": [
+            "2608.30214",
+            "2607.14399",
+            "2609.00248",
+            "2608.10740",
+            "2306.05685"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5569,
+          "retrieved": [
+            "2406.08587",
+            "2607.00738",
+            "1805.02262",
+            "2510.20279",
+            "physics/0508025"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,2079 @@
+{
+  "generated_at": "2026-10-15T09:18:02.144362+00:00",
+  "dataset": "cases.json",
+  "snapshot_version": "2026-10-14",
+  "top_k": 5,
+  "pool": 20,
+  "seeds": 3,
+  "hybrid_weight": 0.5,
+  "note": "네 변형이 같은 후보·같은 질의 임베딩을 봅니다. 답변은 생성하지 않으므로 검색 성능만 비교합니다.",
+  "overall": {
+    "case_count": 31,
+    "vector": {
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.6808,
+      "reciprocal_rank": 1.0,
+      "elapsed_seconds": 0.4879
+    },
+    "ppr": {
+      "hit_at_k": 0.9677,
+      "recall_at_k": 0.6474,
+      "reciprocal_rank": 0.678,
+      "elapsed_seconds": 0.6089
+    },
+    "ppr_no_seeds": {
+      "hit_at_k": 0.2258,
+      "recall_at_k": 0.0012,
+      "reciprocal_rank": 0.1785,
+      "elapsed_seconds": 0.6114
+    },
+    "hybrid": {
+      "hit_at_k": 1.0,
+      "recall_at_k": 0.6803,
+      "reciprocal_rank": 1.0,
+      "elapsed_seconds": 0.6058
+    }
+  },
+  "by_category": {
+    "exact-title": {
+      "case_count": 21,
+      "vector": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "elapsed_seconds": 0.4739
+      },
+      "ppr": {
+        "hit_at_k": 0.9524,
+        "recall_at_k": 0.9524,
+        "reciprocal_rank": 0.6476,
+        "elapsed_seconds": 0.5929
+      },
+      "ppr_no_seeds": {
+        "hit_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "reciprocal_rank": 0.0,
+        "elapsed_seconds": 0.5962
+      },
+      "hybrid": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "elapsed_seconds": 0.592
+      }
+    },
+    "topic": {
+      "case_count": 10,
+      "vector": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0106,
+        "reciprocal_rank": 1.0,
+        "elapsed_seconds": 0.5173
+      },
+      "ppr": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0068,
+        "reciprocal_rank": 0.7417,
+        "elapsed_seconds": 0.6426
+      },
+      "ppr_no_seeds": {
+        "hit_at_k": 0.7,
+        "recall_at_k": 0.0036,
+        "reciprocal_rank": 0.5533,
+        "elapsed_seconds": 0.6433
+      },
+      "hybrid": {
+        "hit_at_k": 1.0,
+        "recall_at_k": 0.0089,
+        "reciprocal_rank": 1.0,
+        "elapsed_seconds": 0.6348
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "topic-graph-neural-network",
+      "category": "topic",
+      "gold_size": 420,
+      "seed_ids": [
+        "2011.11288",
+        "1812.08434",
+        "1904.07785"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.009523809523809525,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 1.2257,
+          "retrieved": [
+            "2011.11288",
+            "1812.08434",
+            "1904.07785",
+            "1901.00596",
+            "1911.06455"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.004761904761904762,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 1.3534,
+          "retrieved": [
+            "2607.07984",
+            "2607.07422",
+            "1904.07785",
+            "1812.08434",
+            "2011.11288"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.004761904761904762,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 1.3593,
+          "retrieved": [
+            "2607.07984",
+            "2607.07422",
+            "2403.09742",
+            "2608.09921",
+            "2507.21873"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.007142857142857143,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 1.351,
+          "retrieved": [
+            "1812.08434",
+            "2011.11288",
+            "1904.07785",
+            "2102.11391",
+            "1903.02428"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-retrieval-augmented-generation",
+      "category": "topic",
+      "gold_size": 695,
+      "seed_ids": [
+        "2506.00054",
+        "2305.15294",
+        "2402.19473"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0057553956834532375,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4413,
+          "retrieved": [
+            "2506.00054",
+            "2305.15294",
+            "2402.19473",
+            "2005.11401",
+            "2407.13193"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0028776978417266188,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 0.5691,
+          "retrieved": [
+            "2609.07152",
+            "2305.15294",
+            "2506.00054",
+            "2402.19473",
+            "2505.02271"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0014388489208633094,
+          "reciprocal_rank": 0.2,
+          "elapsed_seconds": 0.5671,
+          "retrieved": [
+            "2609.07152",
+            "2505.02271",
+            "2608.11584",
+            "2609.00967",
+            "2608.11238"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0057553956834532375,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.561,
+          "retrieved": [
+            "2506.00054",
+            "2305.15294",
+            "2402.19473",
+            "2005.11401",
+            "2407.01219"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-diffusion-model",
+      "category": "topic",
+      "gold_size": 722,
+      "seed_ids": [
+        "2609.13047",
+        "2211.15089",
+        "2410.17891"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.006925207756232687,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4421,
+          "retrieved": [
+            "2609.13047",
+            "2211.15089",
+            "2410.17891",
+            "2208.11970",
+            "2409.15816"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.004155124653739612,
+          "reciprocal_rank": 0.5,
+          "elapsed_seconds": 0.5646,
+          "retrieved": [
+            "2607.25157",
+            "2410.17891",
+            "2211.15089",
+            "2609.13047",
+            "2608.11235"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5672,
+          "retrieved": [
+            "2607.25157",
+            "2608.11235",
+            "2608.03457",
+            "2606.19475",
+            "2607.16207"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.004155124653739612,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5549,
+          "retrieved": [
+            "2609.13047",
+            "2211.15089",
+            "2410.17891",
+            "2606.19475",
+            "2510.18087"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-reinforcement-learning",
+      "category": "topic",
+      "gold_size": 4182,
+      "seed_ids": [
+        "1611.05763",
+        "2002.12636",
+        "cs/9605103"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0011956001912960307,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4316,
+          "retrieved": [
+            "1611.05763",
+            "2002.12636",
+            "cs/9605103",
+            "1611.08944",
+            "2405.10369"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0007173601147776184,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 0.5587,
+          "retrieved": [
+            "2403.04931",
+            "2607.16981",
+            "2002.12636",
+            "1611.05763",
+            "cs/9605103"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5578,
+          "retrieved": [
+            "2403.04931",
+            "2607.16981",
+            "2603.18272",
+            "2603.27611",
+            "2606.04935"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0011956001912960307,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5497,
+          "retrieved": [
+            "1611.05763",
+            "2002.12636",
+            "cs/9605103",
+            "1706.03741",
+            "2311.13294"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-multimodal",
+      "category": "topic",
+      "gold_size": 2892,
+      "seed_ids": [
+        "2301.04856",
+        "1705.09406",
+        "2203.15332"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0013831258644536654,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.418,
+          "retrieved": [
+            "2301.04856",
+            "1705.09406",
+            "2203.15332",
+            "2106.04538",
+            "2508.07555"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0013831258644536654,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5458,
+          "retrieved": [
+            "2602.20723",
+            "2608.02238",
+            "1705.09406",
+            "2203.15332",
+            "2301.04856"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0006915629322268327,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5438,
+          "retrieved": [
+            "2602.20723",
+            "2608.02238",
+            "2609.07409",
+            "2609.11607",
+            "2608.18110"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0017289073305670815,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5348,
+          "retrieved": [
+            "2301.04856",
+            "1705.09406",
+            "2203.15332",
+            "1906.00295",
+            "1806.00064"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-knowledge-graph",
+      "category": "topic",
+      "gold_size": 778,
+      "seed_ids": [
+        "2003.02320",
+        "2303.13948",
+        "2308.14217"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.006426735218508998,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4288,
+          "retrieved": [
+            "2003.02320",
+            "2303.13948",
+            "2308.14217",
+            "2608.15834",
+            "2605.22093"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.006426735218508998,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5521,
+          "retrieved": [
+            "2606.28076",
+            "2003.02320",
+            "2303.13948",
+            "2308.14217",
+            "2505.12369"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.006426735218508998,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5541,
+          "retrieved": [
+            "2606.28076",
+            "2505.12369",
+            "2506.04571",
+            "2412.10390",
+            "2607.07422"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.006426735218508998,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5496,
+          "retrieved": [
+            "2003.02320",
+            "2303.13948",
+            "2308.14217",
+            "2608.15834",
+            "2002.00388"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-code-generation",
+      "category": "topic",
+      "gold_size": 708,
+      "seed_ids": [
+        "2203.13474",
+        "2603.29088",
+        "2405.20092"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.007062146892655367,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4496,
+          "retrieved": [
+            "2203.13474",
+            "2603.29088",
+            "2405.20092",
+            "2412.07822",
+            "2407.16237"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.005649717514124294,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5755,
+          "retrieved": [
+            "2608.09277",
+            "2609.12489",
+            "2405.20092",
+            "2603.29088",
+            "2203.13474"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0014124293785310734,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5746,
+          "retrieved": [
+            "2608.09277",
+            "2609.12489",
+            "2606.26173",
+            "2606.24124",
+            "2607.02186"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.005649717514124294,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5656,
+          "retrieved": [
+            "2203.13474",
+            "2603.29088",
+            "2405.20092",
+            "2406.11409",
+            "2607.26307"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-medical-imaging",
+      "category": "topic",
+      "gold_size": 102,
+      "seed_ids": [
+        "2103.01938",
+        "2609.07719",
+        "1612.07003"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0392156862745098,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4382,
+          "retrieved": [
+            "2103.01938",
+            "2609.07719",
+            "1612.07003",
+            "2204.13258",
+            "2008.09104"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0196078431372549,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5569,
+          "retrieved": [
+            "2609.07719",
+            "2608.30912",
+            "2606.26494",
+            "2103.01938",
+            "1612.07003"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5598,
+          "retrieved": [
+            "2608.30912",
+            "2606.26494",
+            "2607.27235",
+            "2212.13138",
+            "2210.03629"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.029411764705882353,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5488,
+          "retrieved": [
+            "2103.01938",
+            "2609.07719",
+            "1612.07003",
+            "2401.10815",
+            "2502.14753"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-federated-learning",
+      "category": "topic",
+      "gold_size": 221,
+      "seed_ids": [
+        "1908.07873",
+        "1602.05629",
+        "1912.04977"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.02262443438914027,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4588,
+          "retrieved": [
+            "1908.07873",
+            "1602.05629",
+            "1912.04977",
+            "1806.00582",
+            "2002.06440"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.01809954751131222,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5883,
+          "retrieved": [
+            "1602.05629",
+            "1912.04977",
+            "1908.07873",
+            "2608.07007",
+            "2402.02885"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.01809954751131222,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5831,
+          "retrieved": [
+            "2608.07007",
+            "2402.02885",
+            "2608.06112",
+            "2409.06067",
+            "2608.15311"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.02262443438914027,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5762,
+          "retrieved": [
+            "1908.07873",
+            "1602.05629",
+            "1912.04977",
+            "1812.06127",
+            "1811.03604"
+          ]
+        }
+      }
+    },
+    {
+      "id": "topic-AI-agents",
+      "category": "topic",
+      "gold_size": 897,
+      "seed_ids": [
+        "2502.18359",
+        "2505.10468",
+        "2503.12687"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.005574136008918618,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4387,
+          "retrieved": [
+            "2502.18359",
+            "2505.10468",
+            "2503.12687",
+            "2601.01743",
+            "2603.23471"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.004459308807134894,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5618,
+          "retrieved": [
+            "2608.23642",
+            "2505.10468",
+            "2502.18359",
+            "2503.12687",
+            "2603.29139"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.0033444816053511705,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5661,
+          "retrieved": [
+            "2608.23642",
+            "2603.29139",
+            "2608.19072",
+            "2607.16845",
+            "2607.04219"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 0.004459308807134894,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5568,
+          "retrieved": [
+            "2502.18359",
+            "2505.10468",
+            "2503.12687",
+            "2607.04219",
+            "2606.22859"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-01",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.28632",
+        "2505.15155",
+        "2602.07085"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.435,
+          "retrieved": [
+            "2608.28632",
+            "2505.15155",
+            "2602.07085",
+            "2607.12455",
+            "2605.28655"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.2,
+          "elapsed_seconds": 0.5561,
+          "retrieved": [
+            "2609.00731",
+            "2505.15155",
+            "2608.11250",
+            "2602.07085",
+            "2608.28632"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5715,
+          "retrieved": [
+            "2609.00731",
+            "2608.11250",
+            "2607.26642",
+            "2609.08719",
+            "2511.18850"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5656,
+          "retrieved": [
+            "2608.28632",
+            "2505.15155",
+            "2602.07085",
+            "2609.08719",
+            "2606.29194"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-02",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2607.12177",
+        "2601.16965",
+        "2510.18318"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.433,
+          "retrieved": [
+            "2607.12177",
+            "2601.16965",
+            "2510.18318",
+            "2512.24504",
+            "2606.08952"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5525,
+          "retrieved": [
+            "2607.12177",
+            "2608.23525",
+            "2510.18318",
+            "2601.16965",
+            "2606.12821"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5518,
+          "retrieved": [
+            "2608.23525",
+            "2606.12821",
+            "2608.26088",
+            "2412.02732",
+            "2103.00020"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5581,
+          "retrieved": [
+            "2607.12177",
+            "2601.16965",
+            "2510.18318",
+            "2608.10494",
+            "2602.17665"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-03",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.21610",
+        "2602.23978",
+        "2608.29951"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.437,
+          "retrieved": [
+            "2608.21610",
+            "2602.23978",
+            "2608.29951",
+            "2510.27419",
+            "2606.24467"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 0.5465,
+          "retrieved": [
+            "2608.29951",
+            "2609.12399",
+            "2602.23978",
+            "2608.21610",
+            "2106.09685"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5465,
+          "retrieved": [
+            "2609.12399",
+            "2106.09685",
+            "2004.12832",
+            "2507.04590",
+            "2508.21038"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5367,
+          "retrieved": [
+            "2608.21610",
+            "2602.23978",
+            "2608.29951",
+            "2606.24467",
+            "2607.06523"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-04",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2606.18068",
+        "2501.13946",
+        "2608.07627"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.9335,
+          "retrieved": [
+            "2606.18068",
+            "2501.13946",
+            "2608.07627",
+            "2608.07651",
+            "2607.08038"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.2,
+          "elapsed_seconds": 1.0451,
+          "retrieved": [
+            "2608.07627",
+            "2501.13946",
+            "2606.26879",
+            "2605.29055",
+            "2606.18068"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 1.0462,
+          "retrieved": [
+            "2606.26879",
+            "2605.29055",
+            "2305.13523",
+            "2104.06523",
+            "2310.05694"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 1.0461,
+          "retrieved": [
+            "2606.18068",
+            "2501.13946",
+            "2608.07627",
+            "2608.06112",
+            "2607.08038"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-05",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.19408",
+        "2605.11609",
+        "2505.21067"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4341,
+          "retrieved": [
+            "2608.19408",
+            "2605.11609",
+            "2505.21067",
+            "2607.05184",
+            "2604.26573"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5609,
+          "retrieved": [
+            "2608.19408",
+            "2603.10359",
+            "2505.21067",
+            "2605.11609",
+            "2606.22793"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5799,
+          "retrieved": [
+            "2603.10359",
+            "2606.22793",
+            "2608.09555",
+            "2203.02155",
+            "2305.20050"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5746,
+          "retrieved": [
+            "2608.19408",
+            "2605.11609",
+            "2505.21067",
+            "2607.02234",
+            "2505.14216"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-06",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2609.12482",
+        "2602.12953",
+        "2606.18413"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4312,
+          "retrieved": [
+            "2609.12482",
+            "2602.12953",
+            "2606.18413",
+            "2606.16649",
+            "2607.14240"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 0.5467,
+          "retrieved": [
+            "2607.15193",
+            "2602.12953",
+            "2609.12482",
+            "2606.18413",
+            "2505.02024"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5493,
+          "retrieved": [
+            "2607.15193",
+            "2505.02024",
+            "2608.25777",
+            "2307.13854",
+            "2207.01206"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5466,
+          "retrieved": [
+            "2609.12482",
+            "2602.12953",
+            "2606.18413",
+            "2412.10999",
+            "2606.16649"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-07",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2605.30664",
+        "2412.05196",
+        "2609.00738"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.45,
+          "retrieved": [
+            "2605.30664",
+            "2412.05196",
+            "2609.00738",
+            "2609.11061",
+            "2510.09988"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.582,
+          "retrieved": [
+            "2605.30664",
+            "2609.00738",
+            "2412.05196",
+            "0803.0476",
+            "1901.03559"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5687,
+          "retrieved": [
+            "0803.0476",
+            "1901.03559",
+            "1810.08473",
+            "1912.01703",
+            "1512.03385"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5612,
+          "retrieved": [
+            "2605.30664",
+            "2412.05196",
+            "2609.00738",
+            "2502.06813",
+            "2609.11061"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-08",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.10492",
+        "2508.05622",
+        "2502.02780"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.6016,
+          "retrieved": [
+            "2608.10492",
+            "2508.05622",
+            "2502.02780",
+            "2601.04025",
+            "2608.21668"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.7618,
+          "retrieved": [
+            "2608.10492",
+            "2608.17150",
+            "2502.02780",
+            "2508.05622",
+            "2201.11903"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.7242,
+          "retrieved": [
+            "2608.17150",
+            "2201.11903",
+            "1506.05908",
+            "2603.03303",
+            "2510.11502"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.7431,
+          "retrieved": [
+            "2608.10492",
+            "2508.05622",
+            "2502.02780",
+            "2601.04025",
+            "2505.15607"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-09",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.11136",
+        "2012.13635",
+        "2409.16045"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4516,
+          "retrieved": [
+            "2608.11136",
+            "2012.13635",
+            "2409.16045",
+            "2606.29972",
+            "1705.08968"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5738,
+          "retrieved": [
+            "2608.11136",
+            "2012.13635",
+            "2409.16045",
+            "2606.29972",
+            "2604.05539"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5728,
+          "retrieved": [
+            "2606.29972",
+            "2604.05539",
+            "2507.21873",
+            "2608.04285",
+            "2503.18509"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5656,
+          "retrieved": [
+            "2608.11136",
+            "2012.13635",
+            "2409.16045",
+            "2606.29972",
+            "1705.08968"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-10",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.19932",
+        "2509.05754",
+        "2603.28711"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4349,
+          "retrieved": [
+            "2608.19932",
+            "2509.05754",
+            "2603.28711",
+            "2607.01952",
+            "2512.19316"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5577,
+          "retrieved": [
+            "2608.19932",
+            "2603.28711",
+            "2509.05754",
+            "2606.26718",
+            "1807.06843"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5589,
+          "retrieved": [
+            "2606.26718",
+            "1807.06843",
+            "2102.07899",
+            "2409.13825",
+            "1911.05856"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.546,
+          "retrieved": [
+            "2608.19932",
+            "2509.05754",
+            "2603.28711",
+            "2606.26718",
+            "2607.01952"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-11",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2606.05389",
+        "2412.17184",
+        "2410.15704"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4238,
+          "retrieved": [
+            "2606.05389",
+            "2412.17184",
+            "2410.15704",
+            "2409.05357",
+            "2406.04112"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5442,
+          "retrieved": [
+            "2606.05389",
+            "2607.06523",
+            "2412.17184",
+            "2410.15704",
+            "2607.06519"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5446,
+          "retrieved": [
+            "2607.06523",
+            "2607.06519",
+            "2111.02925",
+            "1606.05328",
+            "1802.01436"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5357,
+          "retrieved": [
+            "2606.05389",
+            "2412.17184",
+            "2410.15704",
+            "2409.05357",
+            "2105.11730"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-12",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2607.05359",
+        "2210.01426",
+        "1709.05448"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4099,
+          "retrieved": [
+            "2607.05359",
+            "2210.01426",
+            "1709.05448",
+            "1802.08705",
+            "2310.19848"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5297,
+          "retrieved": [
+            "2607.05359",
+            "2609.01260",
+            "2210.01426",
+            "1709.05448",
+            "1906.09431"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5314,
+          "retrieved": [
+            "2609.01260",
+            "1906.09431",
+            "2210.05015",
+            "2006.04672",
+            "2010.03597"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5285,
+          "retrieved": [
+            "2607.05359",
+            "2210.01426",
+            "1709.05448",
+            "2006.04672",
+            "2210.05015"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-13",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.05716",
+        "2302.05708",
+        "2607.20709"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4132,
+          "retrieved": [
+            "2608.05716",
+            "2302.05708",
+            "2607.20709",
+            "2603.05344",
+            "2407.16741"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5,
+          "elapsed_seconds": 0.4359,
+          "retrieved": [
+            "2302.05708",
+            "2608.05716",
+            "2607.20709",
+            "2601.04770",
+            "1904.12446"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.4361,
+          "retrieved": [
+            "2601.04770",
+            "1904.12446",
+            "2410.11001",
+            "2412.15272",
+            "2412.16311"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4286,
+          "retrieved": [
+            "2608.05716",
+            "2302.05708",
+            "2607.20709",
+            "2603.05344",
+            "2407.16741"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-14",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.21174",
+        "2507.17657",
+        "2607.20524"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4476,
+          "retrieved": [
+            "2608.21174",
+            "2507.17657",
+            "2607.20524",
+            "2508.00367",
+            "2510.20787"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 0.5665,
+          "retrieved": [
+            "2609.03586",
+            "2507.17657",
+            "2608.21174",
+            "2607.20524",
+            "2609.08275"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5684,
+          "retrieved": [
+            "2609.03586",
+            "2609.08275",
+            "2311.17982",
+            "1706.03762",
+            "2408.06072"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5579,
+          "retrieved": [
+            "2608.21174",
+            "2507.17657",
+            "2607.20524",
+            "2005.00928",
+            "2410.10781"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-15",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2606.28126",
+        "2604.03312",
+        "2510.27176"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.436,
+          "retrieved": [
+            "2606.28126",
+            "2604.03312",
+            "2510.27176",
+            "2608.21976",
+            "2511.19669"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5779,
+          "retrieved": [
+            "2606.28126",
+            "2608.09874",
+            "2605.17387",
+            "2605.17424",
+            "2510.27176"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.583,
+          "retrieved": [
+            "2608.09874",
+            "2605.17387",
+            "2605.17424",
+            "2606.02863",
+            "2608.25220"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5933,
+          "retrieved": [
+            "2606.28126",
+            "2604.03312",
+            "2510.27176",
+            "2602.22425",
+            "2604.25083"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-16",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2607.28677",
+        "2502.04381",
+        "2607.10275"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.461,
+          "retrieved": [
+            "2607.28677",
+            "2502.04381",
+            "2607.10275",
+            "2309.10895",
+            "2312.07399"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "elapsed_seconds": 0.5862,
+          "retrieved": [
+            "2502.04381",
+            "2505.02722",
+            "2607.28677",
+            "2607.10275",
+            "2607.02983"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6261,
+          "retrieved": [
+            "2505.02722",
+            "2607.02983",
+            "2407.21783",
+            "2402.03300",
+            "1707.06347"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5886,
+          "retrieved": [
+            "2607.28677",
+            "2502.04381",
+            "2607.10275",
+            "2312.07399",
+            "2308.06834"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-17",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2608.18017",
+        "2605.12332",
+        "2312.00812"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5324,
+          "retrieved": [
+            "2608.18017",
+            "2605.12332",
+            "2312.00812",
+            "2608.04697",
+            "2609.04021"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.658,
+          "retrieved": [
+            "2608.18017",
+            "2608.19299",
+            "2403.04931",
+            "2605.12332",
+            "2312.00812"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.6622,
+          "retrieved": [
+            "2608.19299",
+            "2403.04931",
+            "1706.03762",
+            "2211.04054",
+            "2303.18223"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.6819,
+          "retrieved": [
+            "2608.18017",
+            "2605.12332",
+            "2312.00812",
+            "2608.19299",
+            "2311.17686"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-18",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2601.13591",
+        "2608.10366",
+        "2607.01647"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4527,
+          "retrieved": [
+            "2601.13591",
+            "2608.10366",
+            "2607.01647",
+            "2512.04324",
+            "2601.16344"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.25,
+          "elapsed_seconds": 0.5666,
+          "retrieved": [
+            "2608.03451",
+            "2608.10366",
+            "2607.01647",
+            "2601.13591",
+            "2506.23719"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5834,
+          "retrieved": [
+            "2608.03451",
+            "2506.23719",
+            "2210.03629",
+            "2305.03111",
+            "2404.07972"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5842,
+          "retrieved": [
+            "2601.13591",
+            "2608.10366",
+            "2607.01647",
+            "2608.03451",
+            "2409.07703"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-19",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2604.14221",
+        "2307.08390",
+        "2009.07769"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4706,
+          "retrieved": [
+            "2604.14221",
+            "2307.08390",
+            "2009.07769",
+            "2106.06947",
+            "2009.02040"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.2,
+          "elapsed_seconds": 0.5918,
+          "retrieved": [
+            "2603.11756",
+            "2608.09246",
+            "2307.08390",
+            "2009.07769",
+            "2604.14221"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5937,
+          "retrieved": [
+            "2603.11756",
+            "2608.09246",
+            "1907.10902",
+            "1710.10903",
+            "2303.14483"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5859,
+          "retrieved": [
+            "2604.14221",
+            "2307.08390",
+            "2009.07769",
+            "2106.06947",
+            "2009.02040"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-20",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2609.02057",
+        "2604.00356",
+        "2606.15673"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4196,
+          "retrieved": [
+            "2609.02057",
+            "2604.00356",
+            "2606.15673",
+            "2609.09448",
+            "2609.14422"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5414,
+          "retrieved": [
+            "2609.02057",
+            "2607.06503",
+            "2606.15673",
+            "2604.00356",
+            "2210.03629"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5401,
+          "retrieved": [
+            "2607.06503",
+            "2210.03629",
+            "2504.01382",
+            "2207.05221",
+            "2608.02291"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5301,
+          "retrieved": [
+            "2609.02057",
+            "2604.00356",
+            "2606.15673",
+            "2608.02464",
+            "2609.09448"
+          ]
+        }
+      }
+    },
+    {
+      "id": "title-21",
+      "category": "exact-title",
+      "gold_size": 1,
+      "seed_ids": [
+        "2604.11741",
+        "2601.18077",
+        "2510.04980"
+      ],
+      "variants": {
+        "vector": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.4426,
+          "retrieved": [
+            "2604.11741",
+            "2601.18077",
+            "2510.04980",
+            "2310.10701",
+            "2609.06563"
+          ]
+        },
+        "ppr": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5686,
+          "retrieved": [
+            "2607.24082",
+            "2609.11489",
+            "2607.26465",
+            "2601.18077",
+            "2510.04980"
+          ]
+        },
+        "ppr_no_seeds": {
+          "hit_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "reciprocal_rank": 0.0,
+          "elapsed_seconds": 0.5813,
+          "retrieved": [
+            "2607.24082",
+            "2609.11489",
+            "2607.26465",
+            "2608.03644",
+            "2507.10142"
+          ]
+        },
+        "hybrid": {
+          "hit_at_k": 1.0,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "elapsed_seconds": 0.5739,
+          "retrieved": [
+            "2604.11741",
+            "2601.18077",
+            "2510.04980",
+            "2410.02603",
+            "2504.18039"
+          ]
+        }
+      }
+    }
+  ]
+}

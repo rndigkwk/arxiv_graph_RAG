@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-10-15T09:20:49.985837+00:00",
+  "snapshot_version": "2026-10-14",
+  "tokenizer": "text-embedding-3-large",
+  "pricing": null,
+  "counts_input_tokens_only": true,
+  "note": "추출 1회 통과의 입력 토큰만 센 하한입니다. 프롬프트 템플릿·출력 토큰·청킹 중복·재시도·커뮤니티 요약 통과는 포함하지 않았습니다.",
+  "scopes": [
+    {
+      "scope": "this project (graph already in the data)",
+      "papers": 37854,
+      "input_tokens_one_pass": 0,
+      "mean_tokens_per_paper": 0.0,
+      "usd_one_pass_input_only": null
+    },
+    {
+      "scope": "cs.AI subset (500 papers)",
+      "papers": 500,
+      "input_tokens_one_pass": 106530,
+      "mean_tokens_per_paper": 213.1,
+      "usd_one_pass_input_only": null
+    },
+    {
+      "scope": "whole corpus",
+      "papers": 37854,
+      "input_tokens_one_pass": 9833462,
+      "mean_tokens_per_paper": 259.8,
+      "usd_one_pass_input_only": null
+    }
+  ],
+  "subset_available": 10847,
+  "partial_index_gold_coverage": {
+    "500": {
+      "cases_graph.json": {
+        "cases": 30,
+        "gold_ids": 82,
+        "gold_ids_inside": 1,
+        "gold_share_inside": 0.0122,
+        "cases_fully_covered": 0
+      },
+      "cases.json": {
+        "cases": 31,
+        "gold_ids": 11638,
+        "gold_ids_inside": 150,
+        "gold_share_inside": 0.0129,
+        "cases_fully_covered": 0
+      }
+    },
+    "2000": {
+      "cases_graph.json": {
+        "cases": 30,
+        "gold_ids": 82,
+        "gold_ids_inside": 6,
+        "gold_share_inside": 0.0732,
+        "cases_fully_covered": 1
+      },
+      "cases.json": {
+        "cases": 31,
+        "gold_ids": 11638,
+        "gold_ids_inside": 700,
+        "gold_share_inside": 0.0601,
+        "cases_fully_covered": 0
+      }
+    }
+  }
+}

@@ -274,6 +274,12 @@ uv run python -m evals.run --mode compare --cases evals/cases_graph.json --limit
 # 조건 판정 심판만 따로 재는 하네스
 uv run python -m evals.judge_study
 
+# GraphRAG 변형 비교 (벡터 / PPR / 하이브리드), 질문 유형별
+uv run python -m evals.variant_study
+
+# LLM 색인 비용 하한과 부분 색인 정답 커버리지
+uv run --group dev python -m evals.index_cost
+
 # 집계 순위 질문이 수치를 문자열로 정렬하는 빈도 (유형당 반복 실행)
 uv run python -m evals.order_study --repeats 3
 ```
