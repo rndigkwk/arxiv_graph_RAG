@@ -250,6 +250,9 @@ uv run python -m pipeline.ingest --days 7
 
 # 공동인용 링크 예측 기준선 사다리
 uv run --extra ml python -m models.link_prediction.train
+
+# 피처 절제 + cold-start (스냅샷만 읽으므로 API 비용 없음)
+uv run --extra ml python -m models.link_prediction.ablation
 ```
 
 ## Experiments

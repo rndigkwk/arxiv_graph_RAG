@@ -160,3 +160,107 @@ def test_ranking_metrics_put_the_true_partner_at_index_zero():
 def test_ranking_metrics_need_at_least_one_group():
     with pytest.raises(ValueError):
         metrics.ranking_metrics([])
+
+
+class FakeTable:
+    """`coldstart_pairs`와 네거티브 추출이 실제로 쓰는 필드만 갖춘 대역입니다."""
+
+    def __init__(self, primary):
+        self.primary = dict(primary)
+        self.position = {arxiv_id: index for index, arxiv_id in enumerate(sorted(primary))}
+
+
+def test_coldstart_split_separates_one_sided_from_both_cold():
+    table = FakeTable({"warm1": "cs.AI", "warm2": "cs.AI", "cold1": "cs.AI", "cold2": "cs.AI"})
+    labels = {
+        ("warm1", "warm2"),   # 양쪽 다 따뜻함 — 기존 과제가 이미 쓰는 쌍
+        ("cold1", "warm1"),   # 한쪽만 차가움
+        ("cold1", "cold2"),   # 양쪽 다 차가움
+    }
+
+    split = dataset.coldstart_pairs(labels, {"warm1", "warm2"}, table)
+
+    assert split["one_sided"] == [("cold1", "warm1")]
+    assert split["both_cold"] == [("cold1", "cold2")]
+
+
+def test_coldstart_split_drops_a_pair_whose_paper_has_no_embedding():
+    table = FakeTable({"warm1": "cs.AI", "cold1": "cs.AI"})
+    # 임베딩이 없는 논문은 position에 없으므로 어떤 피처도 만들 수 없습니다.
+    labels = {("cold1", "warm1"), ("missing", "warm1")}
+
+    split = dataset.coldstart_pairs(labels, {"warm1"}, table)
+
+    assert split["one_sided"] == [("cold1", "warm1")]
+    assert split["both_cold"] == []
+
+
+def test_cold_negatives_are_never_drawn_from_the_feature_graph():
+    primary = {"warm": "cs.AI", **{f"cold{index}": "cs.AI" for index in range(8)}}
+    table = FakeTable(primary)
+    allowed = {"warm"}
+    positives = [("cold0", "warm")]
+
+    kept, negatives = dataset.sample_coldstart_negatives(
+        positives, allowed, set(), table, seed=1
+    )
+
+    assert len(kept) == len(negatives) == 1
+    # 차가운 포지티브를 따뜻한 네거티브와 맞추면 모델이 차수 0만 보고 맞힙니다.
+    assert not ({node for pair in negatives for node in pair} & allowed - {"warm"})
+    anchor_and_cold = set(negatives[0])
+    assert "warm" in anchor_and_cold
+    assert (anchor_and_cold - {"warm"}).pop().startswith("cold")
+
+
+def test_cold_negatives_match_the_positive_partners_category():
+    primary = {
+        "warm": "cs.AI",
+        "cold_target": "cs.CV",
+        **{f"cv{index}": "cs.CV" for index in range(8)},
+        **{f"lg{index}": "cs.LG" for index in range(8)},
+    }
+    table = FakeTable(primary)
+
+    _, negatives = dataset.sample_coldstart_negatives(
+        [("cold_target", "warm")], {"warm"}, set(), table, seed=2
+    )
+
+    partner = (set(negatives[0]) - {"warm"}).pop()
+    assert table.primary[partner] == "cs.CV"
+
+
+def test_cold_negatives_skip_a_category_with_too_small_a_pool():
+    table = FakeTable({"warm": "cs.AI", "cold_target": "cs.XX", "other": "cs.XX"})
+
+    kept, negatives = dataset.sample_coldstart_negatives(
+        [("cold_target", "warm")], {"warm"}, set(), table, seed=3
+    )
+
+    assert kept == [] and negatives == []
+
+
+def test_cold_negatives_avoid_forbidden_pairs():
+    primary = {"warm": "cs.AI", **{f"cold{index}": "cs.AI" for index in range(6)}}
+    table = FakeTable(primary)
+    # cold1~cold5를 모두 금지하면 뽑을 상대가 남지 않습니다.
+    forbidden = {
+        (left, right) if left < right else (right, left)
+        for left, right in (("warm", f"cold{index}") for index in range(1, 6))
+    }
+
+    _, negatives = dataset.sample_coldstart_negatives(
+        [("cold0", "warm")], {"warm"}, forbidden, table, seed=4
+    )
+
+    assert all(pair not in forbidden for pair in negatives)
+
+
+def test_cold_buckets_hold_only_papers_outside_the_feature_graph():
+    table = FakeTable({"warm": "cs.AI", "cold1": "cs.AI", "cold2": "cs.CV"})
+
+    buckets = dataset.cold_buckets({"warm"}, table)
+
+    assert buckets["cs.AI"] == ["cold1"]
+    assert buckets["cs.CV"] == ["cold2"]
+    assert "warm" not in {node for nodes in buckets.values() for node in nodes}

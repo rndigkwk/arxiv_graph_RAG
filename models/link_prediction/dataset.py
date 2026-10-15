@@ -193,6 +193,75 @@ def usable_pairs(
     return [pair for pair in sorted(labels) if pair[0] in allowed and pair[1] in allowed]
 
 
+def coldstart_pairs(
+    labels: set[tuple[str, str]], allowed: set[str], table: PaperTable
+) -> dict[str, list[tuple[str, str]]]:
+    """Split the label pairs the warm task threw away into the two kinds of cold start.
+
+    `build` keeps only pairs whose both endpoints sit in the feature graph, which drops 74% of
+    the evaluation labels. Those are not noise: they are the case a running system meets most
+    often, a new paper arriving with no co-citation history. They are measured separately
+    rather than mixed in, because a model told apart by "this node has degree zero" would
+    score well on them while learning nothing about structure.
+    """
+    one_sided: list[tuple[str, str]] = []
+    both_cold: list[tuple[str, str]] = []
+    for left, right in sorted(labels):
+        if left not in table.position or right not in table.position:
+            continue
+        warm = (left in allowed, right in allowed)
+        if all(warm):
+            continue
+        (one_sided if any(warm) else both_cold).append((left, right))
+    return {"one_sided": one_sided, "both_cold": both_cold}
+
+
+def cold_buckets(
+    allowed: set[str], table: PaperTable
+) -> dict[str, list[str]]:
+    """Papers with an embedding but no place in the feature graph, grouped by category."""
+    buckets: dict[str, list[str]] = collections.defaultdict(list)
+    for arxiv_id in sorted(table.position):
+        if arxiv_id not in allowed:
+            buckets[table.primary.get(arxiv_id, "")].append(arxiv_id)
+    return buckets
+
+
+def sample_coldstart_negatives(
+    positives: list[tuple[str, str]],
+    allowed: set[str],
+    forbidden: set[tuple[str, str]],
+    table: PaperTable,
+    *,
+    seed: int,
+) -> tuple[list[tuple[str, str]], list[tuple[str, str]]]:
+    """Match each cold positive with a cold negative drawn from the same category.
+
+    Both sides must be equally cold. Pairing a cold positive against a warm negative would let
+    the model answer by degree alone, which measures the sampling and not the model.
+    """
+    rng = random.Random(seed)
+    buckets = cold_buckets(allowed, table)
+    kept_positives: list[tuple[str, str]] = []
+    negatives: list[tuple[str, str]] = []
+    for left, right in positives:
+        anchor, cold = (left, right) if left in allowed else (right, left)
+        pool = buckets.get(table.primary.get(cold, ""), ())
+        if len(pool) < 4:
+            continue
+        for _ in range(12):
+            candidate = pool[rng.randrange(len(pool))]
+            if candidate in (anchor, cold):
+                continue
+            pair = (anchor, candidate) if anchor < candidate else (candidate, anchor)
+            if pair in forbidden:
+                continue
+            kept_positives.append((anchor, cold) if anchor < cold else (cold, anchor))
+            negatives.append(pair)
+            break
+    return kept_positives, negatives
+
+
 def sample_hard_negatives(
     positives: list[tuple[str, str]],
     adjacency: dict[str, set[str]],
