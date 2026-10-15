@@ -1,0 +1,271 @@
+{
+  "generated_at": "2026-10-15T09:58:25.160680+00:00",
+  "snapshot_version": "2026-10-14",
+  "snapshot_papers_sha256": "662ec63c7255286cd779dd6a9e1b7eee46da50504eb1fa58b832b3957cdeea46",
+  "task": "retrieve the papers a paper cites",
+  "method": "기존 768차원 공간 위의 선형 어댑터. 닫힌 해이므로 학습 루프와 난수 시드가 없고 질의 시 행렬곱 한 번이라 sentence-transformers도 torch도 필요하지 않습니다.",
+  "split": {
+    "key": "arxiv_id_yymm",
+    "test_citers_from": "2026-08",
+    "train_citers": 1645,
+    "test_citers": 1607,
+    "train_pairs_available": 27155,
+    "train_pairs_used": 27069,
+    "fit_citers": 1233,
+    "validation_citers": 412,
+    "validation_queries": 94,
+    "eval_queries": 365,
+    "eval_reference_count_range": [
+      2,
+      10
+    ]
+  },
+  "hyperparameters": {
+    "ridge_multiplier": 0.1,
+    "negative_weight": 0.0,
+    "ridge": 2706.9
+  },
+  "hyperparameter_search": {
+    "selected_on": "validation split inside the training window",
+    "raw_validation": {
+      "queries": 94,
+      "recall_at_10": 0.1938,
+      "hit_at_10": 0.6277,
+      "mrr": 0.3727
+    },
+    "grid": [
+      {
+        "ridge_multiplier": 0.01,
+        "ridge": 270.69,
+        "negative_weight": 0.0,
+        "drift_from_identity": 0.0802,
+        "queries": 94,
+        "recall_at_10": 0.1928,
+        "hit_at_10": 0.6702,
+        "mrr": 0.4029
+      },
+      {
+        "ridge_multiplier": 0.01,
+        "ridge": 270.69,
+        "negative_weight": 0.5,
+        "drift_from_identity": 0.0423,
+        "queries": 94,
+        "recall_at_10": 0.1877,
+        "hit_at_10": 0.6596,
+        "mrr": 0.3983
+      },
+      {
+        "ridge_multiplier": 0.01,
+        "ridge": 270.69,
+        "negative_weight": 0.9,
+        "drift_from_identity": 0.0639,
+        "queries": 94,
+        "recall_at_10": 0.1635,
+        "hit_at_10": 0.5638,
+        "mrr": 0.357
+      },
+      {
+        "ridge_multiplier": 0.1,
+        "ridge": 2706.9,
+        "negative_weight": 0.0,
+        "drift_from_identity": 0.0136,
+        "queries": 94,
+        "recall_at_10": 0.1991,
+        "hit_at_10": 0.6489,
+        "mrr": 0.4078
+      },
+      {
+        "ridge_multiplier": 0.1,
+        "ridge": 2706.9,
+        "negative_weight": 0.5,
+        "drift_from_identity": 0.0079,
+        "queries": 94,
+        "recall_at_10": 0.1958,
+        "hit_at_10": 0.6383,
+        "mrr": 0.4064
+      },
+      {
+        "ridge_multiplier": 0.1,
+        "ridge": 2706.9,
+        "negative_weight": 0.9,
+        "drift_from_identity": 0.0121,
+        "queries": 94,
+        "recall_at_10": 0.1824,
+        "hit_at_10": 0.5957,
+        "mrr": 0.3866
+      },
+      {
+        "ridge_multiplier": 0.5,
+        "ridge": 13534.5,
+        "negative_weight": 0.0,
+        "drift_from_identity": 0.0041,
+        "queries": 94,
+        "recall_at_10": 0.1983,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3977
+      },
+      {
+        "ridge_multiplier": 0.5,
+        "ridge": 13534.5,
+        "negative_weight": 0.5,
+        "drift_from_identity": 0.0028,
+        "queries": 94,
+        "recall_at_10": 0.1946,
+        "hit_at_10": 0.6383,
+        "mrr": 0.3932
+      },
+      {
+        "ridge_multiplier": 0.5,
+        "ridge": 13534.5,
+        "negative_weight": 0.9,
+        "drift_from_identity": 0.003,
+        "queries": 94,
+        "recall_at_10": 0.1923,
+        "hit_at_10": 0.6383,
+        "mrr": 0.385
+      },
+      {
+        "ridge_multiplier": 2.0,
+        "ridge": 54138.0,
+        "negative_weight": 0.0,
+        "drift_from_identity": 0.0014,
+        "queries": 94,
+        "recall_at_10": 0.195,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3812
+      },
+      {
+        "ridge_multiplier": 2.0,
+        "ridge": 54138.0,
+        "negative_weight": 0.5,
+        "drift_from_identity": 0.0009,
+        "queries": 94,
+        "recall_at_10": 0.195,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3788
+      },
+      {
+        "ridge_multiplier": 2.0,
+        "ridge": 54138.0,
+        "negative_weight": 0.9,
+        "drift_from_identity": 0.0008,
+        "queries": 94,
+        "recall_at_10": 0.1923,
+        "hit_at_10": 0.6277,
+        "mrr": 0.376
+      },
+      {
+        "ridge_multiplier": 10.0,
+        "ridge": 270690.0,
+        "negative_weight": 0.0,
+        "drift_from_identity": 0.0003,
+        "queries": 94,
+        "recall_at_10": 0.1938,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3746
+      },
+      {
+        "ridge_multiplier": 10.0,
+        "ridge": 270690.0,
+        "negative_weight": 0.5,
+        "drift_from_identity": 0.0002,
+        "queries": 94,
+        "recall_at_10": 0.1938,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3738
+      },
+      {
+        "ridge_multiplier": 10.0,
+        "ridge": 270690.0,
+        "negative_weight": 0.9,
+        "drift_from_identity": 0.0002,
+        "queries": 94,
+        "recall_at_10": 0.1938,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3727
+      },
+      {
+        "ridge_multiplier": 50.0,
+        "ridge": 1353450.0,
+        "negative_weight": 0.0,
+        "drift_from_identity": 0.0001,
+        "queries": 94,
+        "recall_at_10": 0.1938,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3727
+      },
+      {
+        "ridge_multiplier": 50.0,
+        "ridge": 1353450.0,
+        "negative_weight": 0.5,
+        "drift_from_identity": 0.0,
+        "queries": 94,
+        "recall_at_10": 0.1938,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3727
+      },
+      {
+        "ridge_multiplier": 50.0,
+        "ridge": 1353450.0,
+        "negative_weight": 0.9,
+        "drift_from_identity": 0.0,
+        "queries": 94,
+        "recall_at_10": 0.1938,
+        "hit_at_10": 0.6277,
+        "mrr": 0.3727
+      }
+    ]
+  },
+  "results": {
+    "raw": {
+      "queries": 365,
+      "recall_at_10": 0.2019,
+      "hit_at_10": 0.5863,
+      "mrr": 0.4127,
+      "drift_from_identity": 0.0,
+      "exact_title_check": {
+        "cases": 21,
+        "self_retrieved_at_1": 1.0
+      }
+    },
+    "ridge_only": {
+      "queries": 365,
+      "recall_at_10": 0.2128,
+      "hit_at_10": 0.6,
+      "mrr": 0.4238,
+      "drift_from_identity": 0.0136,
+      "exact_title_check": {
+        "cases": 21,
+        "self_retrieved_at_1": 1.0
+      }
+    },
+    "hard_negatives": {
+      "queries": 365,
+      "recall_at_10": 0.2128,
+      "hit_at_10": 0.6,
+      "mrr": 0.4238,
+      "drift_from_identity": 0.0136,
+      "exact_title_check": {
+        "cases": 21,
+        "self_retrieved_at_1": 1.0
+      }
+    }
+  },
+  "paired_bootstrap_vs_raw": {
+    "ridge_only": {
+      "mean_difference": 0.011,
+      "ci95_low": 0.0049,
+      "ci95_high": 0.0177,
+      "excludes_zero": true,
+      "queries": 365
+    },
+    "hard_negatives": {
+      "mean_difference": 0.011,
+      "ci95_low": 0.0049,
+      "ci95_high": 0.0177,
+      "excludes_zero": true,
+      "queries": 365
+    }
+  },
+  "reading": "질의가 변동의 단위이므로 질의를 쌍으로 재표본해 차이의 95% 구간을 냈습니다. 구간이 0을 포함하면 그 변화는 측정되지 않은 것입니다."
+}

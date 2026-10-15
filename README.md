@@ -253,6 +253,9 @@ uv run --extra ml python -m models.link_prediction.train
 
 # 피처 절제 + cold-start (스냅샷만 읽으므로 API 비용 없음)
 uv run --extra ml python -m models.link_prediction.ablation
+
+# 인용 쌍으로 임베딩 어댑터 학습 (닫힌 해, GPU 불필요)
+uv run python -m models.embedding_tuning.train
 ```
 
 ## Experiments
