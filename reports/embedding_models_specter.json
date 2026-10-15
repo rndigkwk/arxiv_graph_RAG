@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-10-15T19:01:57.465886+00:00",
+  "snapshot_version": "2026-10-14",
+  "task": "retrieve the papers a paper cites",
+  "note": "과제·질의·정답·지표는 embedding_tuning.train과 같습니다. 임베딩 행렬만 바뀝니다. 모든 모델이 전체 말뭉치를 후보로 봅니다.",
+  "split": {
+    "test_citers_from": "2026-08",
+    "eval_queries": 365
+  },
+  "top_k": 10,
+  "results": {
+    "text-embedding-3-large": {
+      "dimensions": 768,
+      "source": "snapshot (OpenAI API, 배포 중인 공간)",
+      "queries": 365,
+      "recall_at_10": 0.2019,
+      "hit_at_10": 0.5863,
+      "mrr": 0.4127
+    },
+    "sentence-transformers/allenai-specter": {
+      "rows": 37854,
+      "dimensions": 768,
+      "cached": true,
+      "queries": 365,
+      "recall_at_10": 0.1296,
+      "hit_at_10": 0.4356,
+      "mrr": 0.2573,
+      "vs_openai": {
+        "mean_difference": -0.0723,
+        "ci95_low": -0.09,
+        "ci95_high": -0.0559,
+        "excludes_zero": true,
+        "queries": 365
+      }
+    }
+  }
+}

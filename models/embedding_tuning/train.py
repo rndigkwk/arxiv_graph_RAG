@@ -1,5 +1,8 @@
 """인용 쌍으로 임베딩 어댑터를 학습하고 Recall@k를 오프라인 측정합니다.
 
+`Corpus`와 채점 함수는 `compare_models`가 로컬 모델을 같은 질의·같은 정답으로 재는 데도
+씁니다. 비교가 성립하려면 과제가 하나여야 하므로 채점 경로를 복제하지 않습니다.
+
     uv run python -m models.embedding_tuning.train
     uv run python -m models.embedding_tuning.train --negative-weight 0.5 --ridge 0.3
 
@@ -81,6 +84,19 @@ class Corpus:
 
     def row(self, arxiv_id: str) -> np.ndarray:
         return self.vectors[self.position[arxiv_id]]
+
+    def with_vectors(self, matrix: np.ndarray) -> Corpus:
+        """Same papers and citation lists, a different embedding matrix.
+
+        Lets one local model be scored on exactly the queries and gold sets the OpenAI
+        embeddings were scored on. Anything else would compare two tasks.
+        """
+        if matrix.shape[0] != len(self.ids):
+            raise ValueError("행 수가 논문 수와 같아야 합니다")
+        swapped = object.__new__(Corpus)
+        swapped.__dict__.update(self.__dict__)
+        swapped.vectors = adapter.unit(np.asarray(matrix, dtype=np.float32))
+        return swapped
 
 
 def split_citers(corpus: Corpus, cut: int) -> dict[str, list[str]]:

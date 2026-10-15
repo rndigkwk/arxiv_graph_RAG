@@ -256,6 +256,9 @@ uv run --extra ml python -m models.link_prediction.ablation
 
 # 인용 쌍으로 임베딩 어댑터 학습 (닫힌 해, GPU 불필요)
 uv run python -m models.embedding_tuning.train
+
+# 로컬 임베딩 모델과 비교. 첫 실행은 CPU 인코딩에 모델당 3시간 25분 걸립니다
+uv run --with sentence-transformers python -m models.embedding_tuning.compare_models   --model sentence-transformers/allenai-specter
 ```
 
 ## Experiments
