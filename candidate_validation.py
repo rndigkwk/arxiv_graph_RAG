@@ -4,7 +4,7 @@ import json
 
 from pydantic import BaseModel, Field
 
-from answer_validation import validate_mixed_candidates
+from answer_validation import validate_mixed_candidates, validate_self_reference
 
 
 class CandidateVerdict(BaseModel):
@@ -78,6 +78,9 @@ def assess_and_validate(question, response, fetch_papers, assess):
     papers = fetch_papers(ids)
     if {paper["arxiv_id"] for paper in papers} != set(ids):
         raise ValueError("인용 논문 정보를 모두 찾지 못했습니다.")
+    # 질문이 명시적으로 제외한 논문은 모델 판정 없이 걸러집니다. 판정 호출보다 앞에
+    # 두어, 걸릴 때 불필요한 호출을 하지 않습니다.
+    validate_self_reference(question, papers, response)
     assessment = assess(question, papers)
     validate_mixed_candidates(response, assessment)
     return assessment

@@ -16,7 +16,19 @@ _VALIDATION_REASON_CODES = (
     ("그래프 검색 조건이 질문의 모든", "graph_conditions_not_covered"),
     ("그래프 조건을 통과하지 않은 논문", "citation_missing_graph_match"),
     ("내용 조건을 확인하지 못한 논문", "citation_missing_content_match"),
+    ("질문이 제외를 요구한 논문", "self_reference_citation"),
 )
+
+# 질문이 기준 논문 자신을 답에서 빼라고 **명시한** 표현만 봅니다. 제외를 추론하지 않습니다.
+EXCLUDING_PHRASES = (
+    "other papers",
+    "other paper",
+    "papers other than",
+    "papers besides",
+    "papers excluding",
+)
+# 짧은 제목이 질문 문장에 우연히 들어가 오탐이 되는 것을 막습니다.
+MIN_MATCHED_TITLE_LENGTH = 20
 
 
 def log_validation_failure(request_id: str, attempt: int, stage: str, error: ValueError) -> None:
@@ -81,3 +93,41 @@ def validate_mixed_candidates(response: dict, assessment: dict) -> None:
     }
     if missing_content:
         raise ValueError(f"내용 조건을 확인하지 못한 논문: {sorted(missing_content)}")
+
+
+def _normalized(value: object) -> str:
+    return " ".join(str(value or "").casefold().split())
+
+
+def self_reference_citations(
+    question: str, papers: list[dict], evidence_ids: list[str]
+) -> set[str]:
+    """Cited papers whose own title the question quotes while asking for *other* papers.
+
+    "Which other papers share an author with <title>" names one paper only to exclude it, so
+    citing it is wrong however it was retrieved. Evidence-side checks cannot catch this on
+    their own: the agent needs a lookup query to turn the title into an ID, and that query's
+    rows legitimately contain the paper, so it passes every "came from the graph" test.
+
+    Only an explicit exclusion in the question triggers this. A question that merely names a
+    paper ("what is the primary category of <title>") is answered *by* that paper, and nothing
+    here may reject it.
+    """
+    normalized_question = _normalized(question)
+    if not any(phrase in normalized_question for phrase in EXCLUDING_PHRASES):
+        return set()
+    cited = set(evidence_ids)
+    return {
+        paper["arxiv_id"]
+        for paper in papers
+        if paper.get("arxiv_id") in cited
+        and len(title := _normalized(paper.get("title"))) >= MIN_MATCHED_TITLE_LENGTH
+        and title in normalized_question
+    }
+
+
+def validate_self_reference(question: str, papers: list[dict], response: dict) -> None:
+    """Reject citing the paper the question named in order to exclude it."""
+    offenders = self_reference_citations(question, papers, response["evidence_ids"])
+    if offenders:
+        raise ValueError(f"질문이 제외를 요구한 논문을 인용했습니다: {sorted(offenders)}")
