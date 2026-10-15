@@ -218,6 +218,7 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 ├── notebooks/                    # 수집·적재·품질 분석 노트북
 ├── reports/                      # 그래프 품질·검색 평가 결과
 ├── evals/                        # 검색·답변 평가 데이터와 실행기
+├── EXPERIMENTS.md                # 실험 기록 (질문·방법·결과·결론)
 ├── pipeline/                     # 스냅샷 고정·품질 게이트·증분 수집·실험 추적
 ├── models/link_prediction/       # 공동인용 링크 예측 데이터셋·기준선
 ├── snapshots/                    # 스냅샷 매니페스트 (sha256·기준월·게이트 결과)
@@ -250,6 +251,11 @@ uv run python -m pipeline.ingest --days 7
 # 공동인용 링크 예측 기준선 사다리
 uv run --extra ml python -m models.link_prediction.train
 ```
+
+## Experiments
+
+왜 그렇게 설계했고 무엇을 기각했는지는 [`EXPERIMENTS.md`](EXPERIMENTS.md)에 실험 단위로
+적었습니다 — 질문 / 방법 / 결과 / 결론 순서이며, 틀렸던 가설과 과했던 수정도 함께 남겼습니다.
 
 ## Advanced evaluation
 

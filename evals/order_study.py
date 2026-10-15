@@ -96,6 +96,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="집계 순위 질문의 정렬 오류를 측정합니다.")
     parser.add_argument("--cases", type=Path, default=CASES)
     parser.add_argument("--family", default="topcited")
+    parser.add_argument("--case-id", help="한 케이스만 반복합니다. --family보다 우선합니다.")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--label", default="")
     parser.add_argument("--output", type=Path, default=OUTPUT)
@@ -104,9 +105,14 @@ def main() -> int:
         parser.error("--repeats must be positive")
 
     dataset = json.loads(args.cases.read_text(encoding="utf-8"))
-    cases = [case for case in dataset["cases"] if case["category"] == args.family]
-    if not cases:
-        parser.error(f"{args.family} 유형의 케이스가 없습니다")
+    if args.case_id:
+        cases = [case for case in dataset["cases"] if case["id"] == args.case_id]
+        if not cases:
+            parser.error(f"{args.case_id} 케이스가 없습니다")
+    else:
+        cases = [case for case in dataset["cases"] if case["category"] == args.family]
+        if not cases:
+            parser.error(f"{args.family} 유형의 케이스가 없습니다")
 
     import chatbot
 
@@ -118,6 +124,7 @@ def main() -> int:
         "generated_at": datetime.now(UTC).isoformat(),
         "label": args.label,
         "family": args.family,
+        "case_id": args.case_id or "",
         "repeats": args.repeats,
         "cases": [case["id"] for case in cases],
         "summary": summarize(rows),

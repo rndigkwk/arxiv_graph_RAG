@@ -785,7 +785,7 @@ A가 768차원 임베딩을 텍스트 피처로 쓰므로, 임베딩 없는 논�
 
 ## 10. 진행 결과 (2026-10-15)
 
-측정 상세는 [`advanced.md`](advanced.md)에, 원시 수치는 `reports/`에 있습니다.
+측정 상세는 [`advanced.md`](advanced.md)에, 실험별 질문·방법·결론은 [`EXPERIMENTS.md`](EXPERIMENTS.md)에, 원시 수치는 `reports/`에 있습니다.
 
 ### 10-1. 6a — 그래프 평가 케이스: 변별력 확보
 
