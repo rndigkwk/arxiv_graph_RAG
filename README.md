@@ -264,6 +264,9 @@ uv run python -m evals.run --mode compare --cases evals/cases_graph.json --limit
 
 # 조건 판정 심판만 따로 재는 하네스
 uv run python -m evals.judge_study
+
+# 집계 순위 질문이 수치를 문자열로 정렬하는 빈도 (유형당 반복 실행)
+uv run python -m evals.order_study --repeats 3
 ```
 
 ## Verification
