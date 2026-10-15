@@ -48,6 +48,12 @@ dev = ["pytest>=8.3", "ruff>=0.12", "tiktoken>=0.14,<1"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# pytest의 기본 임시 루트(Temp/pytest-of-<user>)와 기본 캐시(.pytest_cache)가 이 개발 PC에서
+# 읽기조차 거부되는 ACL로 남아 있습니다. 소유권 복구에는 관리자 권한이 필요하므로, 두 경로를
+# 작업 폴더 안으로 옮겨 관리자 없이도 전체 테스트가 돌게 합니다. 다른 환경에서도 무해하고,
+# 임시 파일이 작업 폴더 안에 머물러 실행이 더 독립적이 됩니다.
+cache_dir = ".pytest_cache_local"
+addopts = "--basetemp=.pytest_tmp"
 
 [tool.ruff]
 line-length = 100

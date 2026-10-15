@@ -6,29 +6,9 @@
 
 import gzip
 import json
-import shutil
-import tempfile
-from pathlib import Path
-
-import pytest
 
 from pipeline import quality
 from pipeline.snapshot import Snapshot, file_digest, month_index, month_label
-
-
-@pytest.fixture
-def scratch():
-    """A throwaway directory.
-
-    pytest's own `tmp_path` cannot be used here: this machine has a stale
-    `Temp/pytest-of-Playdata` whose permissions deny writes, which fails at fixture setup
-    before any test code runs. mkdtemp picks a fresh name and is unaffected.
-    """
-    directory = Path(tempfile.mkdtemp(prefix="arxiv-snapshot-test-"))
-    try:
-        yield directory
-    finally:
-        shutil.rmtree(directory, ignore_errors=True)
 
 
 def paper(arxiv_id, *, embedding_length=768, title="T", abstract="A"):
@@ -128,8 +108,8 @@ def test_gate_catches_counts_that_disagree_with_the_manifest():
     assert "paper_count_matches_manifest" in report["failed"]
 
 
-def test_snapshot_verify_reports_a_digest_mismatch(scratch):
-    path = scratch / "papers.jsonl.gz"
+def test_snapshot_verify_reports_a_digest_mismatch(tmp_path):
+    path = tmp_path / "papers.jsonl.gz"
     with gzip.open(path, "wt", encoding="utf-8") as handle:
         handle.write(json.dumps({"row": paper("2601.00001")}) + "\n")
     manifest = {
@@ -143,7 +123,7 @@ def test_snapshot_verify_reports_a_digest_mismatch(scratch):
         "counts": {"papers": 1},
         "cut": {"month_index": 1},
     }
-    snapshot = Snapshot(version="t", manifest=manifest, data_root=scratch)
+    snapshot = Snapshot(version="t", manifest=manifest, data_root=tmp_path)
 
     assert snapshot.verify() == []
     assert [row["arxiv_id"] for row in snapshot.rows("papers")] == ["2601.00001"]
@@ -154,14 +134,14 @@ def test_snapshot_verify_reports_a_digest_mismatch(scratch):
     assert "sha256" in problems[0]
 
 
-def test_snapshot_verify_reports_a_missing_file(scratch):
+def test_snapshot_verify_reports_a_missing_file(tmp_path):
     manifest = {
         "files": {"papers": {"path": "absent.jsonl.gz", "bytes": 1, "sha256": "x"}},
         "counts": {},
         "cut": {"month_index": 0},
     }
 
-    problems = Snapshot(version="t", manifest=manifest, data_root=scratch).verify()
+    problems = Snapshot(version="t", manifest=manifest, data_root=tmp_path).verify()
 
     assert len(problems) == 1
     assert "파일이 없습니다" in problems[0]

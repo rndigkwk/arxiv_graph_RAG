@@ -22,3 +22,5 @@ reports/runs/
 mlruns/
 mlflow.db
 pipeline/state/
+.pytest_cache_local/
+.pytest_tmp/

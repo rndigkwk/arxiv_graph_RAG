@@ -842,7 +842,7 @@ A가 768차원 임베딩을 텍스트 피처로 쓰므로, 임베딩 없는 논�
 |---|---|
 | `published` 필드를 믿을 수 없음 | OAI 수집분의 27%(1,748편)가 수집 창 날짜를 발행일로 갖고 있음. 시간 기준을 arXiv ID의 `YYMM`으로 변경 |
 | 평가 하네스가 한 건 실패로 중단 | `--mode compare`가 `ask`의 `ValueError`를 잡지 않았음. 0점 기록 후 계속으로 수정, 실패 수를 요약에 별도 기록 |
-| `pytest` 임시 디렉터리 권한 | 이 PC의 `Temp/pytest-of-Playdata`가 쓰기 거부 상태라 `tmp_path`를 쓰는 테스트가 setup에서 실패. 새 테스트는 `mkdtemp`를 씀 |
+| `pytest` 임시 디렉터리 권한 | 이 PC의 `Temp/pytest-of-Playdata`와 `.pytest_cache`가 읽기조차 거부되는 ACL로 남아 있어 `tmp_path` 테스트가 setup에서 실패. 소유권 복구는 관리자 권한이 필요하므로, 두 경로를 작업 폴더 안(`.pytest_tmp`, `.pytest_cache_local`)으로 옮겨 해결. **125개 전부 통과** |
 
 ---
 
