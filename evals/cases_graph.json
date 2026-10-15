@@ -1,0 +1,614 @@
+{
+  "dataset_version": 1,
+  "snapshot_version": "2026-10-14",
+  "snapshot_cut_month": "2026-09",
+  "source": "snapshots/2026-10-14/manifest.json",
+  "label_method": "snapshot_cypher",
+  "note": "정답은 스냅샷에서 계산하고, 같은 뜻의 Cypher를 케이스마다 적었습니다. evals.build_graph_cases --verify-against-db로 DB와 대조할 수 있습니다.",
+  "cases": [
+    {
+      "id": "author-01",
+      "category": "author",
+      "question": "Which papers in this collection list an author named Yuquan Deng?",
+      "search_query": "Yuquan Deng",
+      "expected_ids": [
+        "2502.13130",
+        "2508.07917"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (a:ArxivAuthorName {name: $name})-[:AUTHORED]->(p:ArxivPaper) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "name": "Yuquan Deng"
+      },
+      "label_rationale": "저자 이름은 임베딩 입력(title+abstract)에 없으므로 AUTHORED 관계로만 찾을 수 있습니다. 정답은 이 이름 노드가 가진 논문 전부입니다."
+    },
+    {
+      "id": "author-02",
+      "category": "author",
+      "question": "Which papers in this collection list an author named Finbarr Timbers?",
+      "search_query": "Finbarr Timbers",
+      "expected_ids": [
+        "1903.05614",
+        "1908.09453",
+        "2206.15378"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (a:ArxivAuthorName {name: $name})-[:AUTHORED]->(p:ArxivPaper) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "name": "Finbarr Timbers"
+      },
+      "label_rationale": "저자 이름은 임베딩 입력(title+abstract)에 없으므로 AUTHORED 관계로만 찾을 수 있습니다. 정답은 이 이름 노드가 가진 논문 전부입니다."
+    },
+    {
+      "id": "author-03",
+      "category": "author",
+      "question": "Which papers in this collection list an author named Evgenia Nitishinskaya?",
+      "search_query": "Evgenia Nitishinskaya",
+      "expected_ids": [
+        "2407.00215",
+        "2509.15541",
+        "2607.18966"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (a:ArxivAuthorName {name: $name})-[:AUTHORED]->(p:ArxivPaper) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "name": "Evgenia Nitishinskaya"
+      },
+      "label_rationale": "저자 이름은 임베딩 입력(title+abstract)에 없으므로 AUTHORED 관계로만 찾을 수 있습니다. 정답은 이 이름 노드가 가진 논문 전부입니다."
+    },
+    {
+      "id": "author-04",
+      "category": "author",
+      "question": "Which papers in this collection list an author named Limin Sun?",
+      "search_query": "Limin Sun",
+      "expected_ids": [
+        "2106.01157",
+        "2307.12469",
+        "2511.01287"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (a:ArxivAuthorName {name: $name})-[:AUTHORED]->(p:ArxivPaper) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "name": "Limin Sun"
+      },
+      "label_rationale": "저자 이름은 임베딩 입력(title+abstract)에 없으므로 AUTHORED 관계로만 찾을 수 있습니다. 정답은 이 이름 노드가 가진 논문 전부입니다."
+    },
+    {
+      "id": "author-05",
+      "category": "author",
+      "question": "Which papers in this collection list an author named Matteo Gallici?",
+      "search_query": "Matteo Gallici",
+      "expected_ids": [
+        "2311.10090",
+        "2506.21490"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (a:ArxivAuthorName {name: $name})-[:AUTHORED]->(p:ArxivPaper) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "name": "Matteo Gallici"
+      },
+      "label_rationale": "저자 이름은 임베딩 입력(title+abstract)에 없으므로 AUTHORED 관계로만 찾을 수 있습니다. 정답은 이 이름 노드가 가진 논문 전부입니다."
+    },
+    {
+      "id": "author-06",
+      "category": "author",
+      "question": "Which papers in this collection list an author named Adina Yakefu?",
+      "search_query": "Adina Yakefu",
+      "expected_ids": [
+        "2510.17950",
+        "2512.13168"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (a:ArxivAuthorName {name: $name})-[:AUTHORED]->(p:ArxivPaper) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "name": "Adina Yakefu"
+      },
+      "label_rationale": "저자 이름은 임베딩 입력(title+abstract)에 없으므로 AUTHORED 관계로만 찾을 수 있습니다. 정답은 이 이름 노드가 가진 논문 전부입니다."
+    },
+    {
+      "id": "citing-01",
+      "category": "citing",
+      "question": "Which papers in this collection cite the paper titled The Alignment Problem from a Deep Learning Perspective?",
+      "search_query": "The Alignment Problem from a Deep Learning Perspective",
+      "expected_ids": [
+        "2507.08249",
+        "2606.16914",
+        "2606.22495",
+        "2607.03478",
+        "2608.10209"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 5,
+      "cypher": "MATCH (p:ArxivPaper)-[:REFERENCES]->(q:ArxivPaper {arxiv_id: $arxiv_id}) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2209.00626"
+      },
+      "label_rationale": "인용 방향이 핵심입니다. 벡터 검색은 제목이 비슷한 논문을 돌려주지만 이 논문을 실제로 인용한 논문 집합은 REFERENCES 관계만 알고 있습니다."
+    },
+    {
+      "id": "citing-02",
+      "category": "citing",
+      "question": "Which papers in this collection cite the paper titled Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities?",
+      "search_query": "Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities",
+      "expected_ids": [
+        "2507.05624",
+        "2608.20019"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper)-[:REFERENCES]->(q:ArxivPaper {arxiv_id: $arxiv_id}) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2204.13707"
+      },
+      "label_rationale": "인용 방향이 핵심입니다. 벡터 검색은 제목이 비슷한 논문을 돌려주지만 이 논문을 실제로 인용한 논문 집합은 REFERENCES 관계만 알고 있습니다."
+    },
+    {
+      "id": "citing-03",
+      "category": "citing",
+      "question": "Which papers in this collection cite the paper titled Needle in the Haystack for Memory Based Large Language Models?",
+      "search_query": "Needle in the Haystack for Memory Based Large Language Models",
+      "expected_ids": [
+        "2603.04191",
+        "2608.08634"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper)-[:REFERENCES]->(q:ArxivPaper {arxiv_id: $arxiv_id}) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2407.01437"
+      },
+      "label_rationale": "인용 방향이 핵심입니다. 벡터 검색은 제목이 비슷한 논문을 돌려주지만 이 논문을 실제로 인용한 논문 집합은 REFERENCES 관계만 알고 있습니다."
+    },
+    {
+      "id": "citing-04",
+      "category": "citing",
+      "question": "Which papers in this collection cite the paper titled DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback?",
+      "search_query": "DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback",
+      "expected_ids": [
+        "2606.25996",
+        "2608.20318"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper)-[:REFERENCES]->(q:ArxivPaper {arxiv_id: $arxiv_id}) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2410.06215"
+      },
+      "label_rationale": "인용 방향이 핵심입니다. 벡터 검색은 제목이 비슷한 논문을 돌려주지만 이 논문을 실제로 인용한 논문 집합은 REFERENCES 관계만 알고 있습니다."
+    },
+    {
+      "id": "citing-05",
+      "category": "citing",
+      "question": "Which papers in this collection cite the paper titled Deeply-Supervised Nets?",
+      "search_query": "Deeply-Supervised Nets",
+      "expected_ids": [
+        "2606.24722",
+        "2607.20379"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper)-[:REFERENCES]->(q:ArxivPaper {arxiv_id: $arxiv_id}) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "1409.5185"
+      },
+      "label_rationale": "인용 방향이 핵심입니다. 벡터 검색은 제목이 비슷한 논문을 돌려주지만 이 논문을 실제로 인용한 논문 집합은 REFERENCES 관계만 알고 있습니다."
+    },
+    {
+      "id": "citing-06",
+      "category": "citing",
+      "question": "Which papers in this collection cite the paper titled Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing?",
+      "search_query": "Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing",
+      "expected_ids": [
+        "2607.25045",
+        "2607.25076"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper)-[:REFERENCES]->(q:ArxivPaper {arxiv_id: $arxiv_id}) RETURN p.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2604.08401"
+      },
+      "label_rationale": "인용 방향이 핵심입니다. 벡터 검색은 제목이 비슷한 논문을 돌려주지만 이 논문을 실제로 인용한 논문 집합은 REFERENCES 관계만 알고 있습니다."
+    },
+    {
+      "id": "reference-01",
+      "category": "reference",
+      "question": "Among the papers cited by PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation, which ones have primary category cs.CV?",
+      "search_query": "PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation",
+      "expected_ids": [
+        "2105.09492",
+        "2412.19663",
+        "2603.04337"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})-[:REFERENCES]->(q:ArxivPaper) WHERE q.primary_category = $category RETURN q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2607.05915",
+        "category": "cs.CV"
+      },
+      "label_rationale": "인용 관계와 대표 분류 속성을 함께 걸어야 풀립니다. 두 조건 중 하나만 쓰면 정답 집합이 달라집니다."
+    },
+    {
+      "id": "reference-02",
+      "category": "reference",
+      "question": "Among the papers cited by Forethought: Verifiable Reasoning from Neurosymbolic Primitive Programming, which ones have primary category cs.AI?",
+      "search_query": "Forethought: Verifiable Reasoning from Neurosymbolic Primitive Programming",
+      "expected_ids": [
+        "2409.17270",
+        "2508.01780",
+        "2606.21565"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})-[:REFERENCES]->(q:ArxivPaper) WHERE q.primary_category = $category RETURN q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2607.04096",
+        "category": "cs.AI"
+      },
+      "label_rationale": "인용 관계와 대표 분류 속성을 함께 걸어야 풀립니다. 두 조건 중 하나만 쓰면 정답 집합이 달라집니다."
+    },
+    {
+      "id": "reference-03",
+      "category": "reference",
+      "question": "Among the papers cited by Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning, which ones have primary category cs.CR?",
+      "search_query": "Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning",
+      "expected_ids": [
+        "2404.01318",
+        "2404.13208",
+        "2406.05946",
+        "2509.15202"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 4,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})-[:REFERENCES]->(q:ArxivPaper) WHERE q.primary_category = $category RETURN q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2608.11705",
+        "category": "cs.CR"
+      },
+      "label_rationale": "인용 관계와 대표 분류 속성을 함께 걸어야 풀립니다. 두 조건 중 하나만 쓰면 정답 집합이 달라집니다."
+    },
+    {
+      "id": "reference-04",
+      "category": "reference",
+      "question": "Among the papers cited by StagedWorkspace: A Versioned Workspace for Knowledge-Work Agents, which ones have primary category cs.LG?",
+      "search_query": "StagedWorkspace: A Versioned Workspace for Knowledge-Work Agents",
+      "expected_ids": [
+        "2110.00061",
+        "2403.07718"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})-[:REFERENCES]->(q:ArxivPaper) WHERE q.primary_category = $category RETURN q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2608.18050",
+        "category": "cs.LG"
+      },
+      "label_rationale": "인용 관계와 대표 분류 속성을 함께 걸어야 풀립니다. 두 조건 중 하나만 쓰면 정답 집합이 달라집니다."
+    },
+    {
+      "id": "reference-05",
+      "category": "reference",
+      "question": "Among the papers cited by Reinforcement learning for Quantum Tiq-Taq-Toe, which ones have primary category cs.LG?",
+      "search_query": "Reinforcement learning for Quantum Tiq-Taq-Toe",
+      "expected_ids": [
+        "1707.06347",
+        "2312.00752"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})-[:REFERENCES]->(q:ArxivPaper) WHERE q.primary_category = $category RETURN q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2411.06429",
+        "category": "cs.LG"
+      },
+      "label_rationale": "인용 관계와 대표 분류 속성을 함께 걸어야 풀립니다. 두 조건 중 하나만 쓰면 정답 집합이 달라집니다."
+    },
+    {
+      "id": "reference-06",
+      "category": "reference",
+      "question": "Among the papers cited by BRIDGE: Predicting Human Task Completion Time From Model Performance, which ones have primary category cs.LG?",
+      "search_query": "BRIDGE: Predicting Human Task Completion Time From Model Performance",
+      "expected_ids": [
+        "2411.15114",
+        "2510.04374"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})-[:REFERENCES]->(q:ArxivPaper) WHERE q.primary_category = $category RETURN q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2602.07267",
+        "category": "cs.LG"
+      },
+      "label_rationale": "인용 관계와 대표 분류 속성을 함께 걸어야 풀립니다. 두 조건 중 하나만 쓰면 정답 집합이 달라집니다."
+    },
+    {
+      "id": "coauthor-01",
+      "category": "coauthor",
+      "question": "Which other papers in this collection share an author with Fuzzy K-Means Clustering without Cluster Centroids?",
+      "search_query": "Fuzzy K-Means Clustering without Cluster Centroids",
+      "expected_ids": [
+        "2303.14382",
+        "2403.05530",
+        "2510.01656",
+        "2510.11345"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 4,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})<-[:AUTHORED]-(:ArxivAuthorName)-[:AUTHORED]->(q:ArxivPaper) WHERE q.arxiv_id <> $arxiv_id RETURN DISTINCT q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2404.04940"
+      },
+      "label_rationale": "저자 이름 노드를 거치는 두 홉 질문입니다. 내용이 전혀 다른 논문이 정답에 들어가므로 벡터 유사도와 정답이 어긋납니다."
+    },
+    {
+      "id": "coauthor-02",
+      "category": "coauthor",
+      "question": "Which other papers in this collection share an author with Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study?",
+      "search_query": "Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study",
+      "expected_ids": [
+        "1809.05224",
+        "2104.03220",
+        "2504.08324"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})<-[:AUTHORED]-(:ArxivAuthorName)-[:AUTHORED]->(q:ArxivPaper) WHERE q.arxiv_id <> $arxiv_id RETURN DISTINCT q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2402.04674"
+      },
+      "label_rationale": "저자 이름 노드를 거치는 두 홉 질문입니다. 내용이 전혀 다른 논문이 정답에 들어가므로 벡터 유사도와 정답이 어긋납니다."
+    },
+    {
+      "id": "coauthor-03",
+      "category": "coauthor",
+      "question": "Which other papers in this collection share an author with When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference?",
+      "search_query": "When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference",
+      "expected_ids": [
+        "2504.13641",
+        "2506.06958",
+        "2507.11479",
+        "2510.15144"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 4,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})<-[:AUTHORED]-(:ArxivAuthorName)-[:AUTHORED]->(q:ArxivPaper) WHERE q.arxiv_id <> $arxiv_id RETURN DISTINCT q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2606.08098"
+      },
+      "label_rationale": "저자 이름 노드를 거치는 두 홉 질문입니다. 내용이 전혀 다른 논문이 정답에 들어가므로 벡터 유사도와 정답이 어긋납니다."
+    },
+    {
+      "id": "coauthor-04",
+      "category": "coauthor",
+      "question": "Which other papers in this collection share an author with When to Plan: Learning to Select Between Reactive Control and Deliberative Planning?",
+      "search_query": "When to Plan: Learning to Select Between Reactive Control and Deliberative Planning",
+      "expected_ids": [
+        "2305.14133",
+        "2506.17124"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})<-[:AUTHORED]-(:ArxivAuthorName)-[:AUTHORED]->(q:ArxivPaper) WHERE q.arxiv_id <> $arxiv_id RETURN DISTINCT q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "2607.16421"
+      },
+      "label_rationale": "저자 이름 노드를 거치는 두 홉 질문입니다. 내용이 전혀 다른 논문이 정답에 들어가므로 벡터 유사도와 정답이 어긋납니다."
+    },
+    {
+      "id": "coauthor-05",
+      "category": "coauthor",
+      "question": "Which other papers in this collection share an author with Lifted Variable Elimination: Decoupling the Operators from the Constraint Language?",
+      "search_query": "Lifted Variable Elimination: Decoupling the Operators from the Constraint Language",
+      "expected_ids": [
+        "1802.07127",
+        "2311.17582"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 2,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})<-[:AUTHORED]-(:ArxivAuthorName)-[:AUTHORED]->(q:ArxivPaper) WHERE q.arxiv_id <> $arxiv_id RETURN DISTINCT q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "1402.0565"
+      },
+      "label_rationale": "저자 이름 노드를 거치는 두 홉 질문입니다. 내용이 전혀 다른 논문이 정답에 들어가므로 벡터 유사도와 정답이 어긋납니다."
+    },
+    {
+      "id": "coauthor-06",
+      "category": "coauthor",
+      "question": "Which other papers in this collection share an author with Hyperbolic Neural Networks?",
+      "search_query": "Hyperbolic Neural Networks",
+      "expected_ids": [
+        "2110.06197",
+        "2512.10858",
+        "2606.18206"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})<-[:AUTHORED]-(:ArxivAuthorName)-[:AUTHORED]->(q:ArxivPaper) WHERE q.arxiv_id <> $arxiv_id RETURN DISTINCT q.arxiv_id AS arxiv_id ORDER BY arxiv_id",
+      "cypher_params": {
+        "arxiv_id": "1805.09112"
+      },
+      "label_rationale": "저자 이름 노드를 거치는 두 홉 질문입니다. 내용이 전혀 다른 논문이 정답에 들어가므로 벡터 유사도와 정답이 어긋납니다."
+    },
+    {
+      "id": "topcited-01",
+      "category": "topcited",
+      "question": "Within primary category cs.CL, which 3 papers are cited most often by other papers in this collection?",
+      "search_query": "cs.CL highly cited papers",
+      "expected_ids": [
+        "2210.03629",
+        "2302.04761",
+        "2402.03300"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper)<-[:REFERENCES]-(:ArxivPaper) WHERE p.primary_category = $category WITH p.arxiv_id AS arxiv_id, count(*) AS citations RETURN arxiv_id ORDER BY citations DESC, arxiv_id ASC LIMIT $limit",
+      "cypher_params": {
+        "category": "cs.CL",
+        "limit": 3
+      },
+      "label_rationale": "피인용 수 집계는 그래프에서만 나옵니다. 경계 동점이 있는 분류는 정답이 하나로 정해지지 않으므로 제외했습니다."
+    },
+    {
+      "id": "topcited-02",
+      "category": "topcited",
+      "question": "Within primary category cs.LG, which 3 papers are cited most often by other papers in this collection?",
+      "search_query": "cs.LG highly cited papers",
+      "expected_ids": [
+        "1707.06347",
+        "2110.14168",
+        "2305.20050"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper)<-[:REFERENCES]-(:ArxivPaper) WHERE p.primary_category = $category WITH p.arxiv_id AS arxiv_id, count(*) AS citations RETURN arxiv_id ORDER BY citations DESC, arxiv_id ASC LIMIT $limit",
+      "cypher_params": {
+        "category": "cs.LG",
+        "limit": 3
+      },
+      "label_rationale": "피인용 수 집계는 그래프에서만 나옵니다. 경계 동점이 있는 분류는 정답이 하나로 정해지지 않으므로 제외했습니다."
+    },
+    {
+      "id": "topcited-03",
+      "category": "topcited",
+      "question": "Within primary category cs.AI, which 3 papers are cited most often by other papers in this collection?",
+      "search_query": "cs.AI highly cited papers",
+      "expected_ids": [
+        "2303.11366",
+        "2307.13854",
+        "2407.21783"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper)<-[:REFERENCES]-(:ArxivPaper) WHERE p.primary_category = $category WITH p.arxiv_id AS arxiv_id, count(*) AS citations RETURN arxiv_id ORDER BY citations DESC, arxiv_id ASC LIMIT $limit",
+      "cypher_params": {
+        "category": "cs.AI",
+        "limit": 3
+      },
+      "label_rationale": "피인용 수 집계는 그래프에서만 나옵니다. 경계 동점이 있는 분류는 정답이 하나로 정해지지 않으므로 제외했습니다."
+    },
+    {
+      "id": "topcited-04",
+      "category": "topcited",
+      "question": "Within primary category cs.CV, which 3 papers are cited most often by other papers in this collection?",
+      "search_query": "cs.CV highly cited papers",
+      "expected_ids": [
+        "2103.00020",
+        "2502.13923",
+        "2511.21631"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper)<-[:REFERENCES]-(:ArxivPaper) WHERE p.primary_category = $category WITH p.arxiv_id AS arxiv_id, count(*) AS citations RETURN arxiv_id ORDER BY citations DESC, arxiv_id ASC LIMIT $limit",
+      "cypher_params": {
+        "category": "cs.CV",
+        "limit": 3
+      },
+      "label_rationale": "피인용 수 집계는 그래프에서만 나옵니다. 경계 동점이 있는 분류는 정답이 하나로 정해지지 않으므로 제외했습니다."
+    },
+    {
+      "id": "topcited-05",
+      "category": "topcited",
+      "question": "Within primary category cs.RO, which 3 papers are cited most often by other papers in this collection?",
+      "search_query": "cs.RO highly cited papers",
+      "expected_ids": [
+        "2204.01691",
+        "2307.15818",
+        "2406.09246"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper)<-[:REFERENCES]-(:ArxivPaper) WHERE p.primary_category = $category WITH p.arxiv_id AS arxiv_id, count(*) AS citations RETURN arxiv_id ORDER BY citations DESC, arxiv_id ASC LIMIT $limit",
+      "cypher_params": {
+        "category": "cs.RO",
+        "limit": 3
+      },
+      "label_rationale": "피인용 수 집계는 그래프에서만 나옵니다. 경계 동점이 있는 분류는 정답이 하나로 정해지지 않으므로 제외했습니다."
+    },
+    {
+      "id": "topcited-06",
+      "category": "topcited",
+      "question": "Within primary category cs.SE, which 3 papers are cited most often by other papers in this collection?",
+      "search_query": "cs.SE highly cited papers",
+      "expected_ids": [
+        "2403.07974",
+        "2405.15793",
+        "2601.11868"
+      ],
+      "expected_answer_contains": [],
+      "label_method": "snapshot_cypher",
+      "requires_graph": true,
+      "gold_size": 3,
+      "cypher": "MATCH (p:ArxivPaper)<-[:REFERENCES]-(:ArxivPaper) WHERE p.primary_category = $category WITH p.arxiv_id AS arxiv_id, count(*) AS citations RETURN arxiv_id ORDER BY citations DESC, arxiv_id ASC LIMIT $limit",
+      "cypher_params": {
+        "category": "cs.SE",
+        "limit": 3
+      },
+      "label_rationale": "피인용 수 집계는 그래프에서만 나옵니다. 경계 동점이 있는 분류는 정답이 하나로 정해지지 않으므로 제외했습니다."
+    }
+  ]
+}

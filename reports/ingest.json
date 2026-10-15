@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-10-15T06:16:19.332685+00:00",
+  "window": {
+    "from": "2026-10-13",
+    "until": "2026-10-15"
+  },
+  "harvest": {
+    "records": 315,
+    "pages": 2,
+    "deleted": 0,
+    "skipped": 2285,
+    "last_datestamp": "2026-10-14",
+    "truncated_by_page_limit": true
+  },
+  "loaded": false,
+  "enrichment": {
+    "attempted": 315,
+    "references": 436,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "dead_letters_written": 0
+  },
+  "capacity": {
+    "current_nodes": 149025,
+    "current_relationships": 338366,
+    "projected_nodes": 149905,
+    "projected_relationships": 340681,
+    "node_limit": 200000,
+    "relationship_limit": 400000,
+    "node_usage": 0.7495,
+    "relationship_usage": 0.8517,
+    "safety_ceiling": 0.95,
+    "fits": true,
+    "binding_constraint": "relationships"
+  },
+  "stopped_at": "dry_run"
+}

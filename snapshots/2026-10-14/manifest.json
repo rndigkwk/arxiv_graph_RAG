@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "version": "2026-10-14",
+  "created_at": "2026-10-15T05:45:44.590664+00:00",
+  "exported_at": "2026-10-14T03:29:06.496003+00:00",
+  "data_root": ".local",
+  "source": "neo4j-aura:13b8cb33",
+  "files": {
+    "papers": {
+      "path": "papers.jsonl.gz",
+      "bytes": 208227253,
+      "sha256": "662ec63c7255286cd779dd6a9e1b7eee46da50504eb1fa58b832b3957cdeea46",
+      "rows": 37854
+    },
+    "authors": {
+      "path": "authors.jsonl.gz",
+      "bytes": 979490,
+      "sha256": "bf8bd9c0fe8fbb5ca27ad1f2157f166fdbadaf78a78f4a4257dd7f8531cb11f2",
+      "rows": 111171
+    },
+    "authored": {
+      "path": "authored.jsonl.gz",
+      "bytes": 2912794,
+      "sha256": "73de343526d7b15bbeec0718b7865b311c8e8c305ef6c10bbc6be0ca94b6bdb6",
+      "rows": 268928
+    },
+    "references": {
+      "path": "references.jsonl.gz",
+      "bytes": 541965,
+      "sha256": "ab30c9c4ca3dd3e3b761d5c651d95d32fb42e2866e6e95820f8574a7f58dd7a9",
+      "rows": 69438
+    }
+  },
+  "counts": {
+    "papers": 37854,
+    "authors": 111171,
+    "authored": 268928,
+    "references": 69438
+  },
+  "cut": {
+    "key": "arxiv_id_yymm",
+    "month_index": 24320,
+    "month": "2026-09",
+    "first_month": "2007-04",
+    "papers_with_month_key": 37695,
+    "note": "published 속성은 OAI 수집 시점이 섞여 있어 기준으로 쓰지 않습니다"
+  },
+  "gate": {
+    "passed": true,
+    "failed": [],
+    "checks": [
+      {
+        "name": "paper_count_matches_manifest",
+        "passed": true,
+        "value": 37854,
+        "threshold": 37854,
+        "comparison": "==",
+        "detail": "매니페스트의 행 수와 실제 행 수가 같아야 합니다"
+      },
+      {
+        "name": "reference_count_matches_manifest",
+        "passed": true,
+        "value": 69438,
+        "threshold": 69438,
+        "comparison": "==",
+        "detail": ""
+      },
+      {
+        "name": "arxiv_id_unique",
+        "passed": true,
+        "value": 37854,
+        "threshold": 37854,
+        "comparison": "==",
+        "detail": "arxiv_id 중복은 MERGE 적재에서 조용히 노드를 합쳐 버립니다"
+      },
+      {
+        "name": "embedding_coverage",
+        "passed": true,
+        "value": 1.0,
+        "threshold": 1.0,
+        "comparison": ">=",
+        "detail": "임베딩 없는 논문이 섞이면 링크 예측의 텍스트 피처가 비어 버립니다"
+      },
+      {
+        "name": "embedding_dimensions_uniform",
+        "passed": true,
+        "value": 0,
+        "threshold": 0,
+        "comparison": "==",
+        "detail": "모든 임베딩이 768차원이어야 합니다"
+      },
+      {
+        "name": "month_key_coverage",
+        "passed": true,
+        "value": 0.9958,
+        "threshold": 0.99,
+        "comparison": ">=",
+        "detail": "신식 arXiv ID가 아니면 시간 분할의 기준 월을 정할 수 없습니다"
+      },
+      {
+        "name": "text_present",
+        "passed": true,
+        "value": 0,
+        "threshold": 0,
+        "comparison": "==",
+        "detail": "제목이나 초록이 빈 논문은 임베딩을 다시 만들어도 의미가 없습니다"
+      },
+      {
+        "name": "no_dangling_references",
+        "passed": true,
+        "value": 0.0,
+        "threshold": 0.0,
+        "comparison": "<=",
+        "detail": "인용 간선의 양 끝 논문이 모두 스냅샷 안에 있어야 합니다"
+      },
+      {
+        "name": "no_self_citation",
+        "passed": true,
+        "value": 0,
+        "threshold": 0,
+        "comparison": "==",
+        "detail": ""
+      },
+      {
+        "name": "citation_time_order",
+        "passed": true,
+        "value": 0.005243,
+        "threshold": 0.02,
+        "comparison": "<=",
+        "detail": "인용하는 논문이 인용된 논문보다 과거면 둘 중 하나의 시점이 틀렸습니다"
+      }
+    ]
+  }
+}

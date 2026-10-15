@@ -1,5 +1,6 @@
 .venv/
 .worktrees/
+.local/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
@@ -16,3 +17,8 @@ Neo4j*
 data/pdf_200/
 secret*
 .worktrees/
+derived/
+reports/runs/
+mlruns/
+mlflow.db
+pipeline/state/

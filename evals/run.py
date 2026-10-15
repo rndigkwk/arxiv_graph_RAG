@@ -161,9 +161,27 @@ def compare_case(
     )
 
     start = perf_counter()
-    graph_response, graph_messages = chatbot.ask(case["question"], [])
+    try:
+        graph_response, graph_messages = chatbot.ask(case["question"], [])
+    except ValueError as exc:
+        # 검증을 통과하지 못한 답변은 이 앱에서 "답하지 못함"입니다. 한 건의 실패가 나머지
+        # 케이스의 측정을 막으면 안 되므로, 0점으로 기록하고 사유를 남기고 계속 갑니다.
+        graph_response, graph_messages = {}, []
+        graph_row = evaluate_case(case, graph_response, mode="agent", top_k=top_k)
+        graph_row.update({
+            "failed": True,
+            "error": f"{type(exc).__name__}: {exc}",
+            "elapsed_seconds": perf_counter() - start,
+        })
+        return {
+            "id": case["id"],
+            "category": case["category"],
+            "vector_only": vector_row,
+            "graph_rag": graph_row,
+        }
     graph_seconds = perf_counter() - start
     graph_row = evaluate_case(case, graph_response, mode="agent", top_k=top_k)
+    graph_row["failed"] = False
     graph_input, graph_output = _with_validation_usage(
         *_token_totals(graph_messages), graph_response
     )
@@ -242,7 +260,14 @@ def summarize_comparison(rows: list[dict[str, Any]]) -> dict[str, Any]:
             )
         return result_summary
 
-    summary = {"case_count": len(rows), **summarize_rows(rows)}
+    summary: dict[str, Any] = {"case_count": len(rows), **summarize_rows(rows)}
+    # 답변 검증을 통과하지 못한 케이스 수를 평균 뒤에 숨기지 않고 따로 셉니다.
+    summary["graph_rag_failures"] = sum(
+        1 for row in rows if row.get("graph_rag", {}).get("failed")
+    )
+    summary["graph_rag_failed_ids"] = [
+        row["id"] for row in rows if row.get("graph_rag", {}).get("failed")
+    ]
     summary["by_category"] = {
         category: summarize_rows([row for row in rows if row["category"] == category])
         for category in sorted({row["category"] for row in rows})

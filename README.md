@@ -218,7 +218,10 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 ├── notebooks/                    # 수집·적재·품질 분석 노트북
 ├── reports/                      # 그래프 품질·검색 평가 결과
 ├── evals/                        # 검색·답변 평가 데이터와 실행기
-└── tests/                        # 평가 지표·실행기 단위 테스트
+├── pipeline/                     # 스냅샷 고정·품질 게이트·증분 수집·실험 추적
+├── models/link_prediction/       # 공동인용 링크 예측 데이터셋·기준선
+├── snapshots/                    # 스냅샷 매니페스트 (sha256·기준월·게이트 결과)
+└── tests/                        # 평가 지표·실행기·파이프라인 단위 테스트
 ```
 
 ## Limitations and retrospective
@@ -228,9 +231,40 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 - AI 관련 논문이 인용한 1-hop 논문만 수집해 더 깊은 인용망은 포함하지 못했습니다.
 - 컴퓨터 용량 제약으로 PDF를 청킹·임베딩하지 못하고 제목과 abstract만 사용했습니다.
 
+## Data pipeline and models
+
+데이터는 버전이 박힌 스냅샷으로 고정하고, 학습과 평가는 살아 있는 DB가 아니라 그 스냅샷만
+읽습니다. 인용 보강이 과거 논문 쌍에도 간선을 역채움하므로, 라이브 DB에 학습하면 시간 분할이
+조용히 무너집니다([`ROADMAP.md` 9절](ROADMAP.md#9-개선안-ab를-동시에-적용할-때의-충돌)).
+
+```bash
+# 내보내기를 버전 스냅샷으로 등록하고 품질 게이트 10개를 돌립니다
+uv run python -m pipeline.build_snapshot
+
+# 파생 캐시(메타데이터·임베딩 행렬)를 만듭니다
+uv run python -m pipeline.features
+
+# 증분 수집 시험 실행 — --load 없이는 Aura에 쓰지 않습니다
+uv run python -m pipeline.ingest --days 7
+
+# 공동인용 링크 예측 기준선 사다리
+uv run --extra ml python -m models.link_prediction.train
+```
+
 ## Advanced evaluation
 
 RAG 검색·답변 평가 방법과 이번 개선 변경점은 [`advanced.md`](advanced.md)에 정리했습니다.
+
+```bash
+# 그래프 조건 평가 케이스를 만들고 정답을 라이브 DB의 Cypher와 대조합니다
+uv run python -m evals.build_graph_cases --verify-against-db
+
+# 벡터 단독 대 GraphRAG 비교
+uv run python -m evals.run --mode compare --cases evals/cases_graph.json --limit 30   --output reports/rag_eval_graph_compare.json
+
+# 조건 판정 심판만 따로 재는 하네스
+uv run python -m evals.judge_study
+```
 
 ## Verification
 

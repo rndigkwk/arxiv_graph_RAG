@@ -1,0 +1,55 @@
+name: Weekly ingest
+
+# 주 1회 증분 수집을 **시험 실행**합니다. 기본값으로는 Aura에 아무것도 쓰지 않습니다.
+# 이 그래프는 관계 한도의 84.6%를 이미 쓰고 있어서, 적재를 자동으로 돌리면 몇 주 안에
+# 한도에 부딪힙니다. 실제 적재는 사람이 workflow_dispatch에서 load=true로 선택해야 합니다.
+on:
+  schedule:
+    - cron: "19 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "워터마크가 없을 때 되돌아볼 일수"
+        default: "7"
+      load:
+        description: "Aura에 실제로 적재할지 여부 (true/false)"
+        default: "false"
+
+permissions:
+  contents: read
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked
+      - name: Harvest, check capacity, and report
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+          NEO4J_DATABASE: ${{ secrets.NEO4J_DATABASE }}
+        run: |
+          if [ "${{ inputs.load }}" = "true" ]; then
+            uv run --locked python -m pipeline.ingest \
+              --days "${{ inputs.days || '7' }}" --load --verify-idempotent
+          else
+            uv run --locked python -m pipeline.ingest --days "${{ inputs.days || '7' }}"
+          fi
+      - name: Keep the report and the watermark
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingest-report
+          path: |
+            reports/ingest.json
+            reports/runs/
+            pipeline/state/
+          if-no-files-found: warn

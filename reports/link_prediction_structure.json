@@ -1,0 +1,40 @@
+{
+  "snapshot_version": "2026-10-14",
+  "degree_profile": {
+    "edges": 69438,
+    "papers_with_outgoing_edges": 3252,
+    "papers_with_incoming_edges": 31913,
+    "papers_on_both_sides": 269,
+    "edges_with_both_endpoints_citing": 451,
+    "mean_out_degree": 21.352,
+    "mean_in_degree": 2.176
+  },
+  "direct_citation_common_neighbours": {
+    "sampled_edges": 3000,
+    "share_with_any_common_neighbour": 0.0433,
+    "mean_common_neighbours": 0.066,
+    "verdict": "공통 이웃이 0인 간선이 대부분이면 그래프 피처에 신호가 없습니다. 직접 인용 예측은 사실상 텍스트 유사도 모델이 됩니다."
+  },
+  "cocitation_profile": {
+    "citers": 3252,
+    "citers_skipped_as_too_broad": 5,
+    "cocitation_pairs": 929725,
+    "cocitation_nodes": 31293,
+    "mean_cocitation_degree": 59.421
+  },
+  "citer_months": {
+    "distinct_months": 42,
+    "first_month": "2020-06",
+    "last_month": "2026-09",
+    "citers_by_month": {
+      "2026-02": 74,
+      "2026-03": 99,
+      "2026-04": 41,
+      "2026-05": 21,
+      "2026-06": 469,
+      "2026-07": 779,
+      "2026-08": 1135,
+      "2026-09": 472
+    }
+  }
+}

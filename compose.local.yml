@@ -1,0 +1,30 @@
+name: arxiv-graphrag-local
+services:
+  neo4j:
+    # Neo4j 5.26.32, pinned to the image actually used in this trial.
+    image: neo4j@sha256:f1e52d4dc6da122468c4a3c1050a4f5e117f6d3268625237c34d49166f0d6082
+    container_name: arxiv-graphrag-local
+    ports:
+      - "127.0.0.1:17474:7474"
+      - "127.0.0.1:17687:7687"
+    environment:
+      NEO4J_AUTH: "neo4j/${LOCAL_NEO4J_PASSWORD:?Run local_graph_test.py init first}"
+      NEO4J_server_memory_heap_initial__size: 1G
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 1G
+    mem_limit: 4g
+    cpus: 2
+    volumes:
+      - data:/data
+      - logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+volumes:
+  data:
+    name: arxiv-graphrag-local-data
+  logs:
+    name: arxiv-graphrag-local-logs
