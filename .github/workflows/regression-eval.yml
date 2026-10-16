@@ -1,0 +1,142 @@
+name: Regression evaluation
+
+# 기준선과 대조해 품질 회귀를 막습니다. 판정 규칙과 근거는 docs/adr/ADR-017 과
+# baselines/eval_baseline.json 의 note 에 있습니다.
+#
+# 분할이 둘입니다. PR은 가족마다 한 건씩 5건(smoke), 주간 cron과 수동 실행은 30건 전부(full).
+# PR마다 전량을 돌리면 약 366k 토큰이 매 푸시에 듭니다. 앞에서 5건을 자르는 대신 가족마다
+# 고르는 이유는 이 과제에서 질문 가족이 승자를 정하기 때문입니다(ADR-008).
+#
+# Aura Free는 3일 미사용 시 멈추므로 평가 전에 keep_awake.py 를 먼저 돌립니다. keep-alive
+# 워크플로가 12시간마다 돌지만, 그것이 비활성화된 상태로 cron이 걸리면 멈춘 DB를 만납니다.
+# CLIENT_ID/CLIENT_SECRET 은 인스턴스를 삭제할 수도 있는 관리 API 자격증명이라 저장소 비밀에
+# 넣지 않았습니다. 그래서 이 작업은 멈춘 인스턴스를 깨우지 못하고 분명하게 실패합니다.
+on:
+  pull_request:
+    paths:
+      - chatbot.py
+      - answer_validation.py
+      - candidate_validation.py
+      - cypher_validation.py
+      - evals/**
+      - baselines/**
+      - tests/test_eval_gate.py
+      - .github/workflows/regression-eval.yml
+  schedule:
+    # 한국 시간 월요일 오전 7시. keep-alive(37분)와 겹치지 않게 비켜 둡니다.
+    - cron: "0 22 * * 0"
+  workflow_dispatch:
+    inputs:
+      split:
+        description: "돌릴 분할"
+        type: choice
+        default: full
+        options: [smoke, full]
+
+permissions:
+  contents: read
+
+concurrency:
+  # 같은 브랜치에 새 커밋이 올라오면 진행 중인 평가를 취소해 토큰을 아낍니다.
+  group: regression-eval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      NEO4J_URI: ${{ secrets.NEO4J_URI }}
+      NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+      NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+      NEO4J_DATABASE: ${{ secrets.NEO4J_DATABASE }}
+      # 평가 결과 파일이 없으면 건너뛰기가 아니라 실패가 되게 합니다. 그러지 않으면 평가가
+      # 깨진 날 게이트가 초록색이 됩니다.
+      EVAL_GATE_REQUIRED: "1"
+      PYTHONIOENCODING: utf-8
+    steps:
+      - name: Check secrets
+        run: |
+          missing=""
+          for name in OPENAI_API_KEY NEO4J_URI NEO4J_USERNAME NEO4J_PASSWORD; do
+            [ -z "${!name}" ] && missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Set these repository secrets:$missing"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: uv sync --locked --group dev
+
+      - name: Decide the split
+        id: split
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "name=smoke" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${{ inputs.split || 'full' }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 드라이버와 HTTP 클라이언트만 필요합니다. 앱 의존성은 쓰지 않습니다.
+      - name: Wake Aura
+        run: uvx --with neo4j --with requests python scripts/keep_awake.py
+
+      - name: Run the evaluation
+        run: |
+          split="${{ steps.split.outputs.name }}"
+          ids=$(uv run --locked python -c "
+          import json, sys
+          baseline = json.load(open('baselines/eval_baseline.json', encoding='utf-8'))
+          print(','.join(baseline['splits'][sys.argv[1]]))
+          " "$split")
+          uv run --locked python -m evals.run \
+            --mode compare \
+            --cases evals/cases_graph.json \
+            --case-ids "$ids" \
+            --output "reports/regression_${split}.json"
+
+      - name: Compare against the baseline
+        if: always()
+        run: |
+          split="${{ steps.split.outputs.name }}"
+          test -f "reports/regression_${split}.json" || exit 0
+          uv run --locked python -m evals.gate \
+            --report "reports/regression_${split}.json" \
+            --split "$split"
+
+      - name: Judge
+        run: uv run --locked python -m pytest -q tests/test_eval_gate.py --junitxml=reports/junit.xml
+
+      - name: Summarize
+        if: always()
+        run: |
+          if [ -f reports/summary.md ]; then
+            cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "평가 요약이 없습니다. 앞 단계의 로그를 보세요." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload the reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-eval-${{ steps.split.outputs.name }}-${{ github.run_number }}
+          path: |
+            reports/regression_*.json
+            reports/eval_gate.json
+            reports/summary.md
+            reports/junit.xml
+          retention-days: 30
+          if-no-files-found: warn

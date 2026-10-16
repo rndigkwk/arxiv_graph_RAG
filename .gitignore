@@ -25,3 +25,7 @@ pipeline/state/
 .pytest_cache_local/
 .pytest_tmp/
 exports/
+reports/eval_gate.json
+reports/summary.md
+reports/regression_*.json
+reports/junit.xml

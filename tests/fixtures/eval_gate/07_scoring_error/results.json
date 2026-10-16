@@ -1,0 +1,46 @@
+{
+  "mode": "compare",
+  "dataset": "fixture.json",
+  "generated_at": "2026-10-16T00:00:00+00:00",
+  "summary": {
+    "graph_rag": {
+      "answer_evidence_recall": 1.0,
+      "answer_evidence_precision": 1.0,
+      "hit_at_k": 1.0
+    },
+    "graph_rag_failures": 0
+  },
+  "results": [
+    {
+      "id": "c1",
+      "graph_rag": {
+        "id": "c1",
+        "answer_evidence_recall": 1.0,
+        "answer_evidence_precision": 1.0,
+        "hit_at_k": 1.0,
+        "failed": false
+      }
+    },
+    {
+      "id": "c2",
+      "graph_rag": {
+        "id": "c2",
+        "answer_evidence_recall": 1.0,
+        "answer_evidence_precision": 1.0,
+        "hit_at_k": 1.0,
+        "failed": false
+      }
+    },
+    {
+      "id": "c3",
+      "graph_rag": {
+        "id": "c3",
+        "answer_evidence_recall": 1.0,
+        "answer_evidence_precision": 1.0,
+        "hit_at_k": 1.0,
+        "failed": false
+      }
+    }
+  ],
+  "scoring_errors": 2
+}

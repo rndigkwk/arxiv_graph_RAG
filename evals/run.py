@@ -295,6 +295,13 @@ def main() -> None:
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--cases", type=Path, default=Path("evals/cases.json"))
     parser.add_argument("--case-id", help="Run one named case, for example title-01.")
+    parser.add_argument(
+        "--case-ids",
+        help=(
+            "쉼표로 구분한 사례 목록. 회귀 게이트의 smoke 분할은 가족마다 한 건씩 고르므로 "
+            "--limit로는 지정할 수 없습니다(앞에서 n건을 자르면 한 가족만 봅니다)."
+        ),
+    )
     parser.add_argument("--output", type=Path, default=Path("reports/rag_eval.json"))
     args = parser.parse_args()
     if args.limit < 1 or args.top_k < 1:
@@ -302,7 +309,14 @@ def main() -> None:
     cases = load_cases(args.cases)
     if args.case_id:
         cases = [case for case in cases if case["id"] == args.case_id]
-    cases = cases[: args.limit]
+    if args.case_ids:
+        wanted = [value.strip() for value in args.case_ids.split(",") if value.strip()]
+        available = {case["id"] for case in cases}
+        if missing := [value for value in wanted if value not in available]:
+            parser.error(f"없는 사례를 지정했습니다: {missing}")
+        cases = [case for case in cases if case["id"] in set(wanted)]
+    else:
+        cases = cases[: args.limit]
     if not cases:
         parser.error("no evaluation cases found")
     import chatbot

@@ -61,3 +61,4 @@
 | [ADR-014](ADR-014-remote-mlflow-tracking.md) | 학습 추적은 실행 VM이 아니라 원격 MLflow 서버에 남긴다 | 채택 |
 | [ADR-015](ADR-015-retry-not-higher-timeout.md) | 그래프 적재는 타임아웃을 올리지 않고 재시도한다 | 채택 |
 | [ADR-016](ADR-016-stay-on-streamlit.md) | Cloud Run으로 옮기지 않는다 | 보류 |
+| [ADR-017](ADR-017-regression-gate.md) | 품질 회귀는 CI가 기준선과 대조해 막는다 | 채택 |

@@ -1,0 +1,6 @@
+{
+  "violated_rules": [
+    "floor",
+    "stable_case"
+  ]
+}

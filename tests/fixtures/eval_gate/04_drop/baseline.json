@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-10-16T00:00:00+00:00",
+  "note": "게이트 규칙이 제대로 실패하는지 확인하는 가짜 기준선입니다.",
+  "source": {
+    "mode": "compare",
+    "dataset": "fixture.json",
+    "runs": 3,
+    "git_sha": null,
+    "observed_spread": null
+  },
+  "primary_metric": "answer_evidence_recall",
+  "metrics": {
+    "answer_evidence_recall": 0.9,
+    "answer_evidence_precision": 1.0,
+    "hit_at_k": 1.0,
+    "answer_failure_rate": 0.0
+  },
+  "absolute_floor": {
+    "answer_evidence_recall": 0.3
+  },
+  "allowed_drop": {
+    "answer_evidence_recall": 0.1
+  },
+  "case_ids": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "stable_cases": []
+}

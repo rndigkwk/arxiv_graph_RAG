@@ -1,0 +1,205 @@
+"""회귀 게이트가 규칙마다 제대로 실패하는지, 그리고 이번 평가가 기준선을 지키는지 봅니다.
+
+두 층입니다.
+
+1. **게이트 자체 검증** — `tests/fixtures/eval_gate/`의 가짜 기준선·결과 쌍으로 규칙마다
+   걸리는지 확인합니다. 통과만 시키는 게이트는 게이트가 아니므로, 이 층이 없으면 아래 층의
+   "통과"가 아무것도 뜻하지 않습니다.
+2. **이번 평가 판정** — `reports/eval_gate.json`이 있으면 규칙별로 판정합니다. 없으면 건너뜁니다.
+   단 CI는 `EVAL_GATE_REQUIRED=1`을 켜서, 평가 단계가 파일을 쓰지 못한 경우가 **건너뛰기가 아니라
+   실패**가 되게 합니다. 그러지 않으면 평가가 깨진 날 게이트가 초록색이 됩니다.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+
+import pytest
+
+from evals.gate import BASELINE, GATE_REPORT, check, normalize
+
+FIXTURES = sorted((Path(__file__).parent / "fixtures" / "eval_gate").iterdir())
+RULES = ("cases", "scoring_error", "floor", "drop", "stable_case")
+
+
+def load(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+# --- 1층: 게이트 자체 --------------------------------------------------------------
+
+
+@pytest.mark.parametrize("fixture", FIXTURES, ids=[path.name for path in FIXTURES])
+def test_the_gate_reports_exactly_the_rules_each_fixture_breaks(fixture: Path):
+    expected = set(load(fixture / "expected.json")["violated_rules"])
+    violations = check(load(fixture / "baseline.json"), normalize(load(fixture / "results.json")))
+    assert {violation.rule for violation in violations} == expected, [
+        str(violation) for violation in violations
+    ]
+
+
+def test_every_rule_is_covered_by_some_fixture():
+    covered = set()
+    for fixture in FIXTURES:
+        covered |= set(load(fixture / "expected.json")["violated_rules"])
+    # 규칙을 더하면 그 규칙이 실제로 실패하는 fixture도 함께 더해야 합니다.
+    assert covered == set(RULES)
+
+
+def test_at_least_one_fixture_passes_cleanly():
+    # 아무것도 통과시키지 못하는 게이트는 배포를 영구히 막습니다.
+    passing = [
+        fixture
+        for fixture in FIXTURES
+        if not load(fixture / "expected.json")["violated_rules"]
+    ]
+    assert passing
+
+
+def test_a_metric_sitting_exactly_on_the_floor_passes():
+    fixture = next(path for path in FIXTURES if path.name == "02_pass_boundary")
+    baseline = load(fixture / "baseline.json")
+    report = normalize(load(fixture / "results.json"))
+    floor = baseline["absolute_floor"]["answer_evidence_recall"]
+    assert report["metrics"]["answer_evidence_recall"] == pytest.approx(floor)
+    assert not check(baseline, report)
+
+
+def test_a_failure_rate_is_judged_in_the_other_direction():
+    """실패율은 낮은 쪽이 좋습니다. 하한을 그대로 적용하면 부호가 뒤집힙니다."""
+    baseline = {
+        "primary_metric": "answer_evidence_recall",
+        "metrics": {"answer_failure_rate": 0.03},
+        "absolute_floor": {"answer_failure_rate": 0.10},
+        "allowed_drop": {"answer_failure_rate": 0.05},
+        "case_ids": [],
+        "stable_cases": [],
+    }
+    good = {"metrics": {"answer_failure_rate": 0.0}, "cases": {}, "scoring_errors": 0}
+    bad = {"metrics": {"answer_failure_rate": 0.20}, "cases": {}, "scoring_errors": 0}
+    assert not check(baseline, good)
+    assert {violation.rule for violation in check(baseline, bad)} == {"floor", "drop"}
+
+
+def test_a_case_not_evaluated_this_run_is_not_treated_as_a_regression():
+    """smoke 분할은 일부만 돕니다. 돌지 않은 사례를 깨진 것으로 세면 분할을 쓸 수 없습니다."""
+    baseline = {
+        "primary_metric": "answer_evidence_recall",
+        "metrics": {},
+        "absolute_floor": {},
+        "allowed_drop": None,
+        "case_ids": ["c1", "c2"],
+        "stable_cases": ["c1", "c2"],
+    }
+    partial = {
+        "metrics": {},
+        "cases": {"c1": {"failed": False, "metrics": {"answer_evidence_recall": 1.0}}},
+        "scoring_errors": 0,
+    }
+    # 빠진 사례는 `cases` 규칙이 말하고, `stable_case`는 중복으로 말하지 않습니다.
+    assert {violation.rule for violation in check(baseline, partial)} == {"cases"}
+
+
+def test_normalize_watches_the_product_path_not_the_contrast():
+    """`--mode compare`는 vector_only와 graph_rag를 함께 적습니다. 게이트가 보는 것은 후자입니다."""
+    report = {
+        "mode": "compare",
+        "summary": {
+            "vector_only": {"answer_evidence_recall": 0.0},
+            "graph_rag": {"answer_evidence_recall": 1.0},
+            "graph_rag_failures": 0,
+        },
+        "results": [
+            {
+                "id": "c1",
+                "vector_only": {"id": "c1", "answer_evidence_recall": 0.0},
+                "graph_rag": {"id": "c1", "answer_evidence_recall": 1.0, "failed": False},
+            }
+        ],
+    }
+    normalized = normalize(report)
+    assert normalized["metrics"]["answer_evidence_recall"] == 1.0
+    assert normalized["cases"]["c1"]["metrics"]["answer_evidence_recall"] == 1.0
+
+
+def test_cost_and_latency_are_not_gated():
+    """지연과 토큰은 품질이 아니고 실행 환경에 따라 흔들립니다. 게이트가 보면 매번 터집니다."""
+    report = {
+        "summary": {"recall_at_k": 1.0, "elapsed_seconds": 99.0, "chat_input_tokens": 12345},
+        "results": [{"id": "c1", "recall_at_k": 1.0, "elapsed_seconds": 99.0, "failed": False}],
+    }
+    metrics = normalize(report)["metrics"]
+    assert "recall_at_k" in metrics
+    assert "elapsed_seconds" not in metrics
+    assert "chat_input_tokens" not in metrics
+
+
+# --- 2층: 이번 평가 ----------------------------------------------------------------
+
+
+def _this_run() -> tuple[dict, dict]:
+    if not BASELINE.exists():
+        pytest.fail(f"기준선이 없습니다: {BASELINE}")
+    if not GATE_REPORT.exists():
+        message = f"이번 평가 결과가 없습니다: {GATE_REPORT}"
+        if os.environ.get("EVAL_GATE_REQUIRED") == "1":
+            pytest.fail(f"{message} (EVAL_GATE_REQUIRED=1)")
+        pytest.skip(f"{message} (로컬에서는 평가를 돌리지 않으므로 건너뜁니다)")
+    return load(BASELINE), load(GATE_REPORT)
+
+
+@pytest.mark.parametrize("rule", RULES)
+def test_this_run_does_not_break_the_rule(rule: str):
+    baseline, report = _this_run()
+    broken = [str(violation) for violation in check(baseline, report) if violation.rule == rule]
+    assert not broken, "\n".join(broken)
+
+
+def test_the_baseline_states_why_each_floor_is_where_it_is():
+    """하한을 이번 측정값에 붙이면 게이트가 '어제와 같은가'만 검사합니다 (ADR-004)."""
+    baseline = load(BASELINE)
+    assert baseline["note"].strip(), "기준선에 근거가 적혀 있어야 합니다"
+    assert baseline["absolute_floor"], "하한이 비어 있으면 게이트가 아무것도 막지 않습니다"
+    for name, floor in baseline["absolute_floor"].items():
+        measured = baseline["metrics"].get(name)
+        if measured is None:
+            continue
+        # 하한이 측정값과 같으면 변동 한 번에 터집니다. 여유가 있어야 합니다.
+        assert floor != measured, f"{name}의 하한이 측정값과 같습니다"
+
+
+# --- 분할 ---------------------------------------------------------------------------
+
+
+def test_the_smoke_split_covers_every_family():
+    """가족이 승자를 정하는 과제입니다(ADR-008). 앞에서 n건을 자르면 한 가족만 봅니다."""
+    baseline = load(BASELINE)
+    smoke = baseline["splits"]["smoke"]
+    families = {case_id.rsplit("-", 1)[0] for case_id in baseline["splits"]["full"]}
+    assert {case_id.rsplit("-", 1)[0] for case_id in smoke} == families
+    assert len(smoke) == len(families), "가족마다 한 건씩입니다"
+
+
+def test_a_smoke_run_is_judged_against_the_smoke_split_only():
+    baseline = load(BASELINE)
+    smoke = baseline["splits"]["smoke"]
+    report = {
+        "metrics": {},
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in smoke
+        },
+        "scoring_errors": 0,
+    }
+    assert not [v for v in check(baseline, report, split="smoke") if v.rule == "cases"]
+    # 같은 결과를 full로 판정하면 25건이 빠진 것으로 걸려야 합니다.
+    assert [v for v in check(baseline, report, split="full") if v.rule == "cases"]
+
+
+def test_an_unknown_split_falls_back_to_the_full_case_set():
+    from evals.gate import expected_cases
+
+    baseline = load(BASELINE)
+    assert expected_cases(baseline, "typo") == set(baseline["case_ids"])
