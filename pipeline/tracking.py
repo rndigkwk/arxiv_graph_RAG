@@ -18,6 +18,24 @@ from pathlib import Path
 from typing import Any
 
 FALLBACK_ROOT = Path("reports/runs")
+
+
+def load_env(root: Path | None = None) -> None:
+    """Load the project's .env so MLflow sees the tracking URI and credentials.
+
+    MLflow reads MLFLOW_TRACKING_URI and the username/password from the environment itself,
+    and nothing here put .env there. Without this the URI in .env is ignored and runs land in
+    a local mlruns/ while appearing to be configured for the remote server.
+    """
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+    base = root or Path(__file__).resolve().parents[1]
+    load_dotenv(base / ".env", override=False)
+
+
+load_env()
 EXPERIMENT = os.environ.get("MLFLOW_EXPERIMENT_NAME", "arxiv-graphrag")
 
 
@@ -123,6 +141,7 @@ def track(name: str, *, fallback_root: Path = FALLBACK_ROOT):
             path = _write_fallback(run, fallback_root)
             print(f"추적 기록(파일): {path}")
         else:
+            uri = os.environ.get("MLFLOW_TRACKING_URI", "")
             mlflow.set_experiment(EXPERIMENT)
             with mlflow.start_run(run_name=run.name):
                 mlflow.set_tags(run.tags)
@@ -131,4 +150,5 @@ def track(name: str, *, fallback_root: Path = FALLBACK_ROOT):
                 for artifact in run.artifacts:
                     if artifact.exists():
                         mlflow.log_artifact(str(artifact))
-            print(f"추적 기록(MLflow): experiment={EXPERIMENT} run={run.name}")
+            where = uri or "로컬 mlruns/"
+            print(f"추적 기록(MLflow): {where} experiment={EXPERIMENT} run={run.name}")
