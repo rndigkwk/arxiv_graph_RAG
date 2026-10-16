@@ -1502,12 +1502,40 @@ OOM을 고치려고 `MINI_BATCH = 4`로 내렸더니 **15GB 중 1.87GB만 쓰고
 
 | 값 | 동작 | 비용 |
 |---|---|---|
-| **`tensorboard`** (기본) | `report_to=["tensorboard"]`, 이벤트 파일을 HF에 함께 올림 | 서버 불필요 |
-| `mlflow` | `MLFLOW_TRACKING_URI`가 **원격**을 가리켜야 함. 비어 있으면 거부 | 서버 필요 |
+| **`mlflow`** (기본) | DagsHub 원격 서버에 실시간 기록 | 무료 등급 |
+| `tensorboard` | `report_to=["tensorboard"]`, 이벤트 파일을 HF에 함께 올림 | 서버 불필요 |
 | `csv` | 백엔드 없음. 최소 보험만 | 0 |
 
-`mlruns/`를 실행 VM에 쓰는 구성은 쓰지 않습니다. `TRACKING="mlflow"`인데 URI가 비어 있으면
-노트북이 **시작하기 전에 멈춥니다** — 사라질 곳에 기록하다 나중에 알게 되는 것보다 낫습니다.
+`mlruns/`를 실행 VM에 쓰는 구성은 쓰지 않습니다. `TRACKING="mlflow"`인데 URI나 계정명이 비어
+있으면 노트북이 **시작하기 전에 멈춥니다** — 사라질 곳에 기록하다 나중에 알게 되는 것보다
+낫습니다.
+
+#### DagsHub 서버를 붙였습니다 (2026-10-16)
+
+```
+MLFLOW_TRACKING_URI=https://dagshub.com/rndigkwk/arxiv_graph_RAG.mlflow
+```
+
+DagsHub는 **저장소마다 MLflow 서버가 하나**입니다(계정당이 아닙니다). 그래서 dograg와 공유하지
+않고 각 프로젝트가 자기 저장소의 URI를 씁니다 — DagsHub 문서도 `MLFLOW_TRACKING_URI`를 전역으로
+두지 말라고 권합니다. 프로젝트를 옮긴 뒤 잘못된 저장소에 기록할 수 있기 때문입니다.
+
+| 위치 | 비밀 | 비밀 아님 |
+|---|---|---|
+| 로컬 (`.env`) | `MLFLOW_TRACKING_PASSWORD` | URI, `MLFLOW_TRACKING_USERNAME` |
+| Colab (노트북) | `getpass`로 입력 | URI, 계정명을 노트북에 적음 |
+
+노트북에 토큰을 적지 않습니다. HF 토큰과 같은 방식이고, 커밋에 섞일 수 없습니다.
+
+**SMOKE 실행은 서버에 기록하지 않습니다.** 몇 분짜리 점검이 실험 목록을 채우면 나중에 본 실행을
+찾기 어려워집니다.
+
+`pipeline/tracking.py`가 `.env`를 읽지 않던 것도 함께 고쳤습니다. MLflow는 URI와 자격 증명을
+환경에서 직접 읽는데 아무도 `.env`를 환경에 올려 주지 않아서, **설정해 둔 URI가 무시되고 로컬
+`mlruns/`에 조용히 쌓이는** 상태였습니다. 이제 실행마다 기록 위치를 출력합니다.
+
+연결은 읽기·쓰기 모두 확인했습니다 — 선형 어댑터 보고서를 `register_run`으로 올려 지표 48개·
+파라미터 8개가 서버에 들어갔습니다.
 
 CSV 콜백은 백엔드와 무관하게 항상 켭니다. 보고서 JSON의 손실 요약이 그 값을 쓰고, 백엔드가
 어떤 이유로든 비면 곡선이 통째로 사라지기 때문입니다. Colab에서는 `%tensorboard --logdir /tmp`로
