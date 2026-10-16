@@ -9,6 +9,7 @@
     "observed_spread": null
   },
   "primary_metric": "answer_evidence_recall",
+  "metrics_split": "full",
   "metrics": {
     "hit_at_k": 0.6666666666666666,
     "recall_at_k": 0.6444444444444444,

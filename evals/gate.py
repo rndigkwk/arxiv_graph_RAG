@@ -156,6 +156,8 @@ def make_baseline(
             "observed_spread": merged.get("observed_spread"),
         },
         "primary_metric": primary_metric,
+        # 이 지표를 어떤 사례 집합에서 쟀는지. 다른 분할에는 하한을 들이대지 않습니다.
+        "metrics_split": "full",
         "metrics": merged["metrics"],
         "absolute_floor": floors,
         # 반복 측정이 없으면 비워 둡니다. 근거 없는 허용폭은 규칙이 아니라 숫자입니다.
@@ -177,12 +179,28 @@ def expected_cases(baseline: dict[str, Any], split: str) -> set[str]:
     return set(baseline["case_ids"])
 
 
+def compares_aggregates(baseline: dict[str, Any], split: str) -> bool:
+    """Whether this split's averages can be compared with the baseline's.
+
+    기준선의 지표는 **어떤 사례 집합에서** 쟀는지에 매여 있습니다. 30건 평균과 5건 평균은
+    서로 다른 모수의 값이라 하한·허용폭을 그대로 들이댈 수 없습니다. 실제로 smoke가 고르는
+    `-01` 사례들은 전체보다 쉬워서 평균이 1.0으로 나왔습니다 — 그 1.0은 "좋아졌다"가 아니라
+    "다른 것을 쟀다"입니다.
+
+    그래서 분할이 다르면 집계 규칙(`floor`·`drop`)을 적용하지 않습니다. 모수와 무관한
+    규칙(`cases`·`scoring_error`·`stable_case`)만 봅니다. 5건으로 답할 수 있는 질문은
+    "평균이 괜찮은가"가 아니라 "이 5건 중 깨진 것이 있는가"입니다.
+    """
+    return split == baseline.get("metrics_split", "full")
+
+
 def check(
     baseline: dict[str, Any], report: dict[str, Any], *, split: str = "full"
 ) -> list[Violation]:
     """Apply the five rules and return every violation, not just the first."""
     violations: list[Violation] = []
     primary = baseline["primary_metric"]
+    aggregates = compares_aggregates(baseline, split)
 
     expected, actual = expected_cases(baseline, split), set(report["cases"])
     if missing := sorted(expected - actual):
@@ -195,7 +213,7 @@ def check(
             Violation("scoring_error", f"채점이 {report['scoring_errors']}건에서 죽었습니다")
         )
 
-    for name, floor in baseline["absolute_floor"].items():
+    for name, floor in (baseline["absolute_floor"].items() if aggregates else ()):
         value = report["metrics"].get(name)
         if value is None:
             violations.append(Violation("floor", f"{name}이 이번 결과에 없습니다"))
@@ -204,7 +222,7 @@ def check(
                 Violation("floor", f"{name} {value:.4f}이 하한 {floor:.4f}을 넘었습니다")
             )
 
-    for name, allowed in (baseline["allowed_drop"] or {}).items():
+    for name, allowed in ((baseline["allowed_drop"] or {}).items() if aggregates else ()):
         value, before = report["metrics"].get(name), baseline["metrics"].get(name)
         if value is None or before is None:
             continue
@@ -247,6 +265,15 @@ def write_summary(path: Path, baseline: dict[str, Any], report: dict[str, Any],
         f"- 분할 `{report.get('split', 'full')}` · 사례 {len(report['cases'])}건 "
         f"· 기준선 {baseline['source']['runs']}회 실행분",
         f"- 판정: {'실패' if violations else '통과'} (위반 {len(violations)}건)",
+        *(
+            []
+            if compares_aggregates(baseline, report.get("split", "full"))
+            else [
+                f"- 기준선 지표는 `{baseline.get('metrics_split', 'full')}` 집합에서 쟀으므로 "
+                "이 실행에는 하한·허용폭을 적용하지 않았습니다(모수가 다릅니다). "
+                "사례별 회귀만 판정했습니다."
+            ]
+        ),
         "",
         "| 지표 | 기준선 | 이번 | 하한 |",
         "|---|---:|---:|---:|",

@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-from evals.gate import BASELINE, GATE_REPORT, check, normalize
+from evals.gate import BASELINE, GATE_REPORT, check, compares_aggregates, normalize
 
 FIXTURES = sorted((Path(__file__).parent / "fixtures" / "eval_gate").iterdir())
 RULES = ("cases", "scoring_error", "floor", "drop", "stable_case")
@@ -150,10 +150,24 @@ def _this_run() -> tuple[dict, dict]:
     return load(BASELINE), load(GATE_REPORT)
 
 
+def _split_of(report: dict) -> str:
+    """Which split produced this report.
+
+    2026-10-16 첫 CI 실행이 여기서 실패했습니다. 게이트 CLI는 분할을 알고 "위반 0건"이라고
+    적었는데, 판정하는 쪽이 그것을 읽지 않아 5건 실행을 30건 기준선으로 봤습니다. 분할을
+    추측하면 안 됩니다 — `full`로 가정하면 smoke가 매번 거짓 실패하고, `smoke`로 가정하면
+    full이 거짓 통과합니다.
+    """
+    split = report.get("split")
+    assert split, f"{GATE_REPORT}에 split이 없습니다. evals.gate가 쓴 파일이 아닙니다."
+    return split
+
+
 @pytest.mark.parametrize("rule", RULES)
 def test_this_run_does_not_break_the_rule(rule: str):
     baseline, report = _this_run()
-    broken = [str(violation) for violation in check(baseline, report) if violation.rule == rule]
+    violations = check(baseline, report, split=_split_of(report))
+    broken = [str(violation) for violation in violations if violation.rule == rule]
     assert not broken, "\n".join(broken)
 
 
@@ -203,3 +217,49 @@ def test_an_unknown_split_falls_back_to_the_full_case_set():
 
     baseline = load(BASELINE)
     assert expected_cases(baseline, "typo") == set(baseline["case_ids"])
+
+
+def test_a_smoke_run_is_not_judged_against_full_set_averages():
+    """30건 평균과 5건 평균은 다른 모수의 값입니다.
+
+    실제로 smoke가 고르는 `-01` 사례들은 전체보다 쉬워서 평균이 1.0으로 나왔습니다. 그 1.0은
+    "좋아졌다"가 아니라 "다른 것을 쟀다"입니다. 반대 방향도 같은 이유로 위험합니다 — 어려운
+    5건을 골랐다면 품질이 그대로여도 하한 아래로 떨어집니다.
+    """
+    baseline = load(BASELINE)
+    assert baseline["metrics_split"] == "full"
+    assert compares_aggregates(baseline, "full")
+    assert not compares_aggregates(baseline, "smoke")
+
+    # smoke 평균이 하한을 한참 밑돌아도 집계 규칙으로는 걸리지 않아야 합니다.
+    terrible_average = {
+        "metrics": {name: 0.0 for name in baseline["absolute_floor"]},
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["splits"]["smoke"]
+        },
+        "scoring_errors": 0,
+    }
+    rules = {v.rule for v in check(baseline, terrible_average, split="smoke")}
+    assert rules == set(), rules
+    # 같은 결과를 full로 보면 하한이 걸립니다 — 규칙이 사라진 것이 아닙니다.
+    assert "floor" in {v.rule for v in check(baseline, terrible_average, split="full")}
+
+
+def test_a_smoke_run_still_catches_a_broken_case():
+    """모수와 무관한 규칙은 5건으로도 답할 수 있는 질문입니다."""
+    baseline = load(BASELINE)
+    smoke = baseline["splits"]["smoke"]
+    broken = {
+        "metrics": {},
+        "cases": {
+            case_id: {
+                "failed": False,
+                "metrics": {baseline["primary_metric"]: 0.0 if index == 0 else 1.0},
+            }
+            for index, case_id in enumerate(smoke)
+        },
+        "scoring_errors": 0,
+    }
+    rules = {v.rule for v in check(baseline, broken, split="smoke")}
+    assert rules == {"stable_case"}, rules
