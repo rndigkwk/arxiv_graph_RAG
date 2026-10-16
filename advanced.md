@@ -1383,6 +1383,80 @@ MiniLM을 쓰면 논문 절반의 초록이 잘리고, 그러면 재는 것이 �
 있던 결론을 늦게 냈습니다.** 장시간 작업에는 진행 신호가 있어야 하고, 중간 산출물이 생기면 바로
 읽어야 합니다.
 
+---
+
+### Colab 파인튜닝 준비 — GPU가 없어 답할 수 없던 질문 두 개 (2026-10-16)
+
+두 질문이 열린 채로 남았고, 둘 다 이 PC에서는 답할 수 없습니다.
+
+1. `bge-base-en-v1.5`가 `text-embedding-3-large`와 **동등**합니다(구간이 0 포함). 인용 쌍으로
+   파인튜닝하면 **넘는가?**
+2. hard negative가 **선형 어댑터에서** 기각됐습니다. 용량 있는 모델에서는 **작동하는가?**
+
+개발 PC에 NVIDIA가 없습니다(Intel Iris Xe, CUDA 불가). 37,854편 인코딩이 CPU로 3.5시간이고
+파인튜닝은 비현실적입니다. 그래서 학습만 Colab T4로 보내고, 측정 설계는 그대로 가져갑니다.
+
+#### 내보내는 것은 17.6MB입니다
+
+임베딩 110MB는 보내지 않습니다. Colab이 자기가 다시 인코딩하고, 비교에 필요한 것은 OpenAI
+임베딩 자체가 아니라 **질의별 점수**뿐입니다.
+
+| 파일 | 행 | 크기 |
+|---|---:|---:|
+| `corpus.jsonl.gz` | 37,854 | 17.2MB |
+| `train_pairs.jsonl.gz` | 36,554 | 0.4MB |
+| `eval_queries.jsonl.gz` | 365 | 12KB |
+| `baseline_recall.jsonl.gz` | 365 | 1.7KB |
+
+마지막 파일이 핵심입니다. 질의별 `text-embedding-3-large` recall@10이 들어 있어 Colab에서
+**쌍체 부트스트랩을 그대로** 돌릴 수 있습니다. `manifest.json`에 스냅샷 버전과 papers sha256을
+적어, 어느 데이터로 학습했는지가 결과와 함께 남습니다.
+
+#### dograg에서 가져온 것
+
+사용자의 다른 프로젝트에 검증된 템플릿이 있어 그 패턴을 따랐습니다.
+
+| dograg 패턴 | 이 노트북 |
+|---|---|
+| **`SMOKE` 플래그** | 기본값 `True`. 작은 조각으로 코드가 도는지 먼저 확인 |
+| 코드 전달 | Colab에서 `git clone --depth 1 --branch main` |
+| 비공개 데이터 | HF Hub 비공개 dataset repo + `snapshot_download` |
+| **VS Code 확장 주의** | `google.colab.userdata`가 안 되므로 `getpass` 폴백 |
+| 결과 반환 | HF 비공개 model repo로 `upload_folder` + 보고서 |
+| 재현성 | 패키지 버전 출력, 끝에 `del token` |
+
+`SMOKE`가 특히 중요합니다. 어제 전체 인코딩을 진행률 없이 바로 돌려 3.5시간을 태웠고, 그때
+필요했던 것이 정확히 이 플래그입니다.
+
+**`MAX_SEQ_LENGTH`는 512로 두었습니다.** dograg는 128을 쓰는데(한국어 짧은 질의), 이 말뭉치는
+제목+초록 토큰 중앙값이 258이라 128이나 256으로 자르면 **논문 절반이 잘려 모델이 아니라 절단을
+재게 됩니다.**
+
+#### 비교가 성립하는지 노트북이 먼저 확인합니다
+
+튜닝 전 BGE가 **recall@10 0.1909를 재현하는지** 검사하는 셀을 넣었습니다. 재현하지 않으면
+토크나이저·정규화·질의 집합 중 하나가 어긋난 것이고, 그 아래 수치는 모두 무의미합니다. 비교의
+전제가 "같은 과제·같은 질의·같은 후보"이기 때문입니다.
+
+학습 변형은 둘입니다 — `inbatch`(배치 안 음성만)와 `hard`(그래프 하드 네거티브 추가). 두
+변형의 `vs_untuned`를 비교하면 질문 2에 답이 나옵니다.
+
+#### 실행 절차
+
+```bash
+# 1. 산출물 내보내기 (로컬)
+uv run python -m models.embedding_tuning.export_for_colab
+
+# 2. HF 비공개 dataset repo에 올리기 (토큰 필요, 사람이 실행)
+huggingface-cli upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab   --repo-type=dataset --private
+```
+
+그다음 [`notebooks/finetune_embedding_colab.ipynb`](notebooks/finetune_embedding_colab.ipynb)를
+열어 `DATA_REPO`를 자기 저장소로 바꾸고, `SMOKE = True`로 한 번, `False`로 본 실행을 합니다.
+결과 `colab_finetune_report.json`을 `reports/`로 가져오면 다른 측정들과 같은 자리에 남습니다.
+
+모델 가중치는 커밋하지 않습니다. HF 비공개 저장소에 두고 보고서만 가져옵니다.
+
 ### 증분 수집 파이프라인 (2026-10-15)
 
 arXiv OAI-PMH는 `from`·`until` 날짜 범위로 조회하므로 증분이 본질적으로 자연스럽습니다. 지난
