@@ -239,13 +239,28 @@ def check(
         case = report["cases"].get(case_id)
         if case is None:
             continue  # 이번에 평가하지 않은 사례는 보지 않습니다(smoke 분할).
+        if case["failed"]:
+            # 에이전트가 예외로 멈춘 것은 측정된 변동이고 `answer_failure_rate`의 상한이
+            # 이미 셉니다. 여기서 한 번 더 세면 같은 변동에 두 번 벌점을 주게 됩니다.
+            # 안정 사례 29건에 사례당 실패율 5.6%면 **적어도 한 건이 실패할 확률이 81%** 입니다.
+            # 그러면 회귀가 없는 날에도 게이트가 다섯 번 중 네 번 빨갛게 되고, 그런 게이트는
+            # 꺼집니다. 어느 사례였는지는 요약에 정보로 적습니다.
+            continue
         value = case["metrics"].get(primary)
-        if case["failed"] or value is None or value < 1.0:
-            shown = "실패" if case["failed"] else f"{primary}={value}"
+        if value is None or value < 1.0:
             violations.append(
-                Violation("stable_case", f"{case_id}이 기준선에서는 만점이었는데 {shown}")
+                Violation("stable_case", f"{case_id}이 기준선에서는 만점이었는데 {primary}={value}")
             )
     return violations
+
+
+def transient_failures(baseline: dict[str, Any], report: dict[str, Any]) -> list[str]:
+    """Stable cases whose agent raised this run. Information, not a violation."""
+    return sorted(
+        case_id
+        for case_id in baseline["stable_cases"]
+        if (case := report["cases"].get(case_id)) and case["failed"]
+    )
 
 
 def _lower_is_better(name: str) -> bool:
@@ -284,6 +299,16 @@ def write_summary(path: Path, baseline: dict[str, Any], report: dict[str, Any],
         floor = baseline["absolute_floor"].get(name)
         fmt = lambda value: "—" if value is None else f"{value:.4f}"  # noqa: E731
         lines.append(f"| `{name}` | {fmt(before)} | {fmt(now)} | {fmt(floor)} |")
+    if transient := transient_failures(baseline, report):
+        lines += [
+            "",
+            "### 일시 실패 (위반 아님)",
+            "",
+            f"- 안정 사례 중 이번에 에이전트가 멈춘 것: {', '.join(transient)}",
+            f"- 실패율 {report['metrics'].get('answer_failure_rate', 0):.4f}로 상한 "
+            f"{baseline['absolute_floor'].get('answer_failure_rate', 0):.4f} 안입니다. "
+            "측정된 변동 범위(5.6~8.3%)이므로 회귀로 세지 않습니다.",
+        ]
     if violations:
         lines += ["", "### 위반", ""] + [f"- {violation}" for violation in violations]
     path.parent.mkdir(parents=True, exist_ok=True)

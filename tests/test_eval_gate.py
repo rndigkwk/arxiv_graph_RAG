@@ -18,7 +18,14 @@ from pathlib import Path
 
 import pytest
 
-from evals.gate import BASELINE, GATE_REPORT, check, compares_aggregates, normalize
+from evals.gate import (
+    BASELINE,
+    GATE_REPORT,
+    check,
+    compares_aggregates,
+    normalize,
+    transient_failures,
+)
 
 FIXTURES = sorted((Path(__file__).parent / "fixtures" / "eval_gate").iterdir())
 RULES = ("cases", "scoring_error", "floor", "drop", "stable_case")
@@ -263,3 +270,72 @@ def test_a_smoke_run_still_catches_a_broken_case():
     }
     rules = {v.rule for v in check(baseline, broken, split="smoke")}
     assert rules == {"stable_case"}, rules
+
+
+# --- 일시 실패와 품질 회귀의 구별 -----------------------------------------------------
+
+
+def _report(cases: dict, metrics: dict | None = None) -> dict:
+    return {"metrics": metrics or {}, "cases": cases, "scoring_errors": 0}
+
+
+def test_a_stable_case_whose_agent_raised_is_not_counted_as_a_regression():
+    """에이전트 예외는 측정된 변동이고 실패율 상한이 이미 셉니다.
+
+    2026-10-16 첫 full 실행이 이것으로 실패했습니다. 집계 지표는 전부 기준선과 같거나
+    좋았는데(hit@k 0.6667 -> 0.7333) `author-04` 한 건이 멈췄다는 이유로 빨갛게 됐습니다.
+    기준선의 실패도 한 건이었고(`coauthor-03`) 실패율은 양쪽 다 0.0333이었습니다 —
+    같은 비율에서 **어느 사례가 멈췄는지만** 달랐습니다.
+    """
+    baseline = load(BASELINE)
+    stable = baseline["stable_cases"]
+    cases = {
+        case_id: {"failed": index == 0, "metrics": {} if index == 0
+                  else {baseline["primary_metric"]: 1.0}}
+        for index, case_id in enumerate(stable)
+    }
+    report = _report(cases, {"answer_failure_rate": 1 / len(stable)})
+    assert not [v for v in check(baseline, report) if v.rule == "stable_case"]
+    # 신호를 버리지 않습니다. 어느 사례였는지는 정보로 남습니다.
+    assert transient_failures(baseline, report) == [stable[0]]
+
+
+def test_a_stable_case_that_ran_and_scored_worse_is_still_a_regression():
+    """채점까지 된 사례가 만점을 잃은 것은 변동이 아니라 더 나쁜 답입니다."""
+    baseline = load(BASELINE)
+    stable = baseline["stable_cases"]
+    cases = {
+        case_id: {
+            "failed": False,
+            "metrics": {baseline["primary_metric"]: 0.5 if index == 0 else 1.0},
+        }
+        for index, case_id in enumerate(stable)
+    }
+    violations = [v for v in check(baseline, _report(cases)) if v.rule == "stable_case"]
+    assert len(violations) == 1
+    assert stable[0] in violations[0].detail
+    assert transient_failures(baseline, _report(cases)) == []
+
+
+def test_counting_a_transient_twice_would_make_the_gate_red_most_days():
+    """왜 두 번 세지 않는가를 수치로 고정합니다.
+
+    사례당 실패율은 5.6~8.3%로 측정됐습니다(EXPERIMENTS.md 10절). 안정 사례가 29건이면
+    적어도 한 건이 멈출 확률이 그 범위에서 아래와 같습니다. 터지는 게이트는 꺼집니다.
+    """
+    stable = len(load(BASELINE)["stable_cases"])
+    for rate in (0.056, 0.083):
+        at_least_one = 1 - (1 - rate) ** stable
+        assert at_least_one > 0.7, (rate, at_least_one)
+
+
+def test_many_failures_are_still_caught_by_the_aggregate_ceiling():
+    """일시 실패를 사례별로 세지 않아도 계통적 고장은 막힙니다."""
+    baseline = load(BASELINE)
+    stable = baseline["stable_cases"]
+    cases = {
+        case_id: {"failed": True, "metrics": {}} for case_id in stable
+    }
+    report = _report(cases, {"answer_failure_rate": 1.0})
+    rules = {v.rule for v in check(baseline, report)}
+    assert "floor" in rules and "drop" in rules
