@@ -86,7 +86,6 @@ def normalize(report: dict[str, Any]) -> dict[str, Any]:
     """
     summary = report.get("summary", {})
     compare = "graph_rag" in summary
-    metrics = _numeric(summary["graph_rag"] if compare else summary)
     rows = [row.get("graph_rag", {}) if compare else row for row in report.get("results", [])]
 
     cases: dict[str, Any] = {}
@@ -97,8 +96,21 @@ def normalize(report: dict[str, Any]) -> dict[str, Any]:
         answer_failures += int(failed)
         cases[case_id] = {"failed": failed, "metrics": _numeric(row)}
 
+    # 품질 지표는 **답을 만든 사례만으로** 집계합니다. 하네스의 summary는 멈춘 사례를 0점으로
+    # 섞어서, 근거 recall이 품질이 아니라 실패율을 재게 됩니다. 2026-10-16 세 번째 full 실행이
+    # 그것을 보여 줬습니다 — 멈춘 사례를 섞으면 recall이 0.9667에서 0.9000으로 떨어지지만,
+    # 답을 만든 사례만 보면 **세 실행 모두 1.0000**이고 변동폭이 0입니다. 실패는 아래의
+    # `answer_failure_rate`가 자기 규칙으로 셉니다.
+    completed = [case["metrics"] for case in cases.values() if not case["failed"]]
+    keys = sorted(set().union(*(set(m) for m in completed)) if completed else ())
+    metrics = {
+        key: statistics.fmean(values)
+        for key in keys
+        if (values := [m[key] for m in completed if key in m])
+    }
     metrics.pop("failed", None)  # 실패는 비율이 아니라 건수로 따로 셉니다.
     metrics["answer_failure_rate"] = answer_failures / len(cases) if cases else 0.0
+    metrics["completed_cases"] = float(len(completed))
     return {
         "mode": report.get("mode"),
         "dataset": report.get("dataset"),

@@ -390,3 +390,74 @@ def test_the_allowed_drop_is_not_tighter_than_the_measured_spread():
     for name, allowed in baseline["allowed_drop"].items():
         if name in spread:
             assert allowed >= spread[name], (name, allowed, spread[name])
+
+
+# --- 품질과 실패를 분리해 집계합니다 --------------------------------------------------
+
+
+def test_quality_metrics_skip_the_cases_that_never_produced_an_answer():
+    """멈춘 사례를 0점으로 섞으면 근거 recall이 품질이 아니라 실패율을 잽니다.
+
+    2026-10-16 세 번째 full 실행이 이것으로 실패했습니다. 전체 평균으로는 0.9667 -> 0.9000이지만
+    답을 만든 사례만 보면 **세 실행 모두 1.0000**이었습니다. 떨어뜨린 것은 더 나쁜 답이 아니라
+    멈춘 사례 셋이었고, 그것은 `answer_failure_rate`가 자기 규칙으로 셉니다.
+    """
+    report = normalize({
+        "mode": "compare",
+        "summary": {"graph_rag": {}, "graph_rag_failures": 1},
+        "results": [
+            {"id": "ok-1", "graph_rag": {"id": "ok-1", "answer_evidence_recall": 1.0,
+                                         "failed": False}},
+            {"id": "ok-2", "graph_rag": {"id": "ok-2", "answer_evidence_recall": 1.0,
+                                         "failed": False}},
+            {"id": "dead", "graph_rag": {"id": "dead", "answer_evidence_recall": 0.0,
+                                         "failed": True}},
+        ],
+    })
+    # 멈춘 사례를 섞으면 0.667이 됩니다. 답을 만든 둘만 보면 1.0입니다.
+    assert report["metrics"]["answer_evidence_recall"] == 1.0
+    assert report["metrics"]["answer_failure_rate"] == pytest.approx(1 / 3)
+    assert report["metrics"]["completed_cases"] == 2.0
+
+
+def test_a_real_quality_regression_is_still_caught_after_the_split():
+    """실패를 떼어 냈다고 품질 규칙이 느슨해지지 않아야 합니다."""
+    baseline = load(BASELINE)
+    stable = baseline["stable_cases"]
+    primary = baseline["primary_metric"]
+
+    def report_with(first_value: float) -> dict:
+        return {
+            "metrics": {
+                primary: (first_value + (len(stable) - 1)) / len(stable),
+                "answer_failure_rate": 0.0,
+            },
+            "cases": {
+                case_id: {
+                    "failed": False,
+                    "metrics": {primary: first_value if index == 0 else 1.0},
+                }
+                for index, case_id in enumerate(stable)
+            },
+            "scoring_errors": 0,
+        }
+
+    # 한 사례가 0점이면 평균이 허용폭을 넘습니다.
+    assert "drop" in {v.rule for v in check(baseline, report_with(0.0))}
+    # 반만 맞히면 평균 변화는 작지만 사례별 회귀가 잡습니다.
+    assert "stable_case" in {v.rule for v in check(baseline, report_with(0.5))}
+
+
+def test_the_floors_are_inside_what_three_runs_actually_showed():
+    """하한이 관측 범위 안에 있으면 변동만으로 실패합니다."""
+    baseline = load(BASELINE)
+    assert baseline["source"]["runs"] >= 3
+    spread = baseline["source"]["observed_spread"]
+    # 변동폭이 큰 순위 지표에는 허용폭을 두지 않습니다.
+    for name in ("hit_at_k", "recall_at_k", "reciprocal_rank"):
+        assert spread[name] > 0.1, (name, spread[name])
+        assert name not in baseline["allowed_drop"]
+    # 변동폭이 0인 근거 지표에는 좁은 허용폭을 둡니다.
+    for name in ("answer_evidence_recall", "answer_evidence_precision"):
+        assert spread[name] == 0.0
+        assert baseline["allowed_drop"][name] <= 0.02
