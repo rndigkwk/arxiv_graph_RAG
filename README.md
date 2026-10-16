@@ -264,6 +264,15 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 uv run python -m models.embedding_tuning.export_for_colab
 ```
 
+내보낸 산출물은 Hugging Face 비공개 dataset repo로 올립니다. `huggingface_hub` 2.x의 실행 파일
+이름은 `hf`입니다(`huggingface-cli`는 없습니다).
+
+```bash
+uv tool install huggingface_hub
+hf auth login
+hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-type dataset --private
+```
+
 파인튜닝 노트북은 [`notebooks/finetune_embedding_colab.ipynb`](notebooks/finetune_embedding_colab.ipynb)
 입니다. `SMOKE = True`로 먼저 돌려 코드가 도는지 확인하고 본 실행을 하세요.
 

@@ -1446,9 +1446,17 @@ MiniLM을 쓰면 논문 절반의 초록이 잘리고, 그러면 재는 것이 �
 ```bash
 # 1. 산출물 내보내기 (로컬)
 uv run python -m models.embedding_tuning.export_for_colab
+```
 
-# 2. HF 비공개 dataset repo에 올리기 (토큰 필요, 사람이 실행)
-huggingface-cli upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab   --repo-type=dataset --private
+```bash
+# 2. HF CLI 설치. huggingface_hub 2.x의 실행 파일 이름은 hf이고 huggingface-cli는 없습니다
+uv tool install huggingface_hub
+```
+
+```bash
+# 3. 로그인 후 비공개 dataset repo에 올리기 (토큰 필요, 사람이 실행)
+hf auth login
+hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-type dataset --private
 ```
 
 그다음 [`notebooks/finetune_embedding_colab.ipynb`](notebooks/finetune_embedding_colab.ipynb)를
