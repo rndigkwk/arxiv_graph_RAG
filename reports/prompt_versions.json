@@ -1,0 +1,52 @@
+{
+  "prompts": {
+    "CYPHER_RULES": {
+      "sha256": "93d6931b7641",
+      "chars": 1367
+    },
+    "AGENT_SYSTEM": {
+      "sha256": "a255efe11646",
+      "chars": 2126
+    },
+    "JUDGE_CONTENT": {
+      "sha256": "c09bb82b3769",
+      "chars": 1436
+    },
+    "TRANSLATE_TO_ENGLISH": {
+      "sha256": "1af68d2a119f",
+      "chars": 498
+    },
+    "TRANSLATE_TO_KOREAN": {
+      "sha256": "130e2c8cb43c",
+      "chars": 368
+    }
+  },
+  "registry": {
+    "CYPHER_RULES": {
+      "sha256": "93d6931b7641",
+      "version": 1,
+      "action": "unchanged"
+    },
+    "AGENT_SYSTEM": {
+      "sha256": "a255efe11646",
+      "version": 1,
+      "action": "unchanged"
+    },
+    "JUDGE_CONTENT": {
+      "sha256": "c09bb82b3769",
+      "version": 1,
+      "action": "unchanged"
+    },
+    "TRANSLATE_TO_ENGLISH": {
+      "sha256": "1af68d2a119f",
+      "version": 1,
+      "action": "registered"
+    },
+    "TRANSLATE_TO_KOREAN": {
+      "sha256": "130e2c8cb43c",
+      "version": 1,
+      "action": "registered"
+    }
+  },
+  "alias": "production"
+}

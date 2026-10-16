@@ -75,6 +75,19 @@ def estimate_api_cost(
     return sum(token * rate / 1_000_000 for token, rate in zip(tokens, values))
 
 
+def prompt_manifest() -> dict | None:
+    """Fingerprint the prompts this run used, or None when they cannot be read.
+
+    `pipeline.prompt_registry`가 같은 지문으로 MLflow 레지스트리에 버전을 올립니다. 보고서에
+    지문이 있으면 "이 점수는 어느 프롬프트였나"가 기억이 아니라 조회가 됩니다.
+    """
+    try:
+        from pipeline.prompt_registry import manifest
+    except ImportError:
+        return None
+    return {name: entry["sha256"] for name, entry in manifest().items()}
+
+
 def build_run_metadata(
     *,
     cases_path: Path,
@@ -125,4 +138,7 @@ def build_run_metadata(
         "packages": packages,
         "git_sha": git_sha,
         "git_dirty": git_dirty,
+        # 어떤 점수가 어떤 프롬프트 본문에서 나왔는지 되짚을 수 있게 지문을 함께 적습니다.
+        # git_sha만으로는 부족합니다 - 프롬프트를 안 고친 커밋에서도 점수가 흔들립니다.
+        "prompt_versions": prompt_manifest(),
     }
