@@ -1460,7 +1460,7 @@ hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-ty
 ```
 
 그다음 [`notebooks/finetune_embedding_colab.ipynb`](notebooks/finetune_embedding_colab.ipynb)를
-열어 `DATA_REPO`를 자기 저장소로 바꾸고, `SMOKE = True`로 한 번, `False`로 본 실행을 합니다.
+열어 `SMOKE = True`로 한 번, `False`로 본 실행을 합니다. **계정명은 토큰에서 꺼내므로 손으로 적을 것이 없습니다** — 자리표시자를 두면 빠뜨렸을 때 `huggingface_hub` 안쪽에서 `HFValidationError`가 나와 원인을 찾기 어렵습니다.
 결과 `colab_finetune_report.json`을 `reports/`로 가져오면 다른 측정들과 같은 자리에 남습니다.
 
 모델 가중치는 커밋하지 않습니다. HF 비공개 저장소에 두고 보고서만 가져옵니다.
