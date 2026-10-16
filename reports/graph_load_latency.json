@@ -1,0 +1,145 @@
+{
+  "generated_at": "2026-10-16T06:16:24.955465+00:00",
+  "statement_timeout_seconds": 30,
+  "note": "chatbot.run_read가 모든 질의에 거는 타임아웃이 30초입니다. 앱의 PageRank 탭이 이 두 질의를 연달아 돌립니다. EXPLAIN 비용은 따로 적었습니다.",
+  "explain": {
+    "paper_rows": {
+      "label": "explain:paper_rows",
+      "failed": false,
+      "rows": 0,
+      "seconds": 0.112
+    },
+    "citation_edges": {
+      "label": "explain:citation_edges",
+      "failed": false,
+      "rows": 0,
+      "seconds": 0.119
+    }
+  },
+  "summary": {
+    "paper_rows": {
+      "runs": 8,
+      "failures": 0,
+      "rows": 37854,
+      "p50": 5.58,
+      "p95": 7.176,
+      "max": 7.176,
+      "mean": 6.012,
+      "timeout": 30,
+      "headroom_ratio": 4.18
+    },
+    "citation_edges": {
+      "runs": 8,
+      "failures": 0,
+      "rows": 69438,
+      "p50": 9.592,
+      "p95": 10.254,
+      "max": 10.254,
+      "mean": 9.529,
+      "timeout": 30,
+      "headroom_ratio": 2.93
+    }
+  },
+  "samples": {
+    "paper_rows": [
+      {
+        "label": "paper_rows:0",
+        "failed": false,
+        "rows": 37854,
+        "seconds": 5.472
+      },
+      {
+        "label": "paper_rows:1",
+        "failed": false,
+        "rows": 37854,
+        "seconds": 5.37
+      },
+      {
+        "label": "paper_rows:2",
+        "failed": false,
+        "rows": 37854,
+        "seconds": 5.612
+      },
+      {
+        "label": "paper_rows:3",
+        "failed": false,
+        "rows": 37854,
+        "seconds": 5.548
+      },
+      {
+        "label": "paper_rows:4",
+        "failed": false,
+        "rows": 37854,
+        "seconds": 6.723
+      },
+      {
+        "label": "paper_rows:5",
+        "failed": false,
+        "rows": 37854,
+        "seconds": 6.785
+      },
+      {
+        "label": "paper_rows:6",
+        "failed": false,
+        "rows": 37854,
+        "seconds": 5.41
+      },
+      {
+        "label": "paper_rows:7",
+        "failed": false,
+        "rows": 37854,
+        "seconds": 7.176
+      }
+    ],
+    "citation_edges": [
+      {
+        "label": "citation_edges:0",
+        "failed": false,
+        "rows": 69438,
+        "seconds": 9.732
+      },
+      {
+        "label": "citation_edges:1",
+        "failed": false,
+        "rows": 69438,
+        "seconds": 9.137
+      },
+      {
+        "label": "citation_edges:2",
+        "failed": false,
+        "rows": 69438,
+        "seconds": 8.441
+      },
+      {
+        "label": "citation_edges:3",
+        "failed": false,
+        "rows": 69438,
+        "seconds": 9.996
+      },
+      {
+        "label": "citation_edges:4",
+        "failed": false,
+        "rows": 69438,
+        "seconds": 9.689
+      },
+      {
+        "label": "citation_edges:5",
+        "failed": false,
+        "rows": 69438,
+        "seconds": 9.495
+      },
+      {
+        "label": "citation_edges:6",
+        "failed": false,
+        "rows": 69438,
+        "seconds": 10.254
+      },
+      {
+        "label": "citation_edges:7",
+        "failed": false,
+        "rows": 69438,
+        "seconds": 9.486
+      }
+    ]
+  }
+}

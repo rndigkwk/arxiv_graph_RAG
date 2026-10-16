@@ -10,8 +10,10 @@
 import ast
 import atexit
 import json
+import logging
 import os
 import threading
+import time
 import uuid
 from functools import partial
 from pathlib import Path
@@ -26,7 +28,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.utils.json import parse_partial_json
 from langchain_openai import ChatOpenAI
 from neo4j import READ_ACCESS, GraphDatabase, Query
-from neo4j.exceptions import Neo4jError
+from neo4j.exceptions import Neo4jError, ServiceUnavailable, SessionExpired
 from neo4j_graphrag.embeddings import OpenAIEmbeddings
 from neo4j_graphrag.retrievers import VectorRetriever
 from neo4j_graphrag.types import RetrieverResultItem
@@ -626,6 +628,8 @@ def fetch_paper_for_saving(arxiv_id):
 
 # 인용망은 한 번만 읽습니다. 두 세션이 동시에 처음 부를 수 있어 잠금으로 감쌉니다.
 # 잠금을 쥔 채 citation_graph()를 다시 부르는 경로가 있어 재진입 가능한 RLock을 씁니다.
+graph_logger = logging.getLogger("arxiv_graph_rag.graph")
+
 graph_lock = threading.RLock()
 graph_cache = {}
 
@@ -653,13 +657,37 @@ def run_pagerank(matrix, out_degree, teleport):
     return rank
 
 
+def read_with_retry(cypher, attempts=3, delay=2.0):
+    """일시적인 Aura 저하에만 대응해 한 질의를 다시 읽습니다.
+
+    PageRank 탭의 최초 적재는 논문 37,854행과 간선 69,438행을 읽습니다. 실측 p50은 5.6초와
+    9.6초로 30초 타임아웃까지 4.2배·2.9배 여유가 있고, 8회씩 돌려 실패가 없었습니다
+    (`reports/graph_load_latency.json`). 그러므로 타임아웃을 올릴 이유는 없습니다.
+
+    2026-10-15에 한 번 끊긴 것은 Aura가 Bolt 라우팅까지 실패하던 구간이었고 90초 뒤 자체
+    회복했습니다. 만성 지연이 아니라 일시적 저하이므로, 맞는 대응은 기다리기가 아니라
+    다시 시도하기입니다.
+    """
+    for attempt in range(attempts):
+        try:
+            return run_read(cypher)
+        except (Neo4jError, ServiceUnavailable, SessionExpired) as exc:
+            if attempt == attempts - 1:
+                raise
+            graph_logger.warning(
+                "graph_load_retry attempt=%d reason=%s", attempt + 1, type(exc).__name__
+            )
+            time.sleep(delay * (attempt + 1))
+    raise RuntimeError("재시도를 모두 소진했습니다")
+
+
 def citation_graph():
     """논문 목록과 REFERENCES 관계를 한 번 읽어 PageRank용 행렬을 만듭니다."""
     with graph_lock:
         if "ids" in graph_cache:
             return graph_cache
-        nodes = run_read(PAPER_ROWS)
-        edges = run_read(CITATION_EDGES)
+        nodes = read_with_retry(PAPER_ROWS)
+        edges = read_with_retry(CITATION_EDGES)
         ids = [row["arxiv_id"] for row in nodes]
         index = {arxiv_id: position for position, arxiv_id in enumerate(ids)}
         size = len(ids)

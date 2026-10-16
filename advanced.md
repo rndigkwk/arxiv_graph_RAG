@@ -1650,6 +1650,56 @@ hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-ty
 
 모델 가중치는 커밋하지 않습니다. HF 비공개 저장소에 두고 보고서만 가져옵니다.
 
+### PageRank 적재 타임아웃을 재고, 타임아웃이 아니라 재시도를 넣었습니다 (2026-10-16)
+
+**질문.** Day 57 변형 비교를 돌리던 중 `citation_graph()`가 간선 69,438개를 읽다
+`TransactionTimedOutClientConfiguration`으로 끊겼습니다. `chatbot.run_read`가 모든 질의에
+`timeout=30`을 걸기 때문입니다. 앱의 PageRank 탭이 같은 경로를 쓰므로 운영에서 사용자가 보는
+오류입니다. 그때는 한 번 겪고 넘어갔고 **30초가 빡빡한 값인지** 재지 않았습니다. 고치는 방향이
+타임아웃 상향인지 재시도인지는 그 수치에 달려 있습니다.
+
+**방법.** [`scripts/measure_graph_load.py`](scripts/measure_graph_load.py)로 두 질의를 8회씩
+측정했습니다. `run_read`를 그대로 쓰지 않았습니다 — 그 함수는 질의마다 `EXPLAIN`을 한 번 더
+돌려서 재는 값에 그 비용이 섞입니다. 본 질의만 재고 `EXPLAIN`은 따로 적었습니다.
+
+```bash
+uv run python scripts/measure_graph_load.py --runs 8
+```
+
+**결과** ([`reports/graph_load_latency.json`](reports/graph_load_latency.json)):
+
+| 질의 | 행 | p50 | p95 | 최대 | 실패 | 30초까지 여유 |
+|---|---|---|---|---|---|---|
+| `paper_rows` | 37,854 | 5.58초 | 7.18초 | 7.18초 | 0/8 | 4.18배 |
+| `citation_edges` | 69,438 | 9.59초 | 10.25초 | 10.25초 | 0/8 | 2.93배 |
+
+`EXPLAIN`은 각각 0.11초·0.12초로 무시할 수 있습니다. 탭을 처음 열 때 두 질의를 연달아 돌리므로
+합이 p50 15.2초이고, 그래도 각 질의는 타임아웃의 3분의 1 수준입니다.
+
+**결론.** **타임아웃을 올리는 것은 틀린 처방입니다.** 평상시 3배 여유가 이미 있어서 30초가
+원인이 아니고, 올리면 진짜 장애에서 사용자를 더 오래 매달아 둡니다. 끊겼던 그 한 번은 Aura가
+Bolt 라우팅까지 실패하던 구간이었고 90초 뒤 자체 회복했습니다. 만성 지연이 아니라 **일시적
+저하**이므로 맞는 처방은 다시 시도하는 것입니다.
+
+`chatbot.read_with_retry()`를 넣고 `citation_graph()`가 두 질의에 이것을 쓰게 했습니다.
+
+- 3회까지, 2초→4초로 **간격을 늘려 가며** 재시도합니다. 같은 간격으로 두 번 찔러 보는 것보다
+  회복할 시간을 점점 더 주는 쪽이 라우팅 복구와 맞습니다.
+- `Neo4jError`·`ServiceUnavailable`·`SessionExpired`만 잡습니다. 질의가 잘못된 경우는 기다려도
+  낫지 않으므로 그대로 올립니다.
+- 마지막 시도의 예외는 **삼키지 않고 다시 올립니다**. 조용히 빈 결과를 돌려주면 PageRank가 빈
+  그래프로 계산해 틀린 순위를 내는데, 이것이 오류 화면보다 나쁩니다.
+- 재시도마다 `graph_load_retry attempt=n reason=...`을 남깁니다. 질의 본문은 적지 않습니다 —
+  운영 로그에 데이터가 섞이지 않게.
+
+[`tests/test_graph_load_retry.py`](tests/test_graph_load_retry.py)가 이 다섯 가지를 각각
+검증합니다. `chatbot`은 임포트만으로 Aura와 OpenAI에 붙으므로 테스트에서 가져오지 않고, 같은
+규칙을 주입 가능한 형태로 재구성해 확인합니다.
+
+**남긴 것.** 재시도는 *일시적* 저하만 덮습니다. 데이터가 계속 늘어 `citation_edges`가 30초에
+가까워지면 그때는 전량 적재 자체를 바꿔야 합니다(상위 N만 적재하거나 PageRank를 미리 계산).
+지금은 2.93배 여유가 있으므로 하지 않았습니다. 이 스크립트를 다시 돌리면 그 시점을 알 수 있습니다.
+
 ### 증분 수집 파이프라인 (2026-10-15)
 
 arXiv OAI-PMH는 `from`·`until` 날짜 범위로 조회하므로 증분이 본질적으로 자연스럽습니다. 지난
