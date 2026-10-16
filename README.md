@@ -304,6 +304,9 @@ uv run --group dev python -m evals.index_cost
 # 한국어 질문의 번역 손실 (혼용/순수 두 형태 × 직접/번역)
 uv run python -m evals.language_study
 
+# 다른 곳에서 돌린 실행의 보고서를 로컬 추적에 등록 (예: Colab 파인튜닝)
+uv run python -m pipeline.register_run reports/embedding_finetune_colab.json
+
 # 집계 순위 질문이 수치를 문자열로 정렬하는 빈도 (유형당 반복 실행)
 uv run python -m evals.order_study --repeats 3
 ```

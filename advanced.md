@@ -1512,6 +1512,21 @@ CSV에 적고 보고서와 함께 HF에 올립니다. 의존성이 늘지 않습
 `pipeline.tracking`에 등록하면 다른 측정들과 같은 자리에 남습니다. 실행 환경과 기록 위치를
 분리하는 쪽이 VM이 사라지는 환경에서 안전합니다.
 
+등록은 [`pipeline/register_run.py`](pipeline/register_run.py)가 합니다.
+
+```bash
+uv run python -m pipeline.register_run reports/embedding_finetune_colab.json --dry-run
+uv run python -m pipeline.register_run reports/embedding_finetune_colab.json
+```
+
+보고서 모양을 미리 정해 두지 않습니다. 실험마다 JSON 구조가 다르므로 중첩을 훑어 **숫자는
+지표로, 짧은 문자열은 파라미터로, 긴 설명문은 버립니다.** 목록은 길이만 남깁니다 — 원소까지
+펼치면 지표 이름이 수십 개로 번집니다. `registered_externally` 태그를 붙여 로컬에서 만든
+실행과 구별합니다.
+
+이 저장소의 다른 보고서도 같은 명령으로 등록됩니다. `reports/embedding_models.json`을 넣으면
+지표 35개·파라미터 5개가 올라가고, MLflow가 없으면 `reports/runs/`에 JSON으로 떨어집니다.
+
 #### 실행 절차
 
 ```bash
