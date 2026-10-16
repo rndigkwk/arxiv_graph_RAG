@@ -21,6 +21,10 @@ permissions:
 jobs:
   ingest:
     runs-on: ubuntu-latest
+    # 503 백오프가 겹치면 한 페이지에 최악 20.2분(9회 시도)까지 기다립니다. --max-pages 20이므로
+    # 상한이 없으면 GitHub 기본 한도(360분)까지 끌 수 있습니다. 적재는 MERGE만 하므로 중간에
+    # 끊겨도 다음 실행이 다시 받습니다 - 조용히 몇 시간 도는 것보다 끊는 쪽이 낫습니다.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
