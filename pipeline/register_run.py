@@ -17,15 +17,26 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
 
+from pipeline.console import use_utf8_stdout
 from pipeline.tracking import track
 
 # MLflow의 파라미터 값 한도보다 넉넉히 아래에서 자릅니다. 긴 설명문은 지표도 파라미터도
 # 아니므로 기록하지 않습니다.
 MAX_PARAM_LENGTH = 250
 SKIP_KEYS = frozenset({"note", "reading", "task_note", "limitation"})
+# MLflow는 지표·파라미터 이름을 `[/\w.\- ]`만 받습니다. Colab 보고서가 변형을
+# `BAAI/bge-base-en-v1.5 (untuned)`로 적어서 괄호 때문에 등록 전체가 INVALID_PARAMETER_VALUE로
+# 실패했습니다. 보고서가 쓰는 이름을 우리가 정할 수 없으므로 여기서 맞춰 줍니다.
+DISALLOWED_IN_NAME = re.compile(r"[^/\w.\- ]+")
+
+
+def safe_name(key: str) -> str:
+    """Make one flattened key acceptable to MLflow without collapsing distinct keys."""
+    return DISALLOWED_IN_NAME.sub("_", key).strip() or "unnamed"
 
 
 def flatten(value: Any, prefix: str = "") -> dict[str, Any]:
@@ -48,7 +59,8 @@ def split_leaves(flat: dict[str, Any]) -> tuple[dict[str, float], dict[str, str]
     """Numbers become metrics, short strings become params, long strings are dropped."""
     metrics: dict[str, float] = {}
     params: dict[str, str] = {}
-    for key, value in flat.items():
+    for raw_key, value in flat.items():
+        key = safe_name(raw_key)
         if isinstance(value, bool):
             metrics[key] = float(value)
         elif isinstance(value, (int, float)):
@@ -65,6 +77,7 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true",
                         help="등록하지 않고 무엇이 기록될지만 보여 줍니다.")
     args = parser.parse_args()
+    use_utf8_stdout()
 
     if not args.report.exists():
         parser.error(f"보고서가 없습니다: {args.report}")

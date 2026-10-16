@@ -1,0 +1,88 @@
+{
+  "smoke": false,
+  "snapshot_version": "2026-10-14",
+  "snapshot_papers_sha256": "662ec63c7255286cd779dd6a9e1b7eee46da50504eb1fa58b832b3957cdeea46",
+  "base_model": "BAAI/bge-base-en-v1.5",
+  "max_seq_length": 512,
+  "hyperparameters": {
+    "batch_size": 32,
+    "mini_batch_size": 96,
+    "mini_batch_auto_selected": true,
+    "eval_batch_size": 16,
+    "learning_rate": 2e-05,
+    "epochs": 1,
+    "seed": 20261015,
+    "loss": "CachedMultipleNegativesRankingLoss",
+    "tracking": "mlflow"
+  },
+  "corpus": 37854,
+  "train_pairs": 36554,
+  "queries": 365,
+  "results": {
+    "text-embedding-3-large": {
+      "recall_at_10": 0.2019,
+      "source": "스냅샷에서 내보낸 질의별 점수"
+    },
+    "BAAI/bge-base-en-v1.5 (untuned)": {
+      "queries": 365,
+      "recall_at_10": 0.1909,
+      "hit_at_10": 0.5671,
+      "mrr": 0.399,
+      "vs_openai": {
+        "mean_difference": -0.0109,
+        "ci95_low": -0.025,
+        "ci95_high": 0.0032,
+        "excludes_zero": false
+      }
+    },
+    "BAAI/bge-base-en-v1.5 (inbatch)": {
+      "queries": 365,
+      "recall_at_10": 0.2051,
+      "hit_at_10": 0.5863,
+      "mrr": 0.4115,
+      "vs_openai": {
+        "mean_difference": 0.0032,
+        "ci95_low": -0.0115,
+        "ci95_high": 0.0188,
+        "excludes_zero": false
+      },
+      "vs_untuned": {
+        "mean_difference": 0.0141,
+        "ci95_low": 0.0081,
+        "ci95_high": 0.0209,
+        "excludes_zero": true
+      },
+      "loss_curve": {
+        "resumed": true,
+        "csv": "/tmp/loss-inbatch.csv"
+      }
+    },
+    "BAAI/bge-base-en-v1.5 (hard)": {
+      "queries": 365,
+      "recall_at_10": 0.204,
+      "hit_at_10": 0.589,
+      "mrr": 0.4117,
+      "vs_openai": {
+        "mean_difference": 0.0022,
+        "ci95_low": -0.0124,
+        "ci95_high": 0.0167,
+        "excludes_zero": false
+      },
+      "vs_untuned": {
+        "mean_difference": 0.0131,
+        "ci95_low": 0.0063,
+        "ci95_high": 0.0201,
+        "excludes_zero": true
+      },
+      "loss_curve": {
+        "resumed": true,
+        "csv": "/tmp/loss-hard.csv"
+      }
+    }
+  },
+  "model_repos": {
+    "inbatch": "blanden77/bge-arxiv-citation-inbatch",
+    "hard": "blanden77/bge-arxiv-citation-hard"
+  },
+  "retrieved_from": "huggingface:blanden77/bge-arxiv-citation-hard/colab_finetune_report.json"
+}

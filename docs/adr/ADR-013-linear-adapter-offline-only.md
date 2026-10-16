@@ -1,7 +1,7 @@
 # ADR-013: 인용 쌍 선형 어댑터는 오프라인까지만 한다
 
 - **상태:** 보류
-- **날짜:** 2026-10-15
+- **날짜:** 2026-10-15 (2026-10-16 Colab T4 측정으로 보강)
 
 ## 맥락
 
@@ -35,9 +35,29 @@ CPU에서 되는 **선형 어댑터**(닫힌 형태 ridge)로 오프라인 Recal
 검증 recall@10(raw 0.1938), 6개 `lambda` 수준 전부에서 `mu`를 올릴수록 **단조 감소**했고
 탐색이 `mu = 0.0`을 골랐습니다.
 
-**기각의 범위를 넘겨 말하지 않습니다.** 선형 변환 하나로는 "같은 분야인데 인용하지 않음"을
-표현할 수 없을 수 있고, 그렇다면 **모델 용량의 문제이지 신호의 문제가 아닙니다.** 측정한 것은
-"선형으로는 안 된다"이며 비선형에서 되는지는 재지 않았습니다.
+**기각의 범위를 넘겨 말하지 않았습니다.** 선형 변환 하나로는 "같은 분야인데 인용하지 않음"을
+표현할 수 없을 수 있고, 그렇다면 모델 용량의 문제이지 신호의 문제가 아닙니다. 당시 측정한 것은
+"선형으로는 안 된다"였고 비선형에서 되는지는 재지 않았습니다.
+
+### 2026-10-16: 용량을 줘도 이기지 않습니다
+
+Colab T4에서 `bge-base-en-v1.5`를 전체 파인튜닝해 그 유보를 닫았습니다. 같은 365질의, 같은
+정답, `CachedMultipleNegativesRankingLoss`, 학습 쌍 36,554개, 1 epoch.
+
+| 변형 | recall@10 | untuned 대비 (쌍체 95% CI) |
+|---|---:|---|
+| in-batch 네거티브만 | **0.2051** | +0.0141 [+0.0081, +0.0209] **0 제외** |
+| hard negative 추가 | 0.2040 | +0.0131 [+0.0063, +0.0201] **0 제외** |
+
+**파인튜닝 자체는 실재하는 개선입니다**(둘 다 구간이 0을 제외). 그런데 **hard negative를 넣은
+쪽이 더 낮습니다.** 두 구간이 거의 완전히 겹치므로 구별되지 않습니다.
+
+그래서 기각의 범위가 "선형 정식화에서"에서 **"이 과제에서"** 로 넓어집니다. 용량을 주면 된다는
+설명은 측정으로 닫혔습니다.
+
+**여기서도 범위를 넘기지 않습니다.** `hard` 대 `inbatch`의 **직접 쌍체 비교는 하지 않았습니다**
+— 두 변형의 질의별 점수를 각각 untuned와만 비교했습니다. 그래서 적을 수 있는 것은 "hard가
+in-batch보다 낫다는 근거가 없다"이고, "hard가 더 나쁘다"는 아닙니다.
 
 ## 과정에서 고친 것
 
@@ -47,14 +67,24 @@ CPU에서 되는 **선형 어댑터**(닫힌 형태 ridge)로 오프라인 Recal
 
 ## 민감도
 
-**Colab T4 파인튜닝 결과가 이 결정을 바꿉니다.** 비선형 모델에서 hard negative가 작동하고
-`text-embedding-3-large`를 유의하게 넘으면, 그때는 배포 경로(ONNX int8)를 다시 계산할 값이
-생깁니다. 그 전까지는 [ADR-009](ADR-009-keep-openai-embedding.md)의 배포 부담이 그대로입니다.
+**이 결정을 바꿀 조건이었던 Colab 파인튜닝은 2026-10-16에 측정됐고, 바뀌지 않았습니다.**
+파인튜닝된 BGE도 `text-embedding-3-large`를 넘지 못합니다(+0.0032 [−0.0115, +0.0188], 0 포함).
+배포 부담을 들일 품질 이득이 없으므로 [ADR-009](ADR-009-keep-openai-embedding.md)가 그대로
+유지됩니다.
+
+남은 조건은 둘입니다.
+
+1. **학습 규모** — 1 epoch, 36,554쌍이었습니다. epoch를 늘리거나 쌍을 늘리면 달라질 수 있습니다.
+2. **과제 정식화** — 네거티브를 `primary_category` 동일로 뽑는 규칙 자체가 약할 수 있습니다
+   ([ADR-012](ADR-012-graph-hard-negatives.md)의 민감도와 같은 지적입니다).
 
 ## 재현
 
 [`models/embedding_tuning/train.py`](../../models/embedding_tuning/train.py) ·
-Colab 내보내기 [`export_for_colab.py`](../../models/embedding_tuning/export_for_colab.py)
+Colab 내보내기 [`export_for_colab.py`](../../models/embedding_tuning/export_for_colab.py) ·
+노트북 [`notebooks/finetune_embedding_colab.ipynb`](../../notebooks/finetune_embedding_colab.ipynb) ·
+보고서 [`reports/embedding_finetune_colab.json`](../../reports/embedding_finetune_colab.json) ·
+추적 DagsHub MLflow `run=colab-finetune` ([ADR-014](ADR-014-remote-mlflow-tracking.md))
 
 ## 참고
 

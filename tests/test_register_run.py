@@ -5,7 +5,12 @@
 다릅니다. 그래서 중첩을 훑어 숫자와 짧은 문자열만 꺼냅니다.
 """
 
-from pipeline.register_run import MAX_PARAM_LENGTH, flatten, split_leaves
+import re
+
+from pipeline.register_run import MAX_PARAM_LENGTH, flatten, safe_name, split_leaves
+
+# MLflow의 지표·파라미터 이름 규칙입니다(mlflow.utils.validation).
+MLFLOW_NAME = re.compile(r"^[/\w.\- ]*$")
 
 
 def test_nested_keys_are_joined_with_dots():
@@ -77,9 +82,37 @@ def test_a_realistic_colab_report_keeps_the_numbers_that_matter():
 
     metrics, params = split_leaves(flatten(report))
 
-    assert metrics["results.bge (hard).recall_at_10"] == 0.2105
-    assert metrics["results.bge (hard).vs_untuned.excludes_zero"] == 1.0
-    assert metrics["results.bge (hard).loss_curve.logged_steps"] == 1142.0
+    # 괄호는 MLflow가 받지 않으므로 `_`로 바뀝니다. 아래 괄호 테스트 참고.
+    assert metrics["results.bge _hard_.recall_at_10"] == 0.2105
+    assert metrics["results.bge _hard_.vs_untuned.excludes_zero"] == 1.0
+    assert metrics["results.bge _hard_.loss_curve.logged_steps"] == 1142.0
     assert metrics["hyperparameters.mini_batch_size"] == 32.0
     assert metrics["smoke"] == 0.0
     assert params["base_model"] == "BAAI/bge-base-en-v1.5"
+
+
+def test_a_variant_name_with_parentheses_is_accepted_by_mlflow():
+    r"""Colab 보고서는 변형을 `BAAI/bge-base-en-v1.5 (untuned)`로 적습니다.
+
+    MLflow는 지표·파라미터 이름을 `[/\w.\- ]`만 받으므로 괄호가 들어가면 **등록 전체가**
+    `INVALID_PARAMETER_VALUE`로 실패합니다. 2026-10-16에 그렇게 터졌고, 보고서가 쓰는 이름은
+    우리가 정할 수 없으므로 등록 쪽에서 맞춰 줍니다.
+    """
+    report = {
+        "results": {
+            "BAAI/bge-base-en-v1.5 (untuned)": {"recall_at_10": 0.1909},
+            "BAAI/bge-base-en-v1.5 (hard)": {"recall_at_10": 0.204},
+        }
+    }
+    metrics, _ = split_leaves(flatten(report))
+    assert all(MLFLOW_NAME.match(name) for name in metrics), sorted(metrics)
+    # 변형이 서로 다른 이름으로 남아야 합니다. 뭉개면 두 측정이 한 칸에 겹쳐 기록됩니다.
+    assert len(metrics) == 2
+
+
+def test_sanitizing_a_name_never_produces_an_empty_key():
+    # 빈 이름을 보내면 MLflow가 거부합니다. 정제가 전부를 지워 버리는 경우를 막습니다.
+    assert safe_name("") == "unnamed"
+    assert safe_name("()") == "_"
+    assert safe_name("a (b)") == "a _b_"
+    assert MLFLOW_NAME.match(safe_name("재현율(한국어)"))
