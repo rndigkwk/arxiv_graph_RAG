@@ -1,22 +1,29 @@
 {
-  "generated_at": "2026-10-16T06:50:08.285770+00:00",
-  "note": "하한과 허용폭은 이번 측정값에 붙이지 않고 데이터의 성질에서 정했습니다(ADR-004와 같은 규칙). 근거는 두 개입니다. (1) 에이전트 실패율을 5.6~8.3%로 측정했습니다 — coauthor-03이 12회 중 1회, topcited가 18회 중 1회(EXPERIMENTS.md 10절). (2) 30건에서 한 사례가 변동으로 뒤집히면 지표가 1/30 = 0.0333 움직입니다. 그래서 허용폭 0.05는 한 사례의 변동을 통과시키고 두 사례를 막으며, 하한은 두 사례까지 허용하고 세 사례에서 막습니다. 기준선은 1회 실행분이라 이 값 자체에 한 사례분의 잡음이 들어 있습니다. 주간 cron이 쌓이면 --report를 여러 개 주어 observed_spread를 측정값으로 채우고 허용폭을 다시 정합니다.",
+  "generated_at": "2026-10-16T07:49:39.135966+00:00",
+  "note": "하한과 허용폭은 이번 측정값에 붙이지 않고 데이터의 성질에서 정했습니다(ADR-004와 같은 규칙). 2026-10-16에 full을 두 번 돌려 변동폭을 쟀고, 그 값으로 허용폭을 다시 정했습니다. 근거 지표(recall·precision·failure_rate)는 두 실행에서 변동폭이 0.0000이고, 순위 지표(hit_at_k·recall_at_k·reciprocal_rank)는 0.0667(사례 2건분)입니다. 그래서 순위 지표의 허용폭은 0.10입니다 - 관측 변동폭에 사례 한 건(0.0333)의 여유를 더한 값이고, 처음 추측한 0.05는 관측 변동폭보다 작아서 변동만으로 실패했을 값입니다. 근거 지표는 변동폭이 0이지만 두 번은 얇은 추정이므로 사례 한 건이 뒤집히는 폭(0.05)을 유지합니다. 실패율 상한 0.10은 측정된 사례당 실패율 5.6~8.3%(EXPERIMENTS.md 10절)의 약 2배입니다. 안정 사례는 두 실행 모두에서 만점이고 멈추지 않은 28건입니다 - 한 번이라도 멈춘 author-04와 coauthor-03은 안정이라고 말할 수 없습니다.",
   "source": {
     "mode": "compare",
     "dataset": "cases_graph.json",
-    "runs": 1,
+    "runs": 2,
     "git_sha": null,
-    "observed_spread": null
+    "observed_spread": {
+      "answer_evidence_precision": 0.0,
+      "answer_evidence_recall": 0.0,
+      "answer_failure_rate": 0.0,
+      "hit_at_k": 0.06666666666666665,
+      "recall_at_k": 0.06666666666666665,
+      "reciprocal_rank": 0.06666666666666665
+    }
   },
   "primary_metric": "answer_evidence_recall",
   "metrics_split": "full",
   "metrics": {
-    "hit_at_k": 0.6666666666666666,
-    "recall_at_k": 0.6444444444444444,
-    "reciprocal_rank": 0.65,
     "answer_evidence_precision": 1.0,
     "answer_evidence_recall": 0.9666666666666667,
-    "answer_failure_rate": 0.03333333333333333
+    "answer_failure_rate": 0.03333333333333333,
+    "hit_at_k": 0.7,
+    "recall_at_k": 0.6777777777777777,
+    "reciprocal_rank": 0.6833333333333333
   },
   "absolute_floor": {
     "answer_evidence_recall": 0.9,
@@ -29,9 +36,9 @@
   "allowed_drop": {
     "answer_evidence_recall": 0.05,
     "answer_evidence_precision": 0.05,
-    "hit_at_k": 0.05,
-    "recall_at_k": 0.05,
-    "reciprocal_rank": 0.05,
+    "hit_at_k": 0.1,
+    "recall_at_k": 0.1,
+    "reciprocal_rank": 0.1,
     "answer_failure_rate": 0.07
   },
   "case_ids": [
@@ -70,7 +77,6 @@
     "author-01",
     "author-02",
     "author-03",
-    "author-04",
     "author-05",
     "author-06",
     "citing-01",
@@ -97,11 +103,6 @@
     "topcited-05",
     "topcited-06"
   ],
-  "floor_rationale": {
-    "hit_at_k": "구조적으로 2/3 근처가 상한입니다. author·topcited 12건은 벡터도 PPR도 못 풀고 Text2Cypher가 답합니다(ADR-008). 이 지표가 1.0이 되는 일은 없습니다.",
-    "answer_evidence_precision": "앵커 자기 인용 결함이 한 사례의 precision을 4/5로 떨어뜨린 적이 있습니다. 그 크기(집계 0.989)가 통과하지 않도록 0.95에 둡니다.",
-    "answer_failure_rate": "낮은 쪽이 좋은 지표입니다. 측정된 실패율 5.6~8.3%의 약 2배에 두어 한 건의 변동으로는 터지지 않고 계통적 고장에서 막힙니다."
-  },
   "splits": {
     "smoke": [
       "author-01",
@@ -143,5 +144,11 @@
       "topcited-06"
     ]
   },
-  "split_rationale": "smoke는 가족마다 한 건씩 5건입니다. 가족이 승자를 정하는 과제이므로(ADR-008) 앞에서 n건을 자르면 한 가족만 보게 됩니다. PR마다 전량을 돌리면 30건 약 366k 토큰이 매 푸시에 듭니다."
+  "split_rationale": "smoke는 가족마다 한 건씩 5건입니다. 가족이 승자를 정하는 과제이므로(ADR-008) 앞에서 n건을 자르면 한 가족만 보게 됩니다. PR마다 전량을 돌리면 30건 약 366k 토큰이 매 푸시에 듭니다.",
+  "floor_rationale": {
+    "hit_at_k": "구조적으로 2/3 근처가 상한입니다. author·topcited 12건은 벡터도 PPR도 못 풀고 Text2Cypher가 답합니다(ADR-008). 이 지표가 1.0이 되는 일은 없습니다.",
+    "answer_evidence_precision": "앵커 자기 인용 결함이 한 사례의 precision을 4/5로 떨어뜨린 적이 있습니다. 그 크기(집계 0.989)가 통과하지 않도록 0.95에 둡니다.",
+    "answer_failure_rate": "낮은 쪽이 좋은 지표입니다. 측정된 실패율 5.6~8.3%의 약 2배에 두어 한 건의 변동으로는 터지지 않고 계통적 고장에서 막힙니다.",
+    "drop_from_observed_spread": "순위 지표의 관측 변동폭이 0.0667(사례 2건분)입니다. 허용폭을 그 아래로 두면 품질 변화 없이 실패합니다. 관측값: {\"answer_evidence_precision\": 0.0, \"answer_evidence_recall\": 0.0, \"answer_failure_rate\": 0.0, \"hit_at_k\": 0.0667, \"recall_at_k\": 0.0667, \"reciprocal_rank\": 0.0667}"
+  }
 }

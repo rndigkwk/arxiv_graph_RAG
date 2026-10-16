@@ -339,3 +339,54 @@ def test_many_failures_are_still_caught_by_the_aggregate_ceiling():
     report = _report(cases, {"answer_failure_rate": 1.0})
     rules = {v.rule for v in check(baseline, report)}
     assert "floor" in rules and "drop" in rules
+
+
+def test_rewriting_the_baseline_keeps_the_values_a_person_set():
+    """`splits`가 한 번 조용히 사라졌습니다. 그러면 smoke가 "25건 빠졌다"로 거짓 실패합니다."""
+    from evals.gate import CARRIED_OVER, make_baseline
+
+    existing = load(BASELINE)
+    merged = {
+        "mode": "compare",
+        "dataset": "cases_graph.json",
+        "runs": 2,
+        "observed_spread": {},
+        "metrics": {"answer_evidence_recall": 1.0},
+        "cases": {
+            case_id: {"failed": False, "metrics": {"answer_evidence_recall": 1.0}}
+            for case_id in existing["case_ids"]
+        },
+    }
+    rewritten = make_baseline(
+        merged,
+        primary_metric="answer_evidence_recall",
+        floors=existing["absolute_floor"],
+        drops=existing["allowed_drop"],
+        note="테스트",
+        carried={key: existing[key] for key in CARRIED_OVER if key in existing},
+    )
+    for key in CARRIED_OVER:
+        assert rewritten.get(key) == existing.get(key), key
+
+
+def test_a_case_that_failed_in_any_run_is_not_called_stable():
+    """두 실행 중 한 번이라도 멈춘 사례는 "늘 통과하던 사례"가 아닙니다."""
+    baseline = load(BASELINE)
+    assert baseline["source"]["runs"] >= 2
+    # 2026-10-16의 두 full 실행에서 각각 한 건이 멈췄고, 둘 다 안정 목록에서 빠졌습니다.
+    assert set(baseline["case_ids"]) - set(baseline["stable_cases"]) >= {
+        "author-04",
+        "coauthor-03",
+    }
+
+
+def test_the_allowed_drop_is_not_tighter_than_the_measured_spread():
+    """허용폭이 관측 변동폭보다 좁으면 품질 변화 없이 실패합니다.
+
+    처음 추측한 0.05가 순위 지표의 관측 변동폭 0.0667보다 작았습니다.
+    """
+    baseline = load(BASELINE)
+    spread = baseline["source"]["observed_spread"]
+    for name, allowed in baseline["allowed_drop"].items():
+        if name in spread:
+            assert allowed >= spread[name], (name, allowed, spread[name])

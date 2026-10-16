@@ -128,7 +128,33 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
     merged["metrics"] = metrics
     merged["runs"] = len(reports)
     merged["observed_spread"] = spread
+    # 사례는 모든 실행에서 같은 결과를 낸 것만 "그 결과였다"고 말할 수 있습니다. 마지막
+    # 실행의 사례만 들고 오면, 한 번 멈춘 사례가 다음 기준선에서 안정으로 등록됩니다.
+    merged["cases"] = {
+        case_id: {
+            "failed": any(report["cases"].get(case_id, {}).get("failed") for report in reports),
+            "metrics": {
+                key: min(
+                    report["cases"][case_id]["metrics"][key]
+                    for report in reports
+                    if key in report["cases"].get(case_id, {}).get("metrics", {})
+                )
+                for key in set().union(
+                    *(
+                        set(report["cases"].get(case_id, {}).get("metrics", {}))
+                        for report in reports
+                    )
+                )
+            },
+        }
+        for case_id in set().union(*(set(report["cases"]) for report in reports))
+    }
     return merged
+
+
+# 기준선을 다시 쓸 때 손으로 정한 것은 지켜야 합니다. 이것을 빼먹어서 한 번 `splits`가
+# 조용히 사라졌고, 그러면 smoke가 "사례가 25건 빠졌다"로 거짓 실패합니다.
+CARRIED_OVER = ("splits", "split_rationale", "floor_rationale", "metrics_split")
 
 
 def make_baseline(
@@ -138,6 +164,7 @@ def make_baseline(
     floors: dict[str, float],
     drops: dict[str, float] | None,
     note: str,
+    carried: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build the baseline file. Stable cases are the ones that scored full marks."""
     stable = sorted(
@@ -164,6 +191,7 @@ def make_baseline(
         "allowed_drop": drops,
         "case_ids": sorted(merged["cases"]),
         "stable_cases": stable,
+        **(carried or {}),
     }
 
 
@@ -348,6 +376,7 @@ def main() -> int:
             floors=existing.get("absolute_floor", {}),
             drops=existing.get("allowed_drop"),
             note=args.note,
+            carried={key: existing[key] for key in CARRIED_OVER if key in existing},
         )
         args.baseline.parent.mkdir(parents=True, exist_ok=True)
         args.baseline.write_text(
