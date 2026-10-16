@@ -23,6 +23,7 @@ import sys
 from pathlib import Path
 
 DEFAULT_DOCS = ("README.md", "ROADMAP.md", "advanced.md", "EXPERIMENTS.md", "APP_README.md")
+ADR_DIR = Path("docs/adr")
 LINK = re.compile(r"\[(?:[^\]]*)\]\(([^)]+)\)")
 HEADING = re.compile(r"^#{1,6}\s+(.*)$", re.M)
 PUNCTUATION = re.compile(r"[^\w\s가-힣-]")
@@ -39,8 +40,10 @@ def anchors(markdown: str) -> set[str]:
 
 
 def check(paths: tuple[str, ...]) -> list[str]:
+    # 링크는 그 문서가 있는 폴더를 기준으로 씁니다. ADR은 `docs/adr/`에 있어서 저장소
+    # 최상위에서 그대로 열면 전부 "파일 없음"이 됩니다. 키를 해결된 경로로 둡니다.
     documents = {
-        path: Path(path).read_text(encoding="utf-8")
+        Path(path).resolve(): Path(path).read_text(encoding="utf-8")
         for path in paths
         if Path(path).exists()
     }
@@ -50,19 +53,31 @@ def check(paths: tuple[str, ...]) -> list[str]:
             if target.startswith(("http://", "https://", "mailto:")):
                 continue
             path, _, fragment = target.partition("#")
-            if path and not Path(path).exists():
-                problems.append(f"{name}: 파일 없음 -> {target}")
+            resolved = (name.parent / path).resolve() if path else name
+            if path and not resolved.exists():
+                problems.append(f"{label(name)}: 파일 없음 -> {target}")
                 continue
-            host = documents.get(path) if path else text
-            if path and host is None:
+            host = documents.get(resolved)
+            if host is None:
                 continue  # 검사 대상 밖의 파일이면 앵커는 확인하지 않습니다.
             if fragment and fragment not in anchors(host):
-                problems.append(f"{name}: 앵커 없음 -> {target}")
+                problems.append(f"{label(name)}: 앵커 없음 -> {target}")
     return problems
 
 
+def label(path: Path) -> str:
+    """Print the repo-relative path, so a problem line says which document to open."""
+    try:
+        return str(path.relative_to(Path.cwd()))
+    except ValueError:
+        return str(path)
+
+
 def main() -> int:
-    paths = tuple(sys.argv[1:]) or DEFAULT_DOCS
+    paths = tuple(sys.argv[1:]) or (
+        *DEFAULT_DOCS,
+        *(str(adr) for adr in sorted(ADR_DIR.glob("*.md"))),
+    )
     problems = check(paths)
     for problem in problems:
         print(problem)

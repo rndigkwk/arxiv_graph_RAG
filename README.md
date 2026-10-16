@@ -219,6 +219,7 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 ├── reports/                      # 그래프 품질·검색 평가 결과
 ├── evals/                        # 검색·답변 평가 데이터와 실행기
 ├── EXPERIMENTS.md                # 실험 기록 (질문·방법·결과·결론)
+├── docs/adr/                     # 결정 기록 — 무엇을 쓰고 무엇을 왜 안 쓰는지
 ├── pipeline/                     # 스냅샷 고정·품질 게이트·증분 수집·실험 추적
 ├── models/link_prediction/       # 공동인용 링크 예측 데이터셋·기준선
 ├── snapshots/                    # 스냅샷 매니페스트 (sha256·기준월·게이트 결과)
@@ -280,6 +281,12 @@ hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-ty
 
 왜 그렇게 설계했고 무엇을 기각했는지는 [`EXPERIMENTS.md`](EXPERIMENTS.md)에 실험 단위로
 적었습니다 — 질문 / 방법 / 결과 / 결론 순서이며, 틀렸던 가설과 과했던 수정도 함께 남겼습니다.
+
+## Decisions (ADR)
+
+실험 기록은 "어떻게 알았는가"에 답하지만 "그래서 지금 무엇을 쓰는가"에는 답하지 않습니다.
+그 질문의 답은 [`docs/adr/`](docs/adr/README.md)에 번호를 붙여 두었습니다 — 채택·기각·보류와
+각 결정의 근거 수치, 그리고 **어떤 가정이 바뀌면 그 결정이 바뀌는지**(민감도)까지 적습니다.
 
 ## Advanced evaluation
 
