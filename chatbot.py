@@ -39,6 +39,7 @@ import prompts
 from answer_validation import (
     direct_evidence_ids,
     log_validation_failure,
+    reason_code,
     validate_evidence_ids,
 )
 from candidate_validation import QuestionVerdict, assess_and_validate, judge_content
@@ -358,6 +359,37 @@ def compare_papers(selected_papers):
 agent_template = ChatPromptTemplate.from_messages([("system", prompts.AGENT_SYSTEM)])
 
 
+class AnswerValidationError(ValueError):
+    """검증을 통과하지 못한 답변. 왜 멈췄는지 되짚을 정보를 함께 들고 다닙니다.
+
+    `ValueError`를 상속합니다. 앱과 평가 하네스가 이미 `ValueError`를 잡고 있으므로 그 동작이
+    그대로 유지되고, 필요한 쪽만 속성을 읽습니다.
+
+    2026-10-16에 평가에서 멈춘 5건의 원인을 알려고 에이전트를 **다시 돌려야** 했습니다. 보고서에는
+    오류 문자열만 남고, 사유 코드는 CI 로그에만 있고, 둘을 이어 붙일 `request_id`가 보고서에
+    없었습니다. 그래서 진단에 필요한 것을 예외가 들고 나옵니다 — 사유 코드, 단계, 시도 수,
+    그리고 **모델이 쓴 Cypher 전부**. 질문이나 논문 본문은 넣지 않습니다.
+    """
+
+    def __init__(self, message, *, request_id, stage, reason, attempts, cyphers):
+        super().__init__(message)
+        self.request_id = request_id
+        self.stage = stage
+        self.reason = reason
+        self.attempts = attempts
+        self.cyphers = list(cyphers)
+
+    def diagnostics(self):
+        """A dict safe to write into an evaluation report."""
+        return {
+            "request_id": self.request_id,
+            "stage": self.stage,
+            "reason": self.reason,
+            "attempts": self.attempts,
+            "cyphers": self.cyphers,
+        }
+
+
 def validate_answer(response):
     """답변에 붙인 인용 ID가 이번에 검색한 근거에 포함되는지 확인합니다."""
     if not isinstance(response["answer"], str) or not response["answer"].strip():
@@ -394,6 +426,8 @@ def collect_response(result, question):
             outputs[message.tool_call_id] = message
 
     cypher, rows, papers, translations, errors, related = "", [], {}, [], [], []
+    # 조회가 여러 번이면 `cypher`는 마지막 것만 남습니다. 실패를 되짚을 때는 전부 필요합니다.
+    cyphers = []
     for call in calls:
         message = outputs.get(call["id"])
         if message is None:
@@ -404,6 +438,8 @@ def collect_response(result, question):
             continue
         if call["name"] == "search_graph":
             cypher = call["output"].get("cypher", "") or cypher
+            if call["output"].get("cypher"):
+                cyphers.append(call["output"]["cypher"])
             rows.extend(call["output"].get("rows", []))
             if call["output"].get("error"):
                 errors.append(call["output"]["error"])
@@ -419,7 +455,7 @@ def collect_response(result, question):
             translations.append(call["output"])
 
     return {"question": question, "answer": answer.answer, "evidence_ids": answer.evidence_ids,
-            "tool_calls": calls, "cypher": cypher, "rows": rows,
+            "tool_calls": calls, "cypher": cypher, "cyphers": cyphers, "rows": rows,
             "papers": list(papers.values()), "translations": translations,
             "errors": errors, "related": related}
 
@@ -520,7 +556,14 @@ def ask(question, history, on_answer=None):
                 validation_request_id, attempt + 1, validation_stage, exc,
             )
             if attempt == 1:
-                raise ValueError("답변의 형식·인용을 확인하지 못했습니다. 다시 질문해 주세요.") from exc
+                raise AnswerValidationError(
+                    "답변의 형식·인용을 확인하지 못했습니다. 다시 질문해 주세요.",
+                    request_id=validation_request_id,
+                    stage=validation_stage,
+                    reason=reason_code(exc),
+                    attempts=attempt + 1,
+                    cyphers=response.get("cyphers", []),
+                ) from exc
             # 검색한 근거와 실패 이유를 그대로 전달해 한 번만 수정하고 다시 검사합니다.
             messages = [*result["messages"], ("user",
                 f"Answer validation failed: {exc}. Check both the topic and graph conditions for "

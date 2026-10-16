@@ -172,6 +172,10 @@ def compare_case(
             "failed": True,
             "error": f"{type(exc).__name__}: {exc}",
             "elapsed_seconds": perf_counter() - start,
+            # 사유 코드와 모델이 쓴 Cypher를 보고서에 남깁니다. 2026-10-16에 멈춘 5건의 원인을
+            # 알려고 에이전트를 다시 돌려야 했습니다 - 오류 문자열만으로는 되짚을 수 없고,
+            # 사유 코드가 CI 로그에만 있어서 사례와 이어 붙일 수도 없었습니다.
+            **(exc.diagnostics() if hasattr(exc, "diagnostics") else {}),
         })
         return {
             "id": case["id"],

@@ -31,13 +31,22 @@ EXCLUDING_PHRASES = (
 MIN_MATCHED_TITLE_LENGTH = 20
 
 
-def log_validation_failure(request_id: str, attempt: int, stage: str, error: ValueError) -> None:
-    """Log a safe reason code without recording question or retrieved-paper text."""
+def reason_code(error: ValueError) -> str:
+    """Classify a validation failure into a code that is safe to record anywhere.
+
+    로그에만 두면 사례와 이어 붙일 수 없습니다. 보고서에도 같은 코드를 적어야 "어느 사례가 어떤
+    사유로 멈췄는가"를 다시 돌리지 않고 답할 수 있습니다.
+    """
     message = str(error)
-    reason = next(
+    return next(
         (code for prefix, code in _VALIDATION_REASON_CODES if message.startswith(prefix)),
         f"unclassified_{type(error).__name__}",
     )
+
+
+def log_validation_failure(request_id: str, attempt: int, stage: str, error: ValueError) -> None:
+    """Log a safe reason code without recording question or retrieved-paper text."""
+    reason = reason_code(error)
     validation_logger.warning(
         "answer_validation_failed request_id=%s attempt=%d stage=%s reason=%s",
         request_id, attempt, stage, reason,
