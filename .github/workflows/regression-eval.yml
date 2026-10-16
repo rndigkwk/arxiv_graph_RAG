@@ -55,6 +55,13 @@ jobs:
       # 깨진 날 게이트가 초록색이 됩니다.
       EVAL_GATE_REQUIRED: "1"
       PYTHONIOENCODING: utf-8
+      # 요율은 비밀이 아니므로 저장소 변수(vars)로 둡니다. 비어 있으면 pricing_from_env가
+      # None을 돌려주고 보고서의 cost_usd가 null로 남습니다 - 지금까지 그 상태였습니다.
+      # 네 개를 모두 채우면 다음 실행부터 보고서에 금액이 직접 기록됩니다.
+      EVAL_CHAT_INPUT_USD_PER_1M: ${{ vars.EVAL_CHAT_INPUT_USD_PER_1M }}
+      EVAL_CHAT_OUTPUT_USD_PER_1M: ${{ vars.EVAL_CHAT_OUTPUT_USD_PER_1M }}
+      EVAL_EMBEDDING_USD_PER_1M: ${{ vars.EVAL_EMBEDDING_USD_PER_1M }}
+      EVAL_PRICING_SOURCE: ${{ vars.EVAL_PRICING_SOURCE }}
     steps:
       - name: Check secrets
         run: |
