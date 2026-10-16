@@ -157,6 +157,30 @@ def translate_to_english(text: str) -> dict:
     return {"source_text": text, "english": english or text}
 
 
+def check_evidence_alias(rows):
+    """모든 행이 `evidence_ids`를 arxiv_id 문자열 리스트로 돌려주는지 확인합니다.
+
+    같은 규칙을 `validate_answer`가 답변 직전에 한 번 더 봅니다. 그런데 거기서 걸리면 늦습니다.
+    `rows`는 `search_graph` 호출 **전부**의 행을 이어 붙이므로, 조회 하나가 별칭을 빼먹거나
+    `evidence_id`처럼 단수로 쓰면 **답변 전체가 거부**되고 재작성도 같은 실수를 반복합니다.
+    2026-10-16 세 번의 full 평가에서 멈춘 5건이 전부 이 경로였습니다.
+
+    도구 경계에서 막으면 모델이 오류 메시지를 읽고 **그 호출만** 고칠 수 있습니다. 실행 전에
+    막는 `check_order_by`와 같은 자리입니다. 어떤 별칭을 돌려줬는지 함께 알려 줘야 고칠 수
+    있으므로 키 목록을 적습니다.
+    """
+    for row in rows:
+        ids = row.get("evidence_ids")
+        if isinstance(ids, list) and all(isinstance(value, str) for value in ids):
+            continue
+        keys = ", ".join(sorted(row)) or "(없음)"
+        raise ValueError(
+            "RETURN에 evidence_ids 별칭이 없거나 arxiv_id 문자열 리스트가 아닙니다. "
+            f"이 조회가 돌려준 별칭: {keys}. 논문 한 편이 한 행이면 [p.arxiv_id]처럼 리스트 "
+            "리터럴로, 논문을 특정할 수 없는 순수 집계면 [] 로 반환하세요."
+        )
+
+
 @tool
 def search_graph(cypher: str) -> dict:
     """스키마에 맞게 작성한 조회 Cypher를 검사하고 Neo4j의 관계 근거를 반환합니다.
@@ -169,7 +193,9 @@ def search_graph(cypher: str) -> dict:
         # 문자열로 변환된 값을 ORDER BY에 쓰면 질의는 성공하면서 순위만 틀어집니다.
         # 조용히 틀린 행을 돌려주는 것이 오류보다 나쁘므로 실행 전에 막습니다.
         check_order_by(cypher)
-        return {"cypher": cypher, "rows": to_jsonable(run_read(cypher))}
+        rows = to_jsonable(run_read(cypher))
+        check_evidence_alias(rows)
+        return {"cypher": cypher, "rows": rows}
     except (ValueError, Neo4jError) as exc:
         # 모델이 작성한 Cypher의 오류는 대화를 끊지 않고 돌려주어 한 번 더 고치게 합니다.
         return {"cypher": cypher, "rows": [], "error": str(exc)}
