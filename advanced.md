@@ -1466,6 +1466,30 @@ MiniLM을 쓰면 논문 절반의 초록이 잘리고, 그러면 재는 것이 �
 덧붙여 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`를 torch 임포트 전에 설정하고,
 평가 인코딩 배치를 16으로 낮추고, 변형 사이에 GPU 여유를 출력하게 했습니다.
 
+#### 학습 과정은 CSV로 남깁니다 — MLflow는 Colab에서 쓰지 않습니다
+
+`report_to=[]`로 모든 추적 통합을 껐습니다. Colab에서 MLflow를 켜면 `mlruns/`를 **그 VM에**
+쓰고 런타임이 끊기면 같이 사라집니다. 원격 추적 서버가 없는 동안은 기록이 아니라 착각만
+남습니다.
+
+그런데 그렇게만 두면 **스텝별 손실이 어디에도 남지 않습니다.** 최종 지표만으로는 수렴했는지,
+더 돌릴 가치가 있는지를 나중에 되짚을 수 없습니다. 그래서 `TrainerCallback` 하나로 손실을
+CSV에 적고 보고서와 함께 HF에 올립니다. 의존성이 늘지 않습니다.
+
+| 열 | 내용 |
+|---|---|
+| `variant` | `inbatch` / `hard` |
+| `step`, `epoch` | 전역 스텝과 에포크 |
+| `loss` | 그 스텝의 손실 |
+| `learning_rate`, `grad_norm` | 스케줄과 기울기 크기 |
+
+보고서 JSON에도 요약을 넣습니다 — `first`, `last`, `min`, `mean_last_quarter`. CSV를 열지
+않고도 수렴 여부는 읽힙니다.
+
+**Colab에서 MLflow로 직접 쏘지 않는 것이 맞습니다.** 보고서를 저장소로 가져온 뒤 로컬
+`pipeline.tracking`에 등록하면 다른 측정들과 같은 자리에 남습니다. 실행 환경과 기록 위치를
+분리하는 쪽이 VM이 사라지는 환경에서 안전합니다.
+
 #### 실행 절차
 
 ```bash
