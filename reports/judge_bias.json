@@ -1,0 +1,2001 @@
+{
+  "generated_at": "2026-10-16T15:42:36.425897+00:00",
+  "label": "순서 뒤집기 1회차",
+  "summary": {
+    "questions": 40,
+    "calls_per_question": 3,
+    "repeat_flip_rate": 0.1,
+    "order_only_flip_rate": 0.05,
+    "both_flipped": 0.0,
+    "stable_everywhere": 0.85,
+    "order_flipped_fields": {
+      "requires_content": 0,
+      "requires_graph": 0,
+      "graph_condition_count": 2,
+      "content_matches": 0
+    },
+    "repeat_flipped_fields": {
+      "requires_content": 0,
+      "requires_graph": 0,
+      "graph_condition_count": 3,
+      "content_matches": 1
+    },
+    "by_family": {
+      "author": {
+        "questions": 6,
+        "order_only": 0,
+        "repeat_flips": 0
+      },
+      "citing": {
+        "questions": 6,
+        "order_only": 0,
+        "repeat_flips": 0
+      },
+      "coauthor": {
+        "questions": 6,
+        "order_only": 0,
+        "repeat_flips": 0
+      },
+      "reference": {
+        "questions": 6,
+        "order_only": 0,
+        "repeat_flips": 0
+      },
+      "topcited": {
+        "questions": 6,
+        "order_only": 2,
+        "repeat_flips": 3
+      },
+      "topic": {
+        "questions": 10,
+        "order_only": 0,
+        "repeat_flips": 1
+      }
+    },
+    "reading": "order_only_flip_rate만 위치 편향입니다. repeat_flip_rate가 그보다 크거나 비슷하면 순서가 아니라 심판 자체의 변동이며, 그때 고칠 것은 프롬프트가 아니라 판정을 여러 번 모으는 설계입니다.",
+    "tokens": {
+      "input": 131418,
+      "output": 21323
+    }
+  },
+  "flipped": [
+    {
+      "id": "topcited-02",
+      "family": "topcited",
+      "question": "Within primary category cs.LG, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "1707.06347",
+        "2110.14168"
+      ],
+      "noise_disagreements": [
+        "graph_condition_count"
+      ],
+      "order_disagreements": [],
+      "order_only": false
+    },
+    {
+      "id": "topcited-03",
+      "family": "topcited",
+      "question": "Within primary category cs.AI, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2303.11366",
+        "2307.13854"
+      ],
+      "noise_disagreements": [
+        "graph_condition_count"
+      ],
+      "order_disagreements": [],
+      "order_only": false
+    },
+    {
+      "id": "topcited-04",
+      "family": "topcited",
+      "question": "Within primary category cs.CV, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2103.00020",
+        "2502.13923"
+      ],
+      "noise_disagreements": [],
+      "order_disagreements": [
+        "graph_condition_count"
+      ],
+      "order_only": true
+    },
+    {
+      "id": "topcited-05",
+      "family": "topcited",
+      "question": "Within primary category cs.RO, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2204.01691",
+        "2307.15818"
+      ],
+      "noise_disagreements": [
+        "graph_condition_count"
+      ],
+      "order_disagreements": [],
+      "order_only": false
+    },
+    {
+      "id": "topcited-06",
+      "family": "topcited",
+      "question": "Within primary category cs.SE, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2403.07974",
+        "2405.15793"
+      ],
+      "noise_disagreements": [],
+      "order_disagreements": [
+        "graph_condition_count"
+      ],
+      "order_only": true
+    },
+    {
+      "id": "topic-knowledge-graph",
+      "family": "topic",
+      "question": "Find arXiv papers about knowledge graph.",
+      "paper_ids": [
+        "1503.00759",
+        "1505.04406"
+      ],
+      "noise_disagreements": [
+        "content_matches[1505.04406]"
+      ],
+      "order_disagreements": [],
+      "order_only": false
+    }
+  ],
+  "results": [
+    {
+      "id": "author-01",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Yuquan Deng?",
+      "paper_ids": [
+        "2502.13130",
+        "2508.07917"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2502.13130": true,
+            "2508.07917": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2502.13130": true,
+            "2508.07917": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2508.07917": true,
+          "2502.13130": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3935,
+        "output_tokens": 352
+      }
+    },
+    {
+      "id": "author-02",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Finbarr Timbers?",
+      "paper_ids": [
+        "1903.05614",
+        "1908.09453"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "1903.05614": true,
+            "1908.09453": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "1903.05614": true,
+            "1908.09453": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "1908.09453": true,
+          "1903.05614": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2859,
+        "output_tokens": 451
+      }
+    },
+    {
+      "id": "author-03",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Evgenia Nitishinskaya?",
+      "paper_ids": [
+        "2407.00215",
+        "2509.15541"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2407.00215": true,
+            "2509.15541": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2407.00215": true,
+            "2509.15541": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2509.15541": true,
+          "2407.00215": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3657,
+        "output_tokens": 346
+      }
+    },
+    {
+      "id": "author-04",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Limin Sun?",
+      "paper_ids": [
+        "2106.01157",
+        "2307.12469"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2106.01157": true,
+            "2307.12469": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2106.01157": true,
+            "2307.12469": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2307.12469": true,
+          "2106.01157": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3624,
+        "output_tokens": 461
+      }
+    },
+    {
+      "id": "author-05",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Matteo Gallici?",
+      "paper_ids": [
+        "2311.10090",
+        "2506.21490"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2311.10090": true,
+            "2506.21490": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2311.10090": true,
+            "2506.21490": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2506.21490": true,
+          "2311.10090": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3471,
+        "output_tokens": 367
+      }
+    },
+    {
+      "id": "author-06",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Adina Yakefu?",
+      "paper_ids": [
+        "2510.17950",
+        "2512.13168"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2510.17950": true,
+            "2512.13168": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2510.17950": true,
+            "2512.13168": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2512.13168": true,
+          "2510.17950": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3252,
+        "output_tokens": 382
+      }
+    },
+    {
+      "id": "citing-01",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled The Alignment Problem from a Deep Learning Perspective?",
+      "paper_ids": [
+        "2507.08249",
+        "2606.16914"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2507.08249": true,
+            "2606.16914": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2507.08249": true,
+            "2606.16914": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2606.16914": true,
+          "2507.08249": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2889,
+        "output_tokens": 442
+      }
+    },
+    {
+      "id": "citing-02",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities?",
+      "paper_ids": [
+        "2507.05624",
+        "2608.20019"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2507.05624": true,
+            "2608.20019": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2507.05624": true,
+            "2608.20019": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2608.20019": true,
+          "2507.05624": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3423,
+        "output_tokens": 502
+      }
+    },
+    {
+      "id": "citing-03",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Needle in the Haystack for Memory Based Large Language Models?",
+      "paper_ids": [
+        "2603.04191",
+        "2608.08634"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2603.04191": true,
+            "2608.08634": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2603.04191": true,
+            "2608.08634": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2608.08634": true,
+          "2603.04191": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3393,
+        "output_tokens": 478
+      }
+    },
+    {
+      "id": "citing-04",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback?",
+      "paper_ids": [
+        "2606.25996",
+        "2608.20318"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2606.25996": true,
+            "2608.20318": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2606.25996": true,
+            "2608.20318": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2608.20318": true,
+          "2606.25996": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3654,
+        "output_tokens": 548
+      }
+    },
+    {
+      "id": "citing-05",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Deeply-Supervised Nets?",
+      "paper_ids": [
+        "2606.24722",
+        "2607.20379"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2606.24722": true,
+            "2607.20379": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2606.24722": true,
+            "2607.20379": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2607.20379": true,
+          "2606.24722": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3944,
+        "output_tokens": 530
+      }
+    },
+    {
+      "id": "citing-06",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing?",
+      "paper_ids": [
+        "2607.25045",
+        "2607.25076"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2607.25045": true,
+            "2607.25076": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2607.25045": true,
+            "2607.25076": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2607.25076": true,
+          "2607.25045": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3408,
+        "output_tokens": 512
+      }
+    },
+    {
+      "id": "reference-01",
+      "family": "reference",
+      "question": "Among the papers cited by PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation, which ones have primary category cs.CV?",
+      "paper_ids": [
+        "2105.09492",
+        "2412.19663"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2105.09492": true,
+            "2412.19663": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2105.09492": true,
+            "2412.19663": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2412.19663": true,
+          "2105.09492": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3372,
+        "output_tokens": 782
+      }
+    },
+    {
+      "id": "reference-02",
+      "family": "reference",
+      "question": "Among the papers cited by Forethought: Verifiable Reasoning from Neurosymbolic Primitive Programming, which ones have primary category cs.AI?",
+      "paper_ids": [
+        "2409.17270",
+        "2508.01780"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2409.17270": true,
+            "2508.01780": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2409.17270": true,
+            "2508.01780": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2508.01780": true,
+          "2409.17270": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3510,
+        "output_tokens": 752
+      }
+    },
+    {
+      "id": "reference-03",
+      "family": "reference",
+      "question": "Among the papers cited by Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning, which ones have primary category cs.CR?",
+      "paper_ids": [
+        "2404.01318",
+        "2404.13208"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2404.01318": true,
+            "2404.13208": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2404.01318": true,
+            "2404.13208": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2404.13208": true,
+          "2404.01318": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3351,
+        "output_tokens": 783
+      }
+    },
+    {
+      "id": "reference-04",
+      "family": "reference",
+      "question": "Among the papers cited by StagedWorkspace: A Versioned Workspace for Knowledge-Work Agents, which ones have primary category cs.LG?",
+      "paper_ids": [
+        "2110.00061",
+        "2403.07718"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2110.00061": true,
+            "2403.07718": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2110.00061": true,
+            "2403.07718": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2403.07718": true,
+          "2110.00061": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3093,
+        "output_tokens": 669
+      }
+    },
+    {
+      "id": "reference-05",
+      "family": "reference",
+      "question": "Among the papers cited by Reinforcement learning for Quantum Tiq-Taq-Toe, which ones have primary category cs.LG?",
+      "paper_ids": [
+        "1707.06347",
+        "2312.00752"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "1707.06347": true,
+            "2312.00752": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "1707.06347": true,
+            "2312.00752": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2312.00752": true,
+          "1707.06347": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3273,
+        "output_tokens": 727
+      }
+    },
+    {
+      "id": "reference-06",
+      "family": "reference",
+      "question": "Among the papers cited by BRIDGE: Predicting Human Task Completion Time From Model Performance, which ones have primary category cs.LG?",
+      "paper_ids": [
+        "2411.15114",
+        "2510.04374"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2411.15114": true,
+            "2510.04374": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2411.15114": true,
+            "2510.04374": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2510.04374": true,
+          "2411.15114": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3459,
+        "output_tokens": 657
+      }
+    },
+    {
+      "id": "coauthor-01",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Fuzzy K-Means Clustering without Cluster Centroids?",
+      "paper_ids": [
+        "2303.14382",
+        "2403.05530"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2303.14382": true,
+            "2403.05530": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2303.14382": true,
+            "2403.05530": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2403.05530": true,
+          "2303.14382": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3543,
+        "output_tokens": 498
+      }
+    },
+    {
+      "id": "coauthor-02",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study?",
+      "paper_ids": [
+        "1809.05224",
+        "2104.03220"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "1809.05224": true,
+            "2104.03220": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "1809.05224": true,
+            "2104.03220": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2104.03220": true,
+          "1809.05224": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3072,
+        "output_tokens": 521
+      }
+    },
+    {
+      "id": "coauthor-03",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference?",
+      "paper_ids": [
+        "2504.13641",
+        "2506.06958"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2504.13641": true,
+            "2506.06958": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2504.13641": true,
+            "2506.06958": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2506.06958": true,
+          "2504.13641": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2868,
+        "output_tokens": 536
+      }
+    },
+    {
+      "id": "coauthor-04",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with When to Plan: Learning to Select Between Reactive Control and Deliberative Planning?",
+      "paper_ids": [
+        "2305.14133",
+        "2506.17124"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2305.14133": true,
+            "2506.17124": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2305.14133": true,
+            "2506.17124": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2506.17124": true,
+          "2305.14133": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3174,
+        "output_tokens": 613
+      }
+    },
+    {
+      "id": "coauthor-05",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Lifted Variable Elimination: Decoupling the Operators from the Constraint Language?",
+      "paper_ids": [
+        "1802.07127",
+        "2311.17582"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "1802.07127": true,
+            "2311.17582": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "1802.07127": true,
+            "2311.17582": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2311.17582": true,
+          "1802.07127": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3000,
+        "output_tokens": 436
+      }
+    },
+    {
+      "id": "coauthor-06",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Hyperbolic Neural Networks?",
+      "paper_ids": [
+        "2110.06197",
+        "2512.10858"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2110.06197": true,
+            "2512.10858": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 1,
+          "content_matches": {
+            "2110.06197": true,
+            "2512.10858": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 1,
+        "content_matches": {
+          "2512.10858": true,
+          "2110.06197": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3288,
+        "output_tokens": 518
+      }
+    },
+    {
+      "id": "topcited-01",
+      "family": "topcited",
+      "question": "Within primary category cs.CL, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2210.03629",
+        "2302.04761"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2210.03629": true,
+            "2302.04761": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2210.03629": true,
+            "2302.04761": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2302.04761": true,
+          "2210.03629": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3412,
+        "output_tokens": 797
+      }
+    },
+    {
+      "id": "topcited-02",
+      "family": "topcited",
+      "question": "Within primary category cs.LG, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "1707.06347",
+        "2110.14168"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "1707.06347": true,
+            "2110.14168": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 3,
+          "content_matches": {
+            "1707.06347": true,
+            "2110.14168": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2110.14168": true,
+          "1707.06347": true
+        }
+      },
+      "noise_disagreements": [
+        "graph_condition_count"
+      ],
+      "order_disagreements": [],
+      "stable_under_repeat": false,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2829,
+        "output_tokens": 790
+      }
+    },
+    {
+      "id": "topcited-03",
+      "family": "topcited",
+      "question": "Within primary category cs.AI, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2303.11366",
+        "2307.13854"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2303.11366": true,
+            "2307.13854": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 3,
+          "content_matches": {
+            "2303.11366": true,
+            "2307.13854": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 2,
+        "content_matches": {
+          "2307.13854": true,
+          "2303.11366": true
+        }
+      },
+      "noise_disagreements": [
+        "graph_condition_count"
+      ],
+      "order_disagreements": [],
+      "stable_under_repeat": false,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3489,
+        "output_tokens": 763
+      }
+    },
+    {
+      "id": "topcited-04",
+      "family": "topcited",
+      "question": "Within primary category cs.CV, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2103.00020",
+        "2502.13923"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2103.00020": true,
+            "2502.13923": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2103.00020": true,
+            "2502.13923": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 3,
+        "content_matches": {
+          "2502.13923": true,
+          "2103.00020": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [
+        "graph_condition_count"
+      ],
+      "stable_under_repeat": true,
+      "order_only": true,
+      "tokens": {
+        "input_tokens": 3771,
+        "output_tokens": 751
+      }
+    },
+    {
+      "id": "topcited-05",
+      "family": "topcited",
+      "question": "Within primary category cs.RO, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2204.01691",
+        "2307.15818"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 3,
+          "content_matches": {
+            "2204.01691": true,
+            "2307.15818": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2204.01691": true,
+            "2307.15818": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 3,
+        "content_matches": {
+          "2307.15818": true,
+          "2204.01691": true
+        }
+      },
+      "noise_disagreements": [
+        "graph_condition_count"
+      ],
+      "order_disagreements": [],
+      "stable_under_repeat": false,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3905,
+        "output_tokens": 809
+      }
+    },
+    {
+      "id": "topcited-06",
+      "family": "topcited",
+      "question": "Within primary category cs.SE, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2403.07974",
+        "2405.15793"
+      ],
+      "same_order": [
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2403.07974": true,
+            "2405.15793": true
+          }
+        },
+        {
+          "requires_content": false,
+          "requires_graph": true,
+          "graph_condition_count": 2,
+          "content_matches": {
+            "2403.07974": true,
+            "2405.15793": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": false,
+        "requires_graph": true,
+        "graph_condition_count": 3,
+        "content_matches": {
+          "2405.15793": true,
+          "2403.07974": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [
+        "graph_condition_count"
+      ],
+      "stable_under_repeat": true,
+      "order_only": true,
+      "tokens": {
+        "input_tokens": 3322,
+        "output_tokens": 800
+      }
+    },
+    {
+      "id": "topic-graph-neural-network",
+      "family": "topic",
+      "question": "Find arXiv papers about graph neural network.",
+      "paper_ids": [
+        "1710.10903",
+        "1711.04043"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1710.10903": true,
+            "1711.04043": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1710.10903": true,
+            "1711.04043": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "1711.04043": true,
+          "1710.10903": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2740,
+        "output_tokens": 295
+      }
+    },
+    {
+      "id": "topic-retrieval-augmented-generation",
+      "family": "topic",
+      "question": "Find arXiv papers about retrieval augmented generation.",
+      "paper_ids": [
+        "2005.11401",
+        "2006.05405"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "2005.11401": true,
+            "2006.05405": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "2005.11401": true,
+            "2006.05405": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "2006.05405": true,
+          "2005.11401": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3531,
+        "output_tokens": 315
+      }
+    },
+    {
+      "id": "topic-diffusion-model",
+      "family": "topic",
+      "question": "Find arXiv papers about diffusion model.",
+      "paper_ids": [
+        "1905.09501",
+        "2009.09761"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1905.09501": false,
+            "2009.09761": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1905.09501": false,
+            "2009.09761": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "2009.09761": true,
+          "1905.09501": false
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3126,
+        "output_tokens": 508
+      }
+    },
+    {
+      "id": "topic-reinforcement-learning",
+      "family": "topic",
+      "question": "Find arXiv papers about reinforcement learning.",
+      "paper_ids": [
+        "0906.1713",
+        "1106.5267"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "0906.1713": true,
+            "1106.5267": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "0906.1713": true,
+            "1106.5267": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "1106.5267": true,
+          "0906.1713": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2976,
+        "output_tokens": 248
+      }
+    },
+    {
+      "id": "topic-multimodal",
+      "family": "topic",
+      "question": "Find arXiv papers about multimodal.",
+      "paper_ids": [
+        "1307.0414",
+        "1312.6764"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1307.0414": true,
+            "1312.6764": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1307.0414": true,
+            "1312.6764": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "1312.6764": true,
+          "1307.0414": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2556,
+        "output_tokens": 415
+      }
+    },
+    {
+      "id": "topic-knowledge-graph",
+      "family": "topic",
+      "question": "Find arXiv papers about knowledge graph.",
+      "paper_ids": [
+        "1503.00759",
+        "1505.04406"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1503.00759": true,
+            "1505.04406": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1503.00759": true,
+            "1505.04406": false
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "1505.04406": true,
+          "1503.00759": true
+        }
+      },
+      "noise_disagreements": [
+        "content_matches[1505.04406]"
+      ],
+      "order_disagreements": [],
+      "stable_under_repeat": false,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3333,
+        "output_tokens": 623
+      }
+    },
+    {
+      "id": "topic-code-generation",
+      "family": "topic",
+      "question": "Find arXiv papers about code generation.",
+      "paper_ids": [
+        "1810.02720",
+        "1910.13753"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1810.02720": true,
+            "1910.13753": false
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1810.02720": true,
+            "1910.13753": false
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "1910.13753": false,
+          "1810.02720": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2877,
+        "output_tokens": 448
+      }
+    },
+    {
+      "id": "topic-medical-imaging",
+      "family": "topic",
+      "question": "Find arXiv papers about medical imaging.",
+      "paper_ids": [
+        "1701.00794",
+        "1804.03999"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1701.00794": true,
+            "1804.03999": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1701.00794": true,
+            "1804.03999": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "1804.03999": true,
+          "1701.00794": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3063,
+        "output_tokens": 280
+      }
+    },
+    {
+      "id": "topic-federated-learning",
+      "family": "topic",
+      "question": "Find arXiv papers about federated learning.",
+      "paper_ids": [
+        "1602.05629",
+        "1610.05492"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1602.05629": true,
+            "1610.05492": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1602.05629": true,
+            "1610.05492": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "1610.05492": true,
+          "1602.05629": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 3138,
+        "output_tokens": 269
+      }
+    },
+    {
+      "id": "topic-AI-agents",
+      "family": "topic",
+      "question": "Find arXiv papers about AI agents.",
+      "paper_ids": [
+        "1609.05521",
+        "1611.03673"
+      ],
+      "same_order": [
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1609.05521": true,
+            "1611.03673": true
+          }
+        },
+        {
+          "requires_content": true,
+          "requires_graph": false,
+          "graph_condition_count": 0,
+          "content_matches": {
+            "1609.05521": true,
+            "1611.03673": true
+          }
+        }
+      ],
+      "reversed_order": {
+        "requires_content": true,
+        "requires_graph": false,
+        "graph_condition_count": 0,
+        "content_matches": {
+          "1611.03673": true,
+          "1609.05521": true
+        }
+      },
+      "noise_disagreements": [],
+      "order_disagreements": [],
+      "stable_under_repeat": true,
+      "order_only": false,
+      "tokens": {
+        "input_tokens": 2838,
+        "output_tokens": 349
+      }
+    }
+  ]
+}
