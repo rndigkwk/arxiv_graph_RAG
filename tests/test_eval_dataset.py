@@ -77,3 +77,52 @@ def test_curated_topic_candidates_have_verifiable_source_evidence():
         assert set(case["expected_ids"]).issubset(
             {evidence["arxiv_id"] for evidence in case["source_evidence"]}
         )
+
+
+def test_the_curated_review_records_only_as_much_review_as_happened():
+    """상태가 실제보다 강해지지 않게 고정합니다.
+
+    2026-10-18에 검토자가 **사람 판단이 필요했던 3건만** 보고 판정했습니다. 나머지 7건은
+    질의어 일치라는 기계 규칙으로 확인된 것이고, 검토자는 그 **규칙에 동의**했을 뿐 논문을
+    한 편씩 읽지 않았습니다. 그래서 7건은 `assistant_reviewed`로 남고, 동의 사실만
+    `review.rule_accepted_by`에 적힙니다.
+    """
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "evals" / "cases_curated.json"
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    cases = data["cases"] if isinstance(data, dict) else data
+
+    for case in cases:
+        review = case["review"]
+        if case["review_status"] == "human_reviewed":
+            # 사람이 직접 본 사례입니다. 누가 봤는지가 분명해야 합니다.
+            assert "사람 검토가 아니" not in review["reviewed_by"]
+            assert review["reviewed_by"].strip() and review["reviewed_on"].strip()
+            # 직접 본 사례에는 판단(judgment) 항목이 있어야 합니다. 없으면 기계 검증만 한 것입니다.
+            methods = {check["method"] for check in review["gold_id_checks"].values()}
+            assert "judgment" in methods, case["id"]
+        else:
+            # 규칙에 동의한 것과 논문을 본 것을 구별합니다.
+            assert review.get("rule_accepted_by", "").strip(), case["id"]
+            assert "사람 검토가 아니" in review["reviewed_by"]
+
+
+def test_no_flagged_gold_id_is_left_undecided():
+    """`flag`는 '사람이 봐 주세요'라는 뜻입니다. 남아 있으면 검토가 끝나지 않은 것입니다."""
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[1] / "evals" / "cases_curated.json"
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    cases = data["cases"] if isinstance(data, dict) else data
+
+    flagged = [
+        (case["id"], paper_id)
+        for case in cases
+        for paper_id, check in case["review"]["gold_id_checks"].items()
+        if check["verdict"] == "flag"
+    ]
+
+    assert not flagged, flagged
