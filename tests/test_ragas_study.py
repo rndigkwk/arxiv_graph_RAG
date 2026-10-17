@@ -267,3 +267,30 @@ def test_context_precision_is_not_treated_as_a_retrieval_metric():
     assert "context_precision" not in ANSWER_INDEPENDENT_METRICS
     # 질문과 문맥만 받는 지표만 답변에 독립입니다.
     assert ANSWER_INDEPENDENT_METRICS == ("context_relevance",)
+
+
+def test_context_relevance_is_off_by_default():
+    """원본 30건과 결함 20건, 50건 전부 정확히 1.0000이라 아무것도 구별하지 못했습니다.
+
+    ADR-021의 민감도에 "표본이 늘어도 1.0000이면 측정 자체를 뺀다"고 적었고, 그 조건이
+    충족됐습니다. 끄는 것이 기본이고 플래그로 다시 켭니다.
+    """
+    import inspect
+
+    from evals.ragas_study import build_metrics
+
+    signature = inspect.signature(build_metrics)
+    assert signature.parameters["with_context_relevance"].default is False
+
+
+def test_a_metric_that_was_not_measured_is_not_reported_as_none():
+    """끈 지표를 None으로 적으면 "재 봤더니 없음"처럼 읽힙니다."""
+    rows = [{
+        "id": "a", "family": "citing",
+        "faithfulness": 1.0, "answer_relevancy": 0.9, "context_precision": 1.0,
+    }]
+    summary = summarize(rows, skipped=[], model="gpt-test")
+
+    assert "context_relevance" not in summary["metrics"]
+    assert "context_relevance" not in summary["diagnosis"]["answer_independent"]
+    assert summary["metrics"]["faithfulness"] == 1.0

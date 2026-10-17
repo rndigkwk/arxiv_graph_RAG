@@ -103,7 +103,7 @@ def samples(report: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
     return rows, skipped
 
 
-def build_metrics(model: str) -> dict[str, Any]:
+def build_metrics(model: str, *, with_context_relevance: bool = False) -> dict[str, Any]:
     """Create the four metrics with our own judge model.
 
     ragas 0.4는 클라이언트를 직접 받습니다("Text-only mode has been removed"). 그래서 키를
@@ -125,12 +125,17 @@ def build_metrics(model: str) -> dict[str, Any]:
     client = AsyncOpenAI()
     llm = llm_factory(model, client=client)
     embeddings = embedding_factory(provider="openai", model=EMBEDDING_MODEL, client=client)
-    return {
+    metrics = {
         "faithfulness": Faithfulness(llm=llm),
         "answer_relevancy": AnswerRelevancy(llm=llm, embeddings=embeddings),
         "context_precision": ContextPrecisionWithoutReference(llm=llm),
-        "context_relevance": ContextRelevance(llm=llm),
     }
+    if with_context_relevance:
+        # 기본에서 뺐습니다. 원본 30건과 결함 20건, **50건 전부 정확히 1.0000**이라 아무것도
+        # 구별하지 못했습니다(ADR-021의 민감도에 적어 둔 철회 조건 그대로). 우리 파이프라인에서
+        # 문맥은 항상 그 질문으로 검색한 것이므로 구조적으로 1에 붙습니다. 다시 보려면 켭니다.
+        metrics["context_relevance"] = ContextRelevance(llm=llm)
+    return metrics
 
 
 async def score_one(metrics: dict[str, Any], row: dict[str, Any]) -> dict[str, Any]:
@@ -161,8 +166,10 @@ async def score_one(metrics: dict[str, Any], row: dict[str, Any]) -> dict[str, A
     return scores
 
 
-async def run(rows: list[dict[str, Any]], model: str) -> list[dict[str, Any]]:
-    metrics = build_metrics(model)
+async def run(
+    rows: list[dict[str, Any]], model: str, *, with_context_relevance: bool = False
+) -> list[dict[str, Any]]:
+    metrics = build_metrics(model, with_context_relevance=with_context_relevance)
     scored = []
     for index, row in enumerate(rows, start=1):
         scores = await score_one(metrics, row)
@@ -179,7 +186,12 @@ def mean_of(rows: list[dict[str, Any]], key: str) -> float | None:
 
 def summarize(rows: list[dict[str, Any]], skipped: list[str], model: str) -> dict[str, Any]:
     """Report the four metrics, and pair them with our exact retrieval numbers."""
-    names = (*GENERATION_METRICS, *RETRIEVAL_METRICS)
+    # 끈 지표를 None으로 적으면 "재 봤더니 없음"처럼 읽힙니다. 실제로 잰 것만 셉니다.
+    measured = {key for row in rows for key in row}
+    names = tuple(
+        name for name in (*ANSWER_DEPENDENT_METRICS, *ANSWER_INDEPENDENT_METRICS)
+        if name in measured
+    )
     families = sorted({row["family"] for row in rows if row["family"]})
     scored = {name: mean_of(rows, name) for name in names}
     errors = {
@@ -196,11 +208,13 @@ def summarize(rows: list[dict[str, Any]], skipped: list[str], model: str) -> dic
         # 잡습니다 - 아래 주석과 EXPERIMENTS 11-10절 참고.
         "diagnosis": {
             "answer_independent": {
-                **{name: scored[name] for name in ANSWER_INDEPENDENT_METRICS},
+                **{name: scored[name] for name in ANSWER_INDEPENDENT_METRICS
+                   if name in scored},
                 "recall_at_k": mean_of(rows, "recall_at_k"),
                 "hit_at_k": mean_of(rows, "hit_at_k"),
             },
-            "answer_dependent": {name: scored[name] for name in ANSWER_DEPENDENT_METRICS},
+            "answer_dependent": {name: scored[name] for name in ANSWER_DEPENDENT_METRICS
+                                 if name in scored},
             "exact_retrieval": {
                 "recall_at_k": mean_of(rows, "recall_at_k"),
                 "hit_at_k": mean_of(rows, "hit_at_k"),
@@ -293,6 +307,8 @@ def main() -> int:
     # 기본값을 여기서 환경변수로 정하면 `load_env()`보다 먼저 평가돼 .env가 무시됩니다.
     parser.add_argument("--model", default="")
     parser.add_argument("--label", default="")
+    parser.add_argument("--with-context-relevance", action="store_true",
+                        help="50건 전부 1.0000이어서 기본에서 뺐습니다. 다시 보려면 켭니다.")
     parser.add_argument("--compare-to", type=Path,
                         help="다른 판정 모델로 낸 study 보고서. 사례별 쌍체 비교를 붙입니다.")
     parser.add_argument("--output", type=Path, default=OUTPUT)
@@ -317,7 +333,9 @@ def main() -> int:
         return 1
 
     print(f"{len(rows)}건 채점 (판정 모델 {model})")
-    scored = asyncio.run(run(rows, model))
+    scored = asyncio.run(
+        run(rows, model, with_context_relevance=args.with_context_relevance)
+    )
     out = {
         "generated_at": datetime.now(UTC).isoformat(),
         "label": args.label,
