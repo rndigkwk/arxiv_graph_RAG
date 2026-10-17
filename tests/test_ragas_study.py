@@ -5,7 +5,7 @@
 넘기면 모델이 아니라 우리 입력 실수를 재게 됩니다.
 """
 
-from evals.ragas_study import RETRIEVAL_METRICS, samples, summarize
+from evals.ragas_study import ANSWER_INDEPENDENT_METRICS, samples, summarize
 from evals.run import generator_contexts
 
 
@@ -127,8 +127,12 @@ def test_the_summary_separates_the_retrieval_and_generation_sides():
     summary = summarize(rows, skipped=["b: 답변 없음"], model="gpt-test")
 
     diagnosis = summary["diagnosis"]
-    assert set(diagnosis["retrieval_side"]) == set(RETRIEVAL_METRICS)
-    assert diagnosis["generation_side"]["faithfulness"] == 1.0
+    # 축은 "검색/생성"이 아니라 답변 의존 여부입니다 - context_precision은 답변이 바뀌면
+    # 문맥이 그대로여도 움직입니다(EXPERIMENTS 11-10절).
+    assert "context_precision" in diagnosis["answer_dependent"]
+    assert "context_precision" not in diagnosis["answer_independent"]
+    assert set(ANSWER_INDEPENDENT_METRICS) <= set(diagnosis["answer_independent"])
+    assert diagnosis["answer_dependent"]["faithfulness"] == 1.0
     # 골드 ID로 정확히 센 값을 나란히 둬야 LLM 추정과 어긋나는 것을 볼 수 있습니다.
     assert diagnosis["exact_retrieval"]["recall_at_k"] == 1.0
     assert summary["cases_skipped"] == 1
@@ -249,3 +253,17 @@ def test_tool_calls_are_preferred_over_the_flattened_rows():
 
     assert len(contexts) == 1
     assert contexts[0].startswith("Cypher: ")
+
+
+def test_context_precision_is_not_treated_as_a_retrieval_metric():
+    """결함을 심어 재 보니 문맥이 그대로인데 답변만 바꿔도 0.8286 -> 0.0000이었습니다.
+
+    그러므로 이 지표로는 "검색이 문제인가"를 말할 수 없습니다. 처음 분류가 틀렸고, 그 사실을
+    테스트로 고정합니다.
+    """
+    from evals.ragas_study import ANSWER_DEPENDENT_METRICS
+
+    assert "context_precision" in ANSWER_DEPENDENT_METRICS
+    assert "context_precision" not in ANSWER_INDEPENDENT_METRICS
+    # 질문과 문맥만 받는 지표만 답변에 독립입니다.
+    assert ANSWER_INDEPENDENT_METRICS == ("context_relevance",)

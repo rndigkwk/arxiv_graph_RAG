@@ -42,9 +42,20 @@ from typing import Any
 OUTPUT = Path("reports/ragas_study.json")
 DEFAULT_MODEL = "gpt-4o-mini"
 EMBEDDING_MODEL = "text-embedding-3-large"
-# 검색 쪽 지표와 생성 쪽 지표를 나눠 읽기 위한 분류입니다. 고장 위치 진단의 축입니다.
-RETRIEVAL_METRICS = ("context_precision", "context_relevance")
-GENERATION_METRICS = ("faithfulness", "answer_relevancy")
+# 고장 위치 진단의 축입니다. 기준은 "검색이냐 생성이냐"가 아니라 **답변에 의존하느냐**입니다.
+#
+# 2026-10-17에 결함을 심어 재 보니 `context_precision`(without reference)이 **문맥은 그대로인데
+# 답변만 바꿨을 때** 0.8286에서 0.0000으로 떨어졌습니다. 이 지표는 "각 문맥이 그 답변에 쓸모
+# 있었는가"를 묻기 때문입니다. 그러므로 검색 쪽 지표가 아닙니다 — 나쁜 답변이 검색 점수를
+# 끌어내립니다. 처음에 검색 쪽에 넣었던 것이 틀렸습니다.
+#
+# 답변과 무관한 것은 `context_relevance`(질문·문맥만 받습니다)와 골드 ID로 센 `recall_at_k`뿐
+# 입니다. 검색만 보려면 그 둘을 봐야 합니다.
+ANSWER_INDEPENDENT_METRICS = ("context_relevance",)
+ANSWER_DEPENDENT_METRICS = ("faithfulness", "answer_relevancy", "context_precision")
+# 이름을 유지해 두면 기존 보고서·테스트가 가리키는 축이 남습니다.
+RETRIEVAL_METRICS = ANSWER_INDEPENDENT_METRICS
+GENERATION_METRICS = ANSWER_DEPENDENT_METRICS
 
 
 def samples(report: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
@@ -181,19 +192,25 @@ def summarize(rows: list[dict[str, Any]], skipped: list[str], model: str) -> dic
         "judge_model": model,
         "metrics": scored,
         "metric_errors": {name: count for name, count in errors.items() if count},
-        # 교안 02 6-4절의 진단 축입니다. 검색 쪽과 생성 쪽을 나눠 봐야 어디를 고칠지 압니다.
+        # 교안 02 6-4절의 진단 축입니다. 다만 축을 "검색/생성"이 아니라 **답변 의존 여부**로
+        # 잡습니다 - 아래 주석과 EXPERIMENTS 11-10절 참고.
         "diagnosis": {
-            "retrieval_side": {name: scored[name] for name in RETRIEVAL_METRICS},
-            "generation_side": {name: scored[name] for name in GENERATION_METRICS},
+            "answer_independent": {
+                **{name: scored[name] for name in ANSWER_INDEPENDENT_METRICS},
+                "recall_at_k": mean_of(rows, "recall_at_k"),
+                "hit_at_k": mean_of(rows, "hit_at_k"),
+            },
+            "answer_dependent": {name: scored[name] for name in ANSWER_DEPENDENT_METRICS},
             "exact_retrieval": {
                 "recall_at_k": mean_of(rows, "recall_at_k"),
                 "hit_at_k": mean_of(rows, "hit_at_k"),
                 "answer_evidence_recall": mean_of(rows, "answer_evidence_recall"),
             },
             "reading": (
-                "검색 쪽이 낮고 생성 쪽이 높으면 검색기를, 반대면 생성기를 고칩니다. "
-                "`exact_retrieval`은 골드 ID로 정확히 센 값이므로 LLM 추정과 어긋나면 "
-                "지표가 아니라 판정 모델을 의심합니다."
+                "검색만 보려면 `answer_independent`를 봅니다. `context_precision`은 답변이 "
+                "바뀌면 문맥이 그대로여도 움직이므로(결함 실험에서 0.8286 -> 0.0000) 검색 "
+                "지표로 읽으면 안 됩니다. 네 지표 전부 **누락은 보지 못합니다** - 한 편만 답한 "
+                "변형에서 faithfulness가 1.0000으로 남았습니다. 완전성은 `recall_at_k`가 셉니다."
             ),
         },
         "by_family": {
