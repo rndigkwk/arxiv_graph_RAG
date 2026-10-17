@@ -218,6 +218,54 @@ def summarize(rows: list[dict[str, Any]], skipped: list[str], model: str) -> dic
     }
 
 
+def compare_judges(
+    rows: list[dict[str, Any]], other: dict[str, Any], *, model: str
+) -> dict[str, Any]:
+    """Pair this run against another study report, case by case, metric by metric.
+
+    같은 보고서를 같은 입력으로 채점하므로 **사례별 쌍체 비교**가 됩니다. 판정 모델만 다릅니다.
+
+    보려는 것은 두 가지입니다. 점수가 움직이는가(판정 모델 의존성), 그리고 **생성 모델이 자기
+    답을 채점할 때 더 높게 주는가**(자기채점 편향). 후자는 부호가 중요하므로 평균 차이와 함께
+    사례 수를 적습니다. 다섯 건으로는 유의성을 말할 수 없고, 적을 수 있는 것은 방향과 크기뿐입니다.
+    """
+    baseline_model = other.get("summary", {}).get("judge_model", "(미기재)")
+    baseline = {row["id"]: row for row in other.get("results", [])}
+    names = (*GENERATION_METRICS, *RETRIEVAL_METRICS)
+    per_case, diffs = [], {name: [] for name in names}
+    for row in rows:
+        before = baseline.get(row["id"])
+        if before is None:
+            continue
+        entry = {"id": row["id"], "family": row["family"]}
+        for name in names:
+            new, old = row.get(name), before.get(name)
+            if isinstance(new, (int, float)) and isinstance(old, (int, float)):
+                entry[name] = {"baseline": round(old, 4), "this": round(new, 4),
+                               "difference": round(new - old, 4)}
+                diffs[name].append(new - old)
+        per_case.append(entry)
+    return {
+        "baseline_report_judge": baseline_model,
+        "this_judge": model,
+        "cases_paired": len(per_case),
+        "mean_difference": {
+            name: round(fmean(values), 4) if values else None
+            for name, values in diffs.items()
+        },
+        "cases_changed": {
+            name: sum(1 for value in values if abs(value) > 1e-9)
+            for name, values in diffs.items()
+        },
+        "reading": (
+            "difference는 이번 판정 - 기준 판정입니다. 기준이 생성 모델 자신이면 음수가 "
+            "자기채점 편향(자기가 더 높게 줬다)을 가리킵니다. 사례 수가 적으므로 유의성이 "
+            "아니라 방향과 크기만 읽습니다."
+        ),
+        "by_case": per_case,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="RAGAS 지표로 답변·문맥 품질을 측정합니다.")
     parser.add_argument("--report", type=Path, required=True,
@@ -228,6 +276,8 @@ def main() -> int:
     # 기본값을 여기서 환경변수로 정하면 `load_env()`보다 먼저 평가돼 .env가 무시됩니다.
     parser.add_argument("--model", default="")
     parser.add_argument("--label", default="")
+    parser.add_argument("--compare-to", type=Path,
+                        help="다른 판정 모델로 낸 study 보고서. 사례별 쌍체 비교를 붙입니다.")
     parser.add_argument("--output", type=Path, default=OUTPUT)
     args = parser.parse_args()
 
@@ -258,6 +308,10 @@ def main() -> int:
         "summary": summarize(scored, skipped, model),
         "results": scored,
     }
+    if args.compare_to and args.compare_to.exists():
+        other = json.loads(args.compare_to.read_text(encoding="utf-8"))
+        out["judge_comparison"] = compare_judges(scored, other, model=model)
+        out["judge_comparison"]["baseline_report"] = str(args.compare_to)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
