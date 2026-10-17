@@ -46,6 +46,7 @@ notebooks = [
 [dependency-groups]
 dev = [
     "langchain-community<0.4",
+    "langfuse>=5,<6",
     "pytest>=8.3",
     "ragas==0.4.3",
     "ruff>=0.12",
