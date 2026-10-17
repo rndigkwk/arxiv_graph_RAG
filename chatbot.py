@@ -35,6 +35,7 @@ from neo4j_graphrag.types import RetrieverResultItem
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from scipy.sparse import csr_array
 
+import agent_graph
 import prompts
 from answer_validation import (
     direct_evidence_ids,
@@ -496,80 +497,93 @@ def judging_model(usage):
     return invoke
 
 
+def stream_agent_answer(messages, on_answer=None):
+    """에이전트를 흘려 받으며 부분 답변을 화면에 올리고, 최종 상태를 돌려줍니다."""
+    result, message_id, buffer, displayed = {}, None, "", ""
+    if on_answer is not None:
+        on_answer("")  # 인용 수정 시 이전 초안을 지우고 새 답변으로 교체합니다.
+    # messages는 생성 중인 토큰, values는 검색 기록·구조화 답변이 담긴 상태입니다.
+    for mode, event in agent.stream({"messages": messages}, stream_mode=["messages", "values"]):
+        if mode == "values":
+            result = event
+            continue
+        chunk, metadata = event
+        if metadata.get("langgraph_node") != "model" or not chunk.text:
+            continue
+        if chunk.id != message_id:
+            message_id, buffer = chunk.id, ""
+        buffer += chunk.text
+        answer = partial_answer(buffer)
+        if answer and answer != displayed:
+            displayed = answer
+            if on_answer is not None:
+                on_answer(answer)
+    return result
+
+
 def ask(question, history, on_answer=None):
-    """답변을 생성하는 동안 화면을 갱신하고, 검증한 결과와 새 대화 기록을 반환합니다."""
-    messages = [*history, ("user", question)]
+    """답변을 생성하는 동안 화면을 갱신하고, 검증한 결과와 새 대화 기록을 반환합니다.
+
+    흐름은 `agent_graph`의 StateGraph가 들고 있습니다 — 생성 → 수집 → 형식·인용 검사 →
+    조건 검사 → 통과(accept) 또는 한 번 수정(revise) 또는 보류(abstain). 손으로 쓴 2회 루프와
+    **같은 판정, 같은 행동**이고, 어느 노드에서 얼마나 걸렸는지가 `response["graph_trace"]`에
+    남습니다.
+    """
     validation_request_id = uuid.uuid4().hex[:8]
-    # 재시도가 일어나면 판정 호출도 두 번이므로, 루프 밖에서 누적합니다.
+    # 재시도가 일어나면 판정 호출도 두 번이므로, 그래프 밖에서 누적합니다.
     validation_usage = {}
-    for attempt in range(2):
-        result, message_id, buffer, displayed = {}, None, "", ""
-        if on_answer is not None:
-            on_answer("")  # 인용 수정 시 이전 초안을 지우고 새 답변으로 교체합니다.
-        # messages는 생성 중인 토큰, values는 검색 기록·구조화 답변이 담긴 상태입니다.
-        for mode, event in agent.stream({"messages": messages}, stream_mode=["messages", "values"]):
-            if mode == "values":
-                result = event
-                continue
-            chunk, metadata = event
-            if metadata.get("langgraph_node") != "model" or not chunk.text:
-                continue
-            if chunk.id != message_id:
-                message_id, buffer = chunk.id, ""
-            buffer += chunk.text
-            answer = partial_answer(buffer)
-            if answer and answer != displayed:
-                displayed = answer
-                if on_answer is not None:
-                    on_answer(answer)
-        if "structured_response" not in result:
-            raise ValueError("답변 생성이 완료되지 않았습니다. 다시 질문해 주세요.")
-        # 과거 대화를 제외하고, 이번 질문의 검색과 수정 호출만 모읍니다.
-        current = {**result, "messages": result["messages"][len(history):]}
-        response = collect_response(current, question)
-        validation_stage = "answer_format_citation"
-        try:
-            validate_answer(response)
-            validation_stage = "mixed_candidate_conditions"
-            response["condition_validation"] = assess_and_validate(
-                question, response,
-                lambda ids: run_read(
-                    "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids "
-                    "RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.abstract AS abstract",
-                    {"ids": ids},
-                ),
-                lambda user_question, papers: judge_content(
-                    user_question, papers,
-                    judging_model(validation_usage),
-                    graph_queries=[
-                        call["args"]["cypher"] for call in response["tool_calls"]
-                        if call["name"] == "search_graph" and call.get("status") == "success"
-                        and not call.get("output", {}).get("error")
-                    ],
-                ),
-            )
-            # 공급자가 사용량을 주지 않았거나 판정을 건너뛰었으면 None으로 남깁니다.
-            response["validation_usage"] = validation_usage or None
-            return response, result["messages"]
-        except ValueError as exc:
-            log_validation_failure(
-                validation_request_id, attempt + 1, validation_stage, exc,
-            )
-            if attempt == 1:
-                raise AnswerValidationError(
-                    "답변의 형식·인용을 확인하지 못했습니다. 다시 질문해 주세요.",
-                    request_id=validation_request_id,
-                    stage=validation_stage,
-                    reason=reason_code(exc),
-                    attempts=attempt + 1,
-                    cyphers=response.get("cyphers", []),
-                ) from exc
-            # 검색한 근거와 실패 이유를 그대로 전달해 한 번만 수정하고 다시 검사합니다.
-            messages = [*result["messages"], ("user",
-                f"Answer validation failed: {exc}. Check both the topic and graph conditions for "
-                "each cited paper. Search again if needed. Remove papers that fail either condition. "
-                "Copy every arxiv_id exactly from this turn's direct search results. If no paper "
-                "satisfies all conditions, say so in English with empty evidence_ids.")]
+
+    def check_conditions(user_question, response):
+        return assess_and_validate(
+            user_question, response,
+            lambda ids: run_read(
+                "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids "
+                "RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.abstract AS abstract",
+                {"ids": ids},
+            ),
+            lambda asked, papers: judge_content(
+                asked, papers,
+                judging_model(validation_usage),
+                graph_queries=[
+                    call["args"]["cypher"] for call in response["tool_calls"]
+                    if call["name"] == "search_graph" and call.get("status") == "success"
+                    and not call.get("output", {}).get("error")
+                ],
+            ),
+        )
+
+    deps = agent_graph.Dependencies(
+        stream_answer=lambda messages, attempt: stream_agent_answer(messages, on_answer),
+        collect=collect_response,
+        check_format=validate_answer,
+        check_conditions=check_conditions,
+        log_failure=lambda attempt, stage, exc: log_validation_failure(
+            validation_request_id, attempt, stage, exc
+        ),
+    )
+    state = agent_graph.build_graph(deps).invoke({
+        "question": question,
+        "history": list(history),
+        "messages": [*history, ("user", question)],
+        "attempt": 0,
+        "trace": [],
+    })
+
+    response = state["response"]
+    response["graph_trace"] = agent_graph.summarize_trace(state["trace"])
+    if state.get("abstained"):
+        raise AnswerValidationError(
+            "답변의 형식·인용을 확인하지 못했습니다. 다시 질문해 주세요.",
+            request_id=validation_request_id,
+            stage=state["stage"],
+            reason=reason_code(state["failure"]),
+            attempts=state["trace"][-1]["attempt"],
+            cyphers=response.get("cyphers", []),
+        ) from state["failure"]
+    # 공급자가 사용량을 주지 않았거나 판정을 건너뛰었으면 None으로 남깁니다.
+    response["validation_usage"] = validation_usage or None
+    return response, state["result"]["messages"]
+
 
 
 def translate_to_korean(text):

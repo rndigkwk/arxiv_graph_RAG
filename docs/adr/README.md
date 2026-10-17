@@ -66,3 +66,4 @@
 | [ADR-019](ADR-019-validate-evidence-alias-at-the-tool.md) | 근거 별칭은 도구 경계에서 검사한다 | 채택 |
 | [ADR-020](ADR-020-judge-called-once.md) | 심판은 질문당 한 번만 부른다 | 채택 |
 | [ADR-021](ADR-021-ragas-four-of-six.md) | RAGAS 지표는 여섯 중 넷만 쓰고 둘은 게이트에 넣지 않는다 | 채택 |
+| [ADR-022](ADR-022-answer-flow-as-a-stategraph.md) | 답변 흐름을 StateGraph로 세우되 행동은 바꾸지 않는다 | 채택 |

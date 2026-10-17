@@ -109,6 +109,12 @@ def evaluate_case(
         row["evidence_ids"] = evidence
         row["answer"] = response.get("answer", "")
         row["contexts"] = generator_contexts(response)
+        # 노드별 지연·방문 횟수입니다. "답변이 느리다"를 어느 단계인지로 바꿔 말할 수 있습니다.
+        trace = response.get("graph_trace")
+        if trace:
+            row["graph_trace"] = {
+                key: trace[key] for key in ("visits", "seconds", "attempts", "total_seconds")
+            }
     return row
 
 
