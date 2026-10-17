@@ -21,9 +21,12 @@ import pytest
 from evals.gate import (
     BASELINE,
     GATE_REPORT,
+    RAGAS_FAITHFULNESS,
+    RAGAS_STABLE_PRECISION,
     check,
     compares_aggregates,
     normalize,
+    ragas_metrics,
     transient_failures,
 )
 
@@ -461,3 +464,115 @@ def test_the_floors_are_inside_what_three_runs_actually_showed():
     for name in ("answer_evidence_recall", "answer_evidence_precision"):
         assert spread[name] == 0.0
         assert baseline["allowed_drop"][name] <= 0.02
+
+
+# --- RAGAS 지표 ---------------------------------------------------------------------
+
+
+def _ragas_report(rows):
+    return {"results": [{"id": f"c{i}", **row} for i, row in enumerate(rows)]}
+
+
+def test_the_stable_family_precision_ignores_the_unstable_families():
+    """전체 평균의 변동폭 0.1342를 `coauthor`·`reference`가 전부 만듭니다(11-12절)."""
+    report = _ragas_report([
+        {"family": "author", "faithfulness": 1.0, "context_precision": 1.0},
+        {"family": "citing", "faithfulness": 1.0, "context_precision": 1.0},
+        {"family": "coauthor", "faithfulness": 1.0, "context_precision": 0.0},
+    ])
+    metrics = ragas_metrics(report, ("author", "citing", "topcited"))
+
+    # 불안정한 가족의 0.0이 섞이면 0.667이 됩니다. 섞지 않습니다.
+    assert metrics[RAGAS_STABLE_PRECISION] == 1.0
+    # faithfulness는 전체를 봅니다.
+    assert metrics[RAGAS_FAITHFULNESS] == 1.0
+
+
+def test_the_stable_family_list_comes_from_the_baseline_not_the_code():
+    """어느 가족이 안정적인지는 측정으로 정해진 값입니다. 데이터가 바뀌면 다시 재야 합니다."""
+    baseline = load(BASELINE)
+
+    assert baseline["ragas_stable_families"] == ["author", "citing", "topcited"]
+    report = _ragas_report([{"family": "author", "context_precision": 1.0}])
+    assert RAGAS_STABLE_PRECISION not in ragas_metrics(report, ())
+
+
+def test_a_ragas_regression_trips_the_floor():
+    baseline = load(BASELINE)
+    report = {
+        "metrics": {
+            **baseline["metrics"],
+            # 결함을 심은 20건에서 관측된 수준입니다(11-10절: 모순·주제 이탈에서 0.0000).
+            RAGAS_FAITHFULNESS: 0.4100,
+        },
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["case_ids"]
+        },
+        "scoring_errors": 0,
+    }
+    broken = [v for v in check(baseline, report) if v.rule == "floor"]
+
+    assert any(RAGAS_FAITHFULNESS in str(v) for v in broken), broken
+
+
+def test_one_collapsed_case_in_a_stable_family_trips_the_floor():
+    """18사례가 3회 전부 1.0000입니다. 한 건이 무너지면 평균이 0.0556 내려갑니다."""
+    baseline = load(BASELINE)
+    report = {
+        "metrics": {**baseline["metrics"], RAGAS_STABLE_PRECISION: 1.0 - 1 / 18},
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["case_ids"]
+        },
+        "scoring_errors": 0,
+    }
+    broken = [v for v in check(baseline, report) if v.rule == "floor"]
+
+    assert any(RAGAS_STABLE_PRECISION in str(v) for v in broken), broken
+
+
+def test_a_full_run_without_ragas_fails_loudly():
+    """full 판정에 RAGAS가 빠지면 조용히 통과해서는 안 됩니다.
+
+    EVAL_GATE_REQUIRED와 같은 이유입니다 - 재지 못한 것을 통과로 적으면 게이트가 아닙니다.
+    """
+    baseline = load(BASELINE)
+    report = {
+        "metrics": {
+            name: value for name, value in baseline["metrics"].items()
+            if not name.startswith("ragas_")
+        },
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["case_ids"]
+        },
+        "scoring_errors": 0,
+    }
+    broken = [str(v) for v in check(baseline, report) if v.rule == "floor"]
+
+    assert any("ragas_faithfulness" in text and "없습니다" in text for text in broken), broken
+
+
+def test_the_smoke_split_does_not_require_ragas():
+    """smoke는 집계 규칙을 아예 적용하지 않으므로 RAGAS를 돌리지 않아도 됩니다(비용)."""
+    baseline = load(BASELINE)
+    report = {
+        "metrics": {},
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["splits"]["smoke"]
+        },
+        "scoring_errors": 0,
+    }
+
+    assert not check(baseline, report, split="smoke")
+
+
+def test_no_drop_or_per_case_rule_is_attached_to_the_ragas_metrics():
+    """사례별 변동폭이 최악 1.0000입니다(`coauthor-02`). 붙이면 매번 터집니다."""
+    baseline = load(BASELINE)
+
+    for name in (RAGAS_FAITHFULNESS, RAGAS_STABLE_PRECISION):
+        assert name in baseline["absolute_floor"]
+        assert name not in (baseline["allowed_drop"] or {})

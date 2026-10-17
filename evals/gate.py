@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import statistics
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -75,6 +76,39 @@ def _numeric(row: dict[str, Any]) -> dict[str, float]:
         and isinstance(value, (int, float))
         and not isinstance(value, bool)
     }
+
+
+# RAGAS 지표는 **집계만** 게이트합니다. 사례별 규칙을 붙이면 매번 빨갛게 됩니다 —
+# `coauthor-02`의 faithfulness가 실행에 따라 0과 1을 왕복합니다(변동폭 1.0000).
+# 그리고 `context_precision`은 **검색이 단단한 가족에서만** 봅니다. 전체 평균의 변동폭이
+# 0.1342인데 그것을 `coauthor`·`reference` 두 가족이 전부 만들고, 품질과 무관하게 움직입니다.
+# 근거는 EXPERIMENTS 11-12절, 결정은 ADR-021입니다.
+RAGAS_FAITHFULNESS = "ragas_faithfulness"
+RAGAS_STABLE_PRECISION = "ragas_context_precision_stable_families"
+
+
+def ragas_metrics(report: dict[str, Any], stable_families: Sequence[str]) -> dict[str, float]:
+    """Reduce a RAGAS study report to the two numbers the gate watches.
+
+    `stable_families`는 코드가 아니라 기준선이 정합니다. 어느 가족이 안정적인지는 측정으로
+    정해진 값이고, 데이터가 바뀌면 다시 재야 합니다.
+    """
+    rows = report.get("results", [])
+    metrics: dict[str, float] = {}
+    scores = [
+        row["faithfulness"] for row in rows
+        if isinstance(row.get("faithfulness"), (int, float))
+    ]
+    if scores:
+        metrics[RAGAS_FAITHFULNESS] = statistics.fmean(scores)
+    stable = [
+        row["context_precision"] for row in rows
+        if row.get("family") in set(stable_families)
+        and isinstance(row.get("context_precision"), (int, float))
+    ]
+    if stable:
+        metrics[RAGAS_STABLE_PRECISION] = statistics.fmean(stable)
+    return metrics
 
 
 def normalize(report: dict[str, Any]) -> dict[str, Any]:
@@ -166,7 +200,13 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
 
 # 기준선을 다시 쓸 때 손으로 정한 것은 지켜야 합니다. 이것을 빼먹어서 한 번 `splits`가
 # 조용히 사라졌고, 그러면 smoke가 "사례가 25건 빠졌다"로 거짓 실패합니다.
-CARRIED_OVER = ("splits", "split_rationale", "floor_rationale", "metrics_split")
+CARRIED_OVER = (
+    "splits",
+    "split_rationale",
+    "floor_rationale",
+    "metrics_split",
+    "ragas_stable_families",
+)
 
 
 def make_baseline(
@@ -358,6 +398,8 @@ def write_summary(path: Path, baseline: dict[str, Any], report: dict[str, Any],
 def main() -> int:
     parser = argparse.ArgumentParser(description="평가 결과를 기준선과 대조합니다.")
     parser.add_argument("--report", type=Path, nargs="+", required=True)
+    parser.add_argument("--ragas", type=Path, nargs="*", default=[],
+                        help="같은 실행의 RAGAS study 보고서. 집계 두 개를 지표에 더합니다.")
     parser.add_argument("--baseline", type=Path, default=BASELINE)
     parser.add_argument("--output", type=Path, default=GATE_REPORT)
     parser.add_argument("--summary", type=Path, default=SUMMARY)
@@ -372,16 +414,23 @@ def main() -> int:
     normalized = [
         normalize(json.loads(path.read_text(encoding="utf-8"))) for path in args.report
     ]
+    existing_baseline = (
+        json.loads(args.baseline.read_text(encoding="utf-8")) if args.baseline.exists() else {}
+    )
+    stable = existing_baseline.get("ragas_stable_families", ())
+    if args.ragas:
+        if len(args.ragas) != len(normalized):
+            parser.error("--ragas 개수가 --report 개수와 같아야 합니다(실행끼리 짝지어야 합니다).")
+        for run, path in zip(normalized, args.ragas, strict=True):
+            run["metrics"].update(
+                ragas_metrics(json.loads(path.read_text(encoding="utf-8")), stable)
+            )
     merged = merge(normalized)
 
     if args.write_baseline:
         if not args.note:
             parser.error("--write-baseline에는 --note가 필요합니다. 하한의 근거를 적으세요.")
-        existing = (
-            json.loads(args.baseline.read_text(encoding="utf-8"))
-            if args.baseline.exists()
-            else {}
-        )
+        existing = existing_baseline
         baseline = make_baseline(
             merged,
             primary_metric=args.primary_metric,

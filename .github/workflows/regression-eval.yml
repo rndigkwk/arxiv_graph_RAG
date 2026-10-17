@@ -3,6 +3,11 @@ name: Regression evaluation
 # 기준선과 대조해 품질 회귀를 막습니다. 판정 규칙과 근거는 docs/adr/ADR-017 과
 # baselines/eval_baseline.json 의 note 에 있습니다.
 #
+# full 실행은 RAGAS 지표 둘도 함께 판정합니다(ADR-021). faithfulness 하한 0.90과 안정 세
+# 가족의 context_precision 하한 0.95이며, 사례별 규칙과 허용폭은 두지 않습니다 - 사례별
+# 변동폭이 최악 1.0000입니다. RAGAS 보고서가 없으면 full 판정이 실패합니다. 재지 못한 것을
+# 통과로 적지 않습니다.
+#
 # 분할이 둘입니다. PR은 가족마다 한 건씩 5건(smoke), 주간 cron과 수동 실행은 30건 전부(full).
 # PR마다 전량을 돌리면 약 366k 토큰이 매 푸시에 듭니다. 앞에서 5건을 자르는 대신 가족마다
 # 고르는 이유는 이 과제에서 질문 가족이 승자를 정하기 때문입니다(ADR-008).
@@ -114,13 +119,28 @@ jobs:
             --case-ids "$ids" \
             --output "reports/regression_${split}.json"
 
+      # RAGAS는 full에서만 돌립니다. smoke는 집계 규칙을 아예 적용하지 않으므로(모수가
+      # 다릅니다) 돌려도 판정에 쓰이지 않고 판정 호출 약 450회만 더 듭니다.
+      - name: Score with RAGAS
+        if: steps.split.outputs.name == 'full'
+        run: |
+          uv run --locked --group dev python -m evals.ragas_study \
+            --report reports/regression_full.json \
+            --label "weekly ${{ github.run_number }}" \
+            --output reports/regression_full_ragas.json
+
       - name: Compare against the baseline
         if: always()
         run: |
           split="${{ steps.split.outputs.name }}"
           test -f "reports/regression_${split}.json" || exit 0
+          ragas=""
+          if [ -f reports/regression_full_ragas.json ]; then
+            ragas="--ragas reports/regression_full_ragas.json"
+          fi
           uv run --locked python -m evals.gate \
             --report "reports/regression_${split}.json" \
+            $ragas \
             --split "$split"
 
       - name: Judge
