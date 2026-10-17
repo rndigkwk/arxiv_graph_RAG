@@ -1,0 +1,880 @@
+{
+  "summary": {
+    "runs": 2,
+    "kind": "judge_only",
+    "kind_note": "같은 입력 보고서를 여러 번 채점했습니다. 이 변동은 **판정 모델만**의 것입니다.",
+    "judge_models": [
+      "gpt-6-luna"
+    ],
+    "inputs": [
+      "reports\\ragas_input_full.json",
+      "reports\\ragas_input_full.json"
+    ],
+    "overall": {
+      "faithfulness": {
+        "runs": 2,
+        "min": 0.9833,
+        "max": 0.9917,
+        "mean": 0.9875,
+        "spread": 0.0084
+      },
+      "answer_relevancy": {
+        "runs": 2,
+        "min": 0.8281,
+        "max": 0.8285,
+        "mean": 0.8283,
+        "spread": 0.0004
+      },
+      "context_precision": {
+        "runs": 2,
+        "min": 0.7022,
+        "max": 0.7022,
+        "mean": 0.7022,
+        "spread": 0.0
+      }
+    },
+    "by_family": {
+      "author": {
+        "faithfulness": {
+          "runs": 2,
+          "min": 0.9167,
+          "max": 1.0,
+          "mean": 0.9584,
+          "spread": 0.0833
+        },
+        "answer_relevancy": {
+          "runs": 2,
+          "min": 0.8219,
+          "max": 0.838,
+          "mean": 0.8299,
+          "spread": 0.0161
+        },
+        "context_precision": {
+          "runs": 2,
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "spread": 0.0
+        }
+      },
+      "citing": {
+        "faithfulness": {
+          "runs": 2,
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "spread": 0.0
+        },
+        "answer_relevancy": {
+          "runs": 2,
+          "min": 0.9054,
+          "max": 0.9196,
+          "mean": 0.9125,
+          "spread": 0.0142
+        },
+        "context_precision": {
+          "runs": 2,
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "spread": 0.0
+        }
+      },
+      "coauthor": {
+        "faithfulness": {
+          "runs": 2,
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "spread": 0.0
+        },
+        "answer_relevancy": {
+          "runs": 2,
+          "min": 0.8041,
+          "max": 0.8064,
+          "mean": 0.8053,
+          "spread": 0.0023
+        },
+        "context_precision": {
+          "runs": 2,
+          "min": 0.2183,
+          "max": 0.2183,
+          "mean": 0.2183,
+          "spread": 0.0
+        }
+      },
+      "reference": {
+        "faithfulness": {
+          "runs": 2,
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "spread": 0.0
+        },
+        "answer_relevancy": {
+          "runs": 2,
+          "min": 0.7392,
+          "max": 0.7402,
+          "mean": 0.7397,
+          "spread": 0.001
+        },
+        "context_precision": {
+          "runs": 2,
+          "min": 0.2929,
+          "max": 0.2929,
+          "mean": 0.2929,
+          "spread": 0.0
+        }
+      },
+      "topcited": {
+        "faithfulness": {
+          "runs": 2,
+          "min": 0.9583,
+          "max": 1.0,
+          "mean": 0.9791,
+          "spread": 0.0417
+        },
+        "answer_relevancy": {
+          "runs": 2,
+          "min": 0.8535,
+          "max": 0.8545,
+          "mean": 0.854,
+          "spread": 0.001
+        },
+        "context_precision": {
+          "runs": 2,
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "spread": 0.0
+        }
+      }
+    },
+    "per_case": {
+      "cases_compared": 30,
+      "cases_only_in_some_runs": [],
+      "worst_case_per_metric": {
+        "faithfulness": {
+          "case": "author-01",
+          "runs": 2,
+          "min": 0.5,
+          "max": 1.0,
+          "mean": 0.75,
+          "spread": 0.5
+        },
+        "answer_relevancy": {
+          "case": "citing-01",
+          "runs": 2,
+          "min": 0.866,
+          "max": 0.9373,
+          "mean": 0.9016,
+          "spread": 0.0713
+        },
+        "context_precision": {
+          "case": "author-01",
+          "runs": 2,
+          "min": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "spread": 0.0
+        }
+      },
+      "by_case": {
+        "author-01": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 0.5,
+            "max": 1.0,
+            "mean": 0.75,
+            "spread": 0.5
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.9065,
+            "max": 0.9323,
+            "mean": 0.9194,
+            "spread": 0.0258
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "author-02": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.9271,
+            "max": 0.9271,
+            "mean": 0.9271,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "author-03": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.3752,
+            "max": 0.4142,
+            "mean": 0.3947,
+            "spread": 0.0389
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "author-04": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.9436,
+            "max": 0.9436,
+            "mean": 0.9436,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "author-05": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8729,
+            "max": 0.9049,
+            "mean": 0.8889,
+            "spread": 0.032
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "author-06": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.9058,
+            "max": 0.9058,
+            "mean": 0.9058,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "citing-01": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.866,
+            "max": 0.9373,
+            "mean": 0.9016,
+            "spread": 0.0713
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "citing-02": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.9303,
+            "max": 0.9303,
+            "mean": 0.9303,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "citing-03": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8953,
+            "max": 0.9052,
+            "mean": 0.9003,
+            "spread": 0.0099
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "citing-04": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.9135,
+            "max": 0.9179,
+            "mean": 0.9157,
+            "spread": 0.0044
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "citing-05": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8963,
+            "max": 0.8963,
+            "mean": 0.8963,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "citing-06": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.9308,
+            "max": 0.9308,
+            "mean": 0.9308,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "coauthor-01": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.7725,
+            "max": 0.775,
+            "mean": 0.7737,
+            "spread": 0.0025
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1667,
+            "max": 0.1667,
+            "mean": 0.1667,
+            "spread": 0.0
+          }
+        },
+        "coauthor-02": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8778,
+            "max": 0.885,
+            "mean": 0.8814,
+            "spread": 0.0072
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1667,
+            "max": 0.1667,
+            "mean": 0.1667,
+            "spread": 0.0
+          }
+        },
+        "coauthor-03": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8419,
+            "max": 0.8681,
+            "mean": 0.855,
+            "spread": 0.0262
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1667,
+            "max": 0.1667,
+            "mean": 0.1667,
+            "spread": 0.0
+          }
+        },
+        "coauthor-04": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.5375,
+            "max": 0.5631,
+            "mean": 0.5503,
+            "spread": 0.0257
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1667,
+            "max": 0.1667,
+            "mean": 0.1667,
+            "spread": 0.0
+          }
+        },
+        "coauthor-05": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.9188,
+            "max": 0.9278,
+            "mean": 0.9233,
+            "spread": 0.0091
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1429,
+            "max": 0.1429,
+            "mean": 0.1429,
+            "spread": 0.0
+          }
+        },
+        "coauthor-06": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8407,
+            "max": 0.8545,
+            "mean": 0.8476,
+            "spread": 0.0138
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.5,
+            "max": 0.5,
+            "mean": 0.5,
+            "spread": 0.0
+          }
+        },
+        "reference-01": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.6761,
+            "max": 0.6761,
+            "mean": 0.6761,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1667,
+            "max": 0.1667,
+            "mean": 0.1667,
+            "spread": 0.0
+          }
+        },
+        "reference-02": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.864,
+            "max": 0.868,
+            "mean": 0.866,
+            "spread": 0.004
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1667,
+            "max": 0.1667,
+            "mean": 0.1667,
+            "spread": 0.0
+          }
+        },
+        "reference-03": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.6963,
+            "max": 0.698,
+            "mean": 0.6972,
+            "spread": 0.0017
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1667,
+            "max": 0.1667,
+            "mean": 0.1667,
+            "spread": 0.0
+          }
+        },
+        "reference-04": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.7215,
+            "max": 0.7216,
+            "mean": 0.7216,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.0909,
+            "max": 0.0909,
+            "mean": 0.0909,
+            "spread": 0.0
+          }
+        },
+        "reference-05": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.7262,
+            "max": 0.7262,
+            "mean": 0.7262,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "reference-06": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.7513,
+            "max": 0.7513,
+            "mean": 0.7513,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 0.1667,
+            "max": 0.1667,
+            "mean": 0.1667,
+            "spread": 0.0
+          }
+        },
+        "topcited-01": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 0.75,
+            "max": 1.0,
+            "mean": 0.875,
+            "spread": 0.25
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8685,
+            "max": 0.8685,
+            "mean": 0.8685,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "topcited-02": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8256,
+            "max": 0.8256,
+            "mean": 0.8256,
+            "spread": 0.0
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "topcited-03": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8737,
+            "max": 0.8909,
+            "mean": 0.8823,
+            "spread": 0.0172
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "topcited-04": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.862,
+            "max": 0.8696,
+            "mean": 0.8658,
+            "spread": 0.0076
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "topcited-05": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8182,
+            "max": 0.8322,
+            "mean": 0.8252,
+            "spread": 0.014
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        },
+        "topcited-06": {
+          "faithfulness": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          },
+          "answer_relevancy": {
+            "runs": 2,
+            "min": 0.8545,
+            "max": 0.8588,
+            "mean": 0.8567,
+            "spread": 0.0042
+          },
+          "context_precision": {
+            "runs": 2,
+            "min": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "spread": 0.0
+          }
+        }
+      }
+    }
+  },
+  "reports": [
+    "reports\\ragas_study_full.json",
+    "reports\\ragas_study_full_rescore.json"
+  ]
+}
