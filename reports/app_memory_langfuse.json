@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-10-17T17:10:56.957479+00:00",
+  "label": "Langfuse 임포트 포함",
+  "platform": "win32",
+  "python": "3.12.13",
+  "imported": [
+    "langfuse",
+    "langfuse.langchain"
+  ],
+  "skipped_app": false,
+  "stages_mb": {
+    "interpreter": 17.2,
+    "imported:langfuse": 60.2,
+    "imported:langfuse.langchain": 77.9,
+    "chatbot_imported": 227.3,
+    "citation_graph_loaded": 270.5,
+    "global_pagerank": 270.5,
+    "vector_search": 271.7
+  },
+  "peak_mb": 271.7,
+  "extra_imports": {
+    "langfuse": {
+      "before": 17.2,
+      "after": 60.2,
+      "delta": 43.0
+    },
+    "langfuse.langchain": {
+      "before": 60.2,
+      "after": 77.9,
+      "delta": 17.7
+    }
+  },
+  "baseline_2026_10_14_mb": {
+    "interpreter": 19,
+    "chatbot_imported": 212,
+    "citation_graph_loaded": 257,
+    "global_pagerank": 257,
+    "vector_search": 259,
+    "personalized_pagerank": 259
+  },
+  "streamlit_guaranteed_mb": 690,
+  "headroom_mb": 418.3,
+  "note": "설치가 아니라 임포트가 메모리를 씁니다. `uv run --with <패키지>`로 돌리면 pyproject와 잠금 파일을 건드리지 않습니다. ROADMAP 8-1-1절과 같은 단계로 재서 비교합니다."
+}

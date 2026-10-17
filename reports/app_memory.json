@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-10-17T17:09:57.468583+00:00",
+  "label": "현재 앱 (2026-10-18, Langfuse 없음)",
+  "platform": "win32",
+  "python": "3.12.13",
+  "imported": [],
+  "skipped_app": false,
+  "stages_mb": {
+    "interpreter": 16.7,
+    "chatbot_imported": 221.4,
+    "citation_graph_loaded": 265.2,
+    "global_pagerank": 265.3,
+    "vector_search": 266.5
+  },
+  "peak_mb": 266.5,
+  "extra_imports": {},
+  "baseline_2026_10_14_mb": {
+    "interpreter": 19,
+    "chatbot_imported": 212,
+    "citation_graph_loaded": 257,
+    "global_pagerank": 257,
+    "vector_search": 259,
+    "personalized_pagerank": 259
+  },
+  "streamlit_guaranteed_mb": 690,
+  "headroom_mb": 423.5,
+  "note": "설치가 아니라 임포트가 메모리를 씁니다. `uv run --with <패키지>`로 돌리면 pyproject와 잠금 파일을 건드리지 않습니다. ROADMAP 8-1-1절과 같은 단계로 재서 비교합니다."
+}
