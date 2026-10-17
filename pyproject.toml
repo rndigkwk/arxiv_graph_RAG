@@ -44,7 +44,13 @@ notebooks = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.3", "ruff>=0.12", "tiktoken>=0.14,<1"]
+dev = [
+    "langchain-community<0.4",
+    "pytest>=8.3",
+    "ragas==0.4.3",
+    "ruff>=0.12",
+    "tiktoken>=0.14,<1",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

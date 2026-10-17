@@ -1,0 +1,163 @@
+{
+  "generated_at": "2026-10-17T11:53:28.915552+00:00",
+  "label": "가족별 5건, 조회문 포함 문맥",
+  "source_report": "reports\\ragas_input_families.json",
+  "summary": {
+    "cases_scored": 5,
+    "cases_skipped": 0,
+    "skipped": [],
+    "judge_model": "gpt-6-luna",
+    "metrics": {
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.6995,
+      "context_precision": 0.8286,
+      "context_relevance": 1.0
+    },
+    "metric_errors": {},
+    "diagnosis": {
+      "retrieval_side": {
+        "context_precision": 0.8286,
+        "context_relevance": 1.0
+      },
+      "generation_side": {
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.6995
+      },
+      "exact_retrieval": {
+        "recall_at_k": 0.8,
+        "hit_at_k": 0.8,
+        "answer_evidence_recall": 1.0
+      },
+      "reading": "검색 쪽이 낮고 생성 쪽이 높으면 검색기를, 반대면 생성기를 고칩니다. `exact_retrieval`은 골드 ID로 정확히 센 값이므로 LLM 추정과 어긋나면 지표가 아니라 판정 모델을 의심합니다."
+    },
+    "by_family": {
+      "author": {
+        "cases": 1,
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.3458,
+        "context_precision": 1.0,
+        "context_relevance": 1.0
+      },
+      "citing": {
+        "cases": 1,
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8729,
+        "context_precision": 1.0,
+        "context_relevance": 1.0
+      },
+      "coauthor": {
+        "cases": 1,
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.7391,
+        "context_precision": 1.0,
+        "context_relevance": 1.0
+      },
+      "reference": {
+        "cases": 1,
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.6712,
+        "context_precision": 0.1429,
+        "context_relevance": 1.0
+      },
+      "topcited": {
+        "cases": 1,
+        "faithfulness": 1.0,
+        "answer_relevancy": 0.8685,
+        "context_precision": 1.0,
+        "context_relevance": 1.0
+      }
+    },
+    "not_measured": {
+      "context_recall": "정답 답변을 주장으로 쪼개 세는 지표입니다. 우리는 골드 ID로 recall_at_k를 정확히 세므로 LLM 추정으로 바꾸면 더 나쁜 측정이 됩니다.",
+      "answer_correctness": "정답 답변이 필요합니다. 우리 골드는 ID 목록이고 답변 원문 작성은 사람 몫입니다."
+    }
+  },
+  "results": [
+    {
+      "id": "author-01",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Yuquan Deng?",
+      "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2508.07917 | MolmoAct: Action Reasoning Models that can Reason in Space | cs.RO |\n| 2502.13130 | Magma: A Foundation Model for Multimodal AI Agents | cs.CV |",
+      "contexts": [
+        "Cypher: MATCH (a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE toLower(a.name) = \"yuquan deng\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25\nanswer_value=2508.07917 | evidence_ids=['2508.07917'] | title=MolmoAct: Action Reasoning Models that can Reason in Space | primary_category=cs.RO\nanswer_value=2502.13130 | evidence_ids=['2502.13130'] | title=Magma: A Foundation Model for Multimodal AI Agents | primary_category=cs.CV"
+      ],
+      "recall_at_k": 1.0,
+      "hit_at_k": 1.0,
+      "answer_evidence_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.3458269207061455,
+      "context_precision": 0.9999999999,
+      "context_relevance": 1.0
+    },
+    {
+      "id": "citing-01",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled The Alignment Problem from a Deep Learning Perspective?",
+      "answer": "The collection contains five papers that cite *The Alignment Problem from a Deep Learning Perspective*:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2607.03478 | Demonstrating Generalization Failures via Mixtures of Conditional Policies | cs.AI |\n| 2608.10209 | Evaluation-Conditioned Training: Teaching Models to Generalize to Stronger Oversight Regimes | cs.AI |\n| 2507.08249 | Giving AI Agents Access to Cryptocurrency and Smart Contracts Creates New Vectors of AI Harm | cs.AI |\n| 2606.16914 | Greed Is Learned: Visible Incentives as Reward-Hacking Triggers | cs.AI |\n| 2606.22495 | Grounded Scaling: Why Agentic AI Needs Deterministic Environments | cs.AI |",
+      "contexts": [
+        "Cypher: MATCH (citing:ArxivPaper)-[:REFERENCES]->(p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"the alignment problem from a deep learning perspective\" RETURN citing.arxiv_id AS answer_value, [citing.arxiv_id] AS evidence_ids, citing.title AS title, citing.primary_category AS primary_category ORDER BY title LIMIT 25\nanswer_value=2607.03478 | evidence_ids=['2607.03478'] | title=Demonstrating Generalization Failures via Mixtures of Conditional Policies | primary_category=cs.AI\nanswer_value=2608.10209 | evidence_ids=['2608.10209'] | title=Evaluation-Conditioned Training: Teaching Models to Generalize to Stronger Oversight Regimes | primary_category=cs.AI\nanswer_value=2507.08249 | evidence_ids=['2507.08249'] | title=Giving AI Agents Access to Cryptocurrency and Smart Contracts Creates New Vectors of AI Harm | primary_category=cs.AI\nanswer_value=2606.16914 | evidence_ids=['2606.16914'] | title=Greed Is Learned: Visible Incentives as Reward-Hacking Triggers | primary_category=cs.AI\nanswer_value=2606.22495 | evidence_ids=['2606.22495'] | title=Grounded Scaling: Why Agentic AI Needs Deterministic Environments | primary_category=cs.AI"
+      ],
+      "recall_at_k": 1.0,
+      "hit_at_k": 1.0,
+      "answer_evidence_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8729273821552098,
+      "context_precision": 0.9999999999,
+      "context_relevance": 1.0
+    },
+    {
+      "id": "reference-01",
+      "family": "reference",
+      "question": "Among the papers cited by PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation, which ones have primary category cs.CV?",
+      "answer": "The cited papers with primary category **cs.CV** are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2412.19663 | CAD-GPT: Synthesising CAD Construction Sequence with Spatial Reasoning-Enhanced Multimodal LLMs | cs.CV |\n| 2105.09492 | DeepCAD: A Deep Generative Network for Computer-Aided Design Models | cs.CV |\n| 2603.04337 | Pointer-CAD: Unifying B-Rep and Command Sequences via Pointer-based Edges & Faces Selection | cs.CV |",
+      "contexts": [
+        "Open3DBench: Open-Source Benchmark for 3D-IC Backend Implementation and PPA Evaluation\nThis work introduces Open3DBench, an open-source 3D-IC backend implementation benchmark built upon the OpenROAD-flow-scripts framework, enabling comprehensive evaluation of power, performance, area, and thermal metrics. Our proposed flow supports modular integration of 3D partitioning, placement, 3D routing, RC extraction, and thermal simulation, aligning with advanced 3D flows that rely on commercial tools and in-house scripts. We present two foundational 3D placement algorithms: Open3D-Tiling, which emphasizes regular macro placement, and Open3D-DMP, which enhances wirelength optimization through cross-die co-placement with analytical placer DREAMPlace. Experimental results show significant improvements in area (51.19%), wirelength (24.06%), timing (30.84%), and power (5.72%) compared to 2D flows. The results also highlight that better wirelength does not necessarily lead to PPA gain, emphasizing the need of developing PPA-driven methods. Open3DBench offers a standardized, reproducible platform for evaluating 3D EDA methods, effectively bridging the gap between open-source tools and commercial solutions in 3D-IC design.",
+        "Bridging the Last Mile of Circuit Design: PostEDA-Bench, a Hierarchical Benchmark for PPA Convergence and DRC Fixing\nLLM-based agents are increasingly applied to the \"last mile\" of Electronic Design Automation (EDA): repairing residual sign-off Design Rule Check (DRC) violations and converging Power-Performance-Area (PPA) targets after tool runs. Existing EDA-LLM benchmarks, however, omit DRC fixing entirely and rely on flat hierarchies tied to a single toolchain. We introduce PostEDA-Bench, a hierarchical benchmark with 145 tasks across DRC-Essential, DRC-Reasoning, PPA-Mono, and PPA-Multi, supported by EDA toolchains with machine-checkable evaluation. Across eight commercial and open-source LLMs under multiple agent scaffolds, we find that agents handle synthetic DRC-Essential and single-objective PPA-Mono reasonably well but degrade sharply on the more practical DRC-Reasoning, where the best success rate is 36.66%, and PPA-Multi, where the best success rate is 20.00%; vision augmentation consistently enhances DRC-Bench; and trade-off reasoning, rather than knob knowledge, is the dominant PPA-Multi bottleneck.",
+        "CADEngBench: It Looks Like CAD, but Does It Work? Evaluating Parametric Design, Assembly Reasoning, and Physics Simulation\nA CAD model is not engineering-grade merely because it looks correct. It must satisfy design requirements, respond predictably to parameter changes, support controlled edits, match a reference structural response under a declared analysis, and connect to other parts through valid joints. We present CADEngBench, a two-track benchmark for these capabilities. CADEngBench-P evaluates 300 parametric parts, each used for one zero-to-CAD task and one functional-editing task (600 tasks in total), through boundary-representation (B-Rep) validity, engineering and DFM checks, parameter-family perturbations, functional editing, and matched linear-static FEA in CalculiX. CADEngBench-A evaluates 150 body pairs through ranked joint retrieval, exact face-and-edge grounding, joint-frame prediction, and kinematic verification. Across eight multimodal, code-capable models, editing supplied CAD is substantially easier than generating it, while complex edits and matched FEA remain difficult. Assembly predictions often locate the relevant region but fail to recover the recorded joint or mating entities. These results show that CAD evaluation must test engineering behavior rather than appearance alone.",
+        "CktGNN: Circuit Graph Neural Network for Electronic Design Automation\nThe electronic design automation of analog circuits has been a longstanding challenge in the integrated circuit field due to the huge design space and complex design trade-offs among circuit specifications. In the past decades, intensive research efforts have mostly been paid to automate the transistor sizing with a given circuit topology. By recognizing the graph nature of circuits, this paper presents a Circuit Graph Neural Network (CktGNN) that simultaneously automates the circuit topology generation and device sizing based on the encoder-dependent optimization subroutines. Particularly, CktGNN encodes circuit graphs using a two-level GNN framework (of nested GNN) where circuits are represented as combinations of subgraphs in a known subgraph basis. In this way, it significantly improves design efficiency by reducing the number of subgraphs to perform message passing. Nonetheless, another critical roadblock to advancing learning-assisted circuit design automation is a lack of public benchmarks to perform canonical assessment and reproducible research. To tackle the challenge, we introduce Open Circuit Benchmark (OCB), an open-sourced dataset that contains $10$K distinct operational amplifiers with carefully-extracted circuit specifications. OCB is also equipped with communicative circuit generation and evaluation capabilities such that it can help to generalize CktGNN to design various analog circuits by producing corresponding datasets. Experiments on OCB show the extraordinary advantages of CktGNN through representation-based optimization frameworks over other recent powerful GNN baselines and human experts' manual designs. Our work paves the way toward a learning-based open-sourced design automation for analog circuits. Our source code is available at \\url{https://github.com/zehao-dong/CktGNN}.",
+        "AnalogGym: An Open and Practical Testing Suite for Analog Circuit Synthesis\nRecent advances in machine learning (ML) for automating analog circuit synthesis have been significant, yet challenges remain. A critical gap is the lack of a standardized evaluation framework, compounded by various process design kits (PDKs), simulation tools, and a limited variety of circuit topologies. These factors hinder direct comparisons and the validation of algorithms. To address these shortcomings, we introduced AnalogGym, an open-source testing suite designed to provide fair and comprehensive evaluations. AnalogGym includes 30 circuit topologies in five categories: sensing front ends, voltage references, low dropout regulators, amplifiers, and phase-locked loops. It supports several technology nodes for academic and commercial applications and is compatible with commercial simulators such as Cadence Spectre, Synopsys HSPICE, and the open-source simulator Ngspice. AnalogGym standardizes the assessment of ML algorithms in analog circuit synthesis and promotes reproducibility with its open datasets and detailed benchmark specifications. AnalogGym's user-friendly design allows researchers to easily adapt it for robust, transparent comparisons of state-of-the-art methods, while also exposing them to real-world industrial design challenges, enhancing the practical relevance of their work. Additionally, we have conducted a comprehensive comparison study of various analog sizing methods on AnalogGym, highlighting the capabilities and advantages of different approaches. AnalogGym is available in the GitHub repository https://github.com/CODA-Team/AnalogGym. The documentation is also available at http://coda-team.github.io/AnalogGym/.",
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"pcbworld\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25\nanswer_value=2607.05915 | evidence_ids=['2607.05915'] | title=PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation | primary_category=cs.AI",
+        "Cypher: MATCH (p:ArxivPaper)-[:REFERENCES]->(q:ArxivPaper) WHERE p.arxiv_id = \"2607.05915\" AND q.primary_category = \"cs.CV\" RETURN q.arxiv_id AS answer_value, [q.arxiv_id] AS evidence_ids, q.title AS title, q.primary_category AS primary_category ORDER BY q.title LIMIT 25\nanswer_value=2412.19663 | evidence_ids=['2412.19663'] | title=CAD-GPT: Synthesising CAD Construction Sequence with Spatial Reasoning-Enhanced Multimodal LLMs | primary_category=cs.CV\nanswer_value=2105.09492 | evidence_ids=['2105.09492'] | title=DeepCAD: A Deep Generative Network for Computer-Aided Design Models | primary_category=cs.CV\nanswer_value=2603.04337 | evidence_ids=['2603.04337'] | title=Pointer-CAD: Unifying B-Rep and Command Sequences via Pointer-based Edges & Faces Selection | primary_category=cs.CV"
+      ],
+      "recall_at_k": 0.0,
+      "hit_at_k": 0.0,
+      "answer_evidence_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.6711939242971304,
+      "context_precision": 0.14285714284285714,
+      "context_relevance": 1.0
+    },
+    {
+      "id": "coauthor-01",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Fuzzy K-Means Clustering without Cluster Centroids?",
+      "answer": "The collection shows four other papers sharing the author name Han Lu with *Fuzzy K-Means Clustering without Cluster Centroids*:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 2303.14382 | Active Finetuning: Exploiting Annotation Budget in the Pretraining-Finetuning Paradigm | cs.CV | Han Lu |\n| 2510.01656 | Asymmetric Proximal Policy Optimization: mini-critics boost LLM reasoning | cs.LG | Han Lu |\n| 2403.05530 | Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context | cs.CL | Han Lu |\n| 2510.11345 | Part II: ROLL Flash -- Accelerating RLVR and Agentic Training with Asynchrony | cs.LG | Han Lu |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"fuzzy k-means clustering without cluster centroids\" MATCH (a:ArxivAuthorName)-[:AUTHORED]->(p) MATCH (a)-[:AUTHORED]->(q:ArxivPaper) WHERE q <> p RETURN p.title AS seed_title, p.arxiv_id AS seed_id, a.name AS shared_author, q.title AS answer_value, q.arxiv_id AS qid, q.primary_category AS primary_category, [q.arxiv_id] AS evidence_ids ORDER BY shared_author, answer_value LIMIT 25\nseed_title=Fuzzy K-Means Clustering without Cluster Centroids | seed_id=2404.04940 | shared_author=Han Lu | answer_value=Active Finetuning: Exploiting Annotation Budget in the Pretraining-Finetuning Paradigm | qid=2303.14382 | primary_category=cs.CV | evidence_ids=['2303.14382']\nseed_title=Fuzzy K-Means Clustering without Cluster Centroids | seed_id=2404.04940 | shared_author=Han Lu | answer_value=Asymmetric Proximal Policy Optimization: mini-critics boost LLM reasoning | qid=2510.01656 | primary_category=cs.LG | evidence_ids=['2510.01656']\nseed_title=Fuzzy K-Means Clustering without Cluster Centroids | seed_id=2404.04940 | shared_author=Han Lu | answer_value=Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context | qid=2403.05530 | primary_category=cs.CL | evidence_ids=['2403.05530']\nseed_title=Fuzzy K-Means Clustering without Cluster Centroids | seed_id=2404.04940 | shared_author=Han Lu | answer_value=Part II: ROLL Flash -- Accelerating RLVR and Agentic Training with Asynchrony | qid=2510.11345 | primary_category=cs.LG | evidence_ids=['2510.11345']"
+      ],
+      "recall_at_k": 1.0,
+      "hit_at_k": 1.0,
+      "answer_evidence_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.7390718451120538,
+      "context_precision": 0.9999999999,
+      "context_relevance": 1.0
+    },
+    {
+      "id": "topcited-01",
+      "family": "topcited",
+      "question": "Within primary category cs.CL, which 3 papers are cited most often by other papers in this collection?",
+      "answer": "The three most-cited papers in primary category cs.CL are:\n\n| arXiv ID | Title | Primary category | Citations |\n|---|---|---|---:|\n| 2210.03629 | ReAct: Synergizing Reasoning and Acting in Language Models | cs.CL | 480 |\n| 2402.03300 | DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models | cs.CL | 239 |\n| 2302.04761 | Toolformer: Language Models Can Teach Themselves to Use Tools | cs.CL | 228 |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE p.primary_category = \"cs.CL\" WITH p, COUNT { (p)<-[:REFERENCES]-() } AS citation_count RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, citation_count AS citation_count ORDER BY citation_count DESC LIMIT 3\nanswer_value=2210.03629 | evidence_ids=['2210.03629'] | title=ReAct: Synergizing Reasoning and Acting in Language Models | citation_count=480\nanswer_value=2402.03300 | evidence_ids=['2402.03300'] | title=DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models | citation_count=239\nanswer_value=2302.04761 | evidence_ids=['2302.04761'] | title=Toolformer: Language Models Can Teach Themselves to Use Tools | citation_count=228"
+      ],
+      "recall_at_k": 1.0,
+      "hit_at_k": 1.0,
+      "answer_evidence_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_relevancy": 0.8684712115273031,
+      "context_precision": 0.9999999999,
+      "context_relevance": 1.0
+    }
+  ]
+}

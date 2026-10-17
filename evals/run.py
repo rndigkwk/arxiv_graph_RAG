@@ -17,6 +17,68 @@ from evals.telemetry import (
     summarize_latency,
 )
 
+MAX_CONTEXT_ROWS = 50
+
+
+def generator_contexts(response: dict[str, Any]) -> list[str]:
+    """What the answer generator actually saw, as one string per retrieval call.
+
+    RAGAS의 Faithfulness·Context Precision은 **생성기가 본 문맥**을 입력으로 받습니다. 그래서
+    논문 ID만으로 초록을 되찾아 문맥이라고 넘기면 안 됩니다 — 그래프 조건 질문에서 모델이 본
+    것은 초록이 아니라 Cypher가 돌려준 행입니다.
+
+    **조회문을 행과 같은 문맥에 담습니다.** 행만 넘겼을 때 `citing-01`의 faithfulness가 0.0으로
+    나왔습니다. 답변은 정확했고(근거 recall 1.000) 제목·분류도 행과 일치했는데, 답변의 핵심
+    주장인 "이 논문들이 X를 **인용한다**"가 행에는 없었습니다. 관계는 행이 아니라 **조회문**에
+    적혀 있기 때문입니다. 그것을 빼고 재면 모델이 아니라 우리 입력 실수를 재게 됩니다.
+
+    한 조회를 한 문맥으로 묶는 이유도 같습니다. "이 질의가 이 행들을 돌려줬다"가 근거의 한
+    단위이고, 그렇게 묶어야 Context Precision이 "쓸모 있는 근거가 위에 있는가"를 잽니다.
+    """
+    contexts = []
+    calls = [
+        call for call in response.get("tool_calls", [])
+        if call.get("status") == "success" and isinstance(call.get("output"), dict)
+    ]
+    for call in calls:
+        output = call["output"]
+        if call["name"] == "search_graph" and not output.get("error"):
+            rows = output.get("rows", [])
+            rendered = [
+                " | ".join(
+                    f"{key}={value}" for key, value in row.items() if value not in (None, [], "")
+                )
+                for row in rows[:MAX_CONTEXT_ROWS]
+            ]
+            parts = [f"Cypher: {' '.join((output.get('cypher') or '').split())}"]
+            parts.extend(line for line in rendered if line)
+            if len(rows) > MAX_CONTEXT_ROWS:
+                parts.append(f"... ({len(rows) - MAX_CONTEXT_ROWS} more rows)")
+            contexts.append("\n".join(parts))
+        elif call["name"] == "search_papers":
+            for paper in output.get("papers", []):
+                title = (paper.get("title") or "").strip()
+                abstract = (paper.get("abstract") or "").strip()
+                if title or abstract:
+                    contexts.append(f"{title}\n{abstract}".strip())
+    if contexts:
+        # 같은 근거가 여러 호출에서 나오면 한 번만 남깁니다. 중복은 정밀도를 부풀립니다.
+        return list(dict.fromkeys(contexts))
+
+    # 도구 호출 기록이 없는 경로(옛 보고서·단위 테스트)에서는 모아 둔 행과 논문을 씁니다.
+    for row in response.get("rows", []):
+        rendered = " | ".join(
+            f"{key}={value}" for key, value in row.items() if value not in (None, [], "")
+        )
+        if rendered:
+            contexts.append(rendered)
+    for paper in response.get("papers", []):
+        title = (paper.get("title") or "").strip()
+        abstract = (paper.get("abstract") or "").strip()
+        if title or abstract:
+            contexts.append(f"{title}\n{abstract}".strip())
+    return list(dict.fromkeys(contexts))
+
 
 def evaluate_case(
     case: dict[str, Any], response: dict[str, Any], *, mode: str, top_k: int
@@ -46,6 +108,7 @@ def evaluate_case(
         row["related_ids"] = related_ids
         row["evidence_ids"] = evidence
         row["answer"] = response.get("answer", "")
+        row["contexts"] = generator_contexts(response)
     return row
 
 

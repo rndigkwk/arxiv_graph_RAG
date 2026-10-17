@@ -65,3 +65,4 @@
 | [ADR-018](ADR-018-prompt-versioning.md) | 프롬프트 본문은 한 모듈에 모으고 버전은 MLflow에 남긴다 | 채택 |
 | [ADR-019](ADR-019-validate-evidence-alias-at-the-tool.md) | 근거 별칭은 도구 경계에서 검사한다 | 채택 |
 | [ADR-020](ADR-020-judge-called-once.md) | 심판은 질문당 한 번만 부른다 | 채택 |
+| [ADR-021](ADR-021-ragas-four-of-six.md) | RAGAS 지표는 여섯 중 넷만 쓰고 둘은 게이트에 넣지 않는다 | 채택 |
