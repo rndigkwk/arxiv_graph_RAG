@@ -492,7 +492,10 @@ def test_the_stable_family_list_comes_from_the_baseline_not_the_code():
     """어느 가족이 안정적인지는 측정으로 정해진 값입니다. 데이터가 바뀌면 다시 재야 합니다."""
     baseline = load(BASELINE)
 
-    assert baseline["ragas_stable_families"] == ["author", "citing", "topcited"]
+    # 2026-10-18에 citing을 뺐습니다. citing-06(4회차)과 citing-02(5회차)가 0.1667로 무너져
+    # 변동폭이 0.0000 -> 0.0463 -> 0.0926으로 계속 넓어졌습니다. author·topcited는 5회 전부
+    # 1.0000입니다. **다시 좁히지 않습니다** - 또 무너지면 지표를 게이트에서 뺍니다.
+    assert baseline["ragas_stable_families"] == ["author", "topcited"]
     report = _ragas_report([{"family": "author", "context_precision": 1.0}])
     assert RAGAS_STABLE_PRECISION not in ragas_metrics(report, ())
 
@@ -691,3 +694,17 @@ def test_a_catastrophic_ragas_drop_still_fails():
     broken = {v.rule for v in check(baseline, report)}
 
     assert "floor" in broken
+
+
+def test_the_family_set_is_not_narrowed_a_third_time():
+    """하한을 관측에 맞춰 반복해 내리면 게이트가 장식이 됩니다.
+
+    가족 집합은 한 번(3개 -> 2개) 좁혔고, 그 약속을 기준선의 근거에 적어 뒀습니다. 이 테스트는
+    약속이 문서에서 사라지지 않게 고정합니다.
+    """
+    baseline = load(BASELINE)
+    rationale = baseline["floor_rationale"]["ragas_context_precision_stable_families"]
+
+    assert "다시 좁히지 않습니다" in rationale
+    assert "게이트에서 뺍니다" in rationale
+    assert len(baseline["ragas_stable_families"]) == 2
