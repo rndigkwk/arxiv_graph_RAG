@@ -516,8 +516,15 @@ def test_a_ragas_regression_trips_the_floor():
     assert any(RAGAS_FAITHFULNESS in str(v) for v in broken), broken
 
 
-def test_one_collapsed_case_in_a_stable_family_trips_the_floor():
-    """18사례가 3회 전부 1.0000입니다. 한 건이 무너지면 평균이 0.0556 내려갑니다."""
+def test_one_collapsed_case_in_a_stable_family_does_not_trip_the_floor():
+    """이 단정은 2026-10-18에 뒤집혔습니다.
+
+    3회 관측에서 안정 세 가족이 전부 1.0000이어서 "한 건이 무너지면 걸린다"로 하한을 0.95에
+    뒀습니다. 4회차에서 `citing-06`이 0.1667로 무너져 0.9537이 됐고, 하한까지 여유가 0.0037뿐
+    이었습니다. 변동폭 0은 3회의 착시였습니다.
+
+    그래서 하한은 **파국만** 잡습니다. 한 건의 뒤집힘으로 터지면, 터지는 게이트는 꺼집니다.
+    """
     baseline = load(BASELINE)
     report = {
         "metrics": {**baseline["metrics"], RAGAS_STABLE_PRECISION: 1.0 - 1 / 18},
@@ -526,9 +533,14 @@ def test_one_collapsed_case_in_a_stable_family_trips_the_floor():
             for case_id in baseline["case_ids"]
         },
         "scoring_errors": 0,
+        "ragas_judge_model": baseline["ragas_judge_model"],
     }
     broken = [v for v in check(baseline, report) if v.rule == "floor"]
 
+    assert not any(RAGAS_STABLE_PRECISION in str(v) for v in broken), broken
+    # 그래도 여러 건이 무너지면 걸립니다.
+    report["metrics"][RAGAS_STABLE_PRECISION] = 1.0 - 4 / 18
+    broken = [v for v in check(baseline, report) if v.rule == "floor"]
     assert any(RAGAS_STABLE_PRECISION in str(v) for v in broken), broken
 
 
@@ -640,3 +652,42 @@ def test_runs_scored_by_different_judges_cannot_be_merged_into_one_baseline():
 
     # 비워 두면 게이트가 불일치로 막습니다. 아무 하나를 골라 적지 않습니다.
     assert merge(runs)["ragas_judge_model"] == ""
+
+
+def test_the_ragas_floors_catch_a_catastrophe_not_a_single_case_flip():
+    """사례별 판정이 같은 답변에서도 0과 1을 왕복하므로 작은 회귀는 구별할 수 없습니다.
+
+    하한의 일은 파국을 잡는 것입니다. 심은 결함에서 faithfulness가 0.0000~0.6100이었고
+    (11-10절), 정상 실행은 4회 관측 0.9000~0.9833입니다. 하한이 그 사이에 있어야 합니다.
+    """
+    baseline = load(BASELINE)
+    floor = baseline["absolute_floor"][RAGAS_FAITHFULNESS]
+
+    # 심은 결함 최악(0.0000)과 ID 바꿔치기(0.6100)보다 위
+    assert floor > 0.6100
+    # 관측 최소(0.9000)보다 아래. 사례 몇 건이 뒤집혀도 터지지 않아야 합니다.
+    assert floor < 0.9000
+    # 0점 사례가 몇 건까지 허용되는지를 수치로 고정합니다(1건 = 1/30).
+    allowed_zero_cases = int(round((1.0 - floor) * 30))
+    assert allowed_zero_cases == 6, allowed_zero_cases
+
+
+def test_a_catastrophic_ragas_drop_still_fails():
+    baseline = load(BASELINE)
+    report = {
+        "metrics": {
+            **baseline["metrics"],
+            # 11-10절에서 모순·주제 이탈 답변이 받은 값입니다.
+            RAGAS_FAITHFULNESS: 0.0,
+            RAGAS_STABLE_PRECISION: 0.0,
+        },
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["case_ids"]
+        },
+        "scoring_errors": 0,
+        "ragas_judge_model": baseline["ragas_judge_model"],
+    }
+    broken = {v.rule for v in check(baseline, report)}
+
+    assert "floor" in broken
