@@ -87,6 +87,11 @@ RAGAS_FAITHFULNESS = "ragas_faithfulness"
 RAGAS_STABLE_PRECISION = "ragas_context_precision_stable_families"
 
 
+def ragas_judge(report: dict[str, Any]) -> str:
+    """Which model scored this RAGAS report."""
+    return report.get("summary", {}).get("judge_model", "")
+
+
 def ragas_metrics(report: dict[str, Any], stable_families: Sequence[str]) -> dict[str, float]:
     """Reduce a RAGAS study report to the two numbers the gate watches.
 
@@ -154,6 +159,8 @@ def normalize(report: dict[str, Any]) -> dict[str, Any]:
         "cases": cases,
         # 채점 함수가 죽은 건수입니다. 에이전트 실패와 다릅니다 — 모듈 설명 참고.
         "scoring_errors": int(report.get("scoring_errors", 0)),
+        # 보고서가 적어 두었으면 그대로 들고 옵니다. `--ragas`로 주면 그쪽이 덮습니다.
+        "ragas_judge_model": report.get("ragas_judge_model", ""),
     }
 
 
@@ -163,6 +170,7 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
         single = dict(reports[0])
         single["runs"] = 1
         single["observed_spread"] = None
+        single.setdefault("ragas_judge_model", reports[0].get("ragas_judge_model", ""))
         return single
     keys = sorted(set().union(*(set(report["metrics"]) for report in reports)))
     metrics, spread = {}, {}
@@ -176,6 +184,9 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
     merged["observed_spread"] = spread
     # 사례는 모든 실행에서 같은 결과를 낸 것만 "그 결과였다"고 말할 수 있습니다. 마지막
     # 실행의 사례만 들고 오면, 한 번 멈춘 사례가 다음 기준선에서 안정으로 등록됩니다.
+    judges = {run.get("ragas_judge_model") for run in reports if run.get("ragas_judge_model")}
+    # 실행마다 판정 모델이 다르면 하나로 적을 수 없습니다. 비워 두면 게이트가 불일치로 막습니다.
+    merged["ragas_judge_model"] = judges.pop() if len(judges) == 1 else ""
     merged["cases"] = {
         case_id: {
             "failed": any(report["cases"].get(case_id, {}).get("failed") for report in reports),
@@ -202,6 +213,7 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
 # 조용히 사라졌고, 그러면 smoke가 "사례가 25건 빠졌다"로 거짓 실패합니다.
 CARRIED_OVER = (
     "splits",
+    "ragas_judge_model",
     "split_rationale",
     "floor_rationale",
     "metrics_split",
@@ -287,6 +299,19 @@ def check(
         violations.append(Violation("cases", f"기준선에 있던 사례가 빠졌습니다: {missing}"))
     if added := sorted(actual - expected):
         violations.append(Violation("cases", f"기준선에 없는 사례가 들어왔습니다: {added}"))
+
+    # 판정 모델이 바뀌면 RAGAS 점수를 같은 표에 올릴 수 없습니다. 2026-10-17에 CI가
+    # `OPENAI_MODEL`을 넘기지 않아 기준선과 다른 모델로 채점한 값을 비교했습니다.
+    # 모수가 다르면 비교하지 않는다는 `metrics_split`과 같은 규칙입니다.
+    expected_judge = baseline.get("ragas_judge_model")
+    if aggregates and expected_judge:
+        actual_judge = report.get("ragas_judge_model") or ""
+        if actual_judge != expected_judge:
+            violations.append(Violation(
+                "judge_model",
+                f"RAGAS 판정 모델이 기준선과 다릅니다: 기준선 {expected_judge!r}, "
+                f"이번 {actual_judge or '(기록 없음)'!r}",
+            ))
 
     if report["scoring_errors"]:
         violations.append(
@@ -422,9 +447,9 @@ def main() -> int:
         if len(args.ragas) != len(normalized):
             parser.error("--ragas 개수가 --report 개수와 같아야 합니다(실행끼리 짝지어야 합니다).")
         for run, path in zip(normalized, args.ragas, strict=True):
-            run["metrics"].update(
-                ragas_metrics(json.loads(path.read_text(encoding="utf-8")), stable)
-            )
+            ragas_report = json.loads(path.read_text(encoding="utf-8"))
+            run["metrics"].update(ragas_metrics(ragas_report, stable))
+            run["ragas_judge_model"] = ragas_judge(ragas_report)
     merged = merge(normalized)
 
     if args.write_baseline:

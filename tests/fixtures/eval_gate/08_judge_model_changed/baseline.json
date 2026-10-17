@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-10-17T00:00:00+00:00",
+  "note": "게이트 규칙이 제대로 실패하는지 확인하는 가짜 기준선입니다.",
+  "source": {
+    "mode": "compare",
+    "dataset": "fixture.json",
+    "runs": 3,
+    "git_sha": null,
+    "observed_spread": null
+  },
+  "primary_metric": "answer_evidence_recall",
+  "metrics_split": "full",
+  "metrics": {
+    "answer_evidence_recall": 1.0
+  },
+  "absolute_floor": {
+    "answer_evidence_recall": 0.6
+  },
+  "allowed_drop": null,
+  "case_ids": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "stable_cases": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "ragas_judge_model": "gpt-6-luna"
+}

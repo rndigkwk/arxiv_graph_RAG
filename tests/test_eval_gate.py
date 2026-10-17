@@ -31,7 +31,7 @@ from evals.gate import (
 )
 
 FIXTURES = sorted((Path(__file__).parent / "fixtures" / "eval_gate").iterdir())
-RULES = ("cases", "scoring_error", "floor", "drop", "stable_case")
+RULES = ("cases", "scoring_error", "floor", "drop", "stable_case", "judge_model")
 
 
 def load(path: Path) -> dict:
@@ -576,3 +576,67 @@ def test_no_drop_or_per_case_rule_is_attached_to_the_ragas_metrics():
     for name in (RAGAS_FAITHFULNESS, RAGAS_STABLE_PRECISION):
         assert name in baseline["absolute_floor"]
         assert name not in (baseline["allowed_drop"] or {})
+
+
+def test_a_report_scored_by_another_judge_is_not_compared():
+    """2026-10-17에 CI가 OPENAI_MODEL을 넘기지 않아 기준선과 다른 모델로 채점했습니다.
+
+    그 값을 같은 표에 올려놓고 비교했습니다. 모수가 다르면 비교하지 않는다는 `metrics_split`과
+    같은 규칙이고, 그래서 게이트가 막습니다.
+    """
+    baseline = load(BASELINE)
+    report = {
+        "metrics": dict(baseline["metrics"]),
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["case_ids"]
+        },
+        "scoring_errors": 0,
+        "ragas_judge_model": "gpt-4o-mini",
+    }
+    broken = [v for v in check(baseline, report) if v.rule == "judge_model"]
+
+    assert broken and "gpt-6-luna" in str(broken[0])
+
+
+def test_the_matching_judge_passes():
+    baseline = load(BASELINE)
+    report = {
+        "metrics": dict(baseline["metrics"]),
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["case_ids"]
+        },
+        "scoring_errors": 0,
+        "ragas_judge_model": baseline["ragas_judge_model"],
+    }
+
+    assert not [v for v in check(baseline, report) if v.rule == "judge_model"]
+
+
+def test_the_smoke_split_does_not_check_the_judge():
+    """smoke는 RAGAS를 돌리지 않습니다. 판정 모델을 요구하면 매 PR이 터집니다."""
+    baseline = load(BASELINE)
+    report = {
+        "metrics": {},
+        "cases": {
+            case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+            for case_id in baseline["splits"]["smoke"]
+        },
+        "scoring_errors": 0,
+    }
+
+    assert not [v for v in check(baseline, report, split="smoke") if v.rule == "judge_model"]
+
+
+def test_runs_scored_by_different_judges_cannot_be_merged_into_one_baseline():
+    """여러 실행을 합칠 때 판정 모델이 섞이면 하나로 적을 수 없습니다."""
+    from evals.gate import merge
+
+    runs = [
+        {"metrics": {"a": 1.0}, "cases": {}, "ragas_judge_model": "gpt-6-luna"},
+        {"metrics": {"a": 1.0}, "cases": {}, "ragas_judge_model": "gpt-4o-mini"},
+    ]
+
+    # 비워 두면 게이트가 불일치로 막습니다. 아무 하나를 골라 적지 않습니다.
+    assert merge(runs)["ragas_judge_model"] == ""

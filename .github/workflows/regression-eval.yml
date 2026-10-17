@@ -55,6 +55,9 @@ jobs:
     timeout-minutes: 75
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      # 앱과 RAGAS 판정이 같은 모델을 쓰게 **명시**합니다. 비워 두면 각 스크립트의
+      # 기본값으로 갈라지고, 2026-10-17에 실제로 기준선과 다른 판정으로 채점했습니다.
+      OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-6-luna' }}
       NEO4J_URI: ${{ secrets.NEO4J_URI }}
       NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
       NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}

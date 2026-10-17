@@ -152,11 +152,13 @@
     "no_drop_on_rank_metrics": "순위 지표의 관측 변동폭이 커서 허용폭을 두지 않습니다. 관측값: {\"answer_evidence_precision\": 0.0, \"answer_evidence_recall\": 0.0, \"answer_failure_rate\": 0.0667, \"completed_cases\": 2.0, \"hit_at_k\": 0.166, \"recall_at_k\": 0.143, \"reciprocal_rank\": 0.1488}",
     "ragas_faithfulness": "30건을 3회 돌려 0.9833 / 0.9667 / 0.9500(변동폭 0.0333)이었습니다. 관측 최소에 변동폭과 사례 한 건(1/30 = 0.0333)의 여유를 더해 0.90입니다. **1.0을 요구하면 안 됩니다** - 모델이 행을 세어 만든 집계 주장이 깎여서 맞는 답변이 0.5000을 받은 사례가 있고, 같은 답변을 다시 채점하면 1.0000이 되기도 합니다(EXPERIMENTS 11-11·11-12절).",
     "ragas_context_precision_stable_families": "`author`·`citing`·`topcited` 18사례가 3회 실행에서 **전부 1.0000**(변동폭 0.0000)입니다. 하한 0.95는 그 18건 중 한 건이 무너지면(평균 -0.0556) 걸립니다. 전체 평균은 게이트하지 않습니다 - 변동폭 0.1342를 `coauthor`·`reference` 두 가족이 전부 만들고 품질과 무관하게 움직입니다.",
-    "no_drop_on_ragas": "RAGAS 지표에는 허용폭을 두지 않습니다. 변동폭 추정이 3회뿐이고(ADR-017에서 2회 추정이 3회차에 깨졌습니다) 하한이 이미 범위를 묶습니다. 사례별 규칙도 두지 않습니다 - coauthor-02의 faithfulness가 실행마다 0과 1을 왕복합니다(변동폭 1.0000)."
+    "no_drop_on_ragas": "RAGAS 지표에는 허용폭을 두지 않습니다. 변동폭 추정이 3회뿐이고(ADR-017에서 2회 추정이 3회차에 깨졌습니다) 하한이 이미 범위를 묶습니다. 사례별 규칙도 두지 않습니다 - coauthor-02의 faithfulness가 실행마다 0과 1을 왕복합니다(변동폭 1.0000).",
+    "ragas_judge_model": "기준선의 RAGAS 값은 이 판정 모델로 쟀습니다. 다른 모델로 잰 점수를 같은 표에 올리면 모수가 다른 값을 비교하게 됩니다(metrics_split과 같은 규칙). 2026-10-17에 CI가 OPENAI_MODEL을 넘기지 않아 실제로 그 일이 있었고, 그래서 게이트가 막습니다."
   },
   "ragas_stable_families": [
     "author",
     "citing",
     "topcited"
-  ]
+  ],
+  "ragas_judge_model": "gpt-6-luna"
 }

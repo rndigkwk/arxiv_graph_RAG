@@ -40,7 +40,13 @@ from statistics import fmean
 from typing import Any
 
 OUTPUT = Path("reports/ragas_study.json")
-DEFAULT_MODEL = "gpt-4o-mini"
+# 앱이 쓰는 모델과 같아야 합니다. `chatbot.llm_model`의 기본값과 맞춰 두고
+# tests/test_ragas_study.py가 두 값이 갈라지지 않는지 확인합니다.
+#
+# 2026-10-17에 CI가 `OPENAI_MODEL`을 넘기지 않아서 이 기본값(당시 "gpt-4o-mini")으로 채점했고,
+# 기준선의 세 실행은 `gpt-6-luna`로 잰 값이었습니다. **다른 판정으로 잰 점수를 같은 표에
+# 올려놓고 비교**한 것입니다. 기본값을 맞추고, 게이트가 판정 모델 불일치를 막습니다.
+DEFAULT_MODEL = "gpt-6-luna"
 EMBEDDING_MODEL = "text-embedding-3-large"
 # 고장 위치 진단의 축입니다. 기준은 "검색이냐 생성이냐"가 아니라 **답변에 의존하느냐**입니다.
 #

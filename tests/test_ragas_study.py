@@ -294,3 +294,30 @@ def test_a_metric_that_was_not_measured_is_not_reported_as_none():
     assert "context_relevance" not in summary["metrics"]
     assert "context_relevance" not in summary["diagnosis"]["answer_independent"]
     assert summary["metrics"]["faithfulness"] == 1.0
+
+
+def test_the_default_judge_model_matches_the_app():
+    """CI가 OPENAI_MODEL을 넘기지 않으면 이 기본값이 쓰입니다.
+
+    2026-10-17에 그 기본값이 앱의 모델과 달라서(gpt-4o-mini 대 gpt-6-luna) 기준선과 다른
+    판정으로 채점했습니다. 두 값이 갈라지면 같은 일이 또 생깁니다.
+    """
+    import ast
+    from pathlib import Path
+
+    from evals.ragas_study import DEFAULT_MODEL
+
+    source = (Path(__file__).resolve().parents[1] / "chatbot.py").read_text(encoding="utf-8")
+    app_default = None
+    for node in ast.walk(ast.parse(source)):
+        if (
+            isinstance(node, ast.Assign)
+            and getattr(node.targets[0], "id", "") == "llm_model"
+            and isinstance(node.value, ast.Call)
+        ):
+            for keyword in node.value.keywords:
+                if keyword.arg == "default":
+                    app_default = ast.literal_eval(keyword.value)
+
+    assert app_default, "chatbot.py에서 llm_model 기본값을 찾지 못했습니다"
+    assert DEFAULT_MODEL == app_default
