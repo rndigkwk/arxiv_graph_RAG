@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 from statistics import fmean
 from time import perf_counter
@@ -20,7 +21,47 @@ from evals.telemetry import (
 MAX_CONTEXT_ROWS = 50
 
 
-def generator_contexts(response: dict[str, Any]) -> list[str]:
+# arxiv_id 모양. 골드 Cypher의 매개변수에서 **기준 논문**만 골라내기 위한 것입니다.
+ARXIV_ID = re.compile(r"^\d{4}\.\d{4,5}$")
+
+
+def anchor_ids(case: dict[str, Any]) -> set[str]:
+    """질문이 지칭하는 논문. 골드 Cypher의 매개변수가 그것을 이미 적고 있습니다.
+
+    `citing`·`coauthor`·`reference`는 "X를 인용한 논문", "X와 공저자가 겹치는 논문"처럼 **한
+    논문을 기준으로** 묻고, 골드를 만든 Cypher가 `cypher_params={"arxiv_id": "..."}`로 그
+    논문을 적습니다(6/6). `author`·`topcited`는 저자 이름·분류 코드라 기준 논문이 없습니다(0/6).
+
+    **30건 중 기준 논문이 정답에도 들어 있는 사례는 없습니다.** 그래서 이것을 조회 결과에서
+    빼도 정답을 지우지 않습니다. 그 성질이 깨지면 테스트가 막습니다.
+    """
+    params = case.get("cypher_params") or {}
+    return {
+        value for value in params.values()
+        if isinstance(value, str) and ARXIV_ID.match(value)
+    }
+
+
+def is_lookup(rows: list[dict[str, Any]], anchors: set[str]) -> bool:
+    """Whether this query only resolved the question's own paper.
+
+    조회문 문구로 추측하지 않습니다. **모든 행의 `evidence_ids`가 기준 논문뿐인** 조회가
+    제목 해석 조회입니다 - 그것은 답변의 근거가 아니라 다음 조회의 입력입니다.
+    """
+    if not anchors or not rows:
+        return False
+    seen: set[str] = set()
+    for row in rows:
+        ids = row.get("evidence_ids")
+        if not isinstance(ids, list):
+            return False
+        seen.update(str(value) for value in ids)
+    return bool(seen) and seen <= anchors
+
+
+def generator_contexts(
+    response: dict[str, Any], anchors: set[str] | None = None
+) -> list[str]:
     """What the answer generator actually saw, as one string per retrieval call.
 
     RAGAS의 Faithfulness·Context Precision은 **생성기가 본 문맥**을 입력으로 받습니다. 그래서
@@ -44,6 +85,11 @@ def generator_contexts(response: dict[str, Any]) -> list[str]:
         output = call["output"]
         if call["name"] == "search_graph" and not output.get("error"):
             rows = output.get("rows", [])
+            # 제목을 arxiv_id로 바꾸는 중간 조회는 생성기가 본 **근거**가 아닙니다. 남기면
+            # RAGAS가 그것을 쓸모없는 문맥으로 채점해 Context Precision이 절반이 됩니다
+            # (`citing` 1.0000 -> 0.5046, ADR-024).
+            if is_lookup(rows, anchors or set()):
+                continue
             rendered = [
                 " | ".join(
                     f"{key}={value}" for key, value in row.items() if value not in (None, [], "")
@@ -83,9 +129,14 @@ def generator_contexts(response: dict[str, Any]) -> list[str]:
 def evaluate_case(
     case: dict[str, Any], response: dict[str, Any], *, mode: str, top_k: int
 ) -> dict[str, Any]:
+    # 질문이 지칭한 논문은 **검색 결과가 아니라 질문의 일부**입니다. 제목을 arxiv_id로 바꾸는
+    # 조회가 그것을 돌려주고, 행 순서대로 이어 붙이면 1위를 차지해 정답을 2위로 밉니다 -
+    # reciprocal_rank가 0.7000에 묶이던 원인입니다(ADR-024).
+    anchors = anchor_ids(case)
     retrieved = [paper["arxiv_id"] for paper in response.get("papers", []) if paper.get("arxiv_id")]
     for row in response.get("rows", []):
         retrieved.extend(row.get("evidence_ids", []))
+    retrieved = [arxiv_id for arxiv_id in retrieved if arxiv_id not in anchors]
     related_ids = list(
         dict.fromkeys(
             paper["arxiv_id"] for paper in response.get("related", []) if paper.get("arxiv_id")
@@ -93,6 +144,9 @@ def evaluate_case(
     )
     retrieved = list(dict.fromkeys(retrieved))
     row = {"id": case["id"], "category": case["category"], "retrieved_ids": retrieved}
+    if anchors:
+        # 무엇을 뺐는지 보고서가 스스로 말해야 합니다. 조용히 빼면 지표를 되짚을 수 없습니다.
+        row["anchor_ids"] = sorted(anchors)
     row.update(score_retrieval(case["expected_ids"], retrieved, k=top_k))
     if mode == "agent":
         evidence = response.get("evidence_ids", [])
@@ -108,7 +162,7 @@ def evaluate_case(
         row["related_ids"] = related_ids
         row["evidence_ids"] = evidence
         row["answer"] = response.get("answer", "")
-        row["contexts"] = generator_contexts(response)
+        row["contexts"] = generator_contexts(response, anchors)
         # 어느 경로로 보냈는지와 그 사유입니다. 지시를 지켰는지는 이 값과 임베딩 토큰을
         # 맞춰 봐야 알 수 있습니다(ADR-024).
         route = response.get("route")
