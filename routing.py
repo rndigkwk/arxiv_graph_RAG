@@ -70,17 +70,18 @@ ANY_ROUTE = "any"
 # ("share an author with Fuzzy K-Means Clustering..."). 대문자 구간을 세는 추측을 두는 대신,
 # 판단을 모델에 맡기고 **방법**만 지정합니다. 틀려도 쓰이지 않는 한 문장이 남을 뿐입니다.
 #
-# 중의성 확인 문장은 **측정해서 붙였습니다.** 1차 측정에서 `coauthor-04`가
-# `CONTAINS "when to plan"`으로 두 편을 잡고(의도한 논문과 "Learning When to Plan: ...")
-# 두 시드의 공저자를 모두 펼쳐 25편을 인용했습니다 - 근거 precision 1.000 → 0.040.
-# 벡터 검색은 제목 하나를 고르지만 substring은 고르지 않습니다. 그 차이를 지시로 메웁니다.
+# 중의성 확인 문장은 **측정해서 붙였다가, 도구로 바꿨습니다.** 1차 측정에서 `coauthor-04`가
+# `CONTAINS "when to plan"`으로 두 편을 잡고 25편을 인용했습니다(근거 precision 1.000 →
+# 0.040). 지시로 "따로 조회해서 한 편인지 확인하라"를 붙여 고쳤지만, 그 지시가 조회를 둘로
+# 쪼개서 `citing`의 RAGAS Context Precision을 1.0000 → 0.5046으로 깎았습니다.
+# `resolve_paper`(전문 검색 인덱스)가 그 일을 도구 한 번으로 하고 혼합 정확도 0.9663입니다
+# (`CONTAINS` 단독 0.4600). 그래서 지시는 "도구를 부르라"로 줄었습니다.
 GRAPH_HINT = (
     "Routing hint: this question asks only about stored relationships (authors, citations, "
-    "categories, counts, dates). Answer it with search_graph. If it names a paper, first run "
-    "a lookup of its own with toLower(p.title) CONTAINS \"<distinctive words from the name, "
-    'lowercased>" and check that exactly one paper came back - a short phrase matches several '
-    "titles. If more than one does, narrow the phrase until only the named paper is left, then "
-    "use that arxiv_id. Do not call search_papers - its topic matches are not evidence here."
+    "categories, counts, dates). Answer it with search_graph. If it names a paper, call "
+    "resolve_paper with that name first and use the arxiv_id it returns - do not match the "
+    "title with CONTAINS yourself. Do not call search_papers - its topic matches are not "
+    "evidence here."
 )
 
 

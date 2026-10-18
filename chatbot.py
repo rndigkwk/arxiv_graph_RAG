@@ -33,7 +33,6 @@ from neo4j_graphrag.embeddings import OpenAIEmbeddings
 from neo4j_graphrag.retrievers import VectorRetriever
 from neo4j_graphrag.types import RetrieverResultItem
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
-from scipy.sparse import csr_array
 
 import agent_graph
 import prompts
@@ -45,6 +44,8 @@ from answer_validation import (
 )
 from candidate_validation import QuestionVerdict, assess_and_validate, judge_content
 from cypher_validation import check_order_by
+import pagerank
+import title_search
 from pipeline import tracing
 
 # 이 파일이 저장소 루트에 있든 하위 폴더에 있든, pyproject.toml이 있는 폴더를 루트로 봅니다.
@@ -182,6 +183,50 @@ def check_evidence_alias(rows):
             f"이 조회가 돌려준 별칭: {keys}. 논문 한 편이 한 행이면 [p.arxiv_id]처럼 리스트 "
             "리터럴로, 논문을 특정할 수 없는 순수 집계면 [] 로 반환하세요."
         )
+
+
+TITLE_FULLTEXT_INDEX = "arxiv_paper_title_fulltext"
+# 부분문자열로 걸린 논문들. 점수가 없으므로 "정확히 한 편인가"만 봅니다.
+RESOLVE_EXACT = """
+MATCH (p:ArxivPaper)
+WHERE toLower(p.title) CONTAINS $needle
+RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_category
+ORDER BY p.arxiv_id LIMIT 25
+"""
+RESOLVE_FULLTEXT = """
+CALL db.index.fulltext.queryNodes($index, $needle, {limit: $limit}) YIELD node, score
+RETURN node.arxiv_id AS arxiv_id, node.title AS title,
+       node.primary_category AS primary_category, score
+ORDER BY score DESC
+"""
+
+
+@tool
+def resolve_paper(title: str, top_k: int = 5) -> dict:
+    """질문에 적힌 제목으로 논문 하나를 특정해 arxiv_id를 돌려줍니다.
+
+    "X와 공저자가 겹치는 논문", "X를 인용한 논문", "X가 인용한 논문 중 ..."처럼 **한 논문을
+    기준으로 묻는 질문**에서 먼저 이것을 부르세요. 제목으로 Cypher를 직접 쓰지 마세요 -
+    `toLower(p.title) CONTAINS`는 낱말 하나만 빠져도 94.5%가 0건이고, 짧은 구절에서는 여러
+    편이 걸려 어느 쪽인지 알 수 없습니다.
+    `ambiguous`가 true면 1·2위 점수가 비슷하다는 뜻이므로 `candidates`에서 질문이 말한 논문을
+    직접 확인하고, 확실하지 않으면 답변에 그렇다고 적으세요.
+    `arxiv_id`가 null이면 **그 논문이라고 가정하지 마세요.** `method`가 "weak_match"면 제목이
+    어느 논문과도 충분히 맞지 않은 것이고(수집 범위에 없을 수 있음), "none"이면 아무것도
+    걸리지 않은 것입니다. 둘 다 제목을 더 길게 주고 다시 부르거나, 찾지 못했다고 답하세요.
+    결과는 근거로 인용할 수 있습니다.
+    """
+    needle = (title or "").strip()
+    if not needle:
+        return {"query": title, **title_search.choose([], [], query="").as_dict()}
+    exact = to_jsonable(run_read(RESOLVE_EXACT, {"needle": needle.lower()}))
+    ranked = to_jsonable(run_read(
+        RESOLVE_FULLTEXT,
+        {"index": TITLE_FULLTEXT_INDEX,
+         "needle": title_search.escape_lucene(needle),
+         "limit": max(2, min(int(top_k), 25))},
+    ))
+    return {"query": needle, **title_search.choose(exact, ranked, query=needle).as_dict()}
 
 
 @tool
@@ -428,6 +473,10 @@ def collect_response(result, question):
             outputs[message.tool_call_id] = message
 
     cypher, rows, papers, translations, errors, related = "", [], {}, [], [], []
+    # 제목 해석 결과입니다. **`rows`에 넣지 않습니다** - 질문이 지칭한 논문은 검색 결과가
+    # 아니라 질문의 일부이고, 섞으면 `retrieved_ids`의 1위를 차지해 순위 지표를 망칩니다
+    # (ADR-024). 다만 답변 근거로는 인정합니다(`direct_evidence_ids`).
+    resolved = []
     # 조회가 여러 번이면 `cypher`는 마지막 것만 남습니다. 실패를 되짚을 때는 전부 필요합니다.
     cyphers = []
     for call in calls:
@@ -453,13 +502,15 @@ def collect_response(result, question):
                     papers[hit["arxiv_id"]] = hit
         elif call["name"] == "rank_related_papers":
             related.extend(call["output"].get("related", []))
+        elif call["name"] == "resolve_paper":
+            resolved.append(call["output"])
         elif call["name"] == "translate_to_english":
             translations.append(call["output"])
 
     return {"question": question, "answer": answer.answer, "evidence_ids": answer.evidence_ids,
             "tool_calls": calls, "cypher": cypher, "cyphers": cyphers, "rows": rows,
             "papers": list(papers.values()), "translations": translations,
-            "errors": errors, "related": related}
+            "errors": errors, "related": related, "resolved": resolved}
 
 
 def partial_answer(text):
@@ -621,9 +672,13 @@ def graph_counts():
 # 인용망을 읽는 데 20초쯤 걸리고, 그 뒤 PageRank 계산 자체는 0.1초 안에 끝납니다.
 # Aura Graph Analytics 세션으로 같은 계산을 하는 선택 엔진은 gds_pagerank.py에 있습니다.
 # 순위는 두 엔진이 같고, 세션은 시간당 과금이라 기본값을 이쪽으로 두었습니다.
-DAMPING = 0.85          # 표준값. 15% 확률로 텔레포트 벡터로 점프합니다.
-PAGERANK_ITERATIONS = 200
-PAGERANK_TOLERANCE = 1e-11
+# PageRank의 순수 부분은 `pagerank.py`에 있습니다. 앱이 임포트만으로 Aura·OpenAI에 붙기
+# 때문에, 그 알고리즘을 오프라인에서 재려면 분리돼 있어야 합니다(ADR-027).
+DAMPING = pagerank.DAMPING
+PAGERANK_ITERATIONS = pagerank.PAGERANK_ITERATIONS
+PAGERANK_TOLERANCE = pagerank.PAGERANK_TOLERANCE
+transition_matrix = pagerank.transition_matrix
+run_pagerank = pagerank.run_pagerank
 
 PAPER_ROWS = """
 MATCH (p:ArxivPaper)
@@ -666,29 +721,6 @@ graph_lock = threading.RLock()
 graph_cache = {}
 
 
-def transition_matrix(rows, cols, size):
-    """행 방향으로 정규화한 전이 행렬과 각 노드의 출력 차수를 만듭니다."""
-    out_degree = np.bincount(rows, minlength=size).astype(np.float64)
-    # 출력 차수가 0인 행은 어차피 비어 있으므로 0으로 나누지 않게만 막습니다.
-    weights = 1.0 / np.where(out_degree[rows] == 0, 1.0, out_degree[rows])
-    return csr_array((weights, (rows, cols)), shape=(size, size)), out_degree
-
-
-def run_pagerank(matrix, out_degree, teleport):
-    """멱승법으로 PageRank를 계산합니다. teleport의 합은 1이어야 합니다."""
-    dangling = out_degree == 0
-    rank = teleport.copy()
-    for _ in range(PAGERANK_ITERATIONS):
-        # 나가는 인용이 없는 논문에 고인 점수는 텔레포트 분포로 다시 뿌립니다.
-        leaked = rank[dangling].sum()
-        nxt = DAMPING * (matrix.T @ rank) + (DAMPING * leaked + 1.0 - DAMPING) * teleport
-        moved = np.abs(nxt - rank).sum()
-        rank = nxt
-        if moved < PAGERANK_TOLERANCE:
-            break
-    return rank
-
-
 def read_with_retry(cypher, attempts=3, delay=2.0):
     """일시적인 Aura 저하에만 대응해 한 질의를 다시 읽습니다.
 
@@ -729,8 +761,7 @@ def citation_graph():
         rows = np.array([a for a, _ in pairs], dtype=np.int32)
         cols = np.array([b for _, b in pairs], dtype=np.int32)
         # 무방향 행렬은 양쪽 방향을 모두 넣고 중복된 쌍을 한 번만 남깁니다.
-        both = np.unique(np.stack([np.concatenate([rows, cols]),
-                                   np.concatenate([cols, rows])]), axis=1)
+        both = pagerank.undirected_pairs(rows, cols)
         directed, out_degree = transition_matrix(rows, cols, size)
         undirected, degree = transition_matrix(both[0], both[1], size)
         graph_cache.update({
@@ -992,7 +1023,8 @@ try:
     )[0]
     agent = create_agent(
         model=llm,
-        tools=[translate_to_english, search_graph, search_papers, rank_related_papers],
+        tools=[translate_to_english, resolve_paper, search_graph, search_papers,
+               rank_related_papers],
         system_prompt=agent_system,
         # structured_response는 answer와 evidence_ids가 있는 GroundedAnswer 객체입니다.
         response_format=ProviderStrategy(GroundedAnswer, strict=True),

@@ -108,7 +108,16 @@ def generator_contexts(
             if len(rows) > MAX_CONTEXT_ROWS:
                 parts.append(f"... ({len(rows) - MAX_CONTEXT_ROWS} more rows)")
             contexts.append("\n".join(parts))
-        elif call["name"] == "search_papers":
+        elif call["name"] == "resolve_paper":
+            # 답변이 주제 논문을 제목으로 언급하는 주장의 **근거**입니다. 빼면 faithfulness가
+            # 무너집니다 - 오늘 그렇게 재 봤고 `citing`이 1.0000에서 0.2296으로 갔습니다.
+            found = output.get("arxiv_id")
+            if found:
+                titles = {c.get("arxiv_id"): c.get("title") for c in output.get("candidates", [])}
+                contexts.append(
+                    f"Title lookup: {output.get('query', '')} -> {found} "
+                    f"({titles.get(found) or ''})"
+                )
             for paper in output.get("papers", []):
                 title = (paper.get("title") or "").strip()
                 abstract = (paper.get("abstract") or "").strip()

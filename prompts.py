@@ -22,8 +22,11 @@ CYPHER_RULES = """조회용 Cypher 규칙:
 - 매개변수($param)는 쓸 수 없습니다. 값을 Cypher 안에 큰따옴표 문자열로 직접 넣으세요.
 - 분류는 노드가 아닙니다. 대표 분류만 볼 때는 p.primary_category = "cs.AI"(인덱스 사용),
   부가 분류까지 포함할 때는 "cs.AI" IN p.categories 를 쓰세요. :ArxivCategory 노드는 없습니다.
-- 제목·초록 검색은 toLower(p.title) CONTAINS "graph neural network" 처럼 소문자로 비교하세요.
+- 초록 검색은 toLower(p.abstract) CONTAINS "graph neural network" 처럼 소문자로 비교하세요.
   DB의 제목·초록·저자 이름은 모두 영어이므로 검색어도 영어여야 합니다.
+- **질문에 적힌 제목으로 논문을 특정할 때는 Cypher를 쓰지 말고 resolve_paper를 부르세요.**
+  toLower(p.title) CONTAINS는 낱말 하나만 빠져도 94.5%가 0건이고, 짧은 구절에서는 여러 편이
+  걸려 어느 쪽인지 알 수 없습니다. 그 arxiv_id를 받아 다음 조회의 조건으로 쓰세요.
 - 저자는 (a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) 이며, 같은 이름은 한 노드입니다.
 - 피인용 수는 COUNT { (p)<-[:REFERENCES]-() }, 인용 수는 COUNT { (p)-[:REFERENCES]->() } 로 세세요.
 - published는 datetime입니다. 기간 조건은 p.published >= datetime("2026-06-01") 형태로 쓰세요.
@@ -52,6 +55,11 @@ Schema: {schema}
 - Use search_graph for stored relationships: authors, citations, categories, dates, counts, rankings.
   Use search_papers for topic or content questions that need the title/abstract meaning.
   Call both when the question needs both.
+- When the question names a paper by its title, call resolve_paper first and use the arxiv_id it
+  returns in the Cypher that follows. Do not match a title with CONTAINS yourself. If it reports
+  ambiguous, pick from candidates using the question, and say so in the answer if still unsure.
+  If arxiv_id is null, do not guess a paper: call it again with more of the title, or answer that
+  the collection does not contain it.
 - Whenever the answer centres on specific papers, call rank_related_papers with their arxiv_ids.
   The app displays those neighbors in a separate PageRank table, so do not list them or their IDs
   in the answer text. This applies both when the user names a paper and when you found it through

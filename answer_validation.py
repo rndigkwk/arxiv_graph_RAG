@@ -54,7 +54,15 @@ def log_validation_failure(request_id: str, attempt: int, stage: str, error: Val
 
 
 def direct_evidence_ids(response: dict[str, object]) -> set[str]:
-    """Collect answer evidence from graph rows and vector hits, never related suggestions."""
+    """Collect answer evidence from graph rows, vector hits and title lookups.
+
+    `related`는 넣지 않습니다 - PageRank 추천은 별도 표에서 보이므로 답변 근거가 아닙니다.
+
+    `resolved`는 넣습니다. `resolve_paper`가 제목으로 찾아 준 논문은 **직접 검색 결과**이고,
+    "X의 대표 분류는?"처럼 그 논문 자체가 답인 질문에서는 유일한 근거입니다. 빼면 맞는 답변이
+    `unsupported_citation_id`로 거부됩니다. 대신 `rows`에는 넣지 않으므로 검색 순위 지표를
+    오염시키지는 않습니다(ADR-024).
+    """
     direct_ids = {
         paper_id
         for row in response.get("rows", [])
@@ -64,6 +72,11 @@ def direct_evidence_ids(response: dict[str, object]) -> set[str]:
         paper["arxiv_id"]
         for paper in response.get("papers", [])
         if paper.get("arxiv_id")
+    )
+    direct_ids.update(
+        found["arxiv_id"]
+        for found in response.get("resolved", [])
+        if isinstance(found, dict) and found.get("arxiv_id")
     )
     return direct_ids
 

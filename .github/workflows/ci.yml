@@ -18,8 +18,8 @@ jobs:
       - run: uv lock --check
       - run: uv sync --locked --group dev
       - run: uv run --locked python -c "import networkx, plotly, streamlit"
-      - run: uv run --locked ruff check answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py routing.py abstain.py evals tests scripts pipeline models
+      - run: uv run --locked ruff check answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py routing.py abstain.py pagerank.py title_search.py evals tests scripts pipeline models
       - run: uv run --locked python -m pytest -q
       - run: uv run --locked python scripts/check_doc_links.py
       - run: uv run --locked python scripts/check_doc_numbers.py
-      - run: uv run --locked python -m compileall -q app.py chatbot.py answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py routing.py abstain.py gds_pagerank.py metagraph.py evals scripts pipeline models
+      - run: uv run --locked python -m compileall -q app.py chatbot.py answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py routing.py abstain.py pagerank.py title_search.py gds_pagerank.py metagraph.py evals scripts pipeline models

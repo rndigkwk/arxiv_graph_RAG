@@ -73,25 +73,34 @@ def test_the_whole_evaluation_set_is_narrowed():
     assert len(cases) == 30
 
 
-def test_the_hint_names_the_tool_to_avoid_and_the_way_to_resolve_a_title():
+def test_the_hint_names_the_tool_to_avoid_and_the_one_to_use():
     """힌트가 "벡터 쓰지 마"만 말하면 모델은 제목을 풀 방법이 없습니다."""
     hint = classify(RELATION_QUESTIONS[2]).hint
 
     assert "Do not call search_papers" in hint
-    assert "toLower(p.title) CONTAINS" in hint
+    # 제목 해석 방법을 지시로 적지 않고 **도구를 가리킵니다**. 지시로 적었던 때
+    # ("따로 조회해서 정확히 한 편인지 확인하라")는 조회가 둘로 쪼개져 `citing`의
+    # Context Precision이 1.0000에서 0.5046으로 깎였습니다.
+    assert "resolve_paper" in hint
+    assert "CONTAINS yourself" in hint
     # 아끼려는 토큰에서 나가는 비용입니다. 한계는 **아끼는 양**으로 정합니다 - 좁히는 질문에서
     # 줄어드는 입력이 약 9,000 토큰이므로, 힌트가 그 1%를 넘기면 다시 생각해야 합니다.
     assert len(hint.split()) < 120
 
 
-def test_the_hint_requires_the_title_lookup_to_be_unambiguous():
-    """1차 측정에서 깨진 지점입니다. `CONTAINS "when to plan"`이 두 편을 잡고 공저자를 모두
-    펼쳐 25편을 인용했습니다(근거 precision 1.000 → 0.040). 벡터 검색은 제목 하나를 고르지만
-    substring은 고르지 않습니다."""
+def test_the_hint_no_longer_spells_out_the_title_lookup():
+    """중의성 확인을 **지시에서 도구로** 옮겼습니다.
+
+    1차 측정에서 `CONTAINS "when to plan"`이 두 편을 잡고 25편을 인용했습니다(근거 precision
+    1.000 → 0.040). 지시로 고쳤더니 조회가 둘로 쪼개져 Context Precision이 깎였습니다.
+    `resolve_paper`가 전문 검색 인덱스로 그 일을 한 번에 하므로 지시가 필요 없습니다.
+    """
     hint = classify(RELATION_QUESTIONS[2]).hint
 
-    assert "exactly one paper" in hint
-    assert "narrow the phrase" in hint
+    assert "exactly one paper" not in hint
+    assert "narrow the phrase" not in hint
+    # 힌트가 짧아진 것도 이득입니다. 여기 쓰는 토큰이 아끼려는 토큰에서 나갑니다.
+    assert len(hint.split()) < 70
 
 
 def test_a_broad_route_carries_no_hint():
