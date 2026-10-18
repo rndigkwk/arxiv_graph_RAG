@@ -94,10 +94,14 @@ def test_the_recorded_study_still_says_what_adr_024_claims():
     assert study["model"] == "gpt-6-luna"
     # 지시를 지켰다는 주장의 근거입니다.
     assert study["after"]["search_papers_rate"] == 0
-    assert study["after"]["search_papers_measured"] == 12
+    # 30건 전체를 재서 전부 0입니다. 한 건이라도 안 세졌으면 "지켰다"를 주장할 수 없습니다.
+    assert study["after"]["search_papers_measured"] == study["after"]["cases"] == 30
     # 정확도를 지켰다는 주장의 근거입니다.
     assert study["after"]["answer_evidence_precision"] == 1.0
     assert study["after"]["failed"] == 0
     # 토큰은 줄고 지연은 늘었습니다. 두 번째를 지우면 보고가 한쪽만 말합니다.
     assert study["deltas"]["chat_input_tokens_p50"] < 0
     assert study["deltas"]["elapsed_seconds_p50"] > 0
+    # 입력 절감은 전체로 보면 작습니다(p50 약 −141). 12건의 −4,511을 전체로 읽지 않도록
+    # 여기서 자릿수를 고정합니다 - 그렇게 읽으면 절감을 32배 과장합니다.
+    assert abs(study["deltas"]["chat_input_tokens_p50"]) < 1000

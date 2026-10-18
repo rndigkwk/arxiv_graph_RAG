@@ -85,20 +85,54 @@ search_graph using `toLower(p.title) CONTAINS`"). 틀려도 쓰이지 않는 한
 
 ## 결과
 
-`coauthor`+`reference` 12건을 같은 모델(`gpt-6-luna`)로 다시 돌려
+같은 모델(`gpt-6-luna`)로 **30건 전체**를 다시 돌려
 ([`evals/routing_study.py`](../../evals/routing_study.py) →
-[`reports/routing_study.json`](../../reports/routing_study.json)), 전 36건(full 3회의 같은 두
-가족)과 비교했습니다.
+[`reports/routing_study.json`](../../reports/routing_study.json)), full 3회(90건)와 비교했습니다.
+
+먼저 호출률이 높았던 두 가족(`coauthor`+`reference`, 12건 대 36건)입니다. 이 표의 숫자는
+출처에 묶지 않았습니다 — `reports/routing_study.json`은 한 번에 한 비교만 담고, 지금 담긴
+것은 아래 30건입니다.
 
 | | 전 | 후 | 차 |
 |---|---:|---:|---:|
+| 근거 precision | 1.0000 | 1.0000 | 0.0000 |
+| 근거 recall | 0.9722 | 1.0000 | +0.0278 |
+| hit@5 | 0.2778 | 1.0000 | +0.7222 |
+| `search_papers` 호출률 | 0.7714 | 0.0000 | −0.7714 |
+| 입력 토큰 p50 | 15,786 | 11,276 | **−4,511** |
+| p50 지연(초) | 15.49 | 19.71 | **+4.21** |
+| 답변 실패 | 1 | 0 | −1 |
+
+그다음 **나머지 세 가족**입니다. 라우팅은 다섯 가족 전부에 적용했으므로 건드리지 않은 가족이
+깨지지 않았는지 봐야 합니다.
+
+| 가족 | hit@5 전 → 후 | 근거 recall 전 → 후 | `search_papers` 전 → 후 |
+|---|---|---|---|
+| `author` | 0.944 → 1.000 | 0.944 → 1.000 | 0.00 → 0.00 |
+| `citing` | 0.889 → 1.000 | 1.000 → 1.000 | 0.11 → 0.00 |
+| `topcited` | 0.889 → 1.000 | 0.889 → 1.000 | 0.00 → 0.00 |
+
+**기준선에서 만점이었다가 깨진 사례가 없습니다**(게이트의 `stable_case` 규칙이 보는 것).
+근거 precision은 세 가족 모두 1.000 그대로입니다.
+
+### 30건 전체
+
+| | 전(90건, 3회) | 후(<!--n:reports/routing_study.json#after.cases-->30<!--/n-->건, 1회) | 차 |
+|---|---:|---:|---:|
 | 근거 precision | 1.0000 | <!--n:reports/routing_study.json#after.answer_evidence_precision-->1.0000<!--/n--> | <!--n:reports/routing_study.json#deltas.answer_evidence_precision-->0.0000<!--/n--> |
-| 근거 recall | 0.9722 | <!--n:reports/routing_study.json#after.answer_evidence_recall-->1.0000<!--/n--> | +0.0278 |
-| hit@5 | 0.2778 | <!--n:reports/routing_study.json#after.hit_at_k-->1.0000<!--/n--> | +0.7222 |
-| `search_papers` 호출률 | 0.7714 | <!--n:reports/routing_study.json#after.search_papers_rate-->0<!--/n--> | −0.7714 |
-| 입력 토큰 p50 | 15,786 | <!--n:reports/routing_study.json#after.chat_input_tokens_p50-->11275.5<!--/n--> | **−4,511** |
-| p50 지연(초) | 15.49 | <!--n:reports/routing_study.json#after.elapsed_seconds_p50-->19.7073<!--/n--> | **+4.21** |
-| 답변 실패 | 1 | <!--n:reports/routing_study.json#after.failed-->0<!--/n--> | −1 |
+| 근거 recall | 0.9556 | <!--n:reports/routing_study.json#after.answer_evidence_recall-->1.0000<!--/n--> | +0.0444 |
+| hit@5 | 0.6556 | <!--n:reports/routing_study.json#after.hit_at_k-->1.0000<!--/n--> | +0.3444 |
+| `search_papers` 호출률 | 0.3372 | <!--n:reports/routing_study.json#after.search_papers_rate-->0<!--/n--> | −0.3372 |
+| 입력 토큰 p50 | 10,933 | <!--n:reports/routing_study.json#after.chat_input_tokens_p50-->10791.5<!--/n--> | **−141** |
+| 그중 신선 p50 | 기록 없음 | <!--n:reports/routing_study.json#after.chat_input_tokens_fresh_p50-->1243.5<!--/n--> | — |
+| 출력 토큰 p50 | 630.5 | <!--n:reports/routing_study.json#after.chat_output_tokens_p50-->536.5<!--/n--> | **−94** |
+| p50 지연(초) | 12.96 | <!--n:reports/routing_study.json#after.elapsed_seconds_p50-->17.1489<!--/n--> | **+4.19** |
+| 답변 실패 | 4 | <!--n:reports/routing_study.json#after.failed-->0<!--/n--> | −4 |
+
+**전체로 보면 입력 토큰은 거의 안 줄었습니다 — p50 −141, 약 1%입니다.** 두 가족에서 −4,511이던
+것이 전체에서 −141이 되는 이유가 분명합니다. `author`·`citing`·`topcited`는 애초에 벡터를 부르지
+않았으므로 줄 것이 없고, 제목 확인 조회가 **더해지기만** 합니다. 12건 숫자를 전체로 읽으면
+절감을 32배 과장합니다.
 
 **얻은 것 셋.**
 
@@ -107,10 +141,15 @@ search_graph using `toLower(p.title) CONTAINS`"). 틀려도 쓰이지 않는 한
 2. **입력 토큰 p50이 29% 줄었습니다.** 평균으로는 −2,820뿐인데 `coauthor-03` 한 건이
    36,735 토큰(다른 건의 세 배)이라 평균을 끌고 갑니다. 그래서 중앙값을 같이 적습니다.
    **다만 이것을 비용 29% 감소로 읽으면 안 됩니다** — 아래 보정을 보십시오.
-3. **정확도가 떨어지지 않았습니다.** precision은 1.0000 그대로, recall은 0.9722 → 1.0000,
-   답변 실패 1건 → 0건입니다.
+3. **정확도가 떨어지지 않았습니다.** precision은 1.0000 그대로, recall은 0.9556 → 1.0000,
+   답변 실패 4건 → 0건입니다(30건 기준).
 
-**낸 것 하나. 지연이 p50 기준 4.2초(27%) 늘었습니다.** 원인이 분명합니다 — 제목을 확인하는
+**실패 0건은 운일 수 있습니다.** 전은 사례마다 3회이고 후는 1회입니다. 기존 실패율
+(4/90 ≈ 4.4%)이라면 30건에서 기대 실패가 약 1.3건이므로, 0건이 변동 범위 안입니다
+(`EXPERIMENTS.md` 10절이 같은 함정을 기록해 뒀습니다 — `coauthor-03`을 결함으로 읽었다가
+11회 연속 정답으로 뒤집혔습니다). 실패가 줄었다는 주장은 **다음 full 3회가 필요합니다.**
+
+**낸 것 하나. 지연이 p50 기준 4.19초(32%) 늘었습니다.** 원인이 분명합니다 — 제목을 확인하는
 Cypher가 round-trip 하나를 더합니다(`search_graph` 2~3회). 토큰을 줄인 대가를 지연으로
 냈습니다. 다만 전 측정에는 CI에서 돈 실행이 섞여 있어 **지연 비교는 토큰 비교보다 약합니다.**
 기계가 다르면 초가 달라집니다. 그래서 "줄었다"고 주장하지 않고 **늘었다고 적습니다** —
