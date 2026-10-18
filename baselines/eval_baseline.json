@@ -1,37 +1,39 @@
 {
-  "generated_at": "2026-10-16T08:19:35.056287+00:00",
-  "note": "2026-10-16에 full을 세 번 돌려 정했습니다. 핵심은 품질 지표를 **답을 만든 사례만으로** 집계한다는 것입니다. 멈춘 사례를 0점으로 섞으면 근거 recall이 품질이 아니라 실패율을 재게 되고, 실제로 3회차에서 0.9667 -> 0.9000으로 떨어졌습니다. 답을 만든 사례만 보면 세 실행 모두 1.0000이고 변동폭이 0입니다. 그래서 규칙이 둘로 갈립니다. (1) 품질 - 근거 recall·precision은 변동폭 0이므로 하한을 0.99로 좁게 두고 허용폭도 0.02로 둡니다. 완료 사례 28건 중 한 건이 0점이 되면 평균이 0.036 내려가 허용폭에 걸리고, 0.5로 내려가면 사례별 회귀가 잡습니다. (2) 실패 - answer_failure_rate의 관측 범위가 0.0333~0.1000입니다. 상한은 관측 최대에 사례 한 건(0.0333)을 더한 0.1333이고, 허용폭은 관측 변동폭 0.0667에 한 건을 더한 0.10입니다. (3) 순위 지표 - hit_at_k의 변동폭이 0.166(사례 5건분)입니다. n=30에서는 작은 회귀를 변동과 구별할 수 없으므로 허용폭을 두지 않고, 하한은 파국만 잡는 0.50으로 둡니다. 재는 값은 보고서에 남습니다. 구별할 수 없는 값에 규칙을 붙이면 규칙이 아니라 숫자입니다. 안정 사례는 세 실행 모두에서 멈추지 않고 만점이던 25건입니다. RAGAS 지표 둘을 2026-10-17에 더했습니다(ADR-021). 집계만 봅니다 - 사례별 변동폭이 최악 1.0000이라 사례별 규칙은 매번 터집니다. context_precision은 검색이 단단한 세 가족에서만 봅니다. 판정 모델은 집계 수준에서 사실상 결정적이므로(같은 답변 재채점 변동폭 0.0000~0.0084) 이 지표들은 측정 장치가 아니라 앱을 잽니다. 2026-10-18에 4회차를 같은 판정 모델로 받아 두 하한을 0.90->0.80, 0.95->0.85로 내렸습니다. 품질이 나빠져서가 아니라 **지표의 분해능이 그만큼 낮다는 것을 측정했기 때문**입니다. 파국은 잡고 작은 회귀는 못 잡는다고 적어 두는 쪽이, 못 잡는데 잡는 척하는 것보다 낫습니다. 2026-10-18 5회차: faithfulness 변동폭은 0.0833에서 멈췄고, context_precision은 citing 때문에 계속 넓어져 가족 집합을 author·topcited로 좁혔습니다(5회 전부 1.0000).",
+  "generated_at": "2026-10-18T09:54:17.682514+00:00",
+  "note": "2026-10-18 라우팅(ADR-024) 적용 후 3회 재측정. 지표 수준과 안정 목록만 갱신하고 하한·허용폭은 그대로 둡니다 - 기준선의 floor_rationale에 '다시 좁히지 않습니다'가 적혀 있고, 4·5회차에서 변동폭이 표본마다 커진 전례(0.0167->0.0333->0.0833)가 있어 새 3회로 하한을 올리면 그 약속을 어깁니다. 안정 목록이 늘어난 것은 기준이 바뀐 것이 아니라 같은 기준(3회 전부 만점, merge가 failed=any/지표=min)을 새 행동에 적용한 결과입니다. reciprocal_rank는 구조적 상한 0.7000에 닿아 있어 오르지 않습니다(ADR-024).",
   "source": {
     "mode": "compare",
     "dataset": "cases_graph.json",
     "runs": 3,
     "git_sha": null,
     "observed_spread": {
-      "answer_evidence_precision": 0.0,
+      "answer_evidence_precision": 0.011111111111111072,
       "answer_evidence_recall": 0.0,
-      "answer_failure_rate": 0.06666666666666668,
-      "completed_cases": 2.0,
-      "hit_at_k": 0.16602809706257982,
-      "recall_at_k": 0.1430395913154534,
-      "reciprocal_rank": 0.14878671775223506
+      "answer_failure_rate": 0.0,
+      "completed_cases": 0.0,
+      "hit_at_k": 0.0,
+      "ragas_context_precision_stable_families": 0.0,
+      "ragas_faithfulness": 0.01666666666666672,
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.005555555555555536
     }
   },
   "primary_metric": "answer_evidence_recall",
   "metrics_split": "full",
   "metrics": {
-    "answer_evidence_precision": 1.0,
+    "answer_evidence_precision": 0.9962962962962963,
     "answer_evidence_recall": 1.0,
-    "answer_failure_rate": 0.05555555555555556,
-    "completed_cases": 28.333333333333332,
-    "hit_at_k": 0.680289484887186,
-    "recall_at_k": 0.6649638143891017,
-    "reciprocal_rank": 0.6687952320136228,
-    "ragas_faithfulness": 0.9561,
-    "ragas_context_precision_stable_families": 1.0
+    "answer_failure_rate": 0.0,
+    "completed_cases": 30.0,
+    "hit_at_k": 1.0,
+    "ragas_context_precision_stable_families": 0.9999999999,
+    "ragas_faithfulness": 0.9944444444444445,
+    "recall_at_k": 0.9933333333333335,
+    "reciprocal_rank": 0.6962962962962962
   },
   "absolute_floor": {
     "answer_evidence_recall": 0.99,
-    "answer_evidence_precision": 0.99,
+    "answer_evidence_precision": 0.95,
     "answer_failure_rate": 0.1333,
     "hit_at_k": 0.5,
     "recall_at_k": 0.48,
@@ -80,6 +82,7 @@
     "author-01",
     "author-02",
     "author-03",
+    "author-04",
     "author-05",
     "author-06",
     "citing-01",
@@ -90,17 +93,21 @@
     "citing-06",
     "coauthor-01",
     "coauthor-02",
+    "coauthor-03",
     "coauthor-04",
     "coauthor-05",
     "coauthor-06",
     "reference-01",
+    "reference-02",
     "reference-03",
     "reference-04",
     "reference-05",
     "reference-06",
     "topcited-01",
+    "topcited-02",
     "topcited-03",
     "topcited-04",
+    "topcited-05",
     "topcited-06"
   ],
   "splits": {
@@ -144,6 +151,7 @@
       "topcited-06"
     ]
   },
+  "ragas_judge_model": "gpt-6-luna",
   "split_rationale": "smoke는 가족마다 한 건씩 5건입니다. 가족이 승자를 정하는 과제이므로(ADR-008) 앞에서 n건을 자르면 한 가족만 보게 됩니다. PR마다 전량을 돌리면 30건 약 366k 토큰이 매 푸시에 듭니다.",
   "floor_rationale": {
     "answer_evidence_recall": "답을 만든 사례만 보면 세 실행 모두 1.0000(변동폭 0)입니다. 그래서 좁게 둘 수 있고, 이것이 이 게이트의 본 규칙입니다.",
@@ -153,11 +161,11 @@
     "ragas_faithfulness": "**파국만 잡는 하한입니다.** 5회 관측 0.9833 / 0.9667 / 0.9500 / 0.9000 / 0.9806이고 변동폭은 4회에서 0.0833이 된 뒤 5회에서도 0.0833입니다(2회 0.0167, 3회 0.0333에서 넓어진 뒤 멈췄습니다). 이 지표의 집계는 **사례별 0/1 판정의 개수**이고(한 건 = 1/30 = 0.0333), 그 0점은 답변 품질을 따라가지 않습니다 - reference-01의 답변이 1회차와 4회차에서 사실상 같은데 1.0000에서 0.0000으로 뒤집혔습니다(EXPERIMENTS 11-13절). 작은 회귀는 구별할 수 없으므로 하한은 심은 결함 수준(0.0000~0.6100, 11-10절)만 잡게 0.80에 둡니다.",
     "ragas_context_precision_stable_families": "**가족 집합을 한 번 좁혔고, 다시 좁히지 않습니다.** 처음에는 3회 관측으로 author·citing·topcited를 골랐는데, citing-06이 4회차에, citing-02가 5회차에 0.1667로 무너져 변동폭이 0.0000 -> 0.0463 -> 0.0926으로 계속 넓어졌습니다. citing을 빼면 author·topcited 12사례가 5회 전부 1.0000(변동폭 0.0000)입니다. citing이 움직이는 이유는 그 질문에서 에이전트가 가져오는 문맥 개수가 실행마다 달라지고, 이 지표가 **답변에 의존**하기 때문입니다(11-10절). 하한은 그래도 파국용 0.85로 둡니다 - '변동폭이 0이다'라는 전제는 이미 두 번 깨졌고, 같은 전제에 좁은 하한을 다시 얹지 않습니다. **author나 topcited가 무너지면 하한을 또 내리는 대신 이 지표를 게이트에서 뺍니다.** 하한을 관측에 맞춰 반복해 내리면 게이트가 장식이 됩니다.",
     "no_drop_on_ragas": "RAGAS 지표에는 허용폭도 사례별 규칙도 두지 않습니다. 사례별 판정이 같은 답변에서도 0과 1을 왕복하고(reference-01: 1,1,1,0 / coauthor-02: 1,0,1,0 / citing-06의 context_precision: 1,1,1,0.1667) 집계는 그 개수이므로, n=30에서 작은 회귀를 변동과 구별할 수 없습니다. 구별할 수 없는 값에 규칙을 붙이면 규칙이 아니라 숫자입니다.",
-    "ragas_judge_model": "기준선의 RAGAS 값은 이 판정 모델로 쟀습니다. 다른 모델로 잰 점수를 같은 표에 올리면 모수가 다른 값을 비교하게 됩니다(metrics_split과 같은 규칙). 2026-10-17에 CI가 OPENAI_MODEL을 넘기지 않아 실제로 그 일이 있었고, 그래서 게이트가 막습니다."
+    "ragas_judge_model": "기준선의 RAGAS 값은 이 판정 모델로 쟀습니다. 다른 모델로 잰 점수를 같은 표에 올리면 모수가 다른 값을 비교하게 됩니다(metrics_split과 같은 규칙). 2026-10-17에 CI가 OPENAI_MODEL을 넘기지 않아 실제로 그 일이 있었고, 그래서 게이트가 막습니다.",
+    "answer_evidence_precision": "0.99에서 0.95로 **넓혔습니다**(2026-10-18). 라우팅(ADR-024) 뒤 재측정에서 3회 중 한 번 `citing-03`이 시드 논문 자신을 근거에 넣어 precision이 0.6667이 됐고, 30건 집계가 (29 + 0.6667)/30 = 0.9889로 하한 0.9900을 0.0011 넘겼습니다. 즉 **기준선을 만든 실행이 그 기준선에 걸립니다.** 관측 변동폭 0.0111이 하한까지의 여유 0.0063보다 커서, 0.99는 품질이 아니라 변동을 막는 하한입니다(90 사례-실행 중 1건 -> 30건 실행이 빨개질 확률 약 28%). 0.95는 같은 사례 4~5건까지 견디고 계통적 고장은 여전히 막습니다. **근본 원인은 따로 고칩니다**: 제목을 arxiv_id로 바꾸는 중간 조회의 행이 `evidence_ids`에 시드를 담고, 그것이 (1) `retrieved_ids` 1위를 차지해 reciprocal_rank 상한을 0.7000으로 묶고 (2) RAGAS context_precision을 절반으로 깎고 (3) 드물게 답변 근거로 새어 나옵니다. 중간 조회 결과를 근거와 분리하면 셋이 한 번에 풀리지만 지표 정의가 바뀌어 기준선을 다시 써야 하므로 다음 주기로 둡니다."
   },
   "ragas_stable_families": [
     "author",
     "topcited"
-  ],
-  "ragas_judge_model": "gpt-6-luna"
+  ]
 }

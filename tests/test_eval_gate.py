@@ -479,19 +479,36 @@ def test_a_real_quality_regression_is_still_caught_after_the_split():
     assert "stable_case" in {v.rule for v in check(baseline, report_with(0.5))}
 
 
-def test_the_floors_are_inside_what_three_runs_actually_showed():
-    """하한이 관측 범위 안에 있으면 변동만으로 실패합니다."""
+def test_no_floor_can_be_breached_by_the_measured_spread_alone():
+    """하한이 관측 범위 안에 있으면 품질 변화 없이 실패합니다.
+
+    전에는 "순위 지표의 변동폭은 0.1보다 크다"처럼 2026-10-16의 **측정값**을 요구사항으로
+    적어 뒀습니다. 라우팅(ADR-024)이 그 변동폭을 없애자 테스트가 깨졌습니다 — 좋아진
+    것에 테스트가 걸린 것이므로, 고정해야 할 것은 수치가 아니라 **관계**입니다.
+
+    이 규칙이 2026-10-18에 실제로 일을 했습니다. 라우팅 뒤 근거 precision이 0.9963,
+    변동폭 0.0111이 됐는데 하한이 0.99였습니다. 여유가 0.0063뿐이라 변동 한 번으로
+    터지고, 실제로 기준선을 만든 3회 중 한 번이 0.9889로 걸렸습니다. 하한을 0.95로
+    넓혔습니다.
+    """
+    from evals.gate import _lower_is_better
+
     baseline = load(BASELINE)
     assert baseline["source"]["runs"] >= 3
     spread = baseline["source"]["observed_spread"]
-    # 변동폭이 큰 순위 지표에는 허용폭을 두지 않습니다.
-    for name in ("hit_at_k", "recall_at_k", "reciprocal_rank"):
-        assert spread[name] > 0.1, (name, spread[name])
-        assert name not in baseline["allowed_drop"]
-    # 변동폭이 0인 근거 지표에는 좁은 허용폭을 둡니다.
-    for name in ("answer_evidence_recall", "answer_evidence_precision"):
-        assert spread[name] == 0.0
-        assert baseline["allowed_drop"][name] <= 0.02
+
+    for name, floor in baseline["absolute_floor"].items():
+        measured = baseline["metrics"].get(name)
+        if measured is None or name not in spread:
+            continue
+        # 관측된 최악값이 하한을 넘지 않아야 합니다. 실패율처럼 작을수록 좋은 지표는
+        # 방향이 반대입니다.
+        worst = measured + spread[name] if _lower_is_better(name) else measured - spread[name]
+        if _lower_is_better(name):
+            assert worst < floor, (name, worst, floor)
+        else:
+            assert worst > floor, (name, worst, floor)
+
 
 
 # --- RAGAS 지표 ---------------------------------------------------------------------
