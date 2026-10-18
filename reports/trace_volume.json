@@ -1,31 +1,31 @@
 {
-  "generated_at": "2026-10-18T07:36:12.181730+00:00",
+  "generated_at": "2026-10-18T07:51:52.953389+00:00",
   "cases": 30,
   "cases_file": "evals/cases_graph.json",
   "per_path": {
     "clean": {
-      "nodes": 5,
-      "observations": 6
+      "nodes": 6,
+      "observations": 7
     },
     "revise_once": {
-      "nodes": 9,
-      "observations": 10
+      "nodes": 10,
+      "observations": 11
     },
     "abstain": {
-      "nodes": 8,
-      "observations": 9
+      "nodes": 9,
+      "observations": 10
     }
   },
   "per_eval_run": {
-    "best": 180,
-    "worst": 270
+    "best": 210,
+    "worst": 300
   },
   "weekly_cron_per_month": {
-    "best": 720,
-    "worst": 1080
+    "best": 840,
+    "worst": 1200
   },
   "budget_key": "LANGFUSE_MAX_TRACES",
   "default_budget_traces": 50,
-  "default_budget_observations_worst": 450,
+  "default_budget_observations_worst": 500,
   "note": "추정이 아니라 그래프를 실제로 돌려 센 값입니다. 보내는 내용은 노드 이름·시도 번호·지연뿐이고 질문도 답변도 포함하지 않습니다(ADR-023)."
 }

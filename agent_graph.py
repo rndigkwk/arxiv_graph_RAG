@@ -9,6 +9,9 @@ Day 50~53 교안의 구조입니다. 바꾸는 것은 **흐름의 모양**이고
    화면에도 추적에도 드러나지 않았습니다.
 3. **보류 경로가 자리를 얻습니다.** 두 번 실패하면 `abstain` 노드를 지나고, 그 사실이 추적에
    남습니다.
+4. **경로 선택이 노드가 됩니다.** `route`가 질문을 보고 저장된 관계만 묻는 질문을 가려냅니다
+   ([`routing.py`](routing.py), ADR-024). 그 전까지 경로 선택은 시스템 프롬프트의 문장으로만
+   있었고, 모델이 지키는지 세지 않았습니다.
 
 **행동은 바꾸지 않았습니다.** `abstain`은 지금도 `AnswerValidationError`를 올립니다. 평가
 하네스가 그 예외를 "답하지 못함"으로 세고 게이트의 `answer_failure_rate` 기준선이 그 정의로
@@ -26,6 +29,8 @@ from time import perf_counter
 from typing import Any, Callable, TypedDict
 
 from langgraph.graph import END, START, StateGraph
+
+import routing
 
 # 한 질문에 허용하는 생성 시도 횟수입니다. 손으로 쓴 루프의 `range(2)`와 같은 값입니다.
 MAX_ATTEMPTS = 2
@@ -46,6 +51,7 @@ class AnswerState(TypedDict, total=False):
     question: str
     history: list[Any]
     messages: list[Any]
+    route: dict[str, Any]
     attempt: int
     result: dict[str, Any]
     response: dict[str, Any]
@@ -82,6 +88,19 @@ def _timed(name: str, state: AnswerState, work: Callable[[], dict[str, Any]]) ->
 def build_graph(deps: Dependencies):
     """Compile the generate → validate → revise → accept/abstain graph."""
 
+    def route(state: AnswerState) -> dict[str, Any]:
+        def work() -> dict[str, Any]:
+            decided = routing.classify(state["question"])
+            if not decided.hint:
+                return {"route": decided.as_dict()}
+            # 힌트는 이번 턴에만 붙습니다. 과거 대화에 남기면 다음 질문의 경로까지 좁힙니다.
+            return {
+                "route": decided.as_dict(),
+                "messages": [*state["messages"], ("user", decided.hint)],
+            }
+
+        return _timed("route", state, work)
+
     def generate(state: AnswerState) -> dict[str, Any]:
         def work() -> dict[str, Any]:
             result = deps.stream_answer(state["messages"], state.get("attempt", 0))
@@ -97,7 +116,11 @@ def build_graph(deps: Dependencies):
             result = state["result"]
             # 과거 대화를 제외하고, 이번 질문의 검색과 수정 호출만 모읍니다.
             current = {**result, "messages": result["messages"][len(state["history"]):]}
-            return {"response": deps.collect(current, state["question"])}
+            response = deps.collect(current, state["question"])
+            # 경로를 응답에 실어 둡니다. 지시를 지켰는지는 보고서에서 세어야 알 수 있고,
+            # 세려면 판정이 답변과 같은 줄에 남아 있어야 합니다(ADR-024).
+            response["route"] = state.get("route", {})
+            return {"response": response}
 
         return _timed("collect", state, work)
 
@@ -159,6 +182,7 @@ def build_graph(deps: Dependencies):
 
     graph = StateGraph(AnswerState)
     for name, node in (
+        ("route", route),
         ("generate", generate),
         ("collect", collect),
         ("check_format", check_format),
@@ -169,7 +193,8 @@ def build_graph(deps: Dependencies):
     ):
         graph.add_node(name, node)
 
-    graph.add_edge(START, "generate")
+    graph.add_edge(START, "route")
+    graph.add_edge("route", "generate")
     graph.add_edge("generate", "collect")
     graph.add_edge("collect", "check_format")
     graph.add_conditional_edges(

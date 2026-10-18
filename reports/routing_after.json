@@ -1,0 +1,847 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-18T07:56:58.388728+00:00",
+  "mode": "agent",
+  "top_k": 5,
+  "dataset": "cases_graph.json",
+  "metadata": {
+    "timestamp_utc": "2026-10-18T07:56:58.388728+00:00",
+    "dataset_file": "cases_graph.json",
+    "dataset_sha256": "27f1fea3bb5961e9b52767b1399d9da1324fbff2bf51ffc91444f37f99670aeb",
+    "mode": "agent",
+    "top_k": 5,
+    "case_ids": [
+      "reference-01",
+      "reference-02",
+      "reference-03",
+      "reference-04",
+      "reference-05",
+      "reference-06",
+      "coauthor-01",
+      "coauthor-02",
+      "coauthor-03",
+      "coauthor-04",
+      "coauthor-05",
+      "coauthor-06"
+    ],
+    "model": "gpt-6-luna",
+    "embedding_model": "text-embedding-3-large",
+    "python_version": "3.12.13",
+    "platform": {
+      "system": "Windows",
+      "release": "11",
+      "machine": "AMD64"
+    },
+    "packages": {
+      "openai": "3.3.0",
+      "langchain": "1.3.16",
+      "neo4j-graphrag": "1.18.0",
+      "tiktoken": "0.14.0"
+    },
+    "git_sha": "fa72d03893e38f27e2fab647638687e15d7fbbea",
+    "git_dirty": true,
+    "prompt_versions": {
+      "CYPHER_RULES": "93d6931b7641",
+      "AGENT_SYSTEM": "a255efe11646",
+      "JUDGE_CONTENT": "c09bb82b3769",
+      "TRANSLATE_TO_ENGLISH": "1af68d2a119f",
+      "TRANSLATE_TO_KOREAN": "130e2c8cb43c"
+    }
+  },
+  "pricing": null,
+  "results": [
+    {
+      "id": "reference-01",
+      "category": "reference",
+      "retrieved_ids": [
+        "2412.19663",
+        "2105.09492",
+        "2603.04337"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2607.05915",
+        "2607.05123",
+        "2607.05750",
+        "2609.07434",
+        "2606.13368"
+      ],
+      "evidence_ids": [
+        "2412.19663",
+        "2105.09492",
+        "2603.04337"
+      ],
+      "answer": "The cited papers with primary category cs.CV are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2412.19663 | CAD-GPT: Synthesising CAD Construction Sequence with Spatial Reasoning-Enhanced Multimodal LLMs | cs.CV |\n| 2105.09492 | DeepCAD: A Deep Generative Network for Computer-Aided Design Models | cs.CV |\n| 2603.04337 | Pointer-CAD: Unifying B-Rep and Command Sequences via Pointer-based Edges & Faces Selection | cs.CV |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"pcbworld: a benchmark environment for engine-grounded pcb design automation\" MATCH (p)-[:REFERENCES]->(q:ArxivPaper) WHERE q.primary_category = \"cs.CV\" RETURN q.arxiv_id AS answer_value, [q.arxiv_id] AS evidence_ids, q.title AS title, q.primary_category AS primary_category ORDER BY title LIMIT 25\nanswer_value=2412.19663 | evidence_ids=['2412.19663'] | title=CAD-GPT: Synthesising CAD Construction Sequence with Spatial Reasoning-Enhanced Multimodal LLMs | primary_category=cs.CV\nanswer_value=2105.09492 | evidence_ids=['2105.09492'] | title=DeepCAD: A Deep Generative Network for Computer-Aided Design Models | primary_category=cs.CV\nanswer_value=2603.04337 | evidence_ids=['2603.04337'] | title=Pointer-CAD: Unifying B-Rep and Command Sequences via Pointer-based Edges & Faces Selection | primary_category=cs.CV"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.003,
+          "generate": 29.434,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.802,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 33.239
+      }
+    },
+    {
+      "id": "reference-02",
+      "category": "reference",
+      "retrieved_ids": [
+        "2606.21565",
+        "2508.01780",
+        "2409.17270"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2607.04096",
+        "2305.12295",
+        "2310.03714",
+        "2603.25111",
+        "2607.27354"
+      ],
+      "evidence_ids": [
+        "2606.21565",
+        "2508.01780",
+        "2409.17270"
+      ],
+      "answer": "The cited papers with primary category **cs.AI** are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.21565 | Composing Verifiable Conceptual Models via Building Blocks: Towards Design-Time Verification of Agentic AI Workflows | cs.AI |\n| 2508.01780 | LiveMCPBench: Can Agents Navigate an Ocean of MCP Tools? | cs.AI |\n| 2409.17270 | Proof of Thought : Neurosymbolic Program Synthesis allows Robust and Interpretable Reasoning | cs.AI |",
+      "contexts": [
+        "Cypher: MATCH (seed:ArxivPaper) WHERE toLower(seed.title) CONTAINS \"verifiable reasoning from neurosymbolic primitive programming\" MATCH (seed)-[:REFERENCES]->(p:ArxivPaper) WHERE p.primary_category = \"cs.AI\" RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category ORDER BY answer_value LIMIT 25\nanswer_value=Composing Verifiable Conceptual Models via Building Blocks: Towards Design-Time Verification of Agentic AI Workflows | evidence_ids=['2606.21565'] | arxiv_id=2606.21565 | primary_category=cs.AI\nanswer_value=LiveMCPBench: Can Agents Navigate an Ocean of MCP Tools? | evidence_ids=['2508.01780'] | arxiv_id=2508.01780 | primary_category=cs.AI\nanswer_value=Proof of Thought : Neurosymbolic Program Synthesis allows Robust and Interpretable Reasoning | evidence_ids=['2409.17270'] | arxiv_id=2409.17270 | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 10.445,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.711,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 14.156
+      }
+    },
+    {
+      "id": "reference-03",
+      "category": "reference",
+      "retrieved_ids": [
+        "2608.11705",
+        "2509.15202",
+        "2404.01318",
+        "2406.05946",
+        "2404.13208"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.5,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2608.11705",
+        "2608.17202",
+        "2603.08234",
+        "2609.02707",
+        "2606.16808"
+      ],
+      "evidence_ids": [
+        "2509.15202",
+        "2404.01318",
+        "2406.05946",
+        "2404.13208"
+      ],
+      "answer": "The cited papers with primary category cs.CR are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2509.15202 | Beyond Surface Alignment: Rebuilding LLMs Safety Mechanism via Probabilistically Ablating Refusal Direction | cs.CR |\n| 2404.01318 | JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models | cs.CR |\n| 2406.05946 | Safety Alignment Should Be Made More Than Just a Few Tokens Deep | cs.CR |\n| 2404.13208 | The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions | cs.CR |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"making your llms more objective\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.arxiv_id LIMIT 25\nanswer_value=2608.11705 | evidence_ids=['2608.11705'] | title=Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning | primary_category=cs.AI",
+        "Cypher: MATCH (p:ArxivPaper {arxiv_id: \"2608.11705\"})-[:REFERENCES]->(c:ArxivPaper) WHERE c.primary_category = \"cs.CR\" RETURN c.arxiv_id AS answer_value, [c.arxiv_id] AS evidence_ids, c.title AS title, c.primary_category AS primary_category ORDER BY c.title LIMIT 25\nanswer_value=2509.15202 | evidence_ids=['2509.15202'] | title=Beyond Surface Alignment: Rebuilding LLMs Safety Mechanism via Probabilistically Ablating Refusal Direction | primary_category=cs.CR\nanswer_value=2404.01318 | evidence_ids=['2404.01318'] | title=JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models | primary_category=cs.CR\nanswer_value=2406.05946 | evidence_ids=['2406.05946'] | title=Safety Alignment Should Be Made More Than Just a Few Tokens Deep | primary_category=cs.CR\nanswer_value=2404.13208 | evidence_ids=['2404.13208'] | title=The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions | primary_category=cs.CR"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 12.906,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.459,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 18.365
+      }
+    },
+    {
+      "id": "reference-04",
+      "category": "reference",
+      "retrieved_ids": [
+        "2110.00061",
+        "2403.07718"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2608.18050",
+        "2210.03629",
+        "2310.06770",
+        "2404.07972",
+        "2607.15193"
+      ],
+      "evidence_ids": [
+        "2110.00061",
+        "2403.07718"
+      ],
+      "answer": "The cited papers with primary category cs.LG are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2110.00061 | PubTables-1M: Towards comprehensive table extraction from unstructured documents | cs.LG |\n| 2403.07718 | WorkArena: How Capable Are Web Agents at Solving Common Knowledge Work Tasks? | cs.LG |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"stagedworkspace: a versioned workspace for knowledge-work agents\" MATCH (p)-[:REFERENCES]->(c:ArxivPaper) WHERE c.primary_category = \"cs.LG\" RETURN c.title AS answer_value, [c.arxiv_id] AS evidence_ids, c.arxiv_id AS arxiv_id, c.primary_category AS primary_category ORDER BY c.title LIMIT 25\nanswer_value=PubTables-1M: Towards comprehensive table extraction from unstructured documents | evidence_ids=['2110.00061'] | arxiv_id=2110.00061 | primary_category=cs.LG\nanswer_value=WorkArena: How Capable Are Web Agents at Solving Common Knowledge Work Tasks? | evidence_ids=['2403.07718'] | arxiv_id=2403.07718 | primary_category=cs.LG"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 11.893,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.434,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 15.327
+      }
+    },
+    {
+      "id": "reference-05",
+      "category": "reference",
+      "retrieved_ids": [
+        "2312.00752",
+        "1707.06347"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2608.24810",
+        "2608.24462",
+        "2609.11372",
+        "2607.02303",
+        "2607.21000"
+      ],
+      "evidence_ids": [
+        "2312.00752",
+        "1707.06347"
+      ],
+      "answer": "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2312.00752 | Mamba: Linear-Time Sequence Modeling with Selective State Spaces | cs.LG |\n| 1707.06347 | Proximal Policy Optimization Algorithms | cs.LG |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"reinforcement learning for quantum tiq-taq-toe\" MATCH (p)-[:REFERENCES]->(c:ArxivPaper) WHERE c.primary_category = \"cs.LG\" RETURN c.title AS answer_value, [c.arxiv_id] AS evidence_ids, c.arxiv_id AS arxiv_id, c.primary_category AS primary_category ORDER BY c.title LIMIT 25\nanswer_value=Mamba: Linear-Time Sequence Modeling with Selective State Spaces | evidence_ids=['2312.00752'] | arxiv_id=2312.00752 | primary_category=cs.LG\nanswer_value=Proximal Policy Optimization Algorithms | evidence_ids=['1707.06347'] | arxiv_id=1707.06347 | primary_category=cs.LG"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 8.649,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.498,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 12.147
+      }
+    },
+    {
+      "id": "reference-06",
+      "category": "reference",
+      "retrieved_ids": [
+        "2602.07267",
+        "2510.04374",
+        "2411.15114"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.5,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2602.07267",
+        "2608.19072",
+        "2604.00594",
+        "2608.20318",
+        "2503.14499"
+      ],
+      "evidence_ids": [
+        "2510.04374",
+        "2411.15114"
+      ],
+      "answer": "The cited papers with primary category cs.LG are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2510.04374 | GDPval: Evaluating AI Model Performance on Real-World Economically Valuable Tasks | cs.LG |\n| 2411.15114 | RE-Bench: Evaluating frontier AI R&D capabilities of language model agents against human experts | cs.LG |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"bridge: predicting human task completion time from model performance\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title ORDER BY p.published DESC LIMIT 25\nanswer_value=2602.07267 | evidence_ids=['2602.07267'] | title=BRIDGE: Predicting Human Task Completion Time From Model Performance",
+        "Cypher: MATCH (citing:ArxivPaper {arxiv_id: \"2602.07267\"})-[:REFERENCES]->(p:ArxivPaper) WHERE p.primary_category = \"cs.LG\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.title LIMIT 25\nanswer_value=2510.04374 | evidence_ids=['2510.04374'] | title=GDPval: Evaluating AI Model Performance on Real-World Economically Valuable Tasks | primary_category=cs.LG\nanswer_value=2411.15114 | evidence_ids=['2411.15114'] | title=RE-Bench: Evaluating frontier AI R&D capabilities of language model agents against human experts | primary_category=cs.LG"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 7.849,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.521,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 12.37
+      }
+    },
+    {
+      "id": "coauthor-01",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2404.04940",
+        "2303.14382",
+        "2510.01656",
+        "2403.05530",
+        "2510.11345"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.5,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2608.29102",
+        "0711.0189",
+        "physics/9806030",
+        "1901.10204",
+        "1301.2603"
+      ],
+      "evidence_ids": [
+        "2303.14382",
+        "2510.01656",
+        "2403.05530",
+        "2510.11345"
+      ],
+      "answer": "These papers share the author Han Lu with *Fuzzy K-Means Clustering without Cluster Centroids*:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 2303.14382 | Active Finetuning: Exploiting Annotation Budget in the Pretraining-Finetuning Paradigm | cs.CV | Han Lu |\n| 2510.01656 | Asymmetric Proximal Policy Optimization: mini-critics boost LLM reasoning | cs.LG | Han Lu |\n| 2403.05530 | Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context | cs.CL | Han Lu |\n| 2510.11345 | Part II: ROLL Flash -- Accelerating RLVR and Agentic Training with Asynchrony | cs.LG | Han Lu |",
+      "contexts": [
+        "Cypher: MATCH (target:ArxivPaper) WHERE toLower(target.title) CONTAINS \"fuzzy k-means clustering without cluster centroids\" RETURN target.arxiv_id AS answer_value, [target.arxiv_id] AS evidence_ids, target.title AS title LIMIT 25\nanswer_value=2404.04940 | evidence_ids=['2404.04940'] | title=Fuzzy K-Means Clustering without Cluster Centroids",
+        "Cypher: MATCH (target:ArxivPaper {arxiv_id: \"2404.04940\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(other:ArxivPaper) WHERE other <> target WITH other, collect(DISTINCT a.name) AS shared_authors RETURN other.arxiv_id AS answer_value, [other.arxiv_id] AS evidence_ids, other.title AS title, other.primary_category AS primary_category, shared_authors AS shared_authors ORDER BY title LIMIT 25\nanswer_value=2303.14382 | evidence_ids=['2303.14382'] | title=Active Finetuning: Exploiting Annotation Budget in the Pretraining-Finetuning Paradigm | primary_category=cs.CV | shared_authors=['Han Lu']\nanswer_value=2510.01656 | evidence_ids=['2510.01656'] | title=Asymmetric Proximal Policy Optimization: mini-critics boost LLM reasoning | primary_category=cs.LG | shared_authors=['Han Lu']\nanswer_value=2403.05530 | evidence_ids=['2403.05530'] | title=Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context | primary_category=cs.CL | shared_authors=['Han Lu']\nanswer_value=2510.11345 | evidence_ids=['2510.11345'] | title=Part II: ROLL Flash -- Accelerating RLVR and Agentic Training with Asynchrony | primary_category=cs.LG | shared_authors=['Han Lu']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 14.492,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.135,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 19.627
+      }
+    },
+    {
+      "id": "coauthor-02",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2402.04674",
+        "2504.08324",
+        "1809.05224",
+        "2104.03220"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.5,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2609.00071",
+        "2608.12555",
+        "2004.10337",
+        "1711.07137",
+        "2402.04674"
+      ],
+      "evidence_ids": [
+        "2504.08324",
+        "1809.05224",
+        "2104.03220"
+      ],
+      "answer": "These papers share at least one author with *Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study*:\n\n| arXiv ID | Title | Primary category | Shared author(s) |\n|---|---|---|---|\n| 2504.08324 | An Introduction to Double/Debiased Machine Learning | econ.EM | Victor Chernozhukov |\n| 1809.05224 | Automatic Debiased Machine Learning of Causal and Structural Effects | math.ST | Victor Chernozhukov |\n| 2104.03220 | DoubleML -- An Object-Oriented Implementation of Double Machine Learning in Python | stat.ML | Philipp Bach; Victor Chernozhukov; Martin Spindler |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"hyperparameter tuning for causal inference with double machine learning\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title ORDER BY p.published DESC LIMIT 25\nanswer_value=2402.04674 | evidence_ids=['2402.04674'] | title=Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study",
+        "Cypher: MATCH (target:ArxivPaper {arxiv_id: \"2402.04674\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(other:ArxivPaper) WHERE other.arxiv_id <> target.arxiv_id RETURN other.arxiv_id AS answer_value, [other.arxiv_id] AS evidence_ids, other.title AS title, other.primary_category AS primary_category, a.name AS shared_author ORDER BY other.title LIMIT 25\nanswer_value=2504.08324 | evidence_ids=['2504.08324'] | title=An Introduction to Double/Debiased Machine Learning | primary_category=econ.EM | shared_author=Victor Chernozhukov\nanswer_value=1809.05224 | evidence_ids=['1809.05224'] | title=Automatic Debiased Machine Learning of Causal and Structural Effects | primary_category=math.ST | shared_author=Victor Chernozhukov\nanswer_value=2104.03220 | evidence_ids=['2104.03220'] | title=DoubleML -- An Object-Oriented Implementation of Double Machine Learning in Python | primary_category=stat.ML | shared_author=Philipp Bach\nanswer_value=2104.03220 | evidence_ids=['2104.03220'] | title=DoubleML -- An Object-Oriented Implementation of Double Machine Learning in Python | primary_category=stat.ML | shared_author=Victor Chernozhukov\nanswer_value=2104.03220 | evidence_ids=['2104.03220'] | title=DoubleML -- An Object-Oriented Implementation of Double Machine Learning in Python | primary_category=stat.ML | shared_author=Martin Spindler"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 12.498,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.602,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 16.1
+      }
+    },
+    {
+      "id": "coauthor-03",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2510.15144",
+        "2507.11479",
+        "2504.13641",
+        "2506.06958",
+        "2606.08098"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2305.20050",
+        "2110.14168",
+        "2203.11171",
+        "2305.14325",
+        "2408.03314"
+      ],
+      "evidence_ids": [
+        "2510.15144",
+        "2507.11479",
+        "2504.13641",
+        "2506.06958"
+      ],
+      "answer": "These other papers in the collection share an author with *When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference*:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 2510.15144 | HugAgent: A Human Simulation Benchmark for Individual-Level Reasoning | cs.AI | Kent Larson |\n| 2507.11479 | Perspective-Aware AI in Extended Reality | cs.AI | Kent Larson |\n| 2504.13641 | Propagational Proxy Voting | cs.SI | Yasushi Sakai; Kent Larson |\n| 2506.06958 | Simulating Society Requires Simulating Thought | cs.CY | Kent Larson |",
+      "contexts": [
+        "Cypher: MATCH (seed:ArxivPaper) WHERE toLower(seed.title) CONTAINS \"when does delegation beat majority\" MATCH (a:ArxivAuthorName)-[:AUTHORED]->(seed) MATCH (a)-[:AUTHORED]->(p:ArxivPaper) WHERE p <> seed RETURN a.name + \" — \" + p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.title LIMIT 25\nanswer_value=Kent Larson — HugAgent: A Human Simulation Benchmark for Individual-Level Reasoning | evidence_ids=['2510.15144'] | title=HugAgent: A Human Simulation Benchmark for Individual-Level Reasoning | primary_category=cs.AI\nanswer_value=Kent Larson — Perspective-Aware AI in Extended Reality | evidence_ids=['2507.11479'] | title=Perspective-Aware AI in Extended Reality | primary_category=cs.AI\nanswer_value=Yasushi Sakai — Propagational Proxy Voting | evidence_ids=['2504.13641'] | title=Propagational Proxy Voting | primary_category=cs.SI\nanswer_value=Kent Larson — Propagational Proxy Voting | evidence_ids=['2504.13641'] | title=Propagational Proxy Voting | primary_category=cs.SI\nanswer_value=Kent Larson — Simulating Society Requires Simulating Thought | evidence_ids=['2506.06958'] | title=Simulating Society Requires Simulating Thought | primary_category=cs.CY",
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"when does delegation beat majority\" RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids ORDER BY p.title LIMIT 25\nanswer_value=When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference | evidence_ids=['2606.08098']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 21.694,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.789,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 26.483
+      }
+    },
+    {
+      "id": "coauthor-04",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2609.04170",
+        "2603.19685",
+        "2111.09794",
+        "2507.02554",
+        "2608.13940",
+        "2509.17158",
+        "2506.21490",
+        "1904.01557",
+        "2411.13543",
+        "2207.09405",
+        "2412.08021",
+        "2609.02459",
+        "2305.14133",
+        "2402.06782",
+        "2402.05828",
+        "2002.00632",
+        "1705.11040",
+        "2406.11905",
+        "2511.16652",
+        "2203.01302",
+        "2602.11964",
+        "2211.07819",
+        "2402.15391",
+        "2301.07608",
+        "2511.08394",
+        "2509.03581",
+        "2607.16421"
+      ],
+      "hit_at_k": 0.0,
+      "recall_at_k": 0.0,
+      "reciprocal_rank": 0.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 0.04,
+      "answer_evidence_recall": 0.5,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "1707.06347",
+        "1612.01474",
+        "2306.13831",
+        "2406.18665",
+        "1705.08439"
+      ],
+      "evidence_ids": [
+        "2609.04170",
+        "2603.19685",
+        "2111.09794",
+        "2507.02554",
+        "2608.13940",
+        "2509.17158",
+        "2506.21490",
+        "1904.01557",
+        "2411.13543",
+        "2207.09405",
+        "2412.08021",
+        "2609.02459",
+        "2305.14133",
+        "2402.06782",
+        "2402.05828",
+        "2002.00632",
+        "1705.11040",
+        "2406.11905",
+        "2511.16652",
+        "2203.01302",
+        "2602.11964",
+        "2211.07819",
+        "2402.15391",
+        "2301.07608",
+        "2511.08394"
+      ],
+      "answer": "The collection contains the following other papers sharing at least one author with *When to Plan: Learning to Select Between Reactive Control and Deliberative Planning*:\n\n| arXiv ID | Title | Primary category | Shared author(s) |\n|---|---|---|---|\n| 2609.04170 | A Case Study on Emergent Cheating and Whistleblowing in Autonomous Research Swarms | cs.AI | Davide Paglieri |\n| 2603.19685 | A Subgoal-driven Framework for Improving Long-Horizon LLM Agents | cs.AI | Edward Grefenstette |\n| 2111.09794 | A Survey of Zero-shot Generalisation in Deep Reinforcement Learning | cs.LG | Tim Rocktäschel; Edward Grefenstette |\n| 2507.02554 | AI Research Agents for Machine Learning: Search, Exploration, and Generalization in MLE-bench | cs.AI | Jakob Nicolaus Foerster |\n| 2608.13940 | AI Research Preference Models | cs.AI | Jakob Nicolaus Foerster |\n| 2509.17158 | ARE: Scaling Up Agent Environments and Evaluations | cs.AI | Ulyana Piterbarg |\n| 2506.21490 | Ad-Hoc Human-AI Coordination Challenge | cs.AI | Jakob Nicolaus Foerster; Jonathan Cook |\n| 1904.01557 | Analysing Mathematical Reasoning Abilities of Neural Models | cs.LG | Edward Grefenstette |\n| 2411.13543 | BALROG: Benchmarking Agentic LLM and VLM Reasoning On Games | cs.AI | Tim Rocktäschel; Jakob Nicolaus Foerster; Jack Parker-Holder; Ulyana Piterbarg; Bartłomiej Cupiał; Davide Paglieri |\n| 2207.09405 | Bayesian Generational Population-Based Training | cs.LG | Jack Parker-Holder |\n| 2412.08021 | Can a MISL Fly? Analysis and Ingredients for Mutual Information Skill Learning | cs.LG | Jens Tuyls |\n| 2609.02459 | CivBench: A Long-Horizon Benchmark for Tool-Mediated Agents in Civilization VI | cs.AI | Jakob Nicolaus Foerster |\n| 2305.14133 | Conditional Mutual Information for Disentangled Representations in Reinforcement Learning | cs.LG | Josiah P. Hanna |\n| 2402.06782 | Debating with More Persuasive LLMs Leads to More Truthful Answers | cs.AI | Tim Rocktäschel; Edward Grefenstette |\n| 2402.05828 | Discovering Temporally-Aware Reinforcement Learning Algorithms | cs.LG | Jakob Nicolaus Foerster |\n| 2002.00632 | Effective Diversity in Population Based Reinforcement Learning | cs.LG | Jack Parker-Holder |\n| 1705.11040 | End-to-End Differentiable Proving | cs.NE | Tim Rocktäschel |\n| 2406.11905 | EvIL: Evolution Strategies for Generalisable Imitation Learning | cs.NE | Jakob Nicolaus Foerster |\n| 2511.16652 | Evolution Strategies at the Hyperscale | cs.LG | Jakob Nicolaus Foerster |\n| 2203.01302 | Evolving Curricula with Regret-Based Environment Design | cs.LG | Tim Rocktäschel; Jack Parker-Holder; Edward Grefenstette |\n| 2602.11964 | Gaia2: Benchmarking LLM Agents on Dynamic and Asynchronous Environments | cs.AI | Ulyana Piterbarg |\n| 2211.07819 | General Intelligence Requires Rethinking Exploration | cs.AI | Tim Rocktäschel; Edward Grefenstette |\n| 2402.15391 | Genie: Generative Interactive Environments | cs.LG | Tim Rocktäschel; Jack Parker-Holder |\n| 2301.07608 | Human-Timescale Adaptation in an Open-Ended Task Space | cs.LG | Tim Rocktäschel; Jack Parker-Holder |\n| 2511.08394 | Interaction Dynamics as a Reward Signal for LLMs | cs.CL | Edward Grefenstette |",
+      "contexts": [
+        "Cypher: MATCH (seed:ArxivPaper) WHERE toLower(seed.title) CONTAINS \"when to plan\" MATCH (a:ArxivAuthorName)-[:AUTHORED]->(seed) MATCH (a)-[:AUTHORED]->(p:ArxivPaper) WHERE p <> seed WITH DISTINCT p, collect(DISTINCT a.name) AS shared_authors RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_category, shared_authors ORDER BY title LIMIT 25\nanswer_value=A Case Study on Emergent Cheating and Whistleblowing in Autonomous Research Swarms | evidence_ids=['2609.04170'] | arxiv_id=2609.04170 | title=A Case Study on Emergent Cheating and Whistleblowing in Autonomous Research Swarms | primary_category=cs.AI | shared_authors=['Davide Paglieri']\nanswer_value=A Subgoal-driven Framework for Improving Long-Horizon LLM Agents | evidence_ids=['2603.19685'] | arxiv_id=2603.19685 | title=A Subgoal-driven Framework for Improving Long-Horizon LLM Agents | primary_category=cs.AI | shared_authors=['Edward Grefenstette']\nanswer_value=A Survey of Zero-shot Generalisation in Deep Reinforcement Learning | evidence_ids=['2111.09794'] | arxiv_id=2111.09794 | title=A Survey of Zero-shot Generalisation in Deep Reinforcement Learning | primary_category=cs.LG | shared_authors=['Tim Rocktäschel', 'Edward Grefenstette']\nanswer_value=AI Research Agents for Machine Learning: Search, Exploration, and Generalization in MLE-bench | evidence_ids=['2507.02554'] | arxiv_id=2507.02554 | title=AI Research Agents for Machine Learning: Search, Exploration, and Generalization in MLE-bench | primary_category=cs.AI | shared_authors=['Jakob Nicolaus Foerster']\nanswer_value=AI Research Preference Models | evidence_ids=['2608.13940'] | arxiv_id=2608.13940 | title=AI Research Preference Models | primary_category=cs.AI | shared_authors=['Jakob Nicolaus Foerster']\nanswer_value=ARE: Scaling Up Agent Environments and Evaluations | evidence_ids=['2509.17158'] | arxiv_id=2509.17158 | title=ARE: Scaling Up Agent Environments and Evaluations | primary_category=cs.AI | shared_authors=['Ulyana Piterbarg']\nanswer_value=Ad-Hoc Human-AI Coordination Challenge | evidence_ids=['2506.21490'] | arxiv_id=2506.21490 | title=Ad-Hoc Human-AI Coordination Challenge | primary_category=cs.AI | shared_authors=['Jakob Nicolaus Foerster', 'Jonathan Cook']\nanswer_value=Analysing Mathematical Reasoning Abilities of Neural Models | evidence_ids=['1904.01557'] | arxiv_id=1904.01557 | title=Analysing Mathematical Reasoning Abilities of Neural Models | primary_category=cs.LG | shared_authors=['Edward Grefenstette']\nanswer_value=BALROG: Benchmarking Agentic LLM and VLM Reasoning On Games | evidence_ids=['2411.13543'] | arxiv_id=2411.13543 | title=BALROG: Benchmarking Agentic LLM and VLM Reasoning On Games | primary_category=cs.AI | shared_authors=['Tim Rocktäschel', 'Jakob Nicolaus Foerster', 'Jack Parker-Holder', 'Ulyana Piterbarg', 'Bartłomiej Cupiał', 'Davide Paglieri']\nanswer_value=Bayesian Generational Population-Based Training | evidence_ids=['2207.09405'] | arxiv_id=2207.09405 | title=Bayesian Generational Population-Based Training | primary_category=cs.LG | shared_authors=['Jack Parker-Holder']\nanswer_value=Can a MISL Fly? Analysis and Ingredients for Mutual Information Skill Learning | evidence_ids=['2412.08021'] | arxiv_id=2412.08021 | title=Can a MISL Fly? Analysis and Ingredients for Mutual Information Skill Learning | primary_category=cs.LG | shared_authors=['Jens Tuyls']\nanswer_value=CivBench: A Long-Horizon Benchmark for Tool-Mediated Agents in Civilization VI | evidence_ids=['2609.02459'] | arxiv_id=2609.02459 | title=CivBench: A Long-Horizon Benchmark for Tool-Mediated Agents in Civilization VI | primary_category=cs.AI | shared_authors=['Jakob Nicolaus Foerster']\nanswer_value=Conditional Mutual Information for Disentangled Representations in Reinforcement Learning | evidence_ids=['2305.14133'] | arxiv_id=2305.14133 | title=Conditional Mutual Information for Disentangled Representations in Reinforcement Learning | primary_category=cs.LG | shared_authors=['Josiah P. Hanna']\nanswer_value=Debating with More Persuasive LLMs Leads to More Truthful Answers | evidence_ids=['2402.06782'] | arxiv_id=2402.06782 | title=Debating with More Persuasive LLMs Leads to More Truthful Answers | primary_category=cs.AI | shared_authors=['Tim Rocktäschel', 'Edward Grefenstette']\nanswer_value=Discovering Temporally-Aware Reinforcement Learning Algorithms | evidence_ids=['2402.05828'] | arxiv_id=2402.05828 | title=Discovering Temporally-Aware Reinforcement Learning Algorithms | primary_category=cs.LG | shared_authors=['Jakob Nicolaus Foerster']\nanswer_value=Effective Diversity in Population Based Reinforcement Learning | evidence_ids=['2002.00632'] | arxiv_id=2002.00632 | title=Effective Diversity in Population Based Reinforcement Learning | primary_category=cs.LG | shared_authors=['Jack Parker-Holder']\nanswer_value=End-to-End Differentiable Proving | evidence_ids=['1705.11040'] | arxiv_id=1705.11040 | title=End-to-End Differentiable Proving | primary_category=cs.NE | shared_authors=['Tim Rocktäschel']\nanswer_value=EvIL: Evolution Strategies for Generalisable Imitation Learning | evidence_ids=['2406.11905'] | arxiv_id=2406.11905 | title=EvIL: Evolution Strategies for Generalisable Imitation Learning | primary_category=cs.NE | shared_authors=['Jakob Nicolaus Foerster']\nanswer_value=Evolution Strategies at the Hyperscale | evidence_ids=['2511.16652'] | arxiv_id=2511.16652 | title=Evolution Strategies at the Hyperscale | primary_category=cs.LG | shared_authors=['Jakob Nicolaus Foerster']\nanswer_value=Evolving Curricula with Regret-Based Environment Design | evidence_ids=['2203.01302'] | arxiv_id=2203.01302 | title=Evolving Curricula with Regret-Based Environment Design | primary_category=cs.LG | shared_authors=['Tim Rocktäschel', 'Jack Parker-Holder', 'Edward Grefenstette']\nanswer_value=Gaia2: Benchmarking LLM Agents on Dynamic and Asynchronous Environments | evidence_ids=['2602.11964'] | arxiv_id=2602.11964 | title=Gaia2: Benchmarking LLM Agents on Dynamic and Asynchronous Environments | primary_category=cs.AI | shared_authors=['Ulyana Piterbarg']\nanswer_value=General Intelligence Requires Rethinking Exploration | evidence_ids=['2211.07819'] | arxiv_id=2211.07819 | title=General Intelligence Requires Rethinking Exploration | primary_category=cs.AI | shared_authors=['Tim Rocktäschel', 'Edward Grefenstette']\nanswer_value=Genie: Generative Interactive Environments | evidence_ids=['2402.15391'] | arxiv_id=2402.15391 | title=Genie: Generative Interactive Environments | primary_category=cs.LG | shared_authors=['Tim Rocktäschel', 'Jack Parker-Holder']\nanswer_value=Human-Timescale Adaptation in an Open-Ended Task Space | evidence_ids=['2301.07608'] | arxiv_id=2301.07608 | title=Human-Timescale Adaptation in an Open-Ended Task Space | primary_category=cs.LG | shared_authors=['Tim Rocktäschel', 'Jack Parker-Holder']\nanswer_value=Interaction Dynamics as a Reward Signal for LLMs | evidence_ids=['2511.08394'] | arxiv_id=2511.08394 | title=Interaction Dynamics as a Reward Signal for LLMs | primary_category=cs.CL | shared_authors=['Edward Grefenstette']",
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"when to plan\" RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id ORDER BY p.title LIMIT 25\nanswer_value=Learning When to Plan: Efficiently Allocating Test-Time Compute for LLM Agents | evidence_ids=['2509.03581'] | arxiv_id=2509.03581\nanswer_value=When to Plan: Learning to Select Between Reactive Control and Deliberative Planning | evidence_ids=['2607.16421'] | arxiv_id=2607.16421"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 21.393,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 8.596,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 29.989
+      }
+    },
+    {
+      "id": "coauthor-05",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "1402.0565",
+        "1802.07127",
+        "2311.17582"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 0.5,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2607.17481",
+        "2603.15212",
+        "2607.14616",
+        "2206.03735",
+        "cs/9809033"
+      ],
+      "evidence_ids": [
+        "1802.07127",
+        "2311.17582"
+      ],
+      "answer": "Two other papers in the collection share an author with the named paper:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 1802.07127 | Actions Speak Louder Than Goals: Valuing Player Actions in Soccer | stat.AP | Jesse Davis |\n| 2311.17582 | LoCoMotif: Discovering time-warped motifs in time series | cs.LG | Hendrik Blockeel |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"lifted variable elimination\" AND toLower(p.title) CONTAINS \"decoupling the operators\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title LIMIT 25\nanswer_value=1402.0565 | evidence_ids=['1402.0565'] | title=Lifted Variable Elimination: Decoupling the Operators from the Constraint Language",
+        "Cypher: MATCH (a:ArxivAuthorName)-[:AUTHORED]->(seed:ArxivPaper {arxiv_id:\"1402.0565\"}) MATCH (a)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> seed.arxiv_id RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, a.name AS shared_author ORDER BY p.title LIMIT 25\nanswer_value=1802.07127 | evidence_ids=['1802.07127'] | title=Actions Speak Louder Than Goals: Valuing Player Actions in Soccer | primary_category=stat.AP | shared_author=Jesse Davis\nanswer_value=2311.17582 | evidence_ids=['2311.17582'] | title=LoCoMotif: Discovering time-warped motifs in time series | primary_category=cs.LG | shared_author=Hendrik Blockeel"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 8.718,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.27,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 13.988
+      }
+    },
+    {
+      "id": "coauthor-06",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2110.06197",
+        "2606.18206",
+        "2512.10858",
+        "1805.09112"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2608.11768",
+        "1006.5169",
+        "2412.01023",
+        "2401.11648",
+        "2404.00974"
+      ],
+      "evidence_ids": [
+        "2110.06197",
+        "2606.18206",
+        "2512.10858"
+      ],
+      "answer": "These papers in the collection share an author with *Hyperbolic Neural Networks*:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 2110.06197 | Crystal Diffusion Variational Autoencoder for Periodic Material Generation | cs.LG | Octavian-Eugen Ganea |\n| 2606.18206 | Fixed-Point Reasoners: Stable and Adaptive Deep Looped Transformers | cs.AI | Thomas Hofmann |\n| 2512.10858 | Scaling Behavior of Discrete Diffusion Language Models | cs.LG | Thomas Hofmann |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"hyperbolic neural networks\" MATCH (a:ArxivAuthorName)-[:AUTHORED]->(p) MATCH (a)-[:AUTHORED]->(q:ArxivPaper) WHERE q <> p RETURN q.title AS answer_value, [q.arxiv_id] AS evidence_ids, a.name AS shared_author, q.primary_category AS primary_category ORDER BY q.title LIMIT 25\nanswer_value=Crystal Diffusion Variational Autoencoder for Periodic Material Generation | evidence_ids=['2110.06197'] | shared_author=Octavian-Eugen Ganea | primary_category=cs.LG\nanswer_value=Fixed-Point Reasoners: Stable and Adaptive Deep Looped Transformers | evidence_ids=['2606.18206'] | shared_author=Thomas Hofmann | primary_category=cs.AI\nanswer_value=Scaling Behavior of Discrete Diffusion Language Models | evidence_ids=['2512.10858'] | shared_author=Thomas Hofmann | primary_category=cs.LG",
+        "Cypher: MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"hyperbolic neural networks\" RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids ORDER BY p.title LIMIT 25\nanswer_value=Hyperbolic Neural Networks | evidence_ids=['1805.09112']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 15.826,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.148,
+          "accept": 0.0
+        },
+        "attempts": 1,
+        "total_seconds": 19.974
+      }
+    }
+  ],
+  "summary": {
+    "case_count": 12,
+    "hit_at_k": 0.9166666666666666,
+    "recall_at_k": 0.9166666666666666,
+    "reciprocal_rank": 0.7083333333333334,
+    "answer_evidence_precision": 0.9199999999999999,
+    "answer_evidence_recall": 0.9583333333333334
+  }
+}

@@ -4,6 +4,9 @@
 입니다. 그래서 여기서 고정하는 것은 세 가지입니다 — 어떤 순서로 노드를 지나는가, 몇 번
 고쳐 보는가, 두 번 실패하면 보류로 가는가.
 
+`route` 노드는 뒤에 더해진 것이고(ADR-024) 여기서는 **경로를 한 번만 정하는지**와 **힌트가
+이번 턴에만 붙는지**를 봅니다. 분류 규칙 자체는 `tests/test_routing.py`에 있습니다.
+
 `chatbot`은 임포트만으로 Aura와 OpenAI에 붙으므로 가져오지 않습니다. `agent_graph`는 무거운
 것을 전부 주입받으므로 **네트워크 없이** 돌 수 있습니다.
 """
@@ -79,7 +82,9 @@ def test_a_clean_answer_goes_straight_to_accept():
 
     state = run(deps)
 
-    assert nodes(state) == ["generate", "collect", "check_format", "check_conditions", "accept"]
+    assert nodes(state) == [
+        "route", "generate", "collect", "check_format", "check_conditions", "accept",
+    ]
     assert state["abstained"] is False
     assert logs == []
     assert len(generated) == 1
@@ -103,8 +108,10 @@ def test_a_format_failure_is_revised_once_and_then_accepted():
     state = run(deps)
 
     assert nodes(state) == [
+        "route",
         "generate", "collect", "check_format",
         "revise",
+        # 수정은 `generate`로 돌아갑니다. 질문이 그대로이므로 경로를 다시 정하지 않습니다.
         "generate", "collect", "check_format", "check_conditions", "accept",
     ]
     assert state["abstained"] is False
@@ -198,3 +205,46 @@ def test_the_trace_can_point_at_one_slow_node():
     assert summary["total_seconds"] == pytest.approx(
         sum(summary["seconds"].values()), abs=0.01
     )
+
+
+def test_the_route_is_decided_once_even_when_the_answer_is_revised():
+    """질문이 그대로인데 경로를 다시 정하면 힌트가 두 번 붙습니다."""
+    deps, _, generated = make_deps(format_failures=1)
+
+    state = run(deps, question="Which papers cite the paper titled Attention?")
+
+    assert nodes(state).count("route") == 1
+    assert state["route"]["name"] == "graph"
+    # 수정 요청 뒤에도 힌트는 하나뿐입니다.
+    hints = [m for m in generated[1] if isinstance(m, tuple) and "Routing hint" in str(m[1])]
+    assert len(hints) == 1
+
+
+def test_a_narrowed_route_appends_the_hint_to_this_turn():
+    deps, _, generated = make_deps(verdict=None)
+
+    run(deps, question="Which other papers share an author with Hyperbolic Neural Networks?")
+
+    last = generated[0][-1]
+    assert last[0] == "user"
+    assert "Do not call search_papers" in last[1]
+
+
+def test_a_broad_route_appends_nothing():
+    """의미 검색이 필요한 질문에 힌트를 붙이면 답을 못 찾는 쪽으로 틀립니다."""
+    deps, _, generated = make_deps(verdict=None)
+
+    state = run(deps, question="Which papers are about graph neural networks?")
+
+    assert state["route"]["name"] == "any"
+    assert generated[0] == [("user", "Which papers are about graph neural networks?")]
+
+
+def test_the_route_is_attached_to_the_response_so_it_can_be_counted():
+    """지시를 지켰는지는 보고서에서 세야 하고, 세려면 답변과 같은 줄에 있어야 합니다."""
+    deps, _, _ = make_deps(verdict=None)
+
+    state = run(deps, question="Which papers cite the paper titled Attention?")
+
+    assert state["response"]["route"]["name"] == "graph"
+    assert state["response"]["route"]["cues"] == ["citation"]

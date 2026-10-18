@@ -68,3 +68,4 @@
 | [ADR-021](ADR-021-ragas-four-of-six.md) | RAGAS 지표는 여섯 중 넷만 쓰고 둘은 게이트에 넣지 않는다 | 채택 |
 | [ADR-022](ADR-022-answer-flow-as-a-stategraph.md) | 답변 흐름을 StateGraph로 세우되 행동은 바꾸지 않는다 | 채택 |
 | [ADR-023](ADR-023-what-to-trace.md) | 추적은 평가에서만 켜고, 켠 뒤에도 프로세스당 상한을 둔다 | 채택 |
+| [ADR-024](ADR-024-route-by-question-type.md) | 경로는 질문 유형으로 코드가 정하되 도구를 빼앗지는 않는다 | 채택 |

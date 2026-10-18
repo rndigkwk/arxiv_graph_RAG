@@ -74,6 +74,7 @@
 | 11-11 | 30건 전체에서는 어떤가 | 그래프 30건을 네 지표로 채점 | Context Precision이 가족 단위로 `recall_at_k`와 **일치**. **Faithfulness를 1.0으로 게이트하면 맞는 답변이 막힘**(집계 주장이 깎임). Context Relevance는 50/50 1.0000으로 **제거** |
 | 11-12 | 변동폭은 얼마이고 누구의 것인가 | 30건을 3회 + 같은 답변을 2회 채점 | **판정은 사실상 결정적**(Context Precision 판정 변동 **0.0000**, 전체 0.1342). 변동은 검색이 약한 두 가족이 전부 만들고, **사례별 게이트는 불가**(최악 1.0000) |
 | 11-13 | 3회로 정한 하한이 버티는가 | 같은 판정으로 4·5회차를 받아 사례별 추적 | **버티지 못함.** faithfulness가 하한과 정확히 같은 0.9000이고, 0점은 **같은 답변에서도 뒤집힘**. 하한을 파국용으로 내리고 `citing`을 뺐습니다 — 변동폭은 표본마다 갱신되는 추정 |
+| 11-14 | 모델이 경로를 스스로 잘 고르는가 | 가족별 도구 호출률·토큰 집계 + 라우팅 전후 12건 | **안 고릅니다.** `coauthor`가 `search_papers`를 0.83에서 부르고 토큰이 두 배인데 그 결과를 **인용하지 않음**(근거 precision 1.000). hit@5 0.167은 품질이 아니라 **순위 집계의 결함**. 지시를 붙여 호출률 0.77 → **0.00**, 입력 토큰 p50 **−29%**, 정확도 유지, 지연 **+27%** |
 
 ---
 
@@ -1704,6 +1705,72 @@ CI 실행 [39044899120](https://github.com/rndigkwk/arxiv_graph_RAG/actions/runs
 
 ---
 
+## 11-14. 모델은 경로를 스스로 고르지 않습니다 (2026-10-18)
+
+**질문.** 11-1절에서 "질문 유형이 승자를 정한다"를 측정했습니다. 그 뒤로 경로 선택은
+시스템 프롬프트의 문장 하나였습니다 — "Use search_graph for stored relationships".
+모델이 그 문장을 지키는지 센 적이 없습니다.
+
+**방법.** 새로 돌리지 않고 **이미 있는 full 3회 보고서**를 가족별로 집계했습니다. 어떤
+도구를 불렀는지는 `embedding_tokens_estimate`로 알 수 있습니다 — 0보다 크면
+`search_papers`를 부른 것입니다.
+
+| 가족 | hit@5 | `search_papers` 호출률 | 입력 토큰 평균 | p50 초 |
+|---|---:|---:|---:|---:|
+| `author` | 0.944 | 0.00 | 9,874 | 12.2 |
+| `citing` | 0.889 | 0.11 | 9,802 | 10.5 |
+| `coauthor` | **0.167** | **0.83** | **18,946** | **17.5** |
+| `reference` | 0.389 | **0.67** | 13,268 | 13.9 |
+| `topcited` | 0.889 | 0.00 | 8,431 | 11.5 |
+
+호출률이 높은 두 가족이 정확히 토큰이 두 배인 두 가족입니다.
+
+**여기서 인과를 잘못 읽었습니다.** 처음 적은 것은 "벡터로 가니까 못 맞힌다"였습니다.
+같은 사례의 근거 지표를 보니 아니었습니다.
+
+| `coauthor` 사례 | hit@5 | 정답이 조회 목록에 | 정답 최고 순위 | 근거 precision | 근거 recall |
+|---|---:|---|---:|---:|---:|
+| `coauthor-01` (벡터 미호출) | 1.0 | 전부 있음 | 1 | 1.000 | 1.000 |
+| `coauthor-02`~`06` (벡터 호출) | 0.0 | **전부 있음** | **6** | **1.000** | **1.000** |
+
+**답변은 12회 전부 정확했습니다.** `evals/run.py`가 `retrieved_ids`를 "벡터 결과 +
+Cypher 근거" 순서로 이어 붙이기 때문에, 벡터가 상위 다섯 칸을 채우면 Cypher가 찾은 정답이
+6위로 밀립니다. "정답이 목록엔 있는데 5위 밖"인 비율은 `coauthor` 10/12, `reference`
+6/12, `citing` 2/12입니다. **hit@5 0.167은 품질 문제가 아니라 순위 집계의 결함입니다.**
+
+그리고 그 벡터 결과는 **인용되지 않았습니다**. 모델은 질문에 적힌 **제목을 arxiv_id로
+바꾸려고** 벡터 검색을 부르고 다섯 편 중 넷을 버립니다. 가족마다 다른 이유도 보입니다 —
+`citing`은 질문이 "the paper **titled** X"라고 적어 줘서 0.11인데, `coauthor`
+("share an author with X")와 `reference`("the papers cited by X")는 그 단서가 없습니다.
+
+**결론.** 경로 선택을 코드로 옮겼습니다([`routing.py`](routing.py), ADR-024). 도구를
+빼앗지는 않고 그 턴에 지시만 붙입니다 — 좁히면 안 되는 질문을 좁히는 대가가 토큰보다
+비싸기 때문입니다.
+
+| | 전(36건) | 후(12건) | 차 |
+|---|---:|---:|---:|
+| 근거 precision | 1.0000 | 1.0000 | 0.0000 |
+| 근거 recall | 0.9722 | 1.0000 | +0.0278 |
+| hit@5 | 0.2778 | 1.0000 | +0.7222 |
+| `search_papers` 호출률 | 0.7714 | **0.0000** | −0.7714 |
+| 입력 토큰 p50 | 15,786 | **11,276** | **−4,511** |
+| p50 지연(초) | 15.49 | 19.71 | **+4.21** |
+| 답변 실패 | 1 | 0 | −1 |
+
+**지연은 나빠졌습니다.** 제목을 확인하는 Cypher가 round-trip 하나를 더합니다. 토큰을 줄인
+대가를 지연으로 냈습니다. 전 측정에 CI 실행이 섞여 있어 지연 비교는 토큰 비교보다 약하지만,
+메커니즘이 실제로 호출을 하나 더하므로 잡음으로 치우지 않고 적습니다.
+
+**1차 측정이 깨져서 지시를 고쳤습니다.** 처음 지시는 "제목을 `CONTAINS`로 찾아라"까지
+였습니다. `coauthor-04`가 `CONTAINS "when to plan"`으로 **두 편**을 잡고(의도한 논문과
+"Learning When to Plan: ...") 두 시드의 공저자를 모두 펼쳐 **25편**을 인용했습니다 —
+근거 precision 1.000 → **0.040**. 벡터 검색은 제목 하나를 고르지만 substring은 고르지
+않습니다. "따로 조회해서 정확히 한 편인지 확인하라"를 더하자 같은 사례가 정답 2편만
+인용했습니다. **1차 측정 없이 넘어갔다면 한 가족을 더 나쁘게 만들고 hit@5가 오른 것만 보고
+성공으로 적었을 것입니다.**
+
+---
+
 ## 13. 재현 방법
 
 ```bash
@@ -1743,6 +1810,9 @@ uv run python -m pipeline.ingest --days 7
 uv run python -m evals.variant_study
 uv run python -m evals.variant_study --cases evals/cases.json   --output reports/variant_study_base.json
 
+# 11-14절: 라우팅 전후 비교. --after는 `--mode agent`로 받은 보고서입니다
+uv run python -m evals.routing_study   --before reports/regression_full_20261016.json   --after reports/routing_after2.json   --families coauthor reference
+
 # 11-2절: LLM 색인 비용 하한 + 부분 색인 정답 커버리지
 uv run --group dev python -m evals.index_cost
 
@@ -1759,6 +1829,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | 리포트 | 내용 |
 |---|---|
 | `reports/link_prediction_structure.json` | 4절 — 인용 그래프 구조 |
+| `reports/routing_study.json` | 11-14절 — 라우팅 전후 비교 |
 | `reports/link_prediction.json` | 5·6절 — 기준선 사다리 |
 | `reports/link_prediction_ablation.json` | 6-1·6-2절 — 절제와 cold-start |
 | `reports/rag_eval_graph_compare{,_after,_final}.json` | 7·8·9절 — 종단 비교 3회 |

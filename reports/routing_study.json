@@ -1,0 +1,64 @@
+{
+  "model": "gpt-6-luna",
+  "families": [
+    "coauthor",
+    "reference"
+  ],
+  "before_files": [
+    "reports/regression_full_20261016.json",
+    "reports/regression_full_20261016b.json",
+    "reports/ragas_input_full.json"
+  ],
+  "after_files": [
+    "reports/routing_after2.json"
+  ],
+  "before": {
+    "cases": 36,
+    "answer_evidence_precision": 1.0,
+    "answer_evidence_recall": 0.9722,
+    "hit_at_k": 0.2778,
+    "recall_at_k": 0.2407,
+    "reciprocal_rank": 0.2361,
+    "chat_input_tokens": 16567.2286,
+    "chat_input_tokens_p50": 15786,
+    "chat_output_tokens": 860.4857,
+    "chat_output_tokens_p50": 851,
+    "elapsed_seconds": 16.9461,
+    "elapsed_seconds_p50": 15.4946,
+    "search_papers_rate": 0.7714,
+    "search_papers_measured": 35,
+    "failed": 1
+  },
+  "after": {
+    "cases": 12,
+    "answer_evidence_precision": 1.0,
+    "answer_evidence_recall": 1.0,
+    "hit_at_k": 1.0,
+    "recall_at_k": 1.0,
+    "reciprocal_rank": 0.5,
+    "chat_input_tokens": 13747.3333,
+    "chat_input_tokens_p50": 11275.5,
+    "chat_output_tokens": 716.8333,
+    "chat_output_tokens_p50": 660.0,
+    "elapsed_seconds": 22.3668,
+    "elapsed_seconds_p50": 19.7073,
+    "search_papers_rate": 0,
+    "search_papers_measured": 12,
+    "failed": 0
+  },
+  "deltas": {
+    "answer_evidence_precision": 0.0,
+    "answer_evidence_recall": 0.0278,
+    "hit_at_k": 0.7222,
+    "recall_at_k": 0.7593,
+    "reciprocal_rank": 0.2639,
+    "chat_input_tokens": -2819.8953,
+    "chat_output_tokens": -143.6524,
+    "elapsed_seconds": 5.4207,
+    "chat_input_tokens_p50": -4510.5,
+    "chat_output_tokens_p50": -191.0,
+    "elapsed_seconds_p50": 4.2127,
+    "search_papers_rate": -0.7714
+  },
+  "note": "정확도(answer_evidence_*)와 순위(hit_at_k)를 따로 읽어야 합니다. hit_at_k는 retrieved_ids의 순서에 걸려 있어서 벡터 결과가 앞에 붙으면 맞은 답도 0이 됩니다."
+}

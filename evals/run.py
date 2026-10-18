@@ -109,6 +109,11 @@ def evaluate_case(
         row["evidence_ids"] = evidence
         row["answer"] = response.get("answer", "")
         row["contexts"] = generator_contexts(response)
+        # 어느 경로로 보냈는지와 그 사유입니다. 지시를 지켰는지는 이 값과 임베딩 토큰을
+        # 맞춰 봐야 알 수 있습니다(ADR-024).
+        route = response.get("route")
+        if route:
+            row["route"] = route
         # 노드별 지연·방문 횟수입니다. "답변이 느리다"를 어느 단계인지로 바꿔 말할 수 있습니다.
         trace = response.get("graph_trace")
         if trace:
@@ -405,9 +410,26 @@ def main() -> None:
             response = chatbot.search_papers.invoke(
                 {"query": case["search_query"], "top_k": args.top_k}
             )
-        else:
-            response, _ = chatbot.ask(case["question"], [])
-        rows.append(evaluate_case(case, response, mode=args.mode, top_k=args.top_k))
+            rows.append(evaluate_case(case, response, mode=args.mode, top_k=args.top_k))
+            continue
+        # agent 모드도 토큰과 지연을 적습니다. compare 모드만 적고 있었는데, 그러면 벡터
+        # 기준선까지 돌리지 않고는 비용을 비교할 수 없습니다 - 라우팅 측정이 정확히 그
+        # 경우였습니다(ADR-024).
+        start = perf_counter()
+        response, messages = chatbot.ask(case["question"], [])
+        row = evaluate_case(case, response, mode=args.mode, top_k=args.top_k)
+        agent_input, agent_output = _token_totals(messages)
+        row.update({
+            "elapsed_seconds": perf_counter() - start,
+            "chat_input_tokens": agent_input,
+            "chat_output_tokens": agent_output,
+            "estimated_api_cost_usd": estimate_api_cost(agent_input, agent_output, 0, rates),
+            # 어떤 도구를 불렀는지입니다. 임베딩 토큰으로 추정하지 않고 직접 셉니다.
+            "tool_names": [
+                call.get("name", "") for call in response.get("tool_calls", []) or []
+            ],
+        })
+        rows.append(row)
     metadata = build_run_metadata(
         cases_path=args.cases,
         case_ids=[case["id"] for case in cases],

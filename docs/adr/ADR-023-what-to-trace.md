@@ -20,10 +20,12 @@
 
 | 단위 | observation |
 |---|---|
-| 답변 1건(깨끗) | <!--n:reports/trace_volume.json#per_path.clean.observations-->6<!--/n--> (루트 1 + 노드 5) |
-| 답변 1건(1회 수정) | <!--n:reports/trace_volume.json#per_path.revise_once.observations-->10<!--/n--> |
-| 평가 1회(<!--n:reports/trace_volume.json#cases-->30<!--/n-->건) | <!--n:reports/trace_volume.json#per_eval_run.best-->180<!--/n-->~<!--n:reports/trace_volume.json#per_eval_run.worst-->270<!--/n--> |
-| 주간 크론 한 달 | <!--n:reports/trace_volume.json#weekly_cron_per_month.best-->720<!--/n-->~<!--n:reports/trace_volume.json#weekly_cron_per_month.worst-->1080<!--/n--> |
+| 답변 1건(깨끗) | <!--n:reports/trace_volume.json#per_path.clean.observations-->7<!--/n--> (루트 1 + 노드 6) |
+| 답변 1건(1회 수정) | <!--n:reports/trace_volume.json#per_path.revise_once.observations-->11<!--/n--> |
+| 평가 1회(<!--n:reports/trace_volume.json#cases-->30<!--/n-->건) | <!--n:reports/trace_volume.json#per_eval_run.best-->210<!--/n-->~<!--n:reports/trace_volume.json#per_eval_run.worst-->300<!--/n--> |
+| 주간 크론 한 달 | <!--n:reports/trace_volume.json#weekly_cron_per_month.best-->840<!--/n-->~<!--n:reports/trace_volume.json#weekly_cron_per_month.worst-->1200<!--/n--> |
+
+표의 수는 노드 수에 달려 있습니다. ADR-024에서 `route` 노드가 하나 늘어 답변마다 observation이 하나씩 늘었고, 그 변화는 손으로 찾은 것이 아니라 `scripts/check_doc_numbers.py`가 막아서 알았습니다.
 
 **앱은 이 표에 없습니다.** 방문자 수에 비례하므로 셀 수가 없고, 그것이 결정의 절반입니다.
 
