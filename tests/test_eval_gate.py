@@ -373,14 +373,42 @@ def test_rewriting_the_baseline_keeps_the_values_a_person_set():
 
 
 def test_a_case_that_failed_in_any_run_is_not_called_stable():
-    """두 실행 중 한 번이라도 멈춘 사례는 "늘 통과하던 사례"가 아닙니다."""
+    """두 실행 중 한 번이라도 멈춘 사례는 "늘 통과하던 사례"가 아닙니다.
+
+    전에는 `author-04`·`coauthor-03`이 안정 목록에서 빠져 있다는 것으로 확인했습니다. 그건
+    2026-10-16 두 실행에서 그 둘이 멈췄다는 **당시 사실**이고, 기준선을 다시 쓰면 성립하지
+    않습니다(2026-10-18 라우팅 뒤 재측정에서 둘 다 깨끗했습니다). 고정해야 하는 것은 어느
+    사례였는지가 아니라 `merge`+`make_baseline`의 **속성**이므로 합성 데이터로 봅니다.
+    """
+    from evals.gate import make_baseline, merge
+
+    runs = [
+        {"metrics": {"m": 1.0}, "cases": {
+            "ok": {"failed": False, "metrics": {"m": 1.0}},
+            "stopped-once": {"failed": False, "metrics": {"m": 1.0}},
+            "dipped-once": {"failed": False, "metrics": {"m": 1.0}},
+        }},
+        {"metrics": {"m": 1.0}, "cases": {
+            "ok": {"failed": False, "metrics": {"m": 1.0}},
+            # 한 실행에서만 멈췄습니다.
+            "stopped-once": {"failed": True, "metrics": {}},
+            # 멈추지는 않았지만 만점을 잃었습니다.
+            "dipped-once": {"failed": False, "metrics": {"m": 0.5}},
+        }},
+    ]
+    baseline = make_baseline(
+        merge(runs), primary_metric="m", floors={}, drops=None, note="테스트",
+    )
+
+    assert baseline["stable_cases"] == ["ok"]
+
+
+def test_the_live_baseline_was_built_from_repeated_runs():
+    """한 번 돌린 결과로 기준선을 쓰면 그 실행의 잡음이 기준이 됩니다."""
     baseline = load(BASELINE)
+
     assert baseline["source"]["runs"] >= 2
-    # 2026-10-16의 두 full 실행에서 각각 한 건이 멈췄고, 둘 다 안정 목록에서 빠졌습니다.
-    assert set(baseline["case_ids"]) - set(baseline["stable_cases"]) >= {
-        "author-04",
-        "coauthor-03",
-    }
+    assert set(baseline["stable_cases"]) <= set(baseline["case_ids"])
 
 
 def test_the_allowed_drop_is_not_tighter_than_the_measured_spread():
