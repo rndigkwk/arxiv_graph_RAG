@@ -70,3 +70,4 @@
 | [ADR-023](ADR-023-what-to-trace.md) | 추적은 평가에서만 켜고, 켠 뒤에도 프로세스당 상한을 둔다 | 채택 |
 | [ADR-024](ADR-024-route-by-question-type.md) | 경로는 질문 유형으로 코드가 정하되 도구를 빼앗지는 않는다 | 채택 |
 | [ADR-025](ADR-025-reject-context-compression.md) | 컨텍스트 압축을 넣지 않는다 — 압축할 것이 입력의 3% | 기각 |
+| [ADR-026](ADR-026-explain-the-abstention-in-the-app-only.md) | 보류를 화면에서 설명하되 `ask()`는 그대로 예외를 올린다 | 채택 |

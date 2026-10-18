@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 import streamlit as st
 
+import abstain
 from paper_library import add_paper, compare_selection
 
 
@@ -137,6 +138,32 @@ def show_answer(response, index):
     if st.button(label, key=f"translate:{index}"):
         st.session_state.korean[index] = not show_korean
         st.rerun()
+
+
+def show_abstention(diagnostics):
+    """보류를 고장이 아니라 판단으로 보여 줍니다.
+
+    `ask()`는 그대로 예외를 올립니다. 보류를 답변으로 바꾸면 평가 하네스가 "답했다"로 세고
+    게이트 기준선이 무효가 되므로, 바꾸는 것은 표시 계층뿐입니다(`abstain.py`).
+    """
+    told = abstain.explain(diagnostics)
+    st.warning(f"**{told['headline']}**" + chr(10) + chr(10) + told["why"])
+    st.markdown(f"**무엇이 걸렸나** — {told['what']}")
+    st.markdown(f"**해 볼 것** — {told['advice']}")
+    with st.expander("검사 기록"):
+        st.markdown(
+            f"- 걸린 단계: {told['stage'] or '기록되지 않음'}" + chr(10)
+            + f"- 시도 횟수: {told['attempts']}" + chr(10)
+            + f"- 요청 ID: `{told['request_id'] or '없음'}`"
+        )
+        if told["cyphers"]:
+            # 모델이 실제로 무엇을 조회했는지 보여 줍니다. 멈춘 것이 "아무것도 안 한 것"이
+            # 아님을 이것이 말해 줍니다.
+            st.caption(f"모델이 실행한 조회 {len(told['cyphers'])}건")
+            for cypher in told["cyphers"]:
+                st.code(cypher, language="cypher")
+        else:
+            st.caption("실행된 그래프 조회가 없습니다.")
 
 
 def show_response(chatbot, response, index):
@@ -743,7 +770,10 @@ def answer_question(chatbot, question):
         except ValueError as exc:
             answer_area.empty()
             # 근거 검증 실패를 빈 검색 결과나 연결 에러로 안내하지 않습니다.
-            st.error(str(exc))
+            if hasattr(exc, "diagnostics"):
+                show_abstention(exc.diagnostics())
+            else:
+                st.error(str(exc))
             return
         except Exception as exc:
             answer_area.empty()
