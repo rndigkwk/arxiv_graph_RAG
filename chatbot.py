@@ -572,8 +572,9 @@ def ask(question, history, on_answer=None):
 
     response = state["response"]
     response["graph_trace"] = agent_graph.summarize_trace(state["trace"])
-    # 기본은 꺼짐입니다. `LANGFUSE_TRACING=1`과 키가 둘 다 있을 때만 보냅니다 — dograg가
-    # 전부 추적해 한 달치 무료 사용량을 소진한 적이 있어서, 명시로 켤 때만 보냅니다.
+    # 기본은 꺼짐입니다. `LANGFUSE_TRACING=1`과 키가 둘 다 있을 때만 보내고, 켠 뒤에도
+    # 프로세스당 `LANGFUSE_MAX_TRACES`개까지입니다(ADR-023) — dograg가 전부 추적해 한 달치
+    # 무료 사용량을 소진한 적이 있어서, 스위치와 상한을 둘 다 둡니다.
     response["tracing"] = tracing.send_trace(
         response["graph_trace"],
         name="ask",
