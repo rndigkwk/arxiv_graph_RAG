@@ -75,6 +75,18 @@ def generator_contexts(
 
     한 조회를 한 문맥으로 묶는 이유도 같습니다. "이 질의가 이 행들을 돌려줬다"가 근거의 한
     단위이고, 그렇게 묶어야 Context Precision이 "쓸모 있는 근거가 위에 있는가"를 잽니다.
+
+    **제목 해석 조회도 빼지 않습니다.** 2026-10-18에 그것을 빼 봤습니다 — RAGAS가 그 문맥을
+    쓸모없다고 채점해서 `citing`의 Context Precision이 1.0000에서 0.5046으로 내려갔기
+    때문입니다. 빼니 Context Precision은 1.0000으로 회복됐지만 **faithfulness가 1.0000에서
+    0.2296으로 무너졌습니다.** 답변이 주제 논문을 제목으로 언급하고("X와 저자를 공유하는
+    네 편"), 그 주장의 근거가 바로 그 조회입니다. 즉 그 조회는 순수한 중간 단계가 아니라
+    답변 일부의 근거입니다.
+
+    그래서 `anchors`는 받지만 문맥을 걸러내는 데 쓰지 않습니다. 기준 논문을 빼는 것은
+    **순위 지표**에서만 맞습니다(`evaluate_case`). 두 지표가 충돌할 때 답변 정확도에 묶인
+    faithfulness를 따릅니다 - Context Precision은 답변에 의존하는 지표이고 검색 지표가
+    아니라는 것이 이미 측정돼 있습니다(`EXPERIMENTS.md` 11-10절).
     """
     contexts = []
     calls = [
@@ -85,11 +97,6 @@ def generator_contexts(
         output = call["output"]
         if call["name"] == "search_graph" and not output.get("error"):
             rows = output.get("rows", [])
-            # 제목을 arxiv_id로 바꾸는 중간 조회는 생성기가 본 **근거**가 아닙니다. 남기면
-            # RAGAS가 그것을 쓸모없는 문맥으로 채점해 Context Precision이 절반이 됩니다
-            # (`citing` 1.0000 -> 0.5046, ADR-024).
-            if is_lookup(rows, anchors or set()):
-                continue
             rendered = [
                 " | ".join(
                     f"{key}={value}" for key, value in row.items() if value not in (None, [], "")
@@ -162,7 +169,7 @@ def evaluate_case(
         row["related_ids"] = related_ids
         row["evidence_ids"] = evidence
         row["answer"] = response.get("answer", "")
-        row["contexts"] = generator_contexts(response, anchors)
+        row["contexts"] = generator_contexts(response, anchors)  # anchors는 쓰이지 않습니다
         # 어느 경로로 보냈는지와 그 사유입니다. 지시를 지켰는지는 이 값과 임베딩 토큰을
         # 맞춰 봐야 알 수 있습니다(ADR-024).
         route = response.get("route")

@@ -92,8 +92,17 @@ def test_a_lookup_is_recognised_by_structure_not_by_wording():
     assert is_lookup([{"evidence_ids": ["2407.01437"]}], set()) is False
 
 
-def test_the_lookup_context_is_withheld_from_the_generator_contexts():
-    """RAGAS가 해석 조회를 쓸모없는 문맥으로 채점해 `citing`이 1.0000에서 0.5046이 됐습니다."""
+def test_the_lookup_context_is_kept_for_the_generator():
+    """**빼면 안 됩니다.** 2026-10-18에 빼 봤고 faithfulness가 무너졌습니다.
+
+    RAGAS의 Context Precision은 해석 조회를 쓸모없다고 채점해서 `citing`이 1.0000에서
+    0.5046이 됐습니다. 그래서 빼 봤더니 Context Precision은 1.0000으로 회복됐지만
+    **faithfulness가 1.0000에서 0.2296으로 내려갔습니다** — 답변이 주제 논문을 제목으로
+    언급하고("X와 저자를 공유하는 네 편") 그 주장의 근거가 바로 그 조회였습니다.
+
+    두 지표가 충돌할 때는 답변 정확도에 묶인 faithfulness를 따릅니다. 기준 논문을 빼는 것은
+    **순위 지표에서만** 맞습니다.
+    """
     anchors = {"2407.01437"}
     response = {"tool_calls": [
         {"name": "search_graph", "status": "success", "output": {
@@ -104,11 +113,8 @@ def test_the_lookup_context_is_withheld_from_the_generator_contexts():
             "rows": [{"evidence_ids": ["2603.04191"]}]}},
     ]}
 
-    kept = generator_contexts(response, anchors)
-
-    assert len(kept) == 1
-    assert "REFERENCES" in kept[0]
-    # 기준 논문을 모르면 아무것도 빼지 않습니다.
+    # 기준 논문을 줘도 문맥은 둘 다 남습니다.
+    assert len(generator_contexts(response, anchors)) == 2
     assert len(generator_contexts(response)) == 2
 
 
@@ -129,6 +135,20 @@ def test_the_answer_metrics_are_not_rescored(cases):
     assert rescored["answer_evidence_recall"] == 1.0
     # 검색 지표만 다시 셉니다.
     assert rescored["reciprocal_rank"] == 1.0
+
+
+def test_rescoring_leaves_the_contexts_alone():
+    """재채점이 문맥을 건드리면 RAGAS를 다시 불러야 하고, 그러면 faithfulness가 무너집니다."""
+    case = {"id": "x", "expected_ids": ["2603.04191"],
+            "cypher_params": {"arxiv_id": "2407.01437"}}
+    row = {
+        "retrieved_ids": ["2407.01437", "2603.04191"],
+        "contexts": ["Cypher: lookup\nevidence_ids=['2407.01437']", "Cypher: answer"],
+    }
+
+    rescored = rescore_row(row, case, 5)
+
+    assert rescored["contexts"] == row["contexts"]
 
 
 def test_a_stored_context_is_filtered_by_the_same_rule():
