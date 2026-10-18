@@ -35,7 +35,14 @@ OUTPUT = Path("reports/routing_study.json")
 # 정확도와 순위를 섞어 적으면 "좋아졌다"가 어느 쪽인지 알 수 없습니다.
 ACCURACY = ("answer_evidence_precision", "answer_evidence_recall")
 RANKING = ("hit_at_k", "recall_at_k", "reciprocal_rank")
-COST = ("chat_input_tokens", "chat_output_tokens", "elapsed_seconds")
+COST = (
+    "chat_input_tokens",
+    # 캐시 읽기를 뺀 양입니다. 토큰 수를 비용으로 읽지 않으려면 이것을 봐야 합니다 -
+    # 한 질문에서 입력의 86.3%가 캐시 읽기였습니다(11-15절).
+    "chat_input_tokens_fresh",
+    "chat_output_tokens",
+    "elapsed_seconds",
+)
 
 
 def answers(report: dict[str, Any]) -> list[dict[str, Any]]:

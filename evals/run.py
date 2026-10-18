@@ -153,6 +153,32 @@ def _token_totals(messages: Any) -> tuple[int | None, int | None]:
     return input_tokens if saw_input else None, output_tokens if saw_output else None
 
 
+def cached_input_tokens(messages: Any) -> int | None:
+    """How much of the input was a cache read, or None when the provider did not say.
+
+    **토큰 수는 비용이 아닙니다.** 2026-10-18에 한 질문을 재 보니 입력 11,239 중 9,702
+    (86.3%)가 캐시 읽기였습니다 - 시스템 프롬프트와 도구 스키마가 round-trip마다 다시
+    실리지만 접두사가 같아서 할인됩니다. 이것을 따로 세지 않으면 "입력 토큰 29% 감소"가
+    "비용 29% 감소"로 읽힙니다(ADR-024에서 실제로 그렇게 적었다가 고쳤습니다).
+    """
+    cached = 0
+    seen = False
+    if not isinstance(messages, (list, tuple)):
+        messages = [messages]
+    for message in messages:
+        usage = getattr(message, "usage_metadata", None)
+        if not usage and isinstance(message, dict):
+            usage = message.get("usage_metadata")
+        if not isinstance(usage, dict):
+            continue
+        details = usage.get("input_token_details") or {}
+        value = details.get("cache_read") if isinstance(details, dict) else None
+        if isinstance(value, int) and not isinstance(value, bool):
+            cached += value
+            seen = True
+    return cached if seen else None
+
+
 def _add_usage(total: int | None, extra: Any) -> int | None:
     """Add a separately recorded token count, keeping None when nothing was reported."""
     if not isinstance(extra, int) or isinstance(extra, bool):
@@ -419,9 +445,17 @@ def main() -> None:
         response, messages = chatbot.ask(case["question"], [])
         row = evaluate_case(case, response, mode=args.mode, top_k=args.top_k)
         agent_input, agent_output = _token_totals(messages)
+        agent_cached = cached_input_tokens(messages)
         row.update({
             "elapsed_seconds": perf_counter() - start,
             "chat_input_tokens": agent_input,
+            # 캐시 읽기는 같은 접두사를 다시 보낼 때 할인되는 부분입니다. 빼고 보면 이번 답변이
+            # 실제로 새로 읽힌 양이 나옵니다.
+            "chat_input_tokens_cached": agent_cached,
+            "chat_input_tokens_fresh": (
+                None if agent_input is None or agent_cached is None
+                else agent_input - agent_cached
+            ),
             "chat_output_tokens": agent_output,
             "estimated_api_cost_usd": estimate_api_cost(agent_input, agent_output, 0, rates),
             # 어떤 도구를 불렀는지입니다. 임베딩 토큰으로 추정하지 않고 직접 셉니다.

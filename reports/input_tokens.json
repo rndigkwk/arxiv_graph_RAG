@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-10-18T08:18:28.700397+00:00",
+  "report": "reports/routing_after2.json",
+  "cases": 12,
+  "encoding": "o200k_base",
+  "p50": {
+    "total": 11276,
+    "contexts": 340,
+    "hint": 116,
+    "question": 28,
+    "rest": 10792
+  },
+  "contexts_share": 0.0302,
+  "rest_share": 0.9571,
+  "fixed": {
+    "system_prompt": 1348,
+    "schema_json": 298,
+    "cypher_rules": 597,
+    "tool_docs": {
+      "translate_to_english": 215,
+      "search_graph": 20,
+      "search_papers": 20,
+      "rank_related_papers": 24
+    },
+    "tool_docs_total": 279,
+    "per_call": 1627
+  },
+  "fresh_p50": null,
+  "note": "contexts가 컨텍스트 압축이 손대는 부분입니다. rest는 호출마다 다시 실리는 고정분과 누적 메시지이고, 접두사가 같아 캐시 할인을 받습니다(ADR-025)."
+}

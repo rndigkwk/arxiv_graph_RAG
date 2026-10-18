@@ -75,6 +75,7 @@
 | 11-12 | 변동폭은 얼마이고 누구의 것인가 | 30건을 3회 + 같은 답변을 2회 채점 | **판정은 사실상 결정적**(Context Precision 판정 변동 **0.0000**, 전체 0.1342). 변동은 검색이 약한 두 가족이 전부 만들고, **사례별 게이트는 불가**(최악 1.0000) |
 | 11-13 | 3회로 정한 하한이 버티는가 | 같은 판정으로 4·5회차를 받아 사례별 추적 | **버티지 못함.** faithfulness가 하한과 정확히 같은 0.9000이고, 0점은 **같은 답변에서도 뒤집힘**. 하한을 파국용으로 내리고 `citing`을 뺐습니다 — 변동폭은 표본마다 갱신되는 추정 |
 | 11-14 | 모델이 경로를 스스로 잘 고르는가 | 가족별 도구 호출률·토큰 집계 + 라우팅 전후 12건 | **안 고릅니다.** `coauthor`가 `search_papers`를 0.83에서 부르고 토큰이 두 배인데 그 결과를 **인용하지 않음**(근거 precision 1.000). hit@5 0.167은 품질이 아니라 **순위 집계의 결함**. 지시를 붙여 호출률 0.77 → **0.00**, 입력 토큰 p50 **−29%**, 정확도 유지, 지연 **+27%** |
+| 11-15 | 컨텍스트 압축으로 비용을 줄일 수 있는가 | 입력 토큰을 구성별로 분해 + 라이브 2건의 캐시 비율 | **못 줄입니다.** 압축 대상인 검색 문맥이 입력의 **3%**(340/11,276). 96%는 호출마다 다시 실리는 고정분인데 **86~87%가 캐시 읽기**. 압축하면 접두사가 바뀌어 **할인을 깨뜨릴** 수도 있음 |
 
 ---
 
@@ -1771,6 +1772,46 @@ Cypher 근거" 순서로 이어 붙이기 때문에, 벡터가 상위 다섯 칸
 
 ---
 
+## 11-15. 압축할 것이 입력의 3%였습니다 (2026-10-18)
+
+**질문.** Day 48 컨텍스트 압축은 검색 문맥을 싼 모델로 줄이는 기법입니다. 로드맵은 그것을
+"OpenAI가 지배적 비용"에 대한 대응으로 적어 뒀습니다. 압축하면 얼마가 줄어드는가.
+
+**방법.** API를 부르지 않고, 라우팅 측정 12건의 `chat_input_tokens`를 분모로 두고 분자를
+`tiktoken`으로 직접 셌습니다([`scripts/measure_input_tokens.py`](scripts/measure_input_tokens.py)).
+
+| 구성 | 토큰(p50) | 비중 |
+|---|---:|---:|
+| **검색 문맥**(Cypher + 조회 행) | **340** | **3.0%** |
+| 라우팅 힌트 | 116 | 1.0% |
+| 질문 | 28 | 0.2% |
+| 나머지(시스템·도구 스키마·누적 메시지) | 10,792 | 95.7% |
+
+압축이 손대는 것이 **첫 줄 하나**입니다. 340을 반으로 줄이려고 호출을 하나 더 넣습니다.
+
+**96%는 재전송입니다.** 호출 1회당 고정분이 1,627 토큰입니다(시스템 프롬프트 1,348 + 도구
+설명 279). 한 답변이 모델을 4회 부르므로 그것만 6,508입니다. 큰 문맥 하나가 아니라 **같은
+접두사를 네 번 다시 보내는 것**입니다.
+
+**그리고 그 재전송은 이미 할인됩니다.** 라이브 질문 두 건의 `input_token_details`를 봤습니다.
+
+| 질문 | 입력 | 캐시 읽기 | 신선 | 캐시 비율 |
+|---|---:|---:|---:|---:|
+| 공저자 질문 1회 | 11,239 | 9,702 | 1,537 | 86.3% |
+| 같은 질문 재측정 | 15,045 | 13,146 | 1,899 | 87.4% |
+
+**결론. 기각**([ADR-025](docs/adr/ADR-025-reject-context-compression.md)). 상한이 3%이고,
+수를 지배하는 쪽은 캐시가 이미 처리하며, 압축으로 접두사를 바꾸면 **그 할인을 깨뜨릴** 수도
+있습니다.
+
+**이 측정이 11-14절의 비용 주장도 깎았습니다.** 라우팅으로 "입력 토큰 p50 −29%"를 적었는데,
+입력의 86%가 캐시 읽기이므로 그것은 **비용 −29%가 아닙니다**. 온전한 절감은 출력 토큰
+(평균 −144)과 초록이 새 토큰으로 들어오지 않는 부분입니다. 라우팅의 채택 근거는 비용이 아니라
+**정확도와 결정 가능성**으로 바꿔 적었습니다. `evals/run.py`가 이제
+`chat_input_tokens_fresh`를 기록하므로 다음 full 실행이 양쪽 숫자를 들고 옵니다.
+
+---
+
 ## 13. 재현 방법
 
 ```bash
@@ -1813,6 +1854,9 @@ uv run python -m evals.variant_study --cases evals/cases.json   --output reports
 # 11-14절: 라우팅 전후 비교. --after는 `--mode agent`로 받은 보고서입니다
 uv run python -m evals.routing_study   --before reports/regression_full_20261016.json   --after reports/routing_after2.json   --families coauthor reference
 
+# 11-15절: 입력 토큰 구성 분해. API를 부르지 않습니다
+uv run --group dev python scripts/measure_input_tokens.py   --report reports/routing_after2.json
+
 # 11-2절: LLM 색인 비용 하한 + 부분 색인 정답 커버리지
 uv run --group dev python -m evals.index_cost
 
@@ -1830,6 +1874,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 |---|---|
 | `reports/link_prediction_structure.json` | 4절 — 인용 그래프 구조 |
 | `reports/routing_study.json` | 11-14절 — 라우팅 전후 비교 |
+| `reports/input_tokens.json` | 11-15절 — 입력 토큰 구성 |
 | `reports/link_prediction.json` | 5·6절 — 기준선 사다리 |
 | `reports/link_prediction_ablation.json` | 6-1·6-2절 — 절제와 cold-start |
 | `reports/rag_eval_graph_compare{,_after,_final}.json` | 7·8·9절 — 종단 비교 3회 |
