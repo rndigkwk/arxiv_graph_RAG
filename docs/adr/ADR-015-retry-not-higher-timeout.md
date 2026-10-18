@@ -20,8 +20,8 @@
 
 | 질의 | 행 | p50 | 최대 | 실패 | 30초까지 여유 |
 |---|---:|---:|---:|---:|---:|
-| `paper_rows` | 37,854 | 5.58초 | 7.18초 | 0/8 | **4.18배** |
-| `citation_edges` | 69,438 | 9.59초 | 10.25초 | 0/8 | **2.93배** |
+| `paper_rows` | 37,854 | <!--n:reports/graph_load_latency.json#summary.paper_rows.p50-->5.58<!--/n-->초 | 7.18초 | 0/8 | **<!--n:reports/graph_load_latency.json#summary.paper_rows.headroom_ratio-->4.18<!--/n-->배** |
+| `citation_edges` | 69,438 | <!--n:reports/graph_load_latency.json#summary.citation_edges.p50-->9.59<!--/n-->초 | 10.25초 | 0/8 | **<!--n:reports/graph_load_latency.json#summary.citation_edges.headroom_ratio-->2.93<!--/n-->배** |
 
 **평상시 3배 여유가 이미 있으므로 30초가 원인이 아닙니다.** 올리면 진짜 장애에서 사용자를 더
 오래 매달아 둡니다. 끊겼던 그때는 Aura가 Bolt 라우팅까지 실패하던 구간이었고 90초 뒤 자체

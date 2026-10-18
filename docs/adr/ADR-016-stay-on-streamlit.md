@@ -46,18 +46,24 @@ Streamlit 보장치 690MB의 38%입니다. 넘칠 이유가 없습니다.
 결론도 바뀝니다. 그래서 다시 재는 스크립트를 두었습니다 —
 [`scripts/measure_app_memory.py`](../../scripts/measure_app_memory.py).
 
+> **이 문서가 실제로 늙었습니다.** 2026-10-18까지 여기에 259MB라고 적혀 있었고 실제는
+> 266.5MB였습니다. Langfuse 비용을 재다가 **우연히** 발견했습니다. 측정값을 적는 프로젝트에서
+> 그 숫자가 조용히 늙는 것은 링크가 깨지는 것보다 나쁩니다 — 링크는 CI가 잡아 줬고 숫자는
+> 아무도 보지 않았습니다. 그래서 아래 표의 수치는 출처 보고서에 묶여 있고
+> [`scripts/check_doc_numbers.py`](../../scripts/check_doc_numbers.py)가 CI에서 대조합니다.
+
 ### 2026-10-18 재측정 — Langfuse를 넣어도 들어갑니다
 
 | 구성 | 피크 상주 | 690MB 대비 |
 |---|---:|---:|
 | 2026-10-14 (ADR 작성 시점) | 259 MB | 38% |
-| 2026-10-18 현재 | **266.5 MB** | 39% |
-| 2026-10-18 + Langfuse 임포트 | **271.7 MB** | 39% |
+| 2026-10-18 현재 | **<!--n:reports/app_memory.json#peak_mb-->266.5<!--/n--> MB** | 39% |
+| 2026-10-18 + Langfuse 임포트 | **<!--n:reports/app_memory_langfuse.json#peak_mb-->271.7<!--/n--> MB** | 39% |
 
-**Langfuse는 앱 피크에 +5.2 MB를 더합니다.** 여유가 418 MB 남습니다.
+**Langfuse는 앱 피크에 +5.2 MB를 더합니다.** 여유가 <!--n:reports/app_memory_langfuse.json#headroom_mb-->418.3<!--/n--> MB 남습니다.
 
-그런데 **빈 인터프리터에 Langfuse만 올리면 60.7 MB**입니다(`langfuse` 43.0 + `langfuse.langchain`
-17.7). 두 숫자가 다른 이유는 **의존성이 이미 올라와 있기 때문**입니다 — `httpx`·`pydantic`·
+그런데 **빈 인터프리터에 Langfuse만 올리면 60.7 MB**입니다(`langfuse` <!--n:reports/app_memory_langfuse.json#extra_imports/langfuse/delta-->43.0<!--/n--> + `langfuse.langchain`
+<!--n:reports/app_memory_langfuse.json#extra_imports/langfuse.langchain/delta-->17.7<!--/n-->). 두 숫자가 다른 이유는 **의존성이 이미 올라와 있기 때문**입니다 — `httpx`·`pydantic`·
 `wrapt`·`packaging`은 `langchain`과 `openai`가 이미 가져옵니다. 새로 드는 것은 OpenTelemetry
 세 패키지뿐이고, 그것이 5.2 MB입니다.
 

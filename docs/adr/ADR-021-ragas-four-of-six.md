@@ -109,8 +109,8 @@ langchain-community 0.4에서 사라졌습니다. `langchain-community<0.4`로 �
 
 | 규칙 | 값 | 근거 |
 |---|---|---|
-| Faithfulness 전체 하한 | ~~0.90~~ → **0.80** | 아래 "4회차" 참고 |
-| Context Precision, 안정 3가족 하한 | ~~0.95~~ → **0.85** | 아래 "4회차" 참고 |
+| Faithfulness 전체 하한 | ~~0.90~~ → **<!--n:baselines/eval_baseline.json#absolute_floor.ragas_faithfulness-->0.80<!--/n-->** | 아래 "4회차" 참고 |
+| Context Precision, 안정 3가족 하한 | ~~0.95~~ → **<!--n:baselines/eval_baseline.json#absolute_floor.ragas_context_precision_stable_families-->0.85<!--/n-->** | 아래 "4회차" 참고 |
 | Context Precision 전체 평균 | **게이트 안 함** | 변동폭 0.1342, 품질과 무관하게 움직입니다 |
 | 사례별 규칙 | **게이트 안 함** | 최악 변동폭 **1.0000**(`coauthor-02`). 매번 빨갛게 됩니다 |
 | Answer Relevancy | **게이트 안 함** | 답변 형식을 재고 있습니다 |

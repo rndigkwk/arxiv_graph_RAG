@@ -21,4 +21,5 @@ jobs:
       - run: uv run --locked ruff check answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py evals tests scripts pipeline models
       - run: uv run --locked python -m pytest -q
       - run: uv run --locked python scripts/check_doc_links.py
+      - run: uv run --locked python scripts/check_doc_numbers.py
       - run: uv run --locked python -m compileall -q app.py chatbot.py answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py gds_pagerank.py metagraph.py evals scripts pipeline models
