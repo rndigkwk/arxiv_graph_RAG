@@ -75,3 +75,4 @@
 | [ADR-028](ADR-028-resolve-titles-with-a-fulltext-index.md) | 제목은 전문 검색 인덱스를 쓰는 도구로 해석하고 못 찾으면 못 찾았다고 한다 | 채택 |
 | [ADR-029](ADR-029-ppr-beats-the-adapter-in-the-related-slot.md) | 관련 논문 슬롯은 PPR이 지킨다 — 어댑터는 그 자리에서 3.9배 진다 | 기각 |
 | [ADR-030](ADR-030-related-papers-needs-a-query-not-a-model.md) | 관련 논문은 모델이 아니라 질의가 답이었다 — 공동인용 수로 정렬한다 | 채택 |
+| [ADR-031](ADR-031-the-model-that-wins-is-the-forecast.md) | 이기는 모델은 예측 쪽이었다 — 가중치를 저장하고 구간을 붙인다 | 채택 |

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-15T06:05:36.407994+00:00",
+  "generated_at": "2026-10-19T01:37:38.350603+00:00",
   "snapshot_version": "2026-10-14",
   "snapshot_papers_sha256": "662ec63c7255286cd779dd6a9e1b7eee46da50504eb1fa58b832b3957cdeea46",
   "task": "co-citation link prediction",
@@ -92,6 +92,14 @@
         "hits_at_1": 0.394,
         "hits_at_3": 0.62,
         "hits_at_5": 0.731
+      },
+      "mrr_vs_best_heuristic": {
+        "baseline": "adamic-adar",
+        "groups": 3000,
+        "mean": -0.0216,
+        "low": -0.0252,
+        "high": -0.0181,
+        "excludes_zero": true
       }
     },
     {
@@ -171,6 +179,14 @@
         "hits_at_1": 0.4183,
         "hits_at_3": 0.6983,
         "hits_at_5": 0.8323
+      },
+      "mrr_vs_best_heuristic": {
+        "baseline": "adamic-adar",
+        "groups": 3000,
+        "mean": 0.0231,
+        "low": 0.0139,
+        "high": 0.0327,
+        "excludes_zero": true
       }
     },
     {
@@ -220,7 +236,28 @@
         "hits_at_1": 0.4793,
         "hits_at_3": 0.778,
         "hits_at_5": 0.8967
+      },
+      "mrr_vs_best_heuristic": {
+        "baseline": "adamic-adar",
+        "groups": 3000,
+        "mean": 0.0818,
+        "low": 0.0699,
+        "high": 0.0936,
+        "excludes_zero": true
       }
     }
-  ]
+  ],
+  "artifacts": {
+    "directory": "derived/link_prediction",
+    "models": {
+      "graph-logistic": {
+        "path": "derived/link_prediction/graph-logistic.joblib",
+        "bytes": 1887
+      },
+      "graph-text-gbm": {
+        "path": "derived/link_prediction/graph-text-gbm.joblib",
+        "bytes": 380442
+      }
+    }
+  }
 }

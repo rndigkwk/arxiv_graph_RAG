@@ -46,12 +46,42 @@ def parse_month(value: str) -> int:
     return index
 
 
-def evaluate(built: dict[str, Any]) -> list[dict[str, Any]]:
-    """Fit each rung on the training split and score it on both test splits and the ranking."""
+def paired_bootstrap(
+    baseline: np.ndarray, candidate: np.ndarray, *, samples: int = 2000, seed: int = 20261019
+) -> dict[str, float]:
+    """Interval for the per-group difference in reciprocal rank.
+
+    점 추정만 적으면 "GBM이 더 낫다"를 말할 수 없습니다. 변동의 단위가 순위 그룹이므로
+    그룹을 쌍으로 다시 뽑고 차이에서 구간을 읽습니다(11-3절과 같은 방법).
+    """
+    diff = 1.0 / np.asarray(candidate, dtype=np.float64)
+    diff = diff - 1.0 / np.asarray(baseline, dtype=np.float64)
+    rng = np.random.default_rng(seed)
+    draws = rng.integers(0, len(diff), size=(samples, len(diff)))
+    means = diff[draws].mean(axis=1)
+    low, high = float(np.percentile(means, 2.5)), float(np.percentile(means, 97.5))
+    return {
+        "groups": int(len(diff)),
+        "mean": round(float(diff.mean()), 4),
+        "low": round(low, 4),
+        "high": round(high, 4),
+        "excludes_zero": bool(low > 0 or high < 0),
+    }
+
+
+def evaluate(built: dict[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Fit each rung on the training split and score it on both test splits and the ranking.
+
+    적합된 모델과 그룹별 순위를 함께 돌려줍니다 - 전자는 아티팩트로 저장하고 후자는 모델
+    사이의 차이에 구간을 내는 데 씁니다. 둘 다 없으면 "이 모델을 승격한다"를 말할 근거가
+    없습니다(ADR-031).
+    """
     splits = built["splits"]
     train, test_hard, test_random = splits["train"], splits["test_hard"], splits["test_random"]
     ranking_features = built["ranking"]["features"]
     results = []
+    fitted: dict[str, Any] = {}
+    ranks: dict[str, np.ndarray] = {}
     for model in ladder():
         model.fit(train.features, train.labels)
         row: dict[str, Any] = {
@@ -68,11 +98,70 @@ def evaluate(built: dict[str, Any]) -> list[dict[str, Any]]:
             ),
         }
         if ranking_features:
-            row["ranking_hard_negatives"] = metrics_module.ranking_metrics(
-                [model.score(features) for features in ranking_features]
-            )
+            scored = [model.score(features) for features in ranking_features]
+            row["ranking_hard_negatives"] = metrics_module.ranking_metrics(scored)
+            ranks[model.name] = metrics_module.ranking_ranks(scored)
+        fitted[model.name] = model
         results.append(row)
-    return results
+
+    # 최고 휴리스틱을 기준으로 학습 모델의 우위에 구간을 냅니다. 휴리스틱을 못 이기는
+    # 학습 모델은 올릴 이유가 없습니다.
+    heuristics = [row["model"] for row in results if not row["detail"].get("fitted")]
+    if ranks and heuristics:
+        best = max(heuristics, key=lambda name: (1.0 / ranks[name]).mean())
+        for row in results:
+            if row["model"] == best or row["model"] not in ranks:
+                continue
+            row["mrr_vs_best_heuristic"] = {
+                "baseline": best,
+                **paired_bootstrap(ranks[best], ranks[row["model"]]),
+            }
+    return results, {"fitted": fitted, "ranks": ranks}
+
+
+def save_models(
+    fitted: dict[str, Any], directory: Path, *, snapshot_version: str, report: dict[str, Any]
+) -> dict[str, Any]:
+    """Persist each fitted rung next to a manifest saying what it was trained on.
+
+    **지금까지 저장하지 않았습니다.** 지표만 남기고 가중치를 버리면 "이 모델을 승격한다"도
+    "이전 버전으로 되돌린다"도 말할 수 없습니다 — 모델 관리가 기록에서 멈춘 이유가 그것입니다
+    (ADR-031).
+
+    스냅샷 버전과 분할을 같이 적습니다. 어떤 데이터로 학습했는지 묶이지 않으면 아티팩트가
+    있어도 되짚을 수 없습니다([ADR-003](../../docs/adr/ADR-003-snapshot-pinning.md)).
+    """
+    import joblib
+
+    directory.mkdir(parents=True, exist_ok=True)
+    saved = {}
+    for name, model in fitted.items():
+        if not model.describe().get("fitted"):
+            continue  # 휴리스틱은 저장할 가중치가 없습니다.
+        path = directory / f"{name}.joblib"
+        joblib.dump(model, path)
+        saved[name] = {
+            "path": str(path).replace("\\", "/"),
+            "bytes": path.stat().st_size,
+        }
+    manifest = {
+        "snapshot_version": snapshot_version,
+        "split": report["split"],
+        "ranking_task": report["ranking_task"],
+        "models": saved,
+        "metrics": {
+            row["model"]: {
+                "hard_roc_auc": row["test_hard_negatives"]["roc_auc"],
+                "ranking_mrr": (row.get("ranking_hard_negatives") or {}).get("mrr"),
+                "mrr_vs_best_heuristic": row.get("mrr_vs_best_heuristic"),
+            }
+            for row in report["results"]
+        },
+    }
+    (directory / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return {"directory": str(directory).replace("\\", "/"), "models": saved}
 
 
 def feature_importance(built: dict[str, Any]) -> dict[str, float]:
@@ -101,6 +190,9 @@ def main() -> int:
                         help="이 달부터의 공동인용이 평가 라벨이 됩니다 (YYYY-MM).")
     parser.add_argument("--max-positives", type=int, default=MAX_POSITIVES)
     parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--save-model", type=Path, default=Path("derived/link_prediction"),
+                        help="적합된 모델을 여기 저장합니다. 승격·롤백의 선행 조건입니다.")
+    parser.add_argument("--no-save", action="store_true")
     args = parser.parse_args()
 
     snap = snapshot_module.load(args.version) if args.version else snapshot_module.latest()
@@ -109,7 +201,7 @@ def main() -> int:
         snap, train_cut=train_cut, test_cut=test_cut, max_positives=args.max_positives
     )
     windows = built["windows"]
-    results = evaluate(built)
+    results, trained = evaluate(built)
 
     report = {
         "generated_at": datetime.now(UTC).isoformat(),
@@ -143,6 +235,10 @@ def main() -> int:
         "feature_separation": feature_importance(built),
         "results": results,
     }
+    if not args.no_save:
+        report["artifacts"] = save_models(
+            trained["fitted"], args.save_model, snapshot_version=snap.version, report=report
+        )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -166,6 +262,9 @@ def main() -> int:
             for metric, value in result.get("ranking_hard_negatives", {}).items():
                 run.log_metrics({f"{name}.rank.{metric}": value})
         run.log_artifact(args.output)
+        for saved in (report.get("artifacts") or {}).get("models", {}).values():
+            # 가중치도 올립니다. 지표만 올리면 승격할 대상이 원격에 없습니다(ADR-031).
+            run.log_artifact(Path(saved["path"]))
 
     print(json.dumps({
         "split": report["split"],

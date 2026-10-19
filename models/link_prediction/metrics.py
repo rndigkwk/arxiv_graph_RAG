@@ -61,9 +61,11 @@ def classification_metrics(labels: np.ndarray, scores: np.ndarray) -> dict[str, 
     }
 
 
-def ranking_metrics(group_scores: list[np.ndarray], *, ks: tuple[int, ...] = (1, 3, 5)
-                    ) -> dict[str, float]:
-    """Score per-anchor rankings where index 0 of each group is the true partner.
+def ranking_ranks(group_scores: list[np.ndarray]) -> np.ndarray:
+    """The true partner's rank in each group, so two models can be compared pairwise.
+
+    집계만 돌려주면 모델 둘의 차이에 구간을 낼 수 없습니다. 변동의 단위가 그룹이므로 그룹별
+    순위를 그대로 꺼내 둡니다 - `train.py`가 그것으로 쌍체 부트스트랩을 합니다.
 
     A tie between the true partner and a decoy is counted at the worse rank, so a model that
     scores everything the same cannot collect credit.
@@ -75,7 +77,14 @@ def ranking_metrics(group_scores: list[np.ndarray], *, ks: tuple[int, ...] = (1,
         scores = np.asarray(scores, dtype=np.float64)
         truth = scores[0]
         ranks.append(1 + int((scores[1:] >= truth).sum()))
-    ranks_array = np.asarray(ranks, dtype=np.float64)
+    return np.asarray(ranks, dtype=np.float64)
+
+
+def ranking_metrics(group_scores: list[np.ndarray], *, ks: tuple[int, ...] = (1, 3, 5)
+                    ) -> dict[str, float]:
+    """Score per-anchor rankings where index 0 of each group is the true partner."""
+    ranks_array = ranking_ranks(group_scores)
+    ranks = ranks_array
     metrics = {
         "groups": len(ranks),
         "mrr": round(float((1.0 / ranks_array).mean()), 4),
