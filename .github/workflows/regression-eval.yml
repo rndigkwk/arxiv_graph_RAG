@@ -16,10 +16,20 @@ name: Regression evaluation
 # 워크플로가 12시간마다 돌지만, 그것이 비활성화된 상태로 cron이 걸리면 멈춘 DB를 만납니다.
 # CLIENT_ID/CLIENT_SECRET 은 인스턴스를 삭제할 수도 있는 관리 API 자격증명이라 저장소 비밀에
 # 넣지 않았습니다. 그래서 이 작업은 멈춘 인스턴스를 깨우지 못하고 분명하게 실패합니다.
+# `evaluate`는 필수 상태 검사입니다(main 브랜치 보호). 필수 검사에 `paths:` 필터를 걸면,
+# 그 경로를 건드리지 않는 PR에서 잡이 **아예 돌지 않아** 영원히 대기합니다. 그래서 짝이 되는
+# regression-eval-skip.yml 이 같은 이름의 잡으로 보완 경로를 받아 통과를 보고합니다.
 on:
   pull_request:
     paths:
+      # 답변 경로에 닿는 파일 전부. 하나라도 빠지면 그 변경은 게이트를 지나지 않습니다.
       - chatbot.py
+      - prompts.py
+      - agent_graph.py
+      - routing.py
+      - abstain.py
+      - title_search.py
+      - pagerank.py
       - answer_validation.py
       - candidate_validation.py
       - cypher_validation.py
