@@ -753,3 +753,26 @@ def test_the_family_set_is_not_narrowed_a_third_time():
     assert "다시 좁히지 않습니다" in rationale
     assert "게이트에서 뺍니다" in rationale
     assert len(baseline["ragas_stable_families"]) == 2
+
+
+def test_every_floor_names_a_metric_the_harness_produces():
+    """하한에 적힌 이름이 평가 보고서에 없으면 **게이트가 매번 실패합니다.**
+
+    2026-10-19에 관련 논문 점수(`related_recall_at_k`)를 `absolute_floor`에 넣었습니다. 그
+    지표는 다른 하네스가 따로 내므로 평가 보고서에 없고, 게이트는 "이번 결과에 없습니다"로
+    위반을 올립니다. 로컬과 단위 CI는 `reports/eval_gate.json`이 없어 이 층을 건너뛰므로
+    초록이었고, 다음 주간 크론에서야 터졌을 것입니다.
+
+    그래서 실제로 기록된 실행 보고서로 확인합니다 - 하한의 모든 이름이 거기 있어야 합니다.
+    """
+    baseline = load(BASELINE)
+    recorded = Path("reports/baseline_routed_run1_rescored.json")
+    if not recorded.exists():
+        pytest.skip(f"기록된 실행 보고서가 없습니다: {recorded}")
+    produced = set(normalize(load(recorded))["metrics"])
+    # RAGAS 지표는 별도 보고서에서 합쳐집니다. 그 두 개는 이름으로 인정합니다.
+    produced |= {RAGAS_FAITHFULNESS, RAGAS_STABLE_PRECISION}
+
+    missing = sorted(set(baseline["absolute_floor"]) - produced)
+
+    assert missing == [], missing

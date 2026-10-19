@@ -29,8 +29,7 @@
     "ragas_context_precision_stable_families": 0.9999999999,
     "ragas_faithfulness": 0.9944444444444445,
     "recall_at_k": 1.0,
-    "reciprocal_rank": 0.9888888888888889,
-    "related_recall_at_k": 0.3816
+    "reciprocal_rank": 0.9888888888888889
   },
   "absolute_floor": {
     "answer_evidence_recall": 0.99,
@@ -40,8 +39,7 @@
     "recall_at_k": 0.48,
     "reciprocal_rank": 0.48,
     "ragas_faithfulness": 0.8,
-    "ragas_context_precision_stable_families": 0.85,
-    "related_recall_at_k": 0.25
+    "ragas_context_precision_stable_families": 0.85
   },
   "allowed_drop": {
     "answer_evidence_recall": 0.02,
@@ -164,11 +162,18 @@
     "ragas_context_precision_stable_families": "**가족 집합을 한 번 좁혔고, 다시 좁히지 않습니다.** 처음에는 3회 관측으로 author·citing·topcited를 골랐는데, citing-06이 4회차에, citing-02가 5회차에 0.1667로 무너져 변동폭이 0.0000 -> 0.0463 -> 0.0926으로 계속 넓어졌습니다. citing을 빼면 author·topcited 12사례가 5회 전부 1.0000(변동폭 0.0000)입니다. citing이 움직이는 이유는 그 질문에서 에이전트가 가져오는 문맥 개수가 실행마다 달라지고, 이 지표가 **답변에 의존**하기 때문입니다(11-10절). 하한은 그래도 파국용 0.85로 둡니다 - '변동폭이 0이다'라는 전제는 이미 두 번 깨졌고, 같은 전제에 좁은 하한을 다시 얹지 않습니다. **author나 topcited가 무너지면 하한을 또 내리는 대신 이 지표를 게이트에서 뺍니다.** 하한을 관측에 맞춰 반복해 내리면 게이트가 장식이 됩니다.",
     "no_drop_on_ragas": "RAGAS 지표에는 허용폭도 사례별 규칙도 두지 않습니다. 사례별 판정이 같은 답변에서도 0과 1을 왕복하고(reference-01: 1,1,1,0 / coauthor-02: 1,0,1,0 / citing-06의 context_precision: 1,1,1,0.1667) 집계는 그 개수이므로, n=30에서 작은 회귀를 변동과 구별할 수 없습니다. 구별할 수 없는 값에 규칙을 붙이면 규칙이 아니라 숫자입니다.",
     "ragas_judge_model": "기준선의 RAGAS 값은 이 판정 모델로 쟀습니다. 다른 모델로 잰 점수를 같은 표에 올리면 모수가 다른 값을 비교하게 됩니다(metrics_split과 같은 규칙). 2026-10-17에 CI가 OPENAI_MODEL을 넘기지 않아 실제로 그 일이 있었고, 그래서 게이트가 막습니다.",
-    "answer_evidence_precision": "0.99에서 0.95로 **넓혔습니다**(2026-10-18). 라우팅(ADR-024) 뒤 재측정에서 3회 중 한 번 `citing-03`이 시드 논문 자신을 근거에 넣어 precision이 0.6667이 됐고, 30건 집계가 (29 + 0.6667)/30 = 0.9889로 하한 0.9900을 0.0011 넘겼습니다. 즉 **기준선을 만든 실행이 그 기준선에 걸립니다.** 관측 변동폭 0.0111이 하한까지의 여유 0.0063보다 커서, 0.99는 품질이 아니라 변동을 막는 하한입니다(90 사례-실행 중 1건 -> 30건 실행이 빨개질 확률 약 28%). 0.95는 같은 사례 4~5건까지 견디고 계통적 고장은 여전히 막습니다. **근본 원인은 따로 고칩니다**: 제목을 arxiv_id로 바꾸는 중간 조회의 행이 `evidence_ids`에 시드를 담고, 그것이 (1) `retrieved_ids` 1위를 차지해 reciprocal_rank 상한을 0.7000으로 묶고 (2) RAGAS context_precision을 절반으로 깎고 (3) 드물게 답변 근거로 새어 나옵니다. 중간 조회 결과를 근거와 분리하면 셋이 한 번에 풀리지만 지표 정의가 바뀌어 기준선을 다시 써야 하므로 다음 주기로 둡니다.",
-    "related_recall_at_k": "관련 논문 슬롯(`rank_related_papers`)의 공동인용 recall@5입니다. 300개 시드에서 0.3816이고 **이 지표는 결정적입니다** - 두 번 돌려 집계가 완전히 같았습니다(LLM도 표본추출도 없습니다). 그래서 변동폭이 아니라 **스냅샷 변화**를 견디게 둡니다. 하한 0.25는 기각된 대안들의 점수(vector 0.0979, adapter_cite 0.0998, adapter_cocite 0.0986) **위**에 있습니다 - 이 선을 깨면 배포된 경로가 그래프를 쓰지 않게 됐다는 뜻입니다(ADR-029). **CI에서는 강제되지 않습니다**: 스냅샷 테이블이 저장소에 없어(manifest만 추적) CI가 `derived/`를 만들 수 없습니다. 스냅샷이 있는 곳에서만 pytest가 검사합니다."
+    "answer_evidence_precision": "0.99에서 0.95로 **넓혔습니다**(2026-10-18). 라우팅(ADR-024) 뒤 재측정에서 3회 중 한 번 `citing-03`이 시드 논문 자신을 근거에 넣어 precision이 0.6667이 됐고, 30건 집계가 (29 + 0.6667)/30 = 0.9889로 하한 0.9900을 0.0011 넘겼습니다. 즉 **기준선을 만든 실행이 그 기준선에 걸립니다.** 관측 변동폭 0.0111이 하한까지의 여유 0.0063보다 커서, 0.99는 품질이 아니라 변동을 막는 하한입니다(90 사례-실행 중 1건 -> 30건 실행이 빨개질 확률 약 28%). 0.95는 같은 사례 4~5건까지 견디고 계통적 고장은 여전히 막습니다. **근본 원인은 따로 고칩니다**: 제목을 arxiv_id로 바꾸는 중간 조회의 행이 `evidence_ids`에 시드를 담고, 그것이 (1) `retrieved_ids` 1위를 차지해 reciprocal_rank 상한을 0.7000으로 묶고 (2) RAGAS context_precision을 절반으로 깎고 (3) 드물게 답변 근거로 새어 나옵니다. 중간 조회 결과를 근거와 분리하면 셋이 한 번에 풀리지만 지표 정의가 바뀌어 기준선을 다시 써야 하므로 다음 주기로 둡니다."
   },
   "ragas_stable_families": [
     "author",
     "topcited"
-  ]
+  ],
+  "related_slot": {
+    "metric": "related_recall_at_k",
+    "floor": 0.25,
+    "measured": 0.3816,
+    "source": "reports/related_study.json",
+    "checked_by": "tests/test_related_slot.py",
+    "rationale": "관련 논문 슬롯(`rank_related_papers`)의 공동인용 recall@5입니다. 300개 시드에서 0.3816이고 **이 지표는 결정적입니다** - 두 번 돌려 집계가 완전히 같았습니다(LLM도 표본추출도 없습니다). 그래서 변동폭이 아니라 **스냅샷 변화**를 견디게 둡니다. 하한 0.25는 기각된 대안들의 점수(vector 0.0979, adapter_cite 0.0998, adapter_cocite 0.0986) **위**에 있습니다 - 이 선을 깨면 배포된 경로가 그래프를 쓰지 않게 됐다는 뜻입니다(ADR-029). **CI에서는 강제되지 않습니다**: 스냅샷 테이블이 저장소에 없어(manifest만 추적) CI가 `derived/`를 만들 수 없습니다. 스냅샷이 있는 곳에서만 pytest가 검사합니다. **`absolute_floor`에 두지 않습니다.** 거기 적힌 이름은 평가 하네스가 매 실행 내놓는 지표여야 하고, 없으면 게이트가 '이번 결과에 없습니다'로 실패합니다 - 2026-10-19에 그렇게 넣어 봤다가 모든 게이트 실행이 깨지는 것을 확인하고 옮겼습니다."
+  }
 }

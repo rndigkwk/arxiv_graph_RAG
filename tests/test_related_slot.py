@@ -40,7 +40,7 @@ def baseline():
 
 def test_the_deployed_path_clears_the_floor(report, baseline):
     """하한은 기각된 대안들 위에 있습니다. 깨지면 그래프를 안 쓰게 된 것입니다."""
-    floor = baseline["absolute_floor"]["related_recall_at_k"]
+    floor = baseline["related_slot"]["floor"]
     measured = report["summary"]["ppr"]["recall_at_k"]
 
     assert measured >= floor, (measured, floor)
@@ -50,7 +50,7 @@ def test_the_deployed_path_clears_the_floor(report, baseline):
 
 def test_the_floor_sits_above_the_rejected_alternatives(report, baseline):
     """0.25를 고른 이유입니다 - 이 선 아래는 "임베딩 수준으로 떨어졌다"는 뜻입니다."""
-    floor = baseline["absolute_floor"]["related_recall_at_k"]
+    floor = baseline["related_slot"]["floor"]
 
     for variant in ("vector", "adapter_cite", "adapter_cocite"):
         if variant in report["summary"]:
@@ -58,7 +58,21 @@ def test_the_floor_sits_above_the_rejected_alternatives(report, baseline):
 
 
 def test_the_baseline_records_the_measured_value(report, baseline):
-    assert baseline["metrics"]["related_recall_at_k"] == report["summary"]["ppr"]["recall_at_k"]
+    assert baseline["related_slot"]["measured"] == report["summary"]["ppr"]["recall_at_k"]
+
+
+def test_this_floor_stays_out_of_the_answer_path_gate():
+    """**2026-10-19에 여기 넣어 봤다가 모든 게이트 실행이 깨졌습니다.**
+
+    `absolute_floor`의 이름은 평가 하네스가 **매 실행 내놓는** 지표여야 합니다. 관련 논문
+    점수는 다른 하네스(`evals.related_study`)가 따로 내므로 평가 보고서에 없고, 그러면
+    게이트가 "이번 결과에 없습니다"로 실패합니다. CI는 게이트 테스트를 건너뛰어서 초록이었고,
+    다음 주간 크론에서야 터졌을 것입니다.
+    """
+    baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+
+    assert "related_recall_at_k" not in baseline["absolute_floor"]
+    assert "related_recall_at_k" not in (baseline["allowed_drop"] or {})
 
 
 def test_the_report_was_built_from_the_current_snapshot(report):
