@@ -192,9 +192,14 @@ jobs:
       - name: Summarize
         if: steps.scope.outputs.run == '1' && (always())
         run: |
+          # 예산이 바닥나 **돌리지 못한** 경우를 품질 회귀와 구별해 맨 위에 적습니다
+          # (ADR-044). 게이트는 여전히 실패합니다 - 돌리지 못한 검사는 통과가 아닙니다.
+          if [ -f reports/eval_not_run.json ]; then
+            uv run --locked python -m evals.budget --explain >> "$GITHUB_STEP_SUMMARY"
+          fi
           if [ -f reports/summary.md ]; then
             cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
-          else
+          elif [ ! -f reports/eval_not_run.json ]; then
             echo "평가 요약이 없습니다. 앞 단계의 로그를 보세요." >> "$GITHUB_STEP_SUMMARY"
           fi
 
@@ -206,6 +211,7 @@ jobs:
           path: |
             reports/regression_*.json
             reports/eval_gate.json
+            reports/eval_not_run.json
             reports/summary.md
             reports/junit.xml
           retention-days: 30

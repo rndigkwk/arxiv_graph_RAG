@@ -88,3 +88,5 @@
 | [ADR-041](ADR-041-the-gate-reads-the-prompt.md) | 게이트가 프롬프트를 읽는다 — 지문을 적어 두기만 하고 보지 않았다 | 채택 |
 | [ADR-042](ADR-042-the-saved-list-leaves-the-app.md) | 저장 목록이 앱 밖으로 나간다 — 빈 칸은 추측하지 않고 센다 | 채택 |
 | [ADR-043](ADR-043-the-floor-is-checked-against-the-worst-run.md) | RAGAS 하한은 최악의 정상 실행과 심은 결함으로 검사한다 | 채택 |
+| [ADR-044](ADR-044-not-run-is-not-a-regression.md) | 돌리지 못한 것은 회귀가 아니다 — 그러나 통과도 아니다 | 채택 |
+| [ADR-045](ADR-045-what-to-delete-before-adding-a-month.md) | 한 달을 더하기 전에 무엇을 지울지 — 지금은 지울 것이 없다 | 채택 |
