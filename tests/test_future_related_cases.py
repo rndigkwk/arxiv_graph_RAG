@@ -145,3 +145,60 @@ def test_the_dataset_says_why_it_is_not_the_deployed_fill_slice(dataset):
 
     assert "6,499" in reason
     assert "피인용 0편" in reason
+
+
+def test_cutting_the_graph_closes_the_leak(dataset):
+    """경고가 아니라 **고쳤다는 것**을 확인합니다.
+
+    `Graph(snap, feature_cut=...)`로 자른 그래프에서는 공동인용이 미래 정답을 담고 있지
+    않아야 합니다. 자르지 않은 그래프에서는 전부 담고 있습니다(위 테스트) - 두 검사가 쌍으로
+    "누수가 실재했고 자르면 닫힌다"를 말합니다(ADR-035).
+    """
+    try:
+        from evals.related_study import Graph
+        from models.link_prediction.train import parse_month
+        from pipeline import snapshot as snapshot_module
+
+        cut = parse_month(dataset["feature_cut"])
+        graph = Graph(snapshot_module.latest(), feature_cut=cut)
+    except Exception as exc:  # noqa: BLE001 - 스냅샷 캐시가 없으면 CI입니다.
+        pytest.skip(f"스냅샷 캐시를 읽을 수 없습니다: {type(exc).__name__}")
+
+    assert graph.dropped_edges > 0, "자른 간선이 0이면 자르지 않은 것입니다"
+
+    checked = 0
+    for case in dataset["cases"][:200]:
+        if not case["new_in_label_window"]:
+            continue
+        checked += 1
+        partners = set(graph.cocited(case["seed_id"]))
+        leaked = partners & set(case["new_in_label_window"])
+        assert not leaked, (case["id"], sorted(leaked))
+    assert checked
+
+
+def test_the_cut_matches_the_window_builder(dataset):
+    """두 곳의 기준이 다르면 같은 W3라고 부르면서 다른 그래프를 씁니다.
+
+    `related_study.Graph`의 컷과 `models/link_prediction/dataset.build_windows`의 W3가
+    **같은 공동인용 집합**을 만들어야 합니다.
+    """
+    try:
+        from evals.related_study import Graph
+        from models.link_prediction.dataset import build_windows
+        from models.link_prediction.train import DEFAULT_TRAIN_CUT, parse_month
+        from pipeline import snapshot as snapshot_module
+
+        snap = snapshot_module.latest()
+        cut = parse_month(dataset["feature_cut"])
+        graph = Graph(snap, feature_cut=cut)
+        windows = build_windows(snap, train_cut=parse_month(DEFAULT_TRAIN_CUT), test_cut=cut)
+    except Exception as exc:  # noqa: BLE001 - 스냅샷 캐시가 없으면 CI입니다.
+        pytest.skip(f"스냅샷 캐시를 읽을 수 없습니다: {type(exc).__name__}")
+
+    embedded = set(graph.position)
+    for case in dataset["cases"][:100]:
+        seed = case["seed_id"]
+        mine = set(graph.cocited(seed))
+        theirs = {p for p in windows.test_feature.get(seed, ()) if p in embedded}
+        assert mine == theirs, (case["id"], sorted(mine ^ theirs)[:5])

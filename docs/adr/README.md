@@ -80,3 +80,4 @@
 | [ADR-033](ADR-033-rank-metrics-measure-the-alphabet.md) | 순위 지표는 알파벳을 재고 있었다 — 순서에 의존하지 않는 지표를 더한다 | 채택 |
 | [ADR-034](ADR-034-measure-every-eligible-seed.md) | 표본을 버리고 적격 시드 전부를 잰다 — 하네스의 현직을 배포된 것으로 맞춘다 | 채택 |
 | [ADR-035](ADR-035-the-fill-slice-cannot-be-labelled.md) | 보충 구간의 정답은 만들 수 없다 — 대신 예측 시점에 얇은 시드를 잰다 | 채택 |
+| [ADR-036](ADR-036-the-embedding-fills-what-the-graph-cannot.md) | 그래프가 비는 자리는 임베딩이 채운다 — 그러나 학습은 여전히 보태지 않는다 | 채택 |

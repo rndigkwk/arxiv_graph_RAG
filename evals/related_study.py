@@ -54,8 +54,10 @@ import numpy as np
 import pagerank
 from evals.metrics import score_retrieval
 from models.embedding_tuning import adapter
+from models.link_prediction.train import parse_month
 from pipeline import features
 from pipeline import snapshot as snapshot_module
+from pipeline.snapshot import month_index
 
 OUTPUT = Path("reports/related_study.json")
 CASES = Path("evals/cases_related.json")
@@ -74,9 +76,22 @@ COCITED_FETCH = 4
 
 
 class Graph:
-    """스냅샷에서 만든 인용 구조와 임베딩. Aura도 OpenAI도 부르지 않습니다."""
+    """스냅샷에서 만든 인용 구조와 임베딩. Aura도 OpenAI도 부르지 않습니다.
 
-    def __init__(self, snap: Any) -> None:
+    `feature_cut`을 주면 **그 달 이전에 나온 논문이 만든 인용만** 남깁니다. 미래를 정답으로
+    쓰는 과제에서 필수입니다 - 전체 스냅샷에는 라벨 창의 인용자가 들어 있어서, 자르지 않으면
+    공동인용 변형이 **정답을 그대로 봅니다**
+    ([ADR-035](../docs/adr/ADR-035-the-fill-slice-cannot-be-labelled.md)).
+
+    자르는 기준은 `models/link_prediction/dataset.py`의 `build_windows`와 **같습니다** -
+    인용하는 논문의 `month_index`로 가르고, 월을 해석할 수 없는 옛 형식 id는 창에 넣지
+    않습니다. 두 곳의 기준이 다르면 같은 W3라고 부르면서 다른 그래프를 쓰게 됩니다.
+
+    어댑터 학습도 이 그래프에서 쌍을 뽑으므로(`pairs_for`), 한 번 자르면 순위와 학습이
+    함께 잘립니다.
+    """
+
+    def __init__(self, snap: Any, *, feature_cut: int | None = None) -> None:
         cache = features.Cache(snap)
         self.ids: list[str] = list(cache.ids)
         self.position: dict[str, int] = dict(cache.position)
@@ -84,16 +99,24 @@ class Graph:
             np.asarray(cache.embeddings(mmap=False), dtype=np.float32)
         )
         self.size = len(self.ids)
+        self.feature_cut = feature_cut
         cites: dict[str, set[str]] = collections.defaultdict(set)
         cited_by: dict[str, set[str]] = collections.defaultdict(set)
         rows, cols = [], []
+        self.dropped_edges = 0
         for row in snap.rows("references"):
             citing, cited = row["citing"], row["cited"]
-            if citing in self.position and cited in self.position:
-                cites[citing].add(cited)
-                cited_by[cited].add(citing)
-                rows.append(self.position[citing])
-                cols.append(self.position[cited])
+            if citing not in self.position or cited not in self.position:
+                continue
+            if feature_cut is not None:
+                month = month_index(citing)
+                if month is None or month >= feature_cut:
+                    self.dropped_edges += 1
+                    continue
+            cites[citing].add(cited)
+            cited_by[cited].add(citing)
+            rows.append(self.position[citing])
+            cols.append(self.position[cited])
         self.cites = cites
         self.cited_by = cited_by
         rows = np.asarray(rows, dtype=np.int32)
@@ -224,6 +247,11 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--variants", nargs="+", choices=VARIANTS, default=list(VARIANTS),
                         help="PPR만 재려면 --variants ppr. 어댑터 학습을 건너뛰어 빠릅니다.")
+    parser.add_argument(
+        "--feature-cut",
+        help="YYYY-MM. 이 달 이전 인용자가 만든 인용만 씁니다. 정답 파일이 feature_cut을 "
+             "적어 두면 그 값을 쓰며, 다르게 주면 거부합니다.",
+    )
     args = parser.parse_args()
 
     from pipeline.console import use_utf8_stdout
@@ -232,7 +260,21 @@ def main() -> int:
     snap = snapshot_module.load(args.version) if args.version else snapshot_module.latest()
     dataset = json.loads(args.cases.read_text(encoding="utf-8"))
     cases = dataset["cases"][: args.limit] if args.limit else dataset["cases"]
-    graph = Graph(snap)
+
+    # **정답이 자르는 선을 정합니다.** 미래를 라벨로 쓰는 정답은 `feature_cut`을 적어 두고,
+    # 자르지 않은 그래프로 재면 공동인용 변형이 정답을 그대로 봅니다(ADR-035). 그래서 명령줄
+    # 인자가 아니라 **정답 파일**이 기본값이고, 둘이 다르면 추측하지 않고 멈춥니다.
+    declared = dataset.get("feature_cut")
+    if args.feature_cut and declared and args.feature_cut != declared:
+        parser.error(
+            f"정답이 적어 둔 feature_cut({declared})과 준 값({args.feature_cut})이 다릅니다. "
+            "자르는 선을 정답이 정합니다."
+        )
+    cut_label = declared or args.feature_cut
+    feature_cut = parse_month(cut_label) if cut_label else None
+    graph = Graph(snap, feature_cut=feature_cut)
+    if feature_cut is not None:
+        print(f"그래프를 {cut_label} 이전으로 잘랐습니다: 간선 {graph.dropped_edges}개 제외")
 
     eval_seeds = {case["seed_id"] for case in cases}
     chosen = tuple(args.variants)
@@ -272,6 +314,10 @@ def main() -> int:
         # (ADR-030: 말뭉치의 17.2%). 전수로 재야 그 집합을 따로 볼 수 있습니다 - 300 시드
         # 표본에서는 그 안의 부분집합이 너무 작았습니다(ADR-034).
         row["cocited_candidates"] = len(graph.cocited(seed)) - 1
+        # 시드가 (잘린) 인용망에 **연결돼 있는지**. 0이면 그래프 계열은 점수를 낼 수 없습니다 -
+        # PPR 점수가 양수로 나오지 않고 `chatbot.top_by_score`가 0점을 뺍니다. 집계만 보면
+        # 그 사실이 평균에 섞여 사라집니다(ADR-036).
+        row["citation_degree"] = len(graph.cites.get(seed, ())) + len(graph.cited_by.get(seed, ()))
         # `cocited`도 PPR을 씁니다(동점 끊기와 보충). 시드당 한 번만 계산합니다.
         rank = (
             pagerank.personalized(
@@ -310,6 +356,31 @@ def main() -> int:
             row for row in rows if row["cocited_candidates"] < args.top_k
         ],
     }
+    # 연결 정도로 나눠 봅니다. **이것을 적지 않으면 집계가 두 체제를 섞습니다** - 간선이
+    # 없는 시드에서 그래프 계열은 0.0000이고 간선이 있는 시드에서는 0.98입니다. 평균 0.18은
+    # 그 둘의 가중합이라 어느 쪽도 설명하지 않습니다(ADR-036).
+    degree_groups = {
+        "no_citation_edges": [row for row in rows if row["citation_degree"] == 0],
+        "degree_1_to_4": [row for row in rows if 1 <= row["citation_degree"] < 5],
+        "degree_5_or_more": [row for row in rows if row["citation_degree"] >= 5],
+    }
+    by_degree = {
+        name: {
+            "seeds": len(group),
+            "share": round(len(group) / len(rows), 4) if rows else 0.0,
+            **{
+                variant: {
+                    metric: round(
+                        statistics.fmean(row[variant][metric] for row in group), 4
+                    )
+                    for metric in ("recall_at_k", "hit_at_k", "reciprocal_rank")
+                }
+                for variant in chosen
+            },
+        }
+        for name, group in degree_groups.items()
+        if group
+    }
     by_slice = {
         name: {
             "seeds": len(group),
@@ -338,6 +409,10 @@ def main() -> int:
         "snapshot_version": snap.version,
         "cases": len(cases),
         "top_k": args.top_k,
+        # 어느 그래프에서 잰 점수인지. 없으면 전체 스냅샷이고, 미래 라벨 과제에서는
+        # 반드시 있어야 합니다(ADR-035).
+        "feature_cut": cut_label,
+        "dropped_edges_outside_feature_window": graph.dropped_edges,
         "variants": list(chosen),
         "gold": str(args.cases).replace("\\", "/"),
         "incumbent": INCUMBENT,
@@ -349,6 +424,8 @@ def main() -> int:
         "summary": summary,
         # 공동인용이 상위 k를 채우는 시드와 PPR이 채워야 하는 시드를 나눠 본 recall@5입니다.
         "by_candidate_slice": by_slice,
+        # 간선 수로 나눈 세 지표. 집계보다 이쪽을 먼저 읽어야 합니다.
+        "by_degree_slice": by_degree,
         "vs_incumbent": against,
         "results": rows,
     }
