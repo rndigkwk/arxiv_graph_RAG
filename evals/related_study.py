@@ -65,7 +65,13 @@ TOP_K = 5
 # 11-3절의 격자 탐색이 고른 값입니다. 여기서 다시 탐색하지 않고 그대로 씁니다 - 같은 공간,
 # 같은 방법이므로 다시 고르면 평가 시드로 하이퍼파라미터를 고르는 셈이 됩니다.
 RIDGE_MULTIPLIER = 0.1
-VARIANTS = ("cocited", "ppr", "vector", "adapter_cite", "adapter_cocite")
+VARIANTS = ("cocited", "ppr", "vector", "adapter_cite", "adapter_cocite", "gbm")
+# ADR-031에서 최고 휴리스틱을 **측정된 구간으로** 이긴 유일한 모델입니다. 저장된 가중치를
+# 그대로 씁니다 - 여기서 다시 학습하면 평가 시드로 하이퍼파라미터를 고르는 셈입니다.
+GBM_MODEL = Path("derived/link_prediction/graph-text-gbm.joblib")
+# 재정렬 모델이므로 후보가 필요합니다. 벡터 상위 N과 **보이는 공동인용 후보의 합**을 씁니다 -
+# 벡터만 주면 공동인용이 이기는 집단에서 모델이 그 후보를 아예 못 봅니다.
+GBM_POOL = 50
 # **배포된 경로가 현직입니다.** 2026-10-19까지 `ppr`이었고 ADR-030이 공동인용 우선으로
 # 바꿨는데, 이 하네스의 현직은 그대로 `ppr`이었습니다 - 그러면 구간이 "배포된 것을 이기는가"가
 # 아니라 "옛 배포를 이기는가"를 답합니다(ADR-034).
@@ -196,6 +202,63 @@ def cocited_ranking(
     return ranked
 
 
+class Reranker:
+    """`graph-text-gbm`을 관련 논문 자리에 세웁니다. 쌍 점수 모델이므로 후보를 재정렬합니다.
+
+    **피처는 모델이 학습한 그래프에서 뽑습니다.** `build_windows`의 W3 피처 그래프와
+    인용 피인용 수이고, 참고문헌 150편 초과 인용자를 버리는 상한까지 같습니다
+    (`MAX_REFERENCES_FOR_COCITATION`). 순위용 `Graph`는 앱과 같게 상한을 두지 않으므로
+    둘이 1,377 시드 중 1건에서 다릅니다 - 그 1건의 원인이 상한뿐이라는 것을 테스트가
+    확인합니다([ADR-037](../docs/adr/ADR-037-the-gbm-wins-the-average-and-loses-both-halves.md)).
+
+    후보는 **벡터 상위 `pool`편 ∪ 보이는 공동인용 후보**입니다. 모델의 상한이 이 후보
+    집합의 recall이므로 그 상한을 보고서에 함께 적습니다 - 적지 않으면 "재정렬이 못 했다"와
+    "후보에 없었다"를 구별할 수 없습니다(ADR-029가 같은 구분을 합니다).
+    """
+
+    def __init__(self, snap: Any, *, feature_cut: int, pool: int = GBM_POOL) -> None:
+        import joblib
+
+        from models.link_prediction.dataset import PaperTable, build_windows
+        from models.link_prediction.train import DEFAULT_TRAIN_CUT
+
+        if not GBM_MODEL.exists():
+            raise FileNotFoundError(
+                f"저장된 가중치가 없습니다: {GBM_MODEL}. "
+                "uv run --extra ml python -m models.link_prediction.train 으로 만드세요."
+            )
+        self.model = joblib.load(GBM_MODEL)
+        windows = build_windows(
+            snap, train_cut=parse_month(DEFAULT_TRAIN_CUT), test_cut=feature_cut
+        )
+        self.adjacency = windows.test_feature
+        self.indegree = windows.test_indegree
+        self.table = PaperTable(snap)
+        self.pool = pool
+        self.pool_sizes: list[int] = []
+
+    def candidates(self, graph: Graph, seed: str, scores: np.ndarray) -> list[str]:
+        order = np.argpartition(-scores, self.pool)[: self.pool]
+        pooled = {graph.ids[index] for index in order}
+        pooled.update(graph.cocited(seed))
+        pooled.discard(seed)
+        return sorted(pooled)
+
+    def rank(self, graph: Graph, seed: str, scores: np.ndarray, top_k: int) -> list[str]:
+        from models.link_prediction.dataset import pair_features
+
+        pooled = self.candidates(graph, seed, scores)
+        self.pool_sizes.append(len(pooled))
+        if not pooled:
+            return []
+        matrix = pair_features(
+            [(seed, paper) for paper in pooled], self.adjacency, self.indegree, self.table
+        )
+        ranked = self.model.score(matrix)
+        order = np.argsort(-ranked)[:top_k]
+        return [pooled[index] for index in order]
+
+
 def pairs_for(graph: Graph, kind: str, exclude: set[str]) -> tuple[np.ndarray, np.ndarray]:
     """Anchor/positive matrices for one training target, skipping the eval seeds."""
     anchors, positives = [], []
@@ -294,9 +357,20 @@ def main() -> int:
             ),
         }
 
+    reranker = None
+    if "gbm" in chosen:
+        if feature_cut is None:
+            parser.error(
+                "gbm 변형은 feature_cut이 필요합니다. 피처 그래프를 자르지 않으면 "
+                "모델이 미래를 보고 점수를 냅니다."
+            )
+        reranker = Reranker(snap, feature_cut=feature_cut)
+
     per_seed: dict[str, dict[str, list[float]]] = {
         variant: collections.defaultdict(list) for variant in chosen
     }
+    # 재정렬 모델의 상한입니다. 후보에 없는 정답은 어떤 재정렬로도 못 가져옵니다.
+    pool_ceiling: list[float] = []
     rows: list[dict[str, Any]] = []
     for case in cases:
         seed, gold = case["seed_id"], case["expected_related_ids"]
@@ -306,8 +380,9 @@ def main() -> int:
                 graph.vectors @ vector if name == "vector"
                 else graph.vectors @ adapter.apply(weights[name], vector[None])[0]
             )
-            # 벡터 점수가 필요한 변형만입니다. `ppr`과 `cocited`는 그래프에서 나옵니다.
-            for name in chosen if name not in ("ppr", "cocited")
+            # 벡터 점수가 필요한 변형만입니다. `ppr`과 `cocited`는 그래프에서 나오고,
+            # `gbm`은 벡터 점수를 **후보 생성에만** 쓰므로 따로 다룹니다.
+            for name in chosen if name not in ("ppr", "cocited", "gbm")
         }
         row: dict[str, Any] = {"id": case["id"], "seed_id": seed, "gold_size": len(gold)}
         # 공동인용 후보가 몇 편인지. 이것이 `top_k`보다 적으면 배포 경로는 **PPR로 채웁니다**
@@ -326,11 +401,21 @@ def main() -> int:
             if {"ppr", "cocited"} & set(chosen)
             else None
         )
+        if reranker is not None:
+            pooled = set(reranker.candidates(graph, seed, graph.vectors @ vector))
+            # 사례별로 적어 둡니다. 집단마다 상한이 전혀 다르고(간선 1~4개 집단은 0.99),
+            # 그 차이를 모르면 "재정렬이 못 했다"와 "후보에 없었다"를 구별할 수 없습니다.
+            row["gbm_pool_recall"] = round(
+                len(pooled & set(gold)) / len(gold) if gold else 0.0, 4
+            )
+            pool_ceiling.append(row["gbm_pool_recall"])
         for variant in chosen:
             if variant == "ppr":
                 ranked = rank_by_score(graph, rank, seed, args.top_k)
             elif variant == "cocited":
                 ranked = cocited_ranking(graph, seed, rank, args.top_k)
+            elif variant == "gbm":
+                ranked = reranker.rank(graph, seed, graph.vectors @ vector, args.top_k)
             else:
                 ranked = rank_by_score(graph, scores[variant], seed, args.top_k)
             scored = score_retrieval(gold, ranked, k=args.top_k)
@@ -368,6 +453,14 @@ def main() -> int:
         name: {
             "seeds": len(group),
             "share": round(len(group) / len(rows), 4) if rows else 0.0,
+            **(
+                {
+                    "gbm_pool_recall_ceiling": round(
+                        statistics.fmean(row["gbm_pool_recall"] for row in group), 4
+                    )
+                }
+                if all("gbm_pool_recall" in row for row in group) else {}
+            ),
             **{
                 variant: {
                     metric: round(
@@ -426,6 +519,15 @@ def main() -> int:
         "by_candidate_slice": by_slice,
         # 간선 수로 나눈 세 지표. 집계보다 이쪽을 먼저 읽어야 합니다.
         "by_degree_slice": by_degree,
+        # 재정렬 후보가 정답을 얼마나 담고 있었는지. gbm의 상한입니다.
+        "gbm_pool": (
+            {
+                "size": GBM_POOL,
+                "mean_candidates": round(statistics.fmean(reranker.pool_sizes), 1),
+                "recall_ceiling": round(statistics.fmean(pool_ceiling), 4),
+            }
+            if reranker is not None and pool_ceiling else None
+        ),
         "vs_incumbent": against,
         "results": rows,
     }

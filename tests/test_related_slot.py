@@ -223,3 +223,43 @@ def test_the_learned_adapter_still_does_not_beat_the_plain_embedding(future_repo
         for metric in ("recall_at_k", "hit_at_k", "reciprocal_rank"):
             gap = abs(empty[variant][metric] - plain[metric])
             assert gap < 0.01, (variant, metric, gap)
+
+
+def test_the_gbm_wins_the_average_and_loses_both_halves(future_report):
+    """**집계만 보면 "모델이 이겼다"고 적게 됩니다**(ADR-037).
+
+    세 지표 모두 1위인데, 다수 집단에서는 자기가 품은 임베딩보다 나쁘고 두 번째 집단에서는
+    Cypher 한 줄보다 나쁩니다. 어느 집단에서도 최선이 아닙니다.
+    """
+    if "gbm" not in future_report["summary"]:
+        pytest.skip("gbm 변형이 없는 보고서입니다")
+    slices = future_report["by_degree_slice"]
+    empty, thin = slices["no_citation_edges"], slices["degree_1_to_4"]
+
+    # 집계에서는 이깁니다.
+    assert future_report["summary"]["gbm"]["recall_at_k"] > max(
+        future_report["summary"][v]["recall_at_k"]
+        for v in future_report["variants"] if v != "gbm"
+    )
+    # 그런데 다수 집단에서는 임베딩보다 못합니다.
+    assert empty["share"] > 0.5
+    assert empty["gbm"]["recall_at_k"] < empty["vector"]["recall_at_k"]
+    assert empty["gbm"]["hit_at_k"] < empty["vector"]["hit_at_k"]
+    # 두 번째 집단에서는 질의보다 못합니다.
+    assert thin["gbm"]["recall_at_k"] < thin["cocited"]["recall_at_k"]
+
+
+def test_the_gbm_failure_is_ranking_not_retrieval(future_report):
+    """후보 상한을 적지 않으면 "못 찾았다"와 "찾아 놓고 못 세웠다"를 구별할 수 없습니다.
+
+    간선 1~4개 집단의 후보에는 정답이 0.98 들어 있는데 GBM은 0.53을 돌려줍니다 - 검색이
+    아니라 순위의 실패입니다(ADR-037).
+    """
+    if "gbm" not in future_report["summary"]:
+        pytest.skip("gbm 변형이 없는 보고서입니다")
+    thin = future_report["by_degree_slice"]["degree_1_to_4"]
+    ceiling = thin.get("gbm_pool_recall_ceiling")
+
+    assert ceiling is not None, "후보 상한이 없으면 실패의 종류를 말할 수 없습니다"
+    assert ceiling > 0.9
+    assert thin["gbm"]["recall_at_k"] < ceiling * 0.7
