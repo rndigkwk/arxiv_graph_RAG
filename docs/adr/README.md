@@ -79,3 +79,4 @@
 | [ADR-032](ADR-032-close-the-model-lifecycle.md) | 모델 생명주기를 닫는다 — 등록·판정·승격·롤백, 그리고 main 보호 | 채택 |
 | [ADR-033](ADR-033-rank-metrics-measure-the-alphabet.md) | 순위 지표는 알파벳을 재고 있었다 — 순서에 의존하지 않는 지표를 더한다 | 채택 |
 | [ADR-034](ADR-034-measure-every-eligible-seed.md) | 표본을 버리고 적격 시드 전부를 잰다 — 하네스의 현직을 배포된 것으로 맞춘다 | 채택 |
+| [ADR-035](ADR-035-the-fill-slice-cannot-be-labelled.md) | 보충 구간의 정답은 만들 수 없다 — 대신 예측 시점에 얇은 시드를 잰다 | 채택 |
