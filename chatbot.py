@@ -1022,6 +1022,28 @@ def category_pagerank(code, limit=20, include_secondary=True, scope="global"):
 # 근사하려 했던 바로 그 값입니다(ADR-030).
 # 동점이 많아 top_k만 받으면 PPR로 깰 여지가 없습니다. 몇 배로 받아 두고 잘라냅니다.
 COCITED_FETCH = 4
+def nearest_by_embedding(arxiv_id, *, limit, exclude=()):
+    """Papers whose abstract embedding is closest to this one. 마지막 채움 수단입니다.
+
+    인용 간선이 없는 논문에서는 공동인용도 PPR도 점수를 내지 못합니다. 그 자리를 비워 두는
+    것과 임베딩으로 채우는 것을 쟀고, 비워 두는 쪽이 모든 지표에서 0.0000이었습니다
+    ([ADR-040](docs/adr/ADR-040-fill-the-empty-panel.md)).
+
+    **근거가 대리 지표라는 것을 적어 둡니다.** hit@5 0.4739는 "상위 다섯 중 하나가 나중에
+    함께 인용된다"이지 "읽을 만하다"가 아닙니다. 다만 빈 화면보다 나쁠 수는 없습니다.
+    """
+    rows = run_read(FORECAST_VECTORS, {"ids": [arxiv_id]})
+    if not rows:
+        return []
+    blocked = set(exclude) | {arxiv_id}
+    # 제외할 논문만큼 넉넉히 받아 옵니다. 딱 limit만 받으면 전부 제외될 수 있습니다.
+    found = run_read(FORECAST_NEIGHBOURS, {
+        "index": VECTOR_INDEX, "limit": limit + len(blocked), "vector": rows[0]["embedding"],
+    })
+    picked = [row["arxiv_id"] for row in found if row["arxiv_id"] not in blocked]
+    return picked[:limit]
+
+
 COCITED_PAPERS = """
 MATCH (s:ArxivPaper)<-[:REFERENCES]-(c:ArxivPaper)-[:REFERENCES]->(p:ArxivPaper)
 WHERE s.arxiv_id IN $ids AND NOT p.arxiv_id IN $ids
@@ -1072,14 +1094,31 @@ def rank_related_papers(arxiv_ids: list[str], top_k: int = 5) -> dict:
         exclude = [*known, *filled]
         filled.extend(top_by_score(score, limit=top_k - len(filled), exclude=exclude))
 
+    # 3단계: 그래도 비면 **임베딩**으로 채웁니다. 인용 간선이 없는 논문은 공동인용도 PPR도
+    # 점수를 내지 못해 패널이 통째로 빕니다 - 미래 라벨 과제의 1,112 시드(그 과제의 80.8%)가
+    # 그 모양이고 둘 다 정확히 0.0000이었습니다. 벡터로 채우면 상위 5 안에 나중에 함께
+    # 인용될 논문이 hit@5 0.4739로 들어갑니다([ADR-040](docs/adr/ADR-040-fill-the-empty-panel.md)).
+    vector_filled = []
+    if len(filled) < top_k:
+        vector_filled = nearest_by_embedding(
+            known[0], limit=top_k - len(filled), exclude={*known, *filled}
+        )
+        filled.extend(vector_filled)
+    from_vector = set(vector_filled)
+
     def rank_score(arxiv_id):
         # 공동인용으로 뽑힌 논문은 공유 인용자 수를, PPR이 채운 논문은 PPR 점수를 적습니다.
+        # 임베딩이 채운 논문은 둘 다 0이라 0.0이 됩니다 - `ranked_by`가 그것을 말합니다.
         return float(counts[arxiv_id]) if arxiv_id in counts else pagerank_of(arxiv_id)
 
     related = with_details(filled, rank_score)
     for paper in related:
         paper["shared_citers"] = counts.get(paper["arxiv_id"])
-        paper["ranked_by"] = "cocitation" if paper["arxiv_id"] in counts else "pagerank"
+        paper["ranked_by"] = (
+            "cocitation" if paper["arxiv_id"] in counts
+            else "embedding" if paper["arxiv_id"] in from_vector
+            else "pagerank"
+        )
     note = "" if related else "시드 논문에 저장된 인용 관계가 없어 관련 논문을 찾지 못했습니다."
     return {"seed_ids": known, "unknown_ids": unknown, "related": related, "note": note}
 

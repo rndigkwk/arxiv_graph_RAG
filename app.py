@@ -7,6 +7,7 @@ from urllib.parse import quote
 import streamlit as st
 
 import abstain
+import quality_board
 from paper_library import add_paper, compare_selection
 
 
@@ -506,6 +507,97 @@ def show_paper_comparison(chatbot, response, index):
     )
 
 
+def show_quality_board():
+    """게이트·하한·기각 기록을 한 화면에. 여기서 숫자를 만들지 않습니다.
+
+    이 저장소의 측정이 보고서 90여 개와 결정 기록 39건에 흩어져 있어서, 처음 보는 사람이
+    확인할 방법이 없었습니다. 읽기는 `quality_board.py`가 하고 여기서는 그리기만 합니다 -
+    나눠 두면 접속 없이 테스트할 수 있습니다(ADR-040).
+    """
+    baseline = quality_board.load(quality_board.BASELINE)
+    if baseline is None:
+        st.info("기준선 파일이 없습니다: baselines/eval_baseline.json")
+        return
+
+    head = quality_board.summary(baseline)
+    st.caption(
+        f'기준선 {head["generated_at"][:19]} · {head["dataset"]} {head["cases"]}건을 '
+        f'{head["runs"]}회 실행 · 분할 `{head["metrics_split"]}` · '
+        f'RAGAS 판정 `{head["judge_model"]}`'
+    )
+    columns = st.columns(4)
+    columns[0].metric("게이트가 보는 지표", head["gated_metrics"])
+    columns[1].metric("사례", head["cases"])
+    columns[2].metric("안정 사례", head["stable_cases"])
+    columns[3].metric("변동폭보다 좁은 하한", len(head["tight_floors"]))
+
+    st.markdown("##### 규칙 — 하나라도 걸리면 머지되지 않습니다")
+    st.dataframe(
+        [{"규칙": name, "무엇을 막는가": what} for name, what in quality_board.RULES],
+        hide_index=True,
+    )
+
+    st.markdown("##### 지표 · 하한 · 여유")
+    st.caption(
+        "**여유가 변동폭보다 좁으면 그 하한은 품질이 아니라 운을 잽니다**(ADR-004). "
+        "지금은 그런 지표가 없습니다." if not head["tight_floors"] else
+        f'**여유가 변동폭보다 좁은 지표가 있습니다: {", ".join(head["tight_floors"])}**'
+    )
+    st.dataframe([{
+        "지표": row["metric"],
+        "측정": row["measured"],
+        "하한": row["floor"],
+        "여유": row["headroom"],
+        "허용 하락폭": row["allowed_drop"],
+        "3회 변동폭": row["observed_spread"],
+    } for row in quality_board.gate_rows(baseline)], hide_index=True)
+
+    with st.expander("하한을 그 값으로 정한 이유"):
+        for name, why in (baseline.get("floor_rationale") or {}).items():
+            st.markdown(f"**`{name}`** — {why}")
+
+    st.markdown("##### 평가 하네스 밖에서 지키는 선")
+    for row in quality_board.slot_rows(baseline):
+        label = f'{row["label"]} · `{row["metric"]}`'
+        if row["variant"]:
+            label += f' (변형 `{row["variant"]}`)'
+        st.markdown(f'{label} — 측정 **{row["measured"]}**, 하한 **{row["floor"]}**')
+        st.caption(f'검사: `{row["checked_by"]}`')
+
+    future = quality_board.load(quality_board.FUTURE_STUDY)
+    if future:
+        st.markdown("##### 관련 논문 변형 비교 (미래 라벨 과제)")
+        st.caption(
+            f'시드 {future.get("cases")}건 · 피처 창 {future.get("feature_cut")} 이전 · '
+            "현직은 배포된 경로입니다."
+        )
+        st.dataframe([{
+            "변형": ("**" + row["variant"] + "** (배포)") if row["deployed"] else row["variant"],
+            "recall@5": row["recall_at_k"],
+            "hit@5": row["hit_at_k"],
+            "MRR": row["reciprocal_rank"],
+            "현직 대비 recall@5": row["vs_incumbent"],
+        } for row in quality_board.variant_rows(future)], hide_index=True)
+
+        degrees = quality_board.degree_rows(future)
+        if degrees:
+            st.markdown("###### 연결 정도로 나누면")
+            st.caption("**집계만 보면 두 체제가 섞입니다**(ADR-037). recall@5입니다.")
+            st.dataframe(degrees, hide_index=True)
+
+    st.markdown("##### 재서 기각한 모델")
+    st.caption("무엇을 쓰는지만큼 무엇을 왜 안 쓰는지가 이 저장소의 내용입니다.")
+    st.dataframe(
+        [{"모델": name, "자리": slot, "결과": result, "기록": record}
+         for name, slot, result, record in quality_board.REJECTED],
+        hide_index=True,
+    )
+    st.caption(
+        "전체 기록: [docs/MODELS.md](https://github.com/rndigkwk/arxiv_graph_RAG/blob/main/docs/MODELS.md) · "
+        "[결정 기록](https://github.com/rndigkwk/arxiv_graph_RAG/tree/main/docs/adr)"
+    )
+
+
 def show_home(chatbot):
     """스키마와 메타그래프로 이 그래프가 무엇인지 먼저 보여 줍니다."""
     import metagraph
@@ -785,13 +877,17 @@ def main():
     sidebar()
     st.caption(f"적재된 논문 {chatbot.paper_count:,}편 / 모델 {chatbot.llm_model}")
 
-    home_tab, chat_tab, rank_tab = st.tabs(["홈", "챗봇", "PageRank 순위"])
+    home_tab, chat_tab, rank_tab, gate_tab = st.tabs(
+        ["홈", "챗봇", "PageRank 순위", "품질 게이트"]
+    )
     with home_tab:
         show_home(chatbot)
     with rank_tab:
         show_pagerank(chatbot)
     with chat_tab:
         chat(chatbot)
+    with gate_tab:
+        show_quality_board()
 
 
 def answer_question(chatbot, question):
