@@ -67,3 +67,27 @@ def test_the_notebook_says_which_model_is_out_of_scope(notebook):
 
     assert "Qwen3-Embedding-8B" in body
     assert "배포 경로가 없습니다" in body
+
+
+def test_the_notebook_caps_the_sequence_length_with_a_measured_reason(notebook):
+    """8192/32k를 열어 두면 어텐션 활성값이 seq_len^2으로 커집니다 - OOM 위험의 거의 전부입니다.
+
+    이 말뭉치는 **512에서 초과 논문이 0.0%**이므로(advanced.md의 토큰 분포) 자르는 대가가
+    없습니다. 기존 비교(512)와 같은 조건이 되는 덤도 있습니다.
+    """
+    body = "\n".join(sources(notebook))
+    prose = "\n".join(sources(notebook, "markdown"))
+
+    assert "MAX_SEQ = 512" in body
+    assert "model.max_seq_length = MAX_SEQ" in body
+    assert "0.0%" in body or "0.0%" in prose
+
+
+def test_the_notebook_survives_an_out_of_memory_instead_of_dying(notebook):
+    """터지는 대신 느려져야 합니다. 조각 저장과 합쳐지면 다시 돌릴 때 이어서 합니다."""
+    body = "\n".join(sources(notebook))
+
+    assert "OutOfMemoryError" in body
+    assert "size // 2" in body
+    # 피크를 찍지 않으면 여유가 얼마인지 끝날 때까지 모릅니다.
+    assert "max_memory_allocated" in body
