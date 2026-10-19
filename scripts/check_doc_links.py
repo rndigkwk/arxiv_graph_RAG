@@ -24,6 +24,7 @@ from pathlib import Path
 
 DEFAULT_DOCS = ("README.md", "ROADMAP.md", "advanced.md", "EXPERIMENTS.md", "APP_README.md")
 ADR_DIR = Path("docs/adr")
+DOCS_DIR = Path("docs")
 LINK = re.compile(r"\[(?:[^\]]*)\]\(([^)]+)\)")
 HEADING = re.compile(r"^#{1,6}\s+(.*)$", re.M)
 PUNCTUATION = re.compile(r"[^\w\s가-힣-]")
@@ -77,6 +78,9 @@ def main() -> int:
     paths = tuple(sys.argv[1:]) or (
         *DEFAULT_DOCS,
         *(str(adr) for adr in sorted(ADR_DIR.glob("*.md"))),
+        # `docs/` 바로 아래 문서도 봅니다. 목록을 손으로 들고 있으면 새 문서가 조용히
+        # 검사 밖에 남습니다 - "들고 올 키 목록"이 세 번 빠뜨린 것과 같은 모양입니다.
+        *(str(doc) for doc in sorted(DOCS_DIR.glob("*.md"))),
     )
     problems = check(paths)
     for problem in problems:
