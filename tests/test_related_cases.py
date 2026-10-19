@@ -76,11 +76,17 @@ def test_every_gold_paper_meets_the_co_citation_bar(dataset):
 
 
 def test_the_recorded_cypher_means_the_same_as_the_stored_gold(dataset):
-    """임베딩 한정이 빠지면 DB 대조가 저장된 정답보다 넓은 집합을 돌려줍니다."""
+    """임베딩 한정이 빠지면 DB 대조가 저장된 정답보다 넓은 집합을 돌려줍니다.
+
+    조회문은 **데이터셋 수준에** 한 번 있습니다(dataset_version 2). 사례마다 적으면
+    3,740건에서 파일의 45.8%가 같은 문자열이 됩니다.
+    """
+    cypher = dataset["cypher"]
+
+    assert "p.embedding IS NOT NULL" in cypher
+    assert "count(DISTINCT c)" in cypher
     for case in dataset["cases"]:
-        cypher = case["cypher"]
-        assert "p.embedding IS NOT NULL" in cypher, case["id"]
-        assert "count(DISTINCT c)" in cypher, case["id"]
+        assert "cypher" not in case, case["id"]
         assert case["cypher_params"] == {
             "arxiv_id": case["seed_id"],
             "min_cociters": MIN_COCITERS,
@@ -88,10 +94,15 @@ def test_the_recorded_cypher_means_the_same_as_the_stored_gold(dataset):
 
 
 def test_the_ids_are_unique_and_ordered(dataset):
+    """번호순과 사전순이 같아야 합니다 - 세 자리로는 3,740건에서 어긋났습니다.
+
+    `related-1000`이 `related-999` **앞**에 옵니다. 300건에서는 드러나지 않던 결함입니다.
+    """
     ids = [case["id"] for case in dataset["cases"]]
 
     assert len(set(ids)) == len(ids)
     assert ids == sorted(ids)
+    assert all(len(case_id.split("-")[1]) == 4 for case_id in ids)
 
 
 def test_the_dataset_pins_the_snapshot_it_was_built_from(dataset):
@@ -101,19 +112,30 @@ def test_the_dataset_pins_the_snapshot_it_was_built_from(dataset):
     assert dataset["label_method"] == "snapshot_cocitation"
 
 
+# 정답이 시드의 직접 인용에 **전부** 들어 있는 사례의 허용 비율입니다. 300 시드에서는
+# 0건이었는데 적격 시드 전부(3,740)로 늘리자 2건이 나왔습니다. "0건"은 과제의 성질이 아니라
+# **표본의 성질**이었습니다 - 측정값을 요구사항으로 적어 둔 것입니다(ADR-034).
+ONE_HOP_RATE = 0.01
+
+
 def test_the_task_is_not_a_one_hop_lookup(dataset, snapshot_tables):
-    """정답이 시드의 직접 인용이면 Cypher 한 줄이 답하므로 모델이 겨룰 과제가 아닙니다."""
+    """정답이 시드의 직접 인용이면 Cypher 한 줄이 답하므로 모델이 겨룰 과제가 아닙니다.
+
+    **0건을 요구하지 않습니다.** 공동인용 정답이 우연히 시드의 참고문헌 안에 들어가는 일은
+    일어날 수 있고, 3,740 시드에서 2건(0.05%)입니다. 과제가 한 홉 조회가 아니라는 성질은
+    그 비율로 충분히 성립합니다 - 0건을 요구하면 다음에 시드를 늘릴 때 또 터집니다.
+    """
     cited_of: dict[str, set[str]] = collections.defaultdict(set)
     for citing, cited in snapshot_tables["cited_of"].items():
         cited_of[citing] = set(cited)
 
-    full_overlap = 0
-    for case in dataset["cases"]:
-        gold = set(case["expected_related_ids"])
-        if gold <= cited_of.get(case["seed_id"], set()):
-            full_overlap += 1
+    full_overlap = [
+        case["id"] for case in dataset["cases"]
+        if set(case["expected_related_ids"]) <= cited_of.get(case["seed_id"], set())
+    ]
+    rate = len(full_overlap) / len(dataset["cases"])
 
-    assert full_overlap == 0
+    assert rate < ONE_HOP_RATE, (len(full_overlap), rate, full_overlap[:5])
 
 
 def test_seeds_and_gold_stay_inside_the_embedding_corpus(dataset, snapshot_tables):
