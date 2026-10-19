@@ -19,6 +19,11 @@ dependencies = [
     "graphviz>=0.19,<1",
     "numpy>=2.3,<2.5",
     "scipy>=1.15",
+    # 예측 패널이 저장된 가중치를 joblib으로 읽고, 그 안에 sklearn 객체가 들어 있습니다
+    # (ADR-038). **앱 의존성입니다** - ml 익스트라에만 두면 로컬에서는 되고 배포에서만
+    # 깨집니다. 더하기 전에 재서 앱 피크가 266.5MB -> 333.2MB이고, 보수적인 690MB 기준으로
+    # 356.8MB가 남습니다(scripts/measure_app_memory.py).
+    "scikit-learn>=1.5",
     "networkx>=3.4",
     "plotly>=7.1.0",
     "tqdm>=4.70.0",

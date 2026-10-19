@@ -825,6 +825,93 @@ def personalized_pagerank(seed_ids):
     return run_pagerank(graph["undirected"], graph["undirected_degree"], teleport), seeds
 
 
+# ── 공동인용 예측 패널 ──────────────────────────────────────────────────────
+# 관련 논문 패널과 **다른 질문**입니다. 관련 논문은 "지금 같이 읽히는 논문"이고 여기는
+# "앞으로 함께 인용될 논문"입니다(ADR-038). 에이전트 도구로 붙이지 않습니다 - 답변 경로에
+# 들어가면 게이트가 보는 지표가 움직이는데, 이 기능은 표시 패널이기 때문입니다.
+FORECAST_VECTORS = """
+MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids AND p.embedding IS NOT NULL
+RETURN p.arxiv_id AS arxiv_id, p.embedding AS embedding
+"""
+FORECAST_NEIGHBOURS = """
+CALL db.index.vector.queryNodes($index, $limit, $vector) YIELD node, score
+RETURN node.arxiv_id AS arxiv_id
+"""
+
+
+def forecast_cocitation(arxiv_id, top_k=5, pool=None):
+    """앞으로 이 논문과 함께 인용될 논문을 예측합니다.
+
+    돌려주는 것은 순위와 **왜 그 점수인지**입니다. 가중치가 없거나 지문이 맞지 않으면
+    `reason`만 담아 돌려주고 앱은 패널을 접습니다 - 어느 모델인지 말할 수 없는 상태로
+    숫자를 보여 주는 것이 비어 있는 것보다 나쁩니다.
+    """
+    import numpy as np
+
+    import forecast as forecast_module
+
+    try:
+        model, card = forecast_module.load_model()
+    except forecast_module.WeightsUnavailable as exc:
+        return {"seed_id": arxiv_id, "papers": [], "reason": str(exc)}
+
+    graph = citation_graph()
+    if arxiv_id not in graph["index"]:
+        return {"seed_id": arxiv_id, "papers": [],
+                "reason": "인용 그래프에 없는 논문입니다."}
+
+    limit = pool or forecast_module.POOL
+    rows = run_read(FORECAST_VECTORS, {"ids": [arxiv_id]})
+    if not rows:
+        return {"seed_id": arxiv_id, "papers": [],
+                "reason": "이 논문의 임베딩이 없어 후보를 만들 수 없습니다."}
+    seed_vector = rows[0]["embedding"]
+
+    nearest = [
+        row["arxiv_id"]
+        for row in run_read(
+            FORECAST_NEIGHBOURS,
+            {"index": VECTOR_INDEX, "limit": limit, "vector": seed_vector},
+        )
+    ]
+    # 후보는 벡터 최근접과 **지금 공동인용되는 논문**의 합입니다. 평가에서 쓴 것과 같은
+    # 구성이고(`evals/related_study.py`), 한쪽만 주면 모델이 그 후보를 아예 못 봅니다.
+    cocited = forecast_module.cocitation_neighbours(graph, arxiv_id)
+    candidates = [paper for paper in dict.fromkeys([*nearest, *sorted(cocited)])
+                  if paper != arxiv_id]
+    if not candidates:
+        return {"seed_id": arxiv_id, "papers": [], "reason": "후보가 없습니다."}
+
+    vectors = {
+        row["arxiv_id"]: np.asarray(row["embedding"], dtype=np.float32)
+        for row in run_read(FORECAST_VECTORS, {"ids": [arxiv_id, *candidates]})
+    }
+    # 피인용 수는 앱이 이미 들고 있는 간선에서 셉니다. Cypher를 한 번 덜 부릅니다.
+    counts = np.bincount(graph["cols"], minlength=graph["size"])
+    indegree = {paper: int(counts[graph["index"][paper]])
+                for paper in (arxiv_id, *candidates) if paper in graph["index"]}
+
+    ranked = forecast_module.rank(
+        arxiv_id, candidates, graph=graph, vectors=vectors,
+        indegree=indegree, model=model, top_k=top_k,
+    )
+    details = {row["arxiv_id"]: row for row in with_details(
+        [hit["arxiv_id"] for hit in ranked], lambda pid: 0.0
+    )}
+    for hit in ranked:
+        hit.update({key: value for key, value in details.get(hit["arxiv_id"], {}).items()
+                    if key not in ("score",)})
+    return {
+        "seed_id": arxiv_id,
+        "papers": ranked,
+        "candidates": len(candidates),
+        "model": {"digest": card.get("digest"),
+                  "snapshot_version": card.get("snapshot_version"),
+                  "ranking_mrr": (card.get("metrics") or {}).get("ranking_mrr")},
+        "reason": "",
+    }
+
+
 def explain_citation_paths(seed_ids, target_ids, max_hops=4):
     """개인화 PageRank와 같은 무방향 인용망에서 각 추천 논문까지의 최단 경로를 찾습니다.
 
