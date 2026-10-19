@@ -41,5 +41,11 @@
         "failed": true
       }
     }
-  ]
+  ],
+  "metadata": {
+    "prompt_versions": {
+      "AGENT_SYSTEM": "72066324526a",
+      "CYPHER_RULES": "0fc2226dcb49"
+    }
+  }
 }

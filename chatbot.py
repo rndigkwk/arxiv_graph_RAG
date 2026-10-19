@@ -700,11 +700,17 @@ RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_c
        COUNT { (p)<-[:REFERENCES]-() } AS cited_by
 """
 
+# 저자 이름을 함께 읽습니다. 저장 목록을 BibTeX로 꺼낼 때 `author` 칸이 비면 그 항목은
+# 서지 관리 도구에서 쓸 수 없습니다(ADR-042). 이름은 **동명이인을 구별하지 않은** 표기이고,
+# 그 사실은 내보내는 파일의 머리말에 적습니다.
 SAVED_PAPER_DETAILS = """
 MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})
+OPTIONAL MATCH (a:ArxivAuthorName)-[:AUTHORED]->(p)
+WITH p, collect(DISTINCT a.name) AS authors
 RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.abstract AS abstract,
        p.primary_category AS primary_category, p.categories AS categories,
-       p.pdf_url AS pdf_url, toString(p.published) AS published
+       p.pdf_url AS pdf_url, toString(p.published) AS published,
+       authors AS authors
 """
 
 

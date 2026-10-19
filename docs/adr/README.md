@@ -85,3 +85,6 @@
 | [ADR-038](ADR-038-the-forecast-panel.md) | 예측 패널을 붙인다 — 모델이 쓰이는 첫 자리 | 채택 |
 | [ADR-039](ADR-039-measure-embeddings-where-the-signal-is-only-the-embedding.md) | 임베딩은 임베딩만이 신호인 자리에서 잰다 | 채택 |
 | [ADR-040](ADR-040-fill-the-empty-panel.md) | 빈 패널을 임베딩으로 채운다 — GBM의 집계 우위가 사라졌다 | 채택 |
+| [ADR-041](ADR-041-the-gate-reads-the-prompt.md) | 게이트가 프롬프트를 읽는다 — 지문을 적어 두기만 하고 보지 않았다 | 채택 |
+| [ADR-042](ADR-042-the-saved-list-leaves-the-app.md) | 저장 목록이 앱 밖으로 나간다 — 빈 칸은 추측하지 않고 센다 | 채택 |
+| [ADR-043](ADR-043-the-floor-is-checked-against-the-worst-run.md) | RAGAS 하한은 최악의 정상 실행과 심은 결함으로 검사한다 | 채택 |

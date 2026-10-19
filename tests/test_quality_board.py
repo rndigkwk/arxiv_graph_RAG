@@ -117,6 +117,70 @@ def test_the_slots_outside_the_harness_are_shown(baseline):
     )
 
 
+def test_the_floor_basis_says_whether_a_planted_defect_trips_the_floor():
+    """상수에 걸린 하한은 게이트가 아닙니다(ADR-021의 `context_relevance`)."""
+    rows = quality_board.basis_rows({"verdict": {
+        "ragas_faithfulness": {
+            "floor": 0.8, "runs_seen": 12, "worst_normal_run": 0.9,
+            "margin_to_floor": 0.1, "survives_the_worst_normal_run": True,
+            "with_a_planted_defect": [0.4025], "a_planted_defect_trips_it": True,
+        },
+    }})
+
+    assert rows[0]["metric"] == "ragas_faithfulness"
+    assert rows[0]["runs_seen"] == 12
+    assert rows[0]["defect_trips_it"] is True
+    assert quality_board.basis_rows(None) == []
+    assert quality_board.basis_rows({"verdict": {}}) == []
+
+
+def test_the_floor_basis_report_in_this_repo_validates_both_ragas_floors(baseline):
+    """이 저장소의 상태를 고정합니다. 깨지면 하한이나 측정 중 하나가 바뀐 것입니다."""
+    report = quality_board.load(quality_board.FLOOR_BASIS)
+    if report is None:
+        pytest.skip(f"근거 보고서가 없습니다: {quality_board.FLOOR_BASIS}")
+    rows = {row["metric"]: row for row in quality_board.basis_rows(report)}
+
+    gated = [name for name in baseline["absolute_floor"] if name.startswith("ragas_")]
+    assert set(rows) == set(gated), (set(rows), set(gated))
+    for name, row in rows.items():
+        assert row["floor"] == baseline["absolute_floor"][name], name
+        assert row["survives"], name
+        assert row["defect_trips_it"], name
+        assert row["runs_seen"] >= 5, name
+
+
+def test_the_prompt_that_produced_the_scores_is_shown_next_to_the_code():
+    """지문이 다르면 화면의 숫자는 **이 코드가 낸 점수가 아닙니다**(ADR-041)."""
+    rows = {row["prompt"]: row for row in quality_board.prompt_rows(
+        {"prompt_versions": {"AGENT_SYSTEM": "아무것도아닌값"}}
+    )}
+
+    assert rows["AGENT_SYSTEM"]["baseline"] == "아무것도아닌값"
+    assert rows["AGENT_SYSTEM"]["same"] is False
+    # 코드에만 있는 프롬프트도 숨기지 않습니다. 기준선이 재지 않은 것도 사실입니다.
+    assert len(rows) > 1
+
+
+def test_a_drifted_prompt_is_counted_in_the_summary(baseline):
+    """한 지문만 어긋나게 둡니다. 나머지를 빼면 "기록되지 않은 프롬프트"까지 섞여 세집니다."""
+    recorded = {**baseline["prompt_versions"], "AGENT_SYSTEM": "아무것도아닌값"}
+    drifted = {**baseline, "prompt_versions": recorded}
+
+    assert quality_board.summary(drifted)["prompts_drifted"] == ["AGENT_SYSTEM"]
+    # 지금 저장소는 어긋난 것이 없어야 합니다. 어긋나면 기준선을 다시 써야 합니다.
+    assert quality_board.summary(baseline)["prompts_drifted"] == []
+
+
+def test_the_board_lists_every_gate_rule():
+    """규칙을 더하고 화면을 안 고치면 화면이 게이트보다 적게 말합니다."""
+    import evals.gate as gate
+
+    assert len(quality_board.RULES) == 7
+    for name, _ in quality_board.RULES:
+        assert f"`{name}`" in gate.__doc__, name
+
+
 def test_the_rejected_models_are_listed_with_where_they_lost():
     """기각을 숨기면 이 저장소의 내용이 절반이 됩니다."""
     assert len(quality_board.REJECTED) >= 6

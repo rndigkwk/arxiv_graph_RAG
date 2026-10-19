@@ -1,12 +1,14 @@
 """실행: uv run streamlit run app.py --server.fileWatcherType none"""
 import json
 import re
+from datetime import datetime
 from textwrap import fill
 from urllib.parse import quote
 
 import streamlit as st
 
 import abstain
+import citations
 import quality_board
 from paper_library import add_paper, compare_selection
 
@@ -313,7 +315,17 @@ def show_response(chatbot, response, index):
             for hit in response["papers"]:
                 st.write(f'{hit["arxiv_id"]} · {hit["title"]}')
                 if st.button("논문 저장", key=f'save-search:{index}:{hit["arxiv_id"]}'):
-                    if _save_paper(hit):
+                    # 벡터 검색 결과에는 저자와 게재일이 없습니다. 저장할 때 그래프에서
+                    # 한 번 읽어 채워 둡니다 - 안 채우면 BibTeX의 `author`가 비고, 그
+                    # 항목은 서지 도구에서 쓸 수 없습니다(ADR-042). 관련 논문 쪽은 이미
+                    # 같은 질의를 씁니다.
+                    # 이 경로는 전에 DB를 쓰지 않았으므로, 조회가 실패하면 **저장 자체가
+                    # 실패하는 것이 아니라** 저자 칸만 비어야 합니다.
+                    try:
+                        details = chatbot.fetch_paper_for_saving(hit["arxiv_id"]) or {}
+                    except Exception:  # noqa: BLE001
+                        details = {}
+                    if _save_paper({**details, **hit}):
                         st.toast("저장 목록에 추가했습니다.")
                         st.rerun()
                     else:
@@ -347,6 +359,40 @@ def _save_paper(paper):
     return True
 
 
+def _show_export_buttons(saved):
+    """저장 목록을 BibTeX·CSV로 내려받습니다. 만드는 일은 `citations.py`가 합니다.
+
+    **빈 칸을 세어 함께 적습니다.** 저장 경로에 따라 저자나 게재일이 없을 수 있고
+    (`fetch_paper_for_saving` 조회가 실패한 경우), 그 사실이 보이지 않으면 쓰는 사람이
+    불완전한 파일을 완전한 줄 알고 인용합니다(ADR-042).
+    """
+    stamp = datetime.now().strftime("%Y%m%d")
+    bibtex_column, csv_column = st.columns(2)
+    bibtex_column.download_button(
+        "BibTeX로 내려받기",
+        data=citations.to_bibtex(saved, note=f"내려받은 날짜 {stamp}").encode("utf-8"),
+        file_name=f"arxiv_graph_rag_{stamp}.bib",
+        mime="application/x-bibtex",
+        key="saved-paper-export-bibtex",
+        width="stretch",
+    )
+    csv_column.download_button(
+        "CSV로 내려받기",
+        # Excel이 BOM 없이는 한글 제목을 깨뜨립니다.
+        data=citations.to_csv(saved).encode("utf-8-sig"),
+        file_name=f"arxiv_graph_rag_{stamp}.csv",
+        mime="text/csv",
+        key="saved-paper-export-csv",
+        width="stretch",
+    )
+    gaps = citations.missing(saved)
+    if gaps:
+        labels = {"author": "저자", "year": "게재 연도"}
+        st.caption(" · ".join(
+            f'{labels.get(name, name)}가 빈 항목 {len(ids)}건' for name, ids in gaps.items()
+        ) + " — 그래프에서 읽지 못한 값은 추측하지 않고 비워 둡니다.")
+
+
 def show_saved_papers(chatbot):
     """세션 저장 목록에서 논문을 관리하고 선택한 논문을 비교합니다."""
     saved = st.session_state.setdefault("saved_papers", [])
@@ -360,6 +406,7 @@ def show_saved_papers(chatbot):
             "분류": ", ".join(paper.get("categories") or []),
             "초록": "있음" if paper.get("abstract") else "없음",
         } for paper in saved], hide_index=True, width="stretch")
+        _show_export_buttons(saved)
         to_remove = st.multiselect(
             "목록에서 제거할 논문", options=[p["arxiv_id"] for p in saved],
             format_func=lambda paper_id: next(
@@ -510,7 +557,7 @@ def show_paper_comparison(chatbot, response, index):
 def show_quality_board():
     """게이트·하한·기각 기록을 한 화면에. 여기서 숫자를 만들지 않습니다.
 
-    이 저장소의 측정이 보고서 90여 개와 결정 기록 39건에 흩어져 있어서, 처음 보는 사람이
+    이 저장소의 측정이 보고서 90여 개와 결정 기록 43건에 흩어져 있어서, 처음 보는 사람이
     확인할 방법이 없었습니다. 읽기는 `quality_board.py`가 하고 여기서는 그리기만 합니다 -
     나눠 두면 접속 없이 테스트할 수 있습니다(ADR-040).
     """
@@ -530,6 +577,13 @@ def show_quality_board():
     columns[1].metric("사례", head["cases"])
     columns[2].metric("안정 사례", head["stable_cases"])
     columns[3].metric("변동폭보다 좁은 하한", len(head["tight_floors"]))
+
+    if head["prompts_drifted"]:
+        st.warning(
+            "지금 코드의 프롬프트가 기준선을 만든 실행과 다릅니다: "
+            f'`{"`, `".join(head["prompts_drifted"])}` — 아래 숫자는 **이 코드가 낸 점수가 '
+            "아닙니다.** 평가를 다시 돌리고 기준선을 다시 써야 합니다(ADR-041)."
+        )
 
     st.markdown("##### 규칙 — 하나라도 걸리면 머지되지 않습니다")
     st.dataframe(
@@ -555,6 +609,38 @@ def show_quality_board():
     with st.expander("하한을 그 값으로 정한 이유"):
         for name, why in (baseline.get("floor_rationale") or {}).items():
             st.markdown(f"**`{name}`** — {why}")
+
+    basis = quality_board.basis_rows(quality_board.load(quality_board.FLOOR_BASIS))
+    if basis:
+        with st.expander("RAGAS 하한이 무언가를 막는지 — 결함을 심어 확인"):
+            st.caption(
+                "하한에 필요한 질문은 '평균이 하한보다 큰가'가 아닙니다(ADR-004·ADR-043). "
+                "**정상이던 실행 중 최악이 하한을 넘는가**, 그리고 **결함을 심으면 걸리는가** "
+                "입니다. 둘째가 아니면 그 하한은 상수에 걸려 있습니다."
+            )
+            st.dataframe([{
+                "지표": row["metric"],
+                "하한": row["floor"],
+                "본 실행": row["runs_seen"],
+                "최악 정상 실행": row["worst_normal_run"],
+                "하한까지 여유": row["margin"],
+                "최악도 넘는가": "예" if row["survives"] else "아니오",
+                "결함을 심으면": ", ".join(f"{value:.4f}" for value in row["with_defect"]),
+                "그때 걸리는가": "예" if row["defect_trips_it"] else "아니오",
+            } for row in basis], hide_index=True)
+
+    with st.expander("이 점수를 낸 프롬프트"):
+        st.caption(
+            "`sha256` 앞 12자입니다. **지문이 다르면 다른 프롬프트**이고, 게이트의 "
+            "`prompt_version` 규칙이 그것을 막습니다 — `git_sha`로는 대신할 수 없습니다"
+            "(ADR-018·ADR-041)."
+        )
+        st.dataframe([{
+            "프롬프트": row["prompt"],
+            "기준선": row["baseline"],
+            "지금 코드": row["code"],
+            "같은가": {True: "예", False: "아니오"}.get(row["same"], "—"),
+        } for row in quality_board.prompt_rows(baseline)], hide_index=True)
 
     st.markdown("##### 평가 하네스 밖에서 지키는 선")
     for row in quality_board.slot_rows(baseline):

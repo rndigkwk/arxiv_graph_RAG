@@ -104,3 +104,106 @@ def test_a_metric_measured_in_only_one_run_is_skipped():
     ]
 
     assert "context_relevance" not in summarize(runs)["overall"]
+
+
+# --- 하한의 근거 (ADR-043) -----------------------------------------------------------
+
+
+def _study(tmp_path, name, rows):
+    """A minimal RAGAS study report on disk, shaped like `evals.ragas_study` writes one."""
+    import json
+
+    path = tmp_path / name
+    path.write_text(
+        json.dumps({"summary": {"judge_model": "gpt-6-luna"}, "results": rows}),
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_the_gated_precision_is_not_the_all_family_average():
+    """게이트의 하한은 **다른 양**에 걸려 있습니다. 전체 평균을 근거로 읽으면 안 됩니다."""
+    from evals.ragas_spread import gated
+
+    report = {"results": [
+        {"id": "a1", "family": "author", "faithfulness": 1.0, "context_precision": 1.0},
+        {"id": "t1", "family": "topcited", "faithfulness": 1.0, "context_precision": 1.0},
+        {"id": "c1", "family": "coauthor", "faithfulness": 1.0, "context_precision": 0.2},
+    ]}
+
+    both = gated(report, ["author", "topcited"])
+
+    assert both["ragas_context_precision_stable_families"] == 1.0
+    # 전체 평균은 0.7333입니다. 그 값으로 하한을 재면 다른 것을 재는 것입니다.
+    everything = gated(report, ["author", "topcited", "coauthor"])
+    assert everything["ragas_context_precision_stable_families"] < 0.75
+
+
+def test_a_floor_that_a_normal_run_would_trip_is_reported_as_such(tmp_path):
+    """한 번 정상이었던 점수에서 터지는 하한은 쓸 수 없습니다(ADR-004)."""
+    from evals.ragas_spread import floor_basis
+
+    good = _study(tmp_path, "good.json", [
+        {"id": "a1", "family": "author", "faithfulness": 1.0, "context_precision": 1.0},
+    ])
+    bad = _study(tmp_path, "bad.json", [
+        {"id": "a1", "family": "author", "faithfulness": 0.70, "context_precision": 1.0},
+    ])
+
+    verdict = floor_basis(
+        {"group": [good, bad]},
+        floors={"ragas_faithfulness": 0.80},
+        stable=["author"],
+        perturbed=[],
+    )["verdict"]["ragas_faithfulness"]
+
+    assert verdict["worst_normal_run"] == 0.70
+    assert verdict["worst_run_report"] == "bad.json"
+    assert verdict["survives_the_worst_normal_run"] is False
+    assert verdict["margin_to_floor"] < 0
+
+
+def test_a_floor_on_a_constant_is_reported_as_not_a_gate(tmp_path):
+    """결함을 심어도 안 내려가면 그 하한은 아무것도 막지 않습니다(ADR-021)."""
+    from evals.ragas_spread import floor_basis
+
+    normal = _study(tmp_path, "normal.json", [
+        {"id": "a1", "family": "author", "faithfulness": 1.0, "context_precision": 1.0},
+    ])
+    broken = _study(tmp_path, "broken.json", [
+        {"id": "a1", "family": "author", "faithfulness": 1.0, "context_precision": 1.0},
+    ])
+
+    verdict = floor_basis(
+        {"group": [normal]},
+        floors={"ragas_faithfulness": 0.80},
+        stable=["author"],
+        perturbed=[broken],
+    )["verdict"]["ragas_faithfulness"]
+
+    assert verdict["with_a_planted_defect"] == [1.0]
+    assert verdict["a_planted_defect_trips_it"] is False
+
+
+def test_groups_are_not_pooled_into_one_spread(tmp_path):
+    """코드 상태가 다른 집단의 평균을 섞으면 무엇의 변동인지 말할 수 없습니다."""
+    from evals.ragas_spread import floor_basis
+
+    one = _study(tmp_path, "one.json", [
+        {"id": "a1", "family": "author", "faithfulness": 1.0, "context_precision": 1.0},
+    ])
+    two = _study(tmp_path, "two.json", [
+        {"id": "a1", "family": "author", "faithfulness": 0.90, "context_precision": 1.0},
+    ])
+
+    result = floor_basis(
+        {"A": [one], "B": [two]},
+        floors={"ragas_faithfulness": 0.80},
+        stable=["author"],
+        perturbed=[],
+    )
+
+    # 집단이 1회씩이므로 집단별 변동폭은 없습니다. 최악값은 집단을 넘어 봅니다.
+    assert "ragas_faithfulness" not in result["by_group"]["A"]
+    assert result["verdict"]["ragas_faithfulness"]["worst_normal_run"] == 0.90
+    assert result["verdict"]["ragas_faithfulness"]["runs_seen"] == 2

@@ -31,11 +31,24 @@ from evals.gate import (
 )
 
 FIXTURES = sorted((Path(__file__).parent / "fixtures" / "eval_gate").iterdir())
-RULES = ("cases", "scoring_error", "floor", "drop", "stable_case", "judge_model")
+RULES = (
+    "cases", "scoring_error", "floor", "drop", "stable_case", "judge_model", "prompt_version",
+)
 
 
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def same_prompts(baseline: dict) -> dict:
+    """What `normalize` puts on a report whose prompts match the baseline.
+
+    손으로 만든 보고서는 `normalize`를 거치지 않으므로 이 칸이 비고, 그러면
+    `prompt_version` 규칙이 "지문이 없다"로 걸립니다 — 맞게 걸리는 것입니다. 분할 규칙을
+    보려는 테스트에서는 **프롬프트가 같았던 실행**을 흉내 내야 하므로 기준선의 지문을 그대로
+    씁니다. 실제 보고서는 `evals.telemetry`가 적어 둡니다.
+    """
+    return {"prompt_versions": baseline.get("prompt_versions") or {}}
 
 
 # --- 1층: 게이트 자체 --------------------------------------------------------------
@@ -249,6 +262,7 @@ def test_a_smoke_run_is_not_judged_against_full_set_averages():
             for case_id in baseline["splits"]["smoke"]
         },
         "scoring_errors": 0,
+        **same_prompts(baseline),
     }
     rules = {v.rule for v in check(baseline, terrible_average, split="smoke")}
     assert rules == set(), rules
@@ -270,6 +284,7 @@ def test_a_smoke_run_still_catches_a_broken_case():
             for index, case_id in enumerate(smoke)
         },
         "scoring_errors": 0,
+        **same_prompts(baseline),
     }
     rules = {v.rule for v in check(baseline, broken, split="smoke")}
     assert rules == {"stable_case"}, rules
@@ -634,9 +649,98 @@ def test_the_smoke_split_does_not_require_ragas():
             for case_id in baseline["splits"]["smoke"]
         },
         "scoring_errors": 0,
+        **same_prompts(baseline),
     }
 
     assert not check(baseline, report, split="smoke")
+
+
+# --- 프롬프트 지문 (ADR-041) ---------------------------------------------------------
+
+
+def test_an_old_baseline_without_digests_is_not_judged_on_them():
+    """규칙을 소급 적용하면 매 실행이 실패하고, 터지는 게이트는 꺼집니다(ADR-004)."""
+    from evals.gate import prompt_drift
+
+    assert prompt_drift(None, {"AGENT_SYSTEM": "abc"}) == []
+    assert prompt_drift({}, {"AGENT_SYSTEM": "abc"}) == []
+
+
+def test_a_changed_prompt_is_named_not_just_counted():
+    """어느 프롬프트가 움직였는지 적지 않으면 되짚을 수 없습니다."""
+    from evals.gate import prompt_drift
+
+    violations = prompt_drift(
+        {"AGENT_SYSTEM": "aaaaaaaaaaaa", "CYPHER_RULES": "bbbbbbbbbbbb"},
+        {"AGENT_SYSTEM": "cccccccccccc", "CYPHER_RULES": "bbbbbbbbbbbb"},
+    )
+
+    assert [v.rule for v in violations] == ["prompt_version"]
+    assert "AGENT_SYSTEM" in violations[0].detail
+    assert "CYPHER_RULES" not in violations[0].detail
+    assert "aaaaaaaaaaaa" in violations[0].detail and "cccccccccccc" in violations[0].detail
+
+
+def test_a_report_without_digests_is_blocked_rather_than_assumed_equal():
+    """지문이 없는 실행은 "같았다"가 아니라 "모른다"입니다."""
+    from evals.gate import prompt_drift
+
+    violations = prompt_drift({"AGENT_SYSTEM": "aaaaaaaaaaaa"}, {})
+
+    assert [v.rule for v in violations] == ["prompt_version"]
+    assert "없습니다" in violations[0].detail
+
+
+def test_normalize_lifts_the_digests_out_of_the_report_metadata():
+    report = {
+        "results": [{"id": "c1", "graph_rag": {"id": "c1", "failed": False}}],
+        "summary": {"graph_rag": {}},
+        "metadata": {"prompt_versions": {"AGENT_SYSTEM": "aaaaaaaaaaaa"}},
+    }
+
+    assert normalize(report)["prompt_versions"] == {"AGENT_SYSTEM": "aaaaaaaaaaaa"}
+    assert normalize({"results": [], "summary": {}})["prompt_versions"] == {}
+
+
+def test_runs_that_disagree_on_the_prompt_cannot_become_one_baseline():
+    """실행 도중 본문을 고쳤으면 세 실행의 평균이 **무엇의 평균인지** 말할 수 없습니다."""
+    from evals.gate import merge, prompt_drift
+
+    def run(digest: str) -> dict:
+        return {
+            "metrics": {"m": 1.0},
+            "cases": {"c1": {"failed": False, "metrics": {"m": 1.0}}},
+            "scoring_errors": 0,
+            "prompt_versions": {"AGENT_SYSTEM": digest},
+        }
+
+    agreed = merge([run("aaaaaaaaaaaa"), run("aaaaaaaaaaaa")])
+    assert agreed["prompt_versions"] == {"AGENT_SYSTEM": "aaaaaaaaaaaa"}
+
+    split = merge([run("aaaaaaaaaaaa"), run("bbbbbbbbbbbb")])
+    assert split["prompt_versions"] == {}
+    # 비면 게이트가 "기록 없음"으로 막습니다 - 조용히 통과하지 않습니다.
+    assert prompt_drift({"AGENT_SYSTEM": "aaaaaaaaaaaa"}, split["prompt_versions"])
+
+
+def test_the_prompts_in_the_code_are_the_ones_the_baseline_was_measured_with():
+    """`prompts.py`를 고치면 **이 테스트가 먼저** 알려 줍니다.
+
+    고의로 고쳤다면 평가를 다시 돌리고 기준선을 다시 써야 합니다. 그 전까지 기준선의 숫자는
+    지금 코드가 낸 점수가 아닙니다 - 프롬프트를 손으로 고치다 심판 정확도 21/21 -> 11/21을
+    낸 사고(ROADMAP 11-2)가 그 상태에서 일어났습니다.
+    """
+    from pipeline.prompt_registry import manifest
+
+    baseline = load(BASELINE)
+    recorded = baseline.get("prompt_versions")
+    assert recorded, "기준선에 prompt_versions가 없습니다"
+    live = {name: entry["sha256"] for name, entry in manifest().items()}
+
+    assert live == recorded, (
+        "prompts.py가 기준선을 만든 실행과 다릅니다. 평가를 다시 돌리고 "
+        "`--write-baseline`으로 기준선을 다시 쓰세요."
+    )
 
 
 def test_no_drop_or_per_case_rule_is_attached_to_the_ragas_metrics():
