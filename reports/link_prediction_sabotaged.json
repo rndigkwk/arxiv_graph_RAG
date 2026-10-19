@@ -1,0 +1,264 @@
+{
+  "generated_at": "2026-10-19T02:03:39.082199+00:00",
+  "snapshot_version": "2026-10-14",
+  "snapshot_papers_sha256": "662ec63c7255286cd779dd6a9e1b7eee46da50504eb1fa58b832b3957cdeea46",
+  "task": "co-citation link prediction",
+  "sabotaged": true,
+  "task_note": "직접 인용 예측은 실제 간선의 95.7%가 공통 이웃 0이어서 기각했습니다. reports/link_prediction_structure.json 참고.",
+  "split": {
+    "key": "arxiv_id_yymm",
+    "train_label_month": "2026-07",
+    "test_label_from": "2026-08",
+    "citers_w1_train_feature": 866,
+    "citers_w2_train_labels": 779,
+    "citers_w3_test_feature": 1645,
+    "citers_w4_test_labels": 1607,
+    "pairs_train_feature": 331330,
+    "pairs_test_feature": 523441,
+    "pairs_train_labels_new": 192111,
+    "pairs_test_labels_new": 406284,
+    "train_labels_total": 192111,
+    "train_labels_usable": 41406,
+    "test_labels_total": 406284,
+    "test_labels_usable": 106343
+  },
+  "splits_used": {
+    "train": {
+      "pairs": 59956,
+      "positives": 30000,
+      "negatives": 29956,
+      "negative_kind": "hard"
+    },
+    "test_hard": {
+      "pairs": 59996,
+      "positives": 30000,
+      "negatives": 29996,
+      "negative_kind": "hard"
+    },
+    "test_random": {
+      "pairs": 60000,
+      "positives": 30000,
+      "negatives": 30000,
+      "negative_kind": "random"
+    }
+  },
+  "ranking_task": {
+    "groups": 3000,
+    "candidates_per_group": 10
+  },
+  "feature_separation": {
+    "embedding_cosine": 0.756,
+    "jaccard": 0.7367,
+    "log_citation_indegree_min": 0.6958,
+    "common_neighbors": 0.6312,
+    "adamic_adar": 0.6291,
+    "log_degree_min": 0.6119,
+    "log_preferential_attachment": 0.5412,
+    "log_degree_max": 0.3219,
+    "month_gap": -0.3115,
+    "log_citation_indegree_max": 0.3081,
+    "category_jaccard": 0.1903,
+    "same_primary_category": -0.0001
+  },
+  "results": [
+    {
+      "model": "common-neighbors",
+      "detail": {
+        "kind": "heuristic",
+        "feature": "common_neighbors",
+        "fitted": false
+      },
+      "test_hard_negatives": {
+        "roc_auc": 0.7201,
+        "average_precision": 0.7581,
+        "positive_rate": 0.5,
+        "pairs": 59996
+      },
+      "test_random_negatives": {
+        "roc_auc": 0.8623,
+        "average_precision": 0.9364,
+        "positive_rate": 0.5,
+        "pairs": 60000
+      },
+      "train_fit": {
+        "roc_auc": 0.4997,
+        "average_precision": 0.4986,
+        "positive_rate": 0.5004,
+        "pairs": 59956
+      },
+      "ranking_hard_negatives": {
+        "groups": 3000,
+        "mrr": 0.548,
+        "mean_rank": 3.85,
+        "hits_at_1": 0.394,
+        "hits_at_3": 0.62,
+        "hits_at_5": 0.731
+      },
+      "mrr_vs_best_heuristic": {
+        "baseline": "adamic-adar",
+        "groups": 3000,
+        "mean": -0.0216,
+        "low": -0.0252,
+        "high": -0.0181,
+        "excludes_zero": true
+      }
+    },
+    {
+      "model": "adamic-adar",
+      "detail": {
+        "kind": "heuristic",
+        "feature": "adamic_adar",
+        "fitted": false
+      },
+      "test_hard_negatives": {
+        "roc_auc": 0.7233,
+        "average_precision": 0.7473,
+        "positive_rate": 0.5,
+        "pairs": 59996
+      },
+      "test_random_negatives": {
+        "roc_auc": 0.8643,
+        "average_precision": 0.929,
+        "positive_rate": 0.5,
+        "pairs": 60000
+      },
+      "train_fit": {
+        "roc_auc": 0.4996,
+        "average_precision": 0.4985,
+        "positive_rate": 0.5004,
+        "pairs": 59956
+      },
+      "ranking_hard_negatives": {
+        "groups": 3000,
+        "mrr": 0.5696,
+        "mean_rank": 3.677,
+        "hits_at_1": 0.4147,
+        "hits_at_3": 0.6553,
+        "hits_at_5": 0.756
+      }
+    },
+    {
+      "model": "graph-logistic",
+      "detail": {
+        "kind": "logistic",
+        "features": [
+          "common_neighbors",
+          "adamic_adar",
+          "jaccard",
+          "log_preferential_attachment",
+          "log_degree_min",
+          "log_degree_max",
+          "log_citation_indegree_min",
+          "log_citation_indegree_max"
+        ],
+        "feature_count": 8,
+        "params": {},
+        "fitted": true
+      },
+      "test_hard_negatives": {
+        "roc_auc": 0.4728,
+        "average_precision": 0.5055,
+        "positive_rate": 0.5,
+        "pairs": 59996
+      },
+      "test_random_negatives": {
+        "roc_auc": 0.6339,
+        "average_precision": 0.7036,
+        "positive_rate": 0.5,
+        "pairs": 60000
+      },
+      "train_fit": {
+        "roc_auc": 0.505,
+        "average_precision": 0.503,
+        "positive_rate": 0.5004,
+        "pairs": 59956
+      },
+      "ranking_hard_negatives": {
+        "groups": 3000,
+        "mrr": 0.3448,
+        "mean_rank": 5.544,
+        "hits_at_1": 0.1757,
+        "hits_at_3": 0.3567,
+        "hits_at_5": 0.4957
+      },
+      "mrr_vs_best_heuristic": {
+        "baseline": "adamic-adar",
+        "groups": 3000,
+        "mean": -0.2247,
+        "low": -0.2416,
+        "high": -0.2075,
+        "excludes_zero": true
+      }
+    },
+    {
+      "model": "graph-text-gbm",
+      "detail": {
+        "kind": "gbm",
+        "features": [
+          "common_neighbors",
+          "adamic_adar",
+          "jaccard",
+          "log_preferential_attachment",
+          "log_degree_min",
+          "log_degree_max",
+          "log_citation_indegree_min",
+          "log_citation_indegree_max",
+          "embedding_cosine",
+          "same_primary_category",
+          "category_jaccard",
+          "month_gap"
+        ],
+        "feature_count": 12,
+        "params": {},
+        "fitted": true
+      },
+      "test_hard_negatives": {
+        "roc_auc": 0.4946,
+        "average_precision": 0.513,
+        "positive_rate": 0.5,
+        "pairs": 59996
+      },
+      "test_random_negatives": {
+        "roc_auc": 0.5257,
+        "average_precision": 0.5156,
+        "positive_rate": 0.5,
+        "pairs": 60000
+      },
+      "train_fit": {
+        "roc_auc": 0.5755,
+        "average_precision": 0.5793,
+        "positive_rate": 0.5004,
+        "pairs": 59956
+      },
+      "ranking_hard_negatives": {
+        "groups": 3000,
+        "mrr": 0.2838,
+        "mean_rank": 5.924,
+        "hits_at_1": 0.111,
+        "hits_at_3": 0.2607,
+        "hits_at_5": 0.432
+      },
+      "mrr_vs_best_heuristic": {
+        "baseline": "adamic-adar",
+        "groups": 3000,
+        "mean": -0.2858,
+        "low": -0.3013,
+        "high": -0.2692,
+        "excludes_zero": true
+      }
+    }
+  ],
+  "artifacts": {
+    "directory": "derived/link_prediction_sabotaged",
+    "models": {
+      "graph-logistic": {
+        "path": "derived/link_prediction_sabotaged/graph-logistic.joblib",
+        "bytes": 1887
+      },
+      "graph-text-gbm": {
+        "path": "derived/link_prediction_sabotaged/graph-text-gbm.joblib",
+        "bytes": 78866
+      }
+    }
+  }
+}

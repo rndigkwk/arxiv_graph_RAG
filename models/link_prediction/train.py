@@ -193,6 +193,10 @@ def main() -> int:
     parser.add_argument("--save-model", type=Path, default=Path("derived/link_prediction"),
                         help="적합된 모델을 여기 저장합니다. 승격·롤백의 선행 조건입니다.")
     parser.add_argument("--no-save", action="store_true")
+    parser.add_argument("--sabotage", action="store_true",
+                        help="학습 라벨을 섞어 **일부러 나쁜 모델**을 만듭니다. 승격 거부와 "
+                             "롤백을 시연할 대상이 필요해서 둡니다(ADR-032). 보고서와 "
+                             "저장 경로를 따로 주세요.")
     args = parser.parse_args()
 
     snap = snapshot_module.load(args.version) if args.version else snapshot_module.latest()
@@ -201,6 +205,12 @@ def main() -> int:
         snap, train_cut=train_cut, test_cut=test_cut, max_positives=args.max_positives
     )
     windows = built["windows"]
+    if args.sabotage:
+        # 라벨만 섞습니다. 피처와 분할은 그대로여서 "같은 과제에서 못 배운 모델"이 됩니다.
+        # 11-10절이 일부러 틀린 답을 심어 지표 천장을 찾은 것과 같은 방법입니다.
+        rng = np.random.default_rng(20261019)
+        train_split = built["splits"]["train"]
+        train_split.labels = rng.permutation(train_split.labels)
     results, trained = evaluate(built)
 
     report = {
@@ -208,6 +218,7 @@ def main() -> int:
         "snapshot_version": snap.version,
         "snapshot_papers_sha256": snap.manifest["files"]["papers"]["sha256"],
         "task": "co-citation link prediction",
+        "sabotaged": bool(args.sabotage),
         "task_note": (
             "직접 인용 예측은 실제 간선의 95.7%가 공통 이웃 0이어서 기각했습니다. "
             "reports/link_prediction_structure.json 참고."
