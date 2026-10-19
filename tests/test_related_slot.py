@@ -155,3 +155,71 @@ def test_rerunning_a_subset_reproduces_the_report(report):
             assert {key: repeated[key] for key in row[variant]} == row[variant], (
                 row["id"], variant, repeated
             )
+
+
+FUTURE_REPORT = Path("reports/related_future_study.json")
+
+
+@pytest.fixture(scope="module")
+def future_report():
+    if not FUTURE_REPORT.exists():
+        pytest.skip(f"미래 라벨 보고서가 없습니다: {FUTURE_REPORT}")
+    return json.loads(FUTURE_REPORT.read_text(encoding="utf-8"))
+
+
+def test_the_future_report_was_measured_on_a_cut_graph(future_report):
+    """자르지 않은 그래프로 낸 숫자는 **거짓**입니다(ADR-035).
+
+    보고서가 `feature_cut`과 제외한 간선 수를 적어야 하고, 둘 다 있어야 그 숫자를 믿을 수
+    있습니다. 간선을 하나도 제외하지 않았다면 자르지 않은 것입니다.
+    """
+    assert future_report["feature_cut"]
+    assert future_report["dropped_edges_outside_feature_window"] > 0
+
+
+def test_the_aggregate_hides_two_opposite_regimes(future_report):
+    """집계를 먼저 읽으면 틀립니다 - 두 체제의 가중합이라 어느 쪽도 설명하지 않습니다.
+
+    간선이 없는 시드에서 그래프 계열은 **정확히 0**이고, 간선이 1~4개인 시드에서는 0.95
+    이상입니다. 집계 0.18은 그 사이 어디에도 해당하지 않습니다(ADR-036).
+    """
+    slices = future_report["by_degree_slice"]
+    empty = slices["no_citation_edges"]
+    thin = slices["degree_1_to_4"]
+
+    for variant in ("cocited", "ppr"):
+        assert empty[variant]["recall_at_k"] == 0.0, variant
+        assert empty[variant]["hit_at_k"] == 0.0, variant
+        assert thin[variant]["recall_at_k"] > 0.9, variant
+
+    aggregate = future_report["summary"]["cocited"]["recall_at_k"]
+    assert empty["cocited"]["recall_at_k"] < aggregate < thin["cocited"]["recall_at_k"]
+
+
+def test_only_the_embedding_scores_where_the_graph_has_no_edges(future_report):
+    """이 프로젝트에서 **임베딩 경로가 그래프 경로가 못 하는 일을 하는 첫 사례**입니다.
+
+    간선이 없는 시드는 공동인용도 PPR도 점수를 낼 수 없습니다(패널이 빕니다, ADR-035).
+    그 자리에서 벡터 최근접은 미래 공동인용을 상위 5 안에 **절반 가까이** 맞힙니다.
+    """
+    empty = future_report["by_degree_slice"]["no_citation_edges"]
+
+    assert empty["share"] > 0.5  # 이 과제의 다수입니다
+    assert empty["vector"]["hit_at_k"] > 0.4
+    assert empty["vector"]["recall_at_k"] > empty["cocited"]["recall_at_k"]
+
+
+def test_the_learned_adapter_still_does_not_beat_the_plain_embedding(future_report):
+    """다섯 번째 측정된 기각입니다 - 이번에는 **라벨이 미래**이고 그래프가 0점인 자리입니다.
+
+    어댑터에 모든 유리함을 준 측정입니다(동어반복 질의가 없고, 현직이 0점이라 여지가 최대).
+    그래도 움직이지 않습니다 - 차이가 네 자리에서 보이지 않습니다. 구간은 ADR-036에
+    적혀 있고, 여기서는 점 추정이 갈리지 않는다는 것만 고정합니다.
+    """
+    empty = future_report["by_degree_slice"]["no_citation_edges"]
+    plain = empty["vector"]
+
+    for variant in ("adapter_cite", "adapter_cocite"):
+        for metric in ("recall_at_k", "hit_at_k", "reciprocal_rank"):
+            gap = abs(empty[variant][metric] - plain[metric])
+            assert gap < 0.01, (variant, metric, gap)
