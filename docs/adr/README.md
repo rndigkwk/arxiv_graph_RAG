@@ -77,3 +77,4 @@
 | [ADR-030](ADR-030-related-papers-needs-a-query-not-a-model.md) | 관련 논문은 모델이 아니라 질의가 답이었다 — 공동인용 수로 정렬한다 | 채택 |
 | [ADR-031](ADR-031-the-model-that-wins-is-the-forecast.md) | 이기는 모델은 예측 쪽이었다 — 가중치를 저장하고 구간을 붙인다 | 채택 |
 | [ADR-032](ADR-032-close-the-model-lifecycle.md) | 모델 생명주기를 닫는다 — 등록·판정·승격·롤백, 그리고 main 보호 | 채택 |
+| [ADR-033](ADR-033-rank-metrics-measure-the-alphabet.md) | 순위 지표는 알파벳을 재고 있었다 — 순서에 의존하지 않는 지표를 더한다 | 채택 |

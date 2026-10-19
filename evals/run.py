@@ -24,6 +24,33 @@ MAX_CONTEXT_ROWS = 50
 # arxiv_id 모양. 골드 Cypher의 매개변수에서 **기준 논문**만 골라내기 위한 것입니다.
 ARXIV_ID = re.compile(r"^\d{4}\.\d{4,5}$")
 
+# 조회가 무엇으로 정렬했는지. `reciprocal_rank`·`hit_at_k`의 "1위"가 무슨 뜻인지는 이것이
+# 정합니다 - 알파벳순이면 1위는 품질이 아니라 제목의 첫 글자입니다(ADR-033).
+ORDER_BY = re.compile(r"\bORDER\s+BY\s+(.+?)(?=\s+\b(?:LIMIT|RETURN|SKIP|UNION)\b|$)", re.I)
+
+
+def ordered_by(response: dict[str, Any]) -> list[str]:
+    """What each successful graph query sorted by, in call order.
+
+    순위 지표를 읽으려면 **순위가 무엇으로 정해졌는지** 알아야 합니다. 2026-10-19 측정에서
+    30건 중 **24건이 식별자 문자열순**(`title`·`arxiv_id`)이고 점수순(`citation_count DESC`)은
+    6건뿐이었습니다. 그 사실이 보고서에 남아 있지 않으면 `reciprocal_rank` 1.0000을 "순위가
+    좋다"로 잘못 읽습니다. 세는 쪽은 `evals/retrieval_metric_study.py`입니다.
+
+    실패는 조용합니다 - 못 찾으면 빈 목록입니다. 이것은 **설명**이고 채점 입력이 아니라서,
+    정규식이 Cypher 변형을 놓쳐도 지표가 흔들리면 안 됩니다.
+    """
+    clauses: list[str] = []
+    for call in response.get("tool_calls", []):
+        if call.get("name") != "search_graph" or call.get("status") != "success":
+            continue
+        output = call.get("output")
+        if not isinstance(output, dict) or output.get("error"):
+            continue
+        cypher = " ".join((output.get("cypher") or "").split())
+        clauses.extend(" ".join(match.group(1).split()) for match in ORDER_BY.finditer(cypher))
+    return clauses
+
 
 def anchor_ids(case: dict[str, Any]) -> set[str]:
     """질문이 지칭하는 논문. 골드 Cypher의 매개변수가 그것을 이미 적고 있습니다.
@@ -160,6 +187,10 @@ def evaluate_case(
     )
     retrieved = list(dict.fromkeys(retrieved))
     row = {"id": case["id"], "category": case["category"], "retrieved_ids": retrieved}
+    # 순위 지표를 되짚을 수 있게 **정렬 기준을 같이 적습니다**. 숫자가 아니므로 게이트의
+    # 지표 집계에는 들어가지 않습니다(`evals/gate.py`의 `_numeric`).
+    if sorts := ordered_by(response):
+        row["ordered_by"] = sorts
     if anchors:
         # 무엇을 뺐는지 보고서가 스스로 말해야 합니다. 조용히 빼면 지표를 되짚을 수 없습니다.
         row["anchor_ids"] = sorted(anchors)

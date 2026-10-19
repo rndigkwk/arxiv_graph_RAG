@@ -345,8 +345,14 @@ def test_many_failures_are_still_caught_by_the_aggregate_ceiling():
 
 
 def test_rewriting_the_baseline_keeps_the_values_a_person_set():
-    """`splits`가 한 번 조용히 사라졌습니다. 그러면 smoke가 "25건 빠졌다"로 거짓 실패합니다."""
-    from evals.gate import CARRIED_OVER, make_baseline
+    """손으로 정한 키는 **하나도** 사라지지 않아야 합니다.
+
+    전 판은 "들고 올 키 목록"으로 `carried`를 만들고 같은 목록이 남았는지 확인해서,
+    **목록에서 빠뜨린 키는 영원히 잡지 못했습니다.** 실제로 `splits`·`related_slot`·
+    `model_registry`가 차례로 조용히 사라졌습니다. 이제 기준선 파일에 있는 키를 기준으로
+    봅니다 - `make_baseline`이 스스로 계산하는 키만 빼고 전부 남아야 합니다.
+    """
+    from evals.gate import DERIVED_KEYS, carried_over, make_baseline
 
     existing = load(BASELINE)
     merged = {
@@ -366,10 +372,14 @@ def test_rewriting_the_baseline_keeps_the_values_a_person_set():
         floors=existing["absolute_floor"],
         drops=existing["allowed_drop"],
         note="테스트",
-        carried={key: existing[key] for key in CARRIED_OVER if key in existing},
+        carried=carried_over(existing),
     )
-    for key in CARRIED_OVER:
-        assert rewritten.get(key) == existing.get(key), key
+    for key, value in existing.items():
+        if key in DERIVED_KEYS:
+            continue
+        assert rewritten.get(key) == value, f"{key}가 재작성에서 사라졌거나 바뀌었습니다"
+    # 계산하는 키를 들고 오면 기준선이 **옛 측정값**을 새 측정값으로 적습니다. 그쪽도 막습니다.
+    assert not (DERIVED_KEYS & set(carried_over(existing)))
 
 
 def test_a_case_that_failed_in_any_run_is_not_called_stable():
@@ -766,9 +776,16 @@ def test_every_floor_names_a_metric_the_harness_produces():
     그래서 실제로 기록된 실행 보고서로 확인합니다 - 하한의 모든 이름이 거기 있어야 합니다.
     """
     baseline = load(BASELINE)
-    recorded = Path("reports/baseline_routed_run1_rescored.json")
-    if not recorded.exists():
-        pytest.skip(f"기록된 실행 보고서가 없습니다: {recorded}")
+    # **기준선을 쓴 보고서 세대**로 봐야 합니다. 더 옛 세대에는 그 뒤에 생긴 지표가 없고,
+    # 그것을 "하한이 잘못됐다"로 읽으면 지표를 늘릴 수 없게 됩니다. 새것부터 찾습니다.
+    candidates = (
+        Path("reports/baseline_resolve_run1_setmetrics.json"),
+        Path("reports/baseline_resolve_run1.json"),
+        Path("reports/baseline_routed_run1_rescored.json"),
+    )
+    recorded = next((path for path in candidates if path.exists()), None)
+    if recorded is None:
+        pytest.skip(f"기록된 실행 보고서가 없습니다: {candidates[0]}")
     produced = set(normalize(load(recorded))["metrics"])
     # RAGAS 지표는 별도 보고서에서 합쳐집니다. 그 두 개는 이름으로 인정합니다.
     produced |= {RAGAS_FAITHFULNESS, RAGAS_STABLE_PRECISION}
@@ -776,3 +793,56 @@ def test_every_floor_names_a_metric_the_harness_produces():
     missing = sorted(set(baseline["absolute_floor"]) - produced)
 
     assert missing == [], missing
+
+
+def _clean_cases(baseline: dict) -> dict:
+    """Every case at full marks, so only the aggregate rules can fire."""
+    return {
+        case_id: {"failed": False, "metrics": {baseline["primary_metric"]: 1.0}}
+        for case_id in baseline["case_ids"]
+    }
+
+
+def test_over_retrieval_is_caught_only_by_the_set_metrics():
+    """순위 지표가 전부 만점인데 쓰레기를 함께 돌려주는 상태를 잡는 규칙은 하나뿐입니다.
+
+    `evals/retrieval_metric_study.py`가 실제 보고서에 쓰레기를 심어 재 본 모양입니다 -
+    30건 전부가 무관한 논문 5편을 함께 돌려주면 `hit_at_k`는 0.9000이고 `recall_at_k`는
+    0.5844인데, **둘 다 자기 하한(0.5 / 0.48) 안입니다.** `retrieval_precision` 0.3474만
+    하한을 깹니다(ADR-033).
+    """
+    baseline = load(BASELINE)
+    report = _report(_clean_cases(baseline), {
+        **baseline["metrics"],
+        "hit_at_k": 0.9,
+        "recall_at_k": 0.5844,
+        "reciprocal_rank": 0.6822,
+        "retrieval_recall": 1.0,
+        "retrieval_precision": 0.3474,
+    })
+    violations = check(baseline, report)
+    assert [v.rule for v in violations if "retrieval_precision" in v.detail] == ["floor", "drop"]
+    # 순위 지표는 같은 상태에서 조용합니다. 그것이 집합 지표를 더한 이유입니다.
+    assert not [v for v in violations if "hit_at_k" in v.detail or "recall_at_k" in v.detail]
+
+
+def test_finding_the_gold_but_burying_it_is_not_called_a_recall_failure():
+    """"못 찾음"과 "묻힘"을 가르는 것이 집합 recall의 일입니다.
+
+    2026-10-16 `coauthor` 가족이 hit@5 0.1667이었는데 집합 recall은 1.0000이었습니다. 그때
+    "검색 품질 문제"로 적었고 틀렸습니다 - 다 찾아 놓고 알파벳순에 밀린 것입니다. 그 상태에서
+    `retrieval_recall`의 하한은 **울리지 않아야** 합니다.
+    """
+    baseline = load(BASELINE)
+    report = _report(_clean_cases(baseline), {
+        **baseline["metrics"],
+        "hit_at_k": 0.7333,
+        "recall_at_k": 0.7111,
+        "reciprocal_rank": 0.7167,
+        "retrieval_recall": 0.9667,
+        "retrieval_precision": 0.7908,
+    })
+    violations = [v for v in check(baseline, report) if v.rule == "floor"]
+
+    assert not [v for v in violations if "retrieval_recall" in v.detail]
+    assert not [v for v in violations if "retrieval_precision" in v.detail]

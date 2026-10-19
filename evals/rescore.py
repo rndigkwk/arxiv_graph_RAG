@@ -31,7 +31,7 @@ from pathlib import Path
 from typing import Any
 
 from evals.metrics import score_retrieval, summarize
-from evals.run import anchor_ids, load_cases
+from evals.run import ORDER_BY, anchor_ids, load_cases
 
 # 저장된 문맥에서 행을 찾기 위한 것입니다. 문맥은 "Cypher: ..." 다음에 `key=value | ...` 줄이
 # 붙은 형태로 굳어 있습니다(`generator_contexts`).
@@ -54,6 +54,21 @@ def context_is_lookup(context: str, anchors: set[str]) -> bool:
     return bool(found) and found <= anchors
 
 
+def ordered_by_from_contexts(row: dict[str, Any]) -> list[str]:
+    """What the stored queries sorted by, read back out of the frozen contexts.
+
+    `evals/run.py`의 `ordered_by`는 도구 출력에서 Cypher를 꺼내지만, 저장된 보고서에는 그
+    출력이 없고 **문맥 문자열**만 있습니다(`"Cypher: ..."`). 둘은 같은 정규식을 씁니다.
+    """
+    clauses: list[str] = []
+    for context in row.get("contexts", []) or []:
+        if not isinstance(context, str) or not context.startswith("Cypher:"):
+            continue
+        head = context.split("\n", 1)[0]
+        clauses.extend(" ".join(match.group(1).split()) for match in ORDER_BY.finditer(head))
+    return clauses
+
+
 def rescore_row(row: dict[str, Any], case: dict[str, Any], top_k: int) -> dict[str, Any]:
     anchors = anchor_ids(case)
     kept = [arxiv_id for arxiv_id in row.get("retrieved_ids", []) if arxiv_id not in anchors]
@@ -61,6 +76,10 @@ def rescore_row(row: dict[str, Any], case: dict[str, Any], top_k: int) -> dict[s
     updated["retrieved_ids"] = kept
     if anchors:
         updated["anchor_ids"] = sorted(anchors)
+    # 순위 지표가 무슨 순서 위에서 매겨졌는지입니다(ADR-033). 옛 보고서에도 적어 둡니다 -
+    # 그래야 "rr 1.0000"을 나중에 혼자 읽을 수 있습니다.
+    if sorts := ordered_by_from_contexts(row):
+        updated["ordered_by"] = sorts
     updated.update(score_retrieval(case["expected_ids"], kept, k=top_k))
     # **문맥은 건드리지 않습니다.** 한 번 걸러 봤고 faithfulness가 무너졌습니다
     # (`citing` 1.0000 -> 0.2296) - 답변이 주제 논문을 제목으로 언급하고 그 근거가 바로
@@ -113,7 +132,9 @@ def main() -> int:
         report["rescored"] = {
             "reason": (
                 "기준 논문(질문이 지칭한 논문)을 retrieved_ids에서만 분리(ADR-024). "
-                "문맥은 그대로 - 빼니 faithfulness가 무너졌습니다"
+                "문맥은 그대로 - 빼니 faithfulness가 무너졌습니다. "
+                "순서에 의존하지 않는 집합 지표(retrieval_precision·retrieval_recall)와 "
+                "정렬 기준(ordered_by)을 더했습니다(ADR-033)"
             ),
             "rows_whose_rank_changed": moved,
             "answer_metrics_untouched": True,

@@ -11,7 +11,8 @@
 수 없습니다** — 통과만 시키는 게이트는 게이트가 아니므로 `tests/fixtures/eval_gate/`의 가짜
 기준선·결과 쌍으로 규칙마다 제대로 실패하는지 확인합니다.
 
-규칙 다섯 개입니다.
+위반으로 올라오는 규칙은 여섯 개입니다. 여기에 비교가 성립하는지 보는 `metrics_split`이
+**전제로** 붙습니다 — 분할이 다르면 집계 규칙(`floor`·`drop`)을 아예 적용하지 않습니다.
 
 | 규칙 | 내용 |
 |---|---|
@@ -20,6 +21,7 @@
 | `floor` | 지표가 절대 하한 이상인가 |
 | `drop` | 기준선 대비 하락이 허용폭 이하인가 |
 | `stable_case` | 기준선에서 만점이던 사례가 이번에 깨졌는가 |
+| `judge_model` | RAGAS를 기준선과 같은 모델이 채점했는가 |
 
 **에이전트 실패와 채점 오류를 구별합니다.** 교안은 "채점 오류 0"만 두지만, 이 프로젝트는
 에이전트 실패율을 **5.6~8.3%로 측정했습니다**(`EXPERIMENTS.md` 10절: `coauthor-03` 12회 중 1회,
@@ -209,19 +211,30 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
     return merged
 
 
-# 기준선을 다시 쓸 때 손으로 정한 것은 지켜야 합니다. 이것을 빼먹어서 한 번 `splits`가
-# 조용히 사라졌고, 그러면 smoke가 "사례가 25건 빠졌다"로 거짓 실패합니다.
-CARRIED_OVER = (
-    "splits",
-    # 다른 하네스(evals.related_study)가 내는 점수와 그 하한입니다. 2026-10-19 재작성에서
-    # 한 번 조용히 사라졌습니다 - 평가 보고서에 없는 값이라 merge가 만들어 줄 수 없습니다.
-    "related_slot",
-    "ragas_judge_model",
-    "split_rationale",
-    "floor_rationale",
-    "metrics_split",
-    "ragas_stable_families",
-)
+# `make_baseline`이 **스스로 계산하는** 키입니다. 나머지는 전부 손으로 정한 값이므로
+# 재작성에서 그대로 들고 옵니다.
+#
+# 전에는 반대로 "들고 올 키 목록"을 들고 있었습니다. 그 목록은 **빠뜨릴 수 있습니다** -
+# `splits`가 한 번, `related_slot`이 한 번, `model_registry`(ADR-032)가 한 번 조용히
+# 사라졌습니다. 세 번째를 겪고 방향을 뒤집었습니다. 목록을 더하는 것을 잊어도 키는
+# 남습니다. 평가 보고서에 없는 값은 `merge`가 만들어 줄 수 없으므로, 사라지면 손으로
+# 되살려야 합니다.
+DERIVED_KEYS = frozenset({
+    "generated_at",
+    "note",
+    "source",
+    "primary_metric",
+    "metrics",
+    "absolute_floor",
+    "allowed_drop",
+    "case_ids",
+    "stable_cases",
+})
+
+
+def carried_over(existing: dict[str, Any]) -> dict[str, Any]:
+    """Everything in the old baseline that a rewrite must not drop."""
+    return {key: value for key, value in existing.items() if key not in DERIVED_KEYS}
 
 
 def make_baseline(
@@ -292,7 +305,7 @@ def compares_aggregates(baseline: dict[str, Any], split: str) -> bool:
 def check(
     baseline: dict[str, Any], report: dict[str, Any], *, split: str = "full"
 ) -> list[Violation]:
-    """Apply the five rules and return every violation, not just the first."""
+    """Apply the rules in the module table and return every violation, not just the first."""
     violations: list[Violation] = []
     primary = baseline["primary_metric"]
     aggregates = compares_aggregates(baseline, split)
@@ -459,13 +472,26 @@ def main() -> int:
         if not args.note:
             parser.error("--write-baseline에는 --note가 필요합니다. 하한의 근거를 적으세요.")
         existing = existing_baseline
+        carried = carried_over(existing)
+        # 판정 모델은 손으로 정한 값이라 들고 오는데, 이번 실행이 **다른 모델**로 채점했다면
+        # 들고 오는 것이 거짓말입니다. 그대로 쓰면 다음 게이트가 영원히 불일치로 막힙니다.
+        # 어느 쪽이 맞는지는 코드가 모르므로 추측하지 않고 멈춥니다.
+        measured_judge = merged.get("ragas_judge_model") or ""
+        carried_judge = carried.get("ragas_judge_model") or ""
+        if measured_judge and carried_judge and measured_judge != carried_judge:
+            parser.error(
+                f"RAGAS 판정 모델이 기준선({carried_judge!r})과 이번 실행({measured_judge!r})에서 "
+                "다릅니다. 기준선의 ragas_judge_model을 손으로 정한 뒤 다시 쓰세요."
+            )
+        if measured_judge:
+            carried["ragas_judge_model"] = measured_judge
         baseline = make_baseline(
             merged,
             primary_metric=args.primary_metric,
             floors=existing.get("absolute_floor", {}),
             drops=existing.get("allowed_drop"),
             note=args.note,
-            carried={key: existing[key] for key in CARRIED_OVER if key in existing},
+            carried=carried,
         )
         args.baseline.parent.mkdir(parents=True, exist_ok=True)
         args.baseline.write_text(
