@@ -80,11 +80,19 @@
 이 PC에 GPU가 없고 bge-base(109M)가 CPU로 3.5시간이었습니다. 다섯 배 큰 모델은 답을 얻을 수
 없습니다.
 
-**텍스트와 순서를 파일로 굳혀 보냅니다**
-([`scripts/export_corpus_for_encoding.py`](../../scripts/export_corpus_for_encoding.py)).
+**텍스트와 순서는 이미 굳어 있습니다** — 11-6절이 만든
+[`export_for_colab.py`](../../models/embedding_tuning/export_for_colab.py)의
+`corpus.jsonl.gz`가 파생 캐시와 같은 순서이고 텍스트도 `compare_models`가 인코딩하는 것과
+같은 문자열입니다(37,854행 전부 대조). **새로 만들려다 그것을 확인하고 중복을 걷어냈습니다.**
 Colab이 스냅샷에서 텍스트를 다시 만들면 공백 하나, 정렬 하나가 달라질 수 있고 그러면 재는
 것이 모델이 아니라 **전처리 차이**입니다. 돌아오는 것은 행렬 하나이고(37,854 × 1024 float32 =
 155MB) `derived/`에 두면 기존 하네스 둘이 그대로 읽습니다.
+
+실행은 노트북 하나입니다([`notebooks/encode_corpus_colab.ipynb`](../../notebooks/encode_corpus_colab.ipynb)).
+모델 이름만 바꾸고 나머지는 그대로 돌립니다 — GPU가 없으면 **시작하지 않고 멈추고**(CPU로는
+10시간을 넘깁니다), 2,000편씩 조각으로 저장해 끊겨도 이어서 하고, 행 수가 말뭉치와 다르면
+저장하지 않습니다. 셀 전부를 SMOKE(200편)로 **실제로 돌려** 확인했고 테스트가 노트북의
+불변 조건을 고정합니다.
 
 **Aura를 건드리지 않습니다.** 비교 하네스는 파생 캐시에서 임베딩을 읽으므로 인덱스 재생성도,
 차원 변경도, 비용도 없습니다. 품질 판정과 배포 결정이 완전히 분리됩니다.
@@ -99,8 +107,8 @@ Colab이 스냅샷에서 텍스트를 다시 만들면 공백 하나, 정렬 하
 ## 재현
 
 ```bash
-uv run python scripts/export_corpus_for_encoding.py
-# Colab: python colab_encode.py --corpus corpus_for_encoding.jsonl --model BAAI/bge-m3
+uv run python -m models.embedding_tuning.export_for_colab
+# Colab: notebooks/encode_corpus_colab.ipynb 를 열고 MODEL만 바꿔 실행
 uv run python -m evals.related_study --cases evals/cases_related_future.json \
     --variants vector --embeddings derived/2026-10-14/local-baai-bge-m3.npy \
     --output reports/embedding_bge_m3.json
