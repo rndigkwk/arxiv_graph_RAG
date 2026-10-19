@@ -263,6 +263,50 @@ def show_response(chatbot, response, index):
                     else:
                         st.warning("논문 정보를 그래프에서 찾지 못했습니다.")
 
+    # 관련 논문 패널과 **다른 질문**입니다 - 저쪽은 "지금 같이 읽히는 논문", 이쪽은
+    # "앞으로 함께 인용될 논문"입니다. 섞으면 무엇을 본 것인지 말할 수 없어서 패널을
+    # 따로 두고, 접은 채로 둡니다(ADR-038). 모델을 부르는 유일한 자리입니다.
+    forecast_seeds = [
+        call.get("output", {}).get("seed_ids", [])
+        for call in response.get("tool_calls", [])
+        if call.get("name") == "rank_related_papers"
+    ]
+    forecast_seed = (forecast_seeds[-1] or [None])[0] if forecast_seeds else None
+    if forecast_seed:
+        with st.expander("앞으로 함께 인용될 논문 (예측 모델)"):
+            st.caption(
+                "지금 같이 읽히는 논문이 아니라 **앞으로** 함께 인용될 논문입니다. "
+                "학습 모델이 휴리스틱을 측정된 구간으로 이긴 유일한 과제여서 여기만 "
+                "모델을 씁니다(ADR-031)."
+            )
+            if st.button("예측 보기", key=f"forecast:{index}:{forecast_seed}"):
+                with st.spinner("후보를 모아 점수를 냅니다."):
+                    result = chatbot.forecast_cocitation(forecast_seed)
+                st.session_state[f"forecast-result:{index}"] = result
+            result = st.session_state.get(f"forecast-result:{index}")
+            if result and result.get("reason"):
+                # 왜 비었는지 적습니다. 빈 패널만 보이면 고장과 구별되지 않습니다.
+                st.info(result["reason"])
+            elif result:
+                st.dataframe([{
+                    "arXiv ID": hit["arxiv_id"],
+                    "점수": hit["score"],
+                    "제목": hit.get("title", ""),
+                    "지금 공동인용": hit["shared_cocitations"],
+                    "임베딩 코사인": hit["embedding_cosine"],
+                } for hit in result["papers"]], hide_index=True)
+                model = result.get("model") or {}
+                st.caption(
+                    f'후보 {result.get("candidates", 0)}편에서 재정렬 · '
+                    f'모델 지문 {model.get("digest")} · 스냅샷 '
+                    f'{model.get("snapshot_version")} · 학습 과제 순위 MRR '
+                    f'{model.get("ranking_mrr")}'
+                )
+                st.caption(
+                    "**이 패널은 미래를 맞히려는 시도이고 정답은 아직 오지 않았습니다.** "
+                    "모델이 통과한 기준은 과거 창에서 잰 것입니다."
+                )
+
     if response["papers"]:
         with st.expander("벡터로 찾은 논문의 초록"):
             for hit in response["papers"]:

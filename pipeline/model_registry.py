@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +43,11 @@ from pipeline.tracking import load_env
 
 MODEL_NAME = "arxiv-cocitation-link-prediction"
 ARTIFACTS = Path("derived/link_prediction")
+# **배포가 읽는 자리입니다.** `derived/`는 gitignore 대상이라 배포된 앱에 가중치가 가지
+# 않습니다 - 예측 패널을 만들면서 드러났습니다(ADR-038). 학습 산출물은 그대로 `derived/`에
+# 두고, **승격된 것만** 추적되는 이 자리로 내보냅니다. 승격은 판정이고 내보내기는 배포라,
+# 두 동사를 따로 둡니다.
+SERVING = Path("models/artifacts")
 REPORT = Path("reports/link_prediction.json")
 BASELINE = Path("baselines/eval_baseline.json")
 # 어느 사다리 칸을 올리는가. 측정에서 이긴 칸입니다.
@@ -76,6 +82,39 @@ def manifest(artifacts: Path = ARTIFACTS) -> dict[str, Any]:
         "split": recorded["split"],
         "metrics": recorded["metrics"].get(RUNG, {}),
     }
+
+
+def export(artifacts: Path = ARTIFACTS, serving: Path = SERVING) -> dict[str, Any]:
+    """Copy the trained weights to the tracked path the app reads, with their fingerprint.
+
+    앱은 레지스트리를 조회하지 않습니다([ADR-032](../docs/adr/ADR-032-close-the-model-lifecycle.md))
+    — 추적 서버가 죽으면 앱이 죽기 때문입니다. 그래서 둘을 잇는 것은 **지문**입니다. 여기서
+    지문과 학습 조건을 함께 적고, 앱은 읽을 때 그것을 맞춰 봅니다.
+
+    sklearn 버전도 적습니다. joblib은 다른 버전에서 조용히 경고만 내고 읽히는 일이 있어서,
+    **적어 두지 않으면 어느 버전으로 구운 파일인지 알 수 없습니다.**
+    """
+    import sklearn
+
+    weights = artifacts / f"{RUNG}.joblib"
+    if not weights.exists():
+        raise FileNotFoundError(
+            f"학습 가중치가 없습니다: {weights}. "
+            "uv run --extra ml python -m models.link_prediction.train 을 먼저 돌리세요."
+        )
+    serving.mkdir(parents=True, exist_ok=True)
+    target = serving / f"{RUNG}.joblib"
+    target.write_bytes(weights.read_bytes())
+    card = {
+        **manifest(artifacts),
+        "weights": str(target).replace("\\", "/"),
+        "sklearn_version": sklearn.__version__,
+        "exported_at": datetime.now(UTC).isoformat(),
+    }
+    (serving / "manifest.json").write_text(
+        json.dumps(card, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return card
 
 
 def judge(
@@ -278,6 +317,8 @@ def main() -> int:
     parser.add_argument("--register", action="store_true")
     parser.add_argument("--promote", metavar="ALIAS")
     parser.add_argument("--rollback", metavar="ALIAS")
+    parser.add_argument("--export", action="store_true",
+                        help="승격된 가중치를 배포가 읽는 models/artifacts로 내보냅니다.")
     parser.add_argument("--version", help="--promote에서 특정 버전을 지정합니다.")
     parser.add_argument("--message", default="")
     parser.add_argument("--artifacts", type=Path, default=ARTIFACTS,
@@ -305,6 +346,11 @@ def main() -> int:
         result = promote(args.promote, args.version, report=args.report, force=args.force)
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0 if result["moved"] else 1
+    if args.export:
+        card = export(args.artifacts)
+        print(json.dumps(card, ensure_ascii=False, indent=2))
+        return 0
+
     if args.rollback:
         result = rollback(args.rollback)
         print(json.dumps(result, ensure_ascii=False, indent=2))

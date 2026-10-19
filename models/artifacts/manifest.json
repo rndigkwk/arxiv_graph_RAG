@@ -1,0 +1,38 @@
+{
+  "model_name": "arxiv-cocitation-link-prediction",
+  "rung": "graph-text-gbm",
+  "weights": "models/artifacts/graph-text-gbm.joblib",
+  "digest": "b4900dad0c8d2354",
+  "snapshot_version": "2026-10-14",
+  "split": {
+    "key": "arxiv_id_yymm",
+    "train_label_month": "2026-07",
+    "test_label_from": "2026-08",
+    "citers_w1_train_feature": 866,
+    "citers_w2_train_labels": 779,
+    "citers_w3_test_feature": 1645,
+    "citers_w4_test_labels": 1607,
+    "pairs_train_feature": 331330,
+    "pairs_test_feature": 523441,
+    "pairs_train_labels_new": 192111,
+    "pairs_test_labels_new": 406284,
+    "train_labels_total": 192111,
+    "train_labels_usable": 41406,
+    "test_labels_total": 406284,
+    "test_labels_usable": 106343
+  },
+  "metrics": {
+    "hard_roc_auc": 0.7957,
+    "ranking_mrr": 0.6513,
+    "mrr_vs_best_heuristic": {
+      "baseline": "adamic-adar",
+      "groups": 3000,
+      "mean": 0.0818,
+      "low": 0.0699,
+      "high": 0.0936,
+      "excludes_zero": true
+    }
+  },
+  "sklearn_version": "1.9.0",
+  "exported_at": "2026-10-19T07:10:02.944204+00:00"
+}
