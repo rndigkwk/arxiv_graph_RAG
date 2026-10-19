@@ -1,0 +1,345 @@
+{
+  "generated_at": "2026-10-19T03:26:48.594867+00:00",
+  "note": "API를 쓰지 않습니다. 저장된 retrieved_ids에 집합 연산을 다시 적용한 것이 전부입니다.",
+  "generations": [
+    {
+      "label": "2026-10-16 라우팅 전",
+      "report": "reports\\regression_full_20261016.json",
+      "graph_rag": {
+        "cases": 30,
+        "mean_retrieved": 3.9667,
+        "overall": {
+          "retrieval_precision": 0.7908,
+          "retrieval_recall": 0.9667,
+          "recall_at_k": 0.7111,
+          "hit_at_k": 0.7333,
+          "reciprocal_rank": 0.7167
+        },
+        "by_family": {
+          "author": {
+            "retrieval_precision": 0.8333,
+            "retrieval_recall": 0.8333,
+            "recall_at_k": 0.8333,
+            "hit_at_k": 0.8333,
+            "reciprocal_rank": 0.8333
+          },
+          "citing": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          },
+          "coauthor": {
+            "retrieval_precision": 0.4276,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 0.1667,
+            "hit_at_k": 0.1667,
+            "reciprocal_rank": 0.1667
+          },
+          "reference": {
+            "retrieval_precision": 0.6931,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 0.5556,
+            "hit_at_k": 0.6667,
+            "reciprocal_rank": 0.5833
+          },
+          "topcited": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          }
+        }
+      },
+      "ordered_by": {
+        "available": false,
+        "every_query": {},
+        "last_query_per_case": {},
+        "last_query_sorts_by": {}
+      }
+    },
+    {
+      "label": "2026-10-18 라우팅 후",
+      "report": "reports\\baseline_routed_run1.json",
+      "graph_rag": {
+        "cases": 30,
+        "mean_retrieved": 3.3667,
+        "overall": {
+          "retrieval_precision": 0.8244,
+          "retrieval_recall": 1.0,
+          "recall_at_k": 0.9933,
+          "hit_at_k": 1.0,
+          "reciprocal_rank": 0.6944
+        },
+        "by_family": {
+          "author": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          },
+          "citing": {
+            "retrieval_precision": 0.6944,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 0.9667,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 0.5
+          },
+          "coauthor": {
+            "retrieval_precision": 0.7111,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 0.4722
+          },
+          "reference": {
+            "retrieval_precision": 0.7167,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 0.5
+          },
+          "topcited": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          }
+        }
+      },
+      "ordered_by": {
+        "available": true,
+        "every_query": {
+          "answer_value": 13,
+          "p.title": 10,
+          "citation_count DESC": 6,
+          "title": 4,
+          "p.published DESC": 3,
+          "citing.published DESC": 2,
+          "p.arxiv_id": 2,
+          "q.title": 2,
+          "citing.title": 1,
+          "c.published DESC": 1,
+          "c.title": 1,
+          "other.title": 1
+        },
+        "last_query_per_case": {
+          "answer_value": 10,
+          "citation_count DESC": 6,
+          "p.title": 4,
+          "title": 3,
+          "p.published DESC": 1,
+          "citing.title": 1,
+          "citing.published DESC": 1,
+          "c.published DESC": 1,
+          "c.title": 1,
+          "other.title": 1,
+          "q.title": 1
+        },
+        "last_query_sorts_by": {
+          "identifier": 21,
+          "score": 6,
+          "other:published": 3
+        }
+      }
+    },
+    {
+      "label": "2026-10-19 resolve_paper 후",
+      "report": "reports\\baseline_resolve_run1.json",
+      "graph_rag": {
+        "cases": 30,
+        "mean_retrieved": 2.7333,
+        "overall": {
+          "retrieval_precision": 1.0,
+          "retrieval_recall": 1.0,
+          "recall_at_k": 1.0,
+          "hit_at_k": 1.0,
+          "reciprocal_rank": 1.0
+        },
+        "by_family": {
+          "author": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          },
+          "citing": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          },
+          "coauthor": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          },
+          "reference": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          },
+          "topcited": {
+            "retrieval_precision": 1.0,
+            "retrieval_recall": 1.0,
+            "recall_at_k": 1.0,
+            "hit_at_k": 1.0,
+            "reciprocal_rank": 1.0
+          }
+        }
+      },
+      "ordered_by": {
+        "available": true,
+        "every_query": {
+          "answer_value": 16,
+          "title": 8,
+          "citation_count DESC": 6,
+          "p.title": 2
+        },
+        "last_query_per_case": {
+          "answer_value": 15,
+          "title": 7,
+          "citation_count DESC": 6,
+          "p.title": 2
+        },
+        "last_query_sorts_by": {
+          "identifier": 24,
+          "score": 6
+        }
+      }
+    }
+  ],
+  "vector_only_contrast": {
+    "cases": 30,
+    "mean_retrieved": 4.4333,
+    "overall": {
+      "retrieval_precision": 0.0083,
+      "retrieval_recall": 0.0111,
+      "recall_at_k": 0.0111,
+      "hit_at_k": 0.0333,
+      "reciprocal_rank": 0.0333
+    },
+    "by_family": {
+      "author": {
+        "retrieval_precision": 0.0,
+        "retrieval_recall": 0.0,
+        "recall_at_k": 0.0,
+        "hit_at_k": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "citing": {
+        "retrieval_precision": 0.0,
+        "retrieval_recall": 0.0,
+        "recall_at_k": 0.0,
+        "hit_at_k": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "coauthor": {
+        "retrieval_precision": 0.0,
+        "retrieval_recall": 0.0,
+        "recall_at_k": 0.0,
+        "hit_at_k": 0.0,
+        "reciprocal_rank": 0.0
+      },
+      "reference": {
+        "retrieval_precision": 0.0417,
+        "retrieval_recall": 0.0556,
+        "recall_at_k": 0.0556,
+        "hit_at_k": 0.1667,
+        "reciprocal_rank": 0.1667
+      },
+      "topcited": {
+        "retrieval_precision": 0.0,
+        "retrieval_recall": 0.0,
+        "recall_at_k": 0.0,
+        "hit_at_k": 0.0,
+        "reciprocal_rank": 0.0
+      }
+    }
+  },
+  "floor_demo": [
+    {
+      "over_retrieving_cases": 0,
+      "metrics": {
+        "retrieval_precision": 1.0,
+        "retrieval_recall": 1.0,
+        "recall_at_k": 1.0,
+        "hit_at_k": 1.0,
+        "reciprocal_rank": 1.0
+      },
+      "violations": []
+    },
+    {
+      "over_retrieving_cases": 1,
+      "metrics": {
+        "retrieval_precision": 0.9762,
+        "retrieval_recall": 1.0,
+        "recall_at_k": 0.9833,
+        "hit_at_k": 1.0,
+        "reciprocal_rank": 0.975
+      },
+      "violations": []
+    },
+    {
+      "over_retrieving_cases": 2,
+      "metrics": {
+        "retrieval_precision": 0.9554,
+        "retrieval_recall": 1.0,
+        "recall_at_k": 0.9833,
+        "hit_at_k": 1.0,
+        "reciprocal_rank": 0.975
+      },
+      "violations": []
+    },
+    {
+      "over_retrieving_cases": 3,
+      "metrics": {
+        "retrieval_precision": 0.9345,
+        "retrieval_recall": 1.0,
+        "recall_at_k": 0.9611,
+        "hit_at_k": 1.0,
+        "reciprocal_rank": 0.9583
+      },
+      "violations": [
+        "[drop] retrieval_precision 1.0000 -> 0.9345, 허용폭 0.0500을 넘었습니다"
+      ]
+    },
+    {
+      "over_retrieving_cases": 5,
+      "metrics": {
+        "retrieval_precision": 0.8899,
+        "retrieval_recall": 1.0,
+        "recall_at_k": 0.9333,
+        "hit_at_k": 1.0,
+        "reciprocal_rank": 0.9583
+      },
+      "violations": [
+        "[drop] retrieval_precision 1.0000 -> 0.8899, 허용폭 0.0500을 넘었습니다"
+      ]
+    },
+    {
+      "over_retrieving_cases": 30,
+      "metrics": {
+        "retrieval_precision": 0.3474,
+        "retrieval_recall": 1.0,
+        "recall_at_k": 0.5844,
+        "hit_at_k": 0.9,
+        "reciprocal_rank": 0.6822
+      },
+      "violations": [
+        "[floor] retrieval_precision 0.3474이 하한 0.7000을 넘었습니다",
+        "[drop] retrieval_precision 1.0000 -> 0.3474, 허용폭 0.0500을 넘었습니다"
+      ]
+    }
+  ]
+}

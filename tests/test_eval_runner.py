@@ -265,3 +265,63 @@ def test_compare_case_keeps_unreported_validation_usage_as_unknown(monkeypatch):
 
     assert result["graph_rag"]["chat_input_tokens"] is None
     assert result["graph_rag"]["chat_output_tokens"] is None
+
+
+def test_evaluate_case_records_what_the_query_sorted_by():
+    """순위 지표의 "1위"가 무슨 뜻인지는 `ORDER BY`가 정합니다(ADR-033).
+
+    보고서에 남지 않으면 `reciprocal_rank` 1.0000을 "순위가 좋다"로 잘못 읽습니다. 실제로
+    30건 중 24건이 식별자 문자열순이었습니다.
+    """
+    case = {
+        "id": "citing-01",
+        "category": "citing",
+        "expected_ids": ["a"],
+        "expected_answer_contains": [],
+    }
+    response = {
+        "papers": [],
+        "rows": [{"evidence_ids": ["a"]}],
+        "evidence_ids": ["a"],
+        "answer": "one paper",
+        "tool_calls": [
+            {
+                "name": "search_graph",
+                "status": "success",
+                "output": {
+                    "cypher": "MATCH (p:ArxivPaper) RETURN p.title AS answer_value "
+                              "ORDER BY answer_value LIMIT 25",
+                    "rows": [{"evidence_ids": ["a"]}],
+                },
+            },
+            {
+                "name": "search_graph",
+                "status": "success",
+                "output": {"cypher": "MATCH (p) RETURN p ORDER BY p.citation_count DESC"},
+            },
+            # 실패한 조회와 다른 도구는 세지 않습니다.
+            {"name": "search_graph", "status": "error", "output": {"cypher": "ORDER BY x"}},
+            {"name": "resolve_paper", "status": "success", "output": {"arxiv_id": "a"}},
+        ],
+    }
+
+    row = evaluate_case(case, response, mode="agent", top_k=5)
+
+    assert row["ordered_by"] == ["answer_value", "p.citation_count DESC"]
+
+
+def test_evaluate_case_omits_the_sort_key_when_no_query_declared_one():
+    """정렬 기준이 없으면 빈 목록이 아니라 **키 자체가 없습니다.**
+
+    설명용 필드이므로 조용히 빠지는 쪽이 맞습니다 - 빈 목록을 적으면 "ORDER BY가 없었다"와
+    "Cypher를 못 읽었다"가 같은 모양이 됩니다.
+    """
+    case = {
+        "id": "author-01",
+        "category": "author",
+        "expected_ids": ["a"],
+        "expected_answer_contains": [],
+    }
+    response = {"papers": [{"arxiv_id": "a"}], "evidence_ids": ["a"], "answer": "x"}
+
+    assert "ordered_by" not in evaluate_case(case, response, mode="agent", top_k=5)

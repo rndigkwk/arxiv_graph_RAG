@@ -16,6 +16,9 @@ def test_retrieval_reports_hit_recall_and_reciprocal_rank():
         "hit_at_k": 1.0,
         "recall_at_k": 0.5,
         "reciprocal_rank": 0.5,
+        # 집합 지표는 **자르지 않습니다**: 3편 중 2편이 골드이고 골드 2편을 다 찾았습니다.
+        "retrieval_precision": pytest.approx(2 / 3),
+        "retrieval_recall": 1.0,
     }
 
 
@@ -24,7 +27,45 @@ def test_retrieval_returns_zero_for_empty_results():
         "hit_at_k": 0.0,
         "recall_at_k": 0.0,
         "reciprocal_rank": 0.0,
+        # 빈 목록의 precision은 None이 아니라 0.0입니다. None이면 `summarize`가 건너뛰어
+        # **전면 실패가 집계에서 사라집니다**(`score_related`와 다른 이유).
+        "retrieval_precision": 0.0,
+        "retrieval_recall": 0.0,
     }
+
+
+def test_set_metrics_separate_not_found_from_buried_below_k():
+    """`recall_at_k` 하나로는 "못 찾았다"와 "너무 많이 찾았다"가 구별되지 않습니다.
+
+    2026-10-16 `coauthor` 가족이 그 모양이었습니다 - hit@5 0.1667인데 집합 recall은 1.0000,
+    평균 7.3편을 돌려주고 골드가 알파벳순 상위 5개 밖으로 밀렸습니다(ADR-033).
+    """
+    buried = score_retrieval(["a", "b"], ["c", "d", "e", "f", "g", "a", "b"], k=5)
+
+    assert buried["recall_at_k"] == 0.0        # 상위 5개에 골드가 없습니다
+    assert buried["hit_at_k"] == 0.0
+    assert buried["retrieval_recall"] == 1.0   # 그러나 **둘 다 찾았습니다**
+    assert buried["retrieval_precision"] == pytest.approx(2 / 7)
+
+    missing = score_retrieval(["a", "b"], ["c", "d"], k=5)
+
+    assert missing["recall_at_k"] == 0.0       # 여기서는 같은 0.0이지만
+    assert missing["retrieval_recall"] == 0.0  # 집합 지표가 두 상태를 가릅니다
+    assert missing["retrieval_precision"] == 0.0
+
+
+def test_set_metrics_do_not_depend_on_order():
+    """집합 지표를 더한 이유 자체입니다 - 이 하네스의 그래프 경로는 순위를 만들지 않습니다.
+
+    답변 조회의 `ORDER BY`는 30건 중 24건이 식별자 문자열순(`title`·`arxiv_id`)입니다.
+    순서를 섞어도 집합 지표는 움직이지 않아야 하고, 순위 지표는 움직입니다.
+    """
+    forward = score_retrieval(["a", "b"], ["x", "a", "b"], k=2)
+    backward = score_retrieval(["a", "b"], ["b", "a", "x"], k=2)
+
+    for metric in ("retrieval_precision", "retrieval_recall"):
+        assert forward[metric] == backward[metric], metric
+    assert forward["reciprocal_rank"] != backward["reciprocal_rank"]
 
 
 def test_answer_metrics_check_required_text_and_supported_citations():

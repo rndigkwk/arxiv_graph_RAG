@@ -110,4 +110,7 @@ def test_rerunning_a_subset_reproduces_the_report(report):
             if case["seed_id"] == seed
         )
         again = score_retrieval(gold, ranked, k=report["top_k"])
-        assert again == row["ppr"], (row["id"], again, row["ppr"])
+        # **보고서가 적어 둔 지표만** 비교합니다. 지표가 늘어나는 것은 재현 실패가 아닙니다 -
+        # 2026-10-19에 집합 지표 둘이 더해지면서(ADR-033) 이 비교가 터졌습니다. 재현이
+        # 확인해야 하는 것은 "그때 적은 값이 지금 다시 나오는가"입니다.
+        assert {key: again[key] for key in row["ppr"]} == row["ppr"], (row["id"], again)
