@@ -177,15 +177,21 @@ def test_cutting_the_graph_closes_the_leak(dataset):
     assert checked
 
 
-def test_the_cut_matches_the_window_builder(dataset):
+def test_the_cut_matches_the_window_builder_except_for_the_reference_cap(dataset):
     """두 곳의 기준이 다르면 같은 W3라고 부르면서 다른 그래프를 씁니다.
 
-    `related_study.Graph`의 컷과 `models/link_prediction/dataset.build_windows`의 W3가
-    **같은 공동인용 집합**을 만들어야 합니다.
+    **처음에는 "같다"고 적었고 100 시드만 봤습니다. 전수로 보니 1건이 다릅니다.**
+    `build_windows`는 참고문헌이 `MAX_REFERENCES_FOR_COCITATION`(150)편을 넘는 인용자를
+    버리고(한 편이 공동인용 쌍 1만 개를 혼자 만듭니다) `Graph`는 앱과 같게 버리지
+    않습니다. 그래서 "같다"가 아니라 **"다른 곳이 있으면 그 원인이 상한뿐이다"**를
+    고정합니다 - 그것이 실제로 참인 성질입니다.
+
+    전수에서 다른 시드는 1,377건 중 1건(`2606.09500`, 참고문헌 170편짜리 인용자 한 명)
+    입니다. 말뭉치 표본 3,000편에서는 41편(1.4%)입니다.
     """
     try:
         from evals.related_study import Graph
-        from models.link_prediction.dataset import build_windows
+        from models.link_prediction.dataset import MAX_REFERENCES_FOR_COCITATION, build_windows
         from models.link_prediction.train import DEFAULT_TRAIN_CUT, parse_month
         from pipeline import snapshot as snapshot_module
 
@@ -197,8 +203,24 @@ def test_the_cut_matches_the_window_builder(dataset):
         pytest.skip(f"스냅샷 캐시를 읽을 수 없습니다: {type(exc).__name__}")
 
     embedded = set(graph.position)
-    for case in dataset["cases"][:100]:
+    differing = 0
+    for case in dataset["cases"]:
         seed = case["seed_id"]
         mine = set(graph.cocited(seed))
         theirs = {p for p in windows.test_feature.get(seed, ()) if p in embedded}
-        assert mine == theirs, (case["id"], sorted(mine ^ theirs)[:5])
+        if mine == theirs:
+            continue
+        differing += 1
+        # 차이는 **상한을 넘은 인용자**가 가져온 것이어야 합니다. 그 설명이 안 되면
+        # 두 정의가 다른 뜻이 된 것이고, 그때는 같은 W3라고 부를 수 없습니다.
+        big = [
+            citer for citer in graph.cited_by.get(seed, ())
+            if len(graph.cites.get(citer, ())) > MAX_REFERENCES_FOR_COCITATION
+        ]
+        from_big = {
+            paper for citer in big for paper in graph.cites.get(citer, ())
+            if paper != seed and paper in embedded
+        }
+        assert mine - theirs <= from_big, (case["id"], len(mine), len(theirs))
+    # 드물어야 합니다. 흔해지면 두 그래프를 같은 이름으로 부르는 것이 위험해집니다.
+    assert differing / len(dataset["cases"]) < 0.01, differing
