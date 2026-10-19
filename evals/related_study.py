@@ -97,13 +97,31 @@ class Graph:
     함께 잘립니다.
     """
 
-    def __init__(self, snap: Any, *, feature_cut: int | None = None) -> None:
+    def __init__(
+        self,
+        snap: Any,
+        *,
+        feature_cut: int | None = None,
+        embeddings: Path | None = None,
+    ) -> None:
         cache = features.Cache(snap)
         self.ids: list[str] = list(cache.ids)
         self.position: dict[str, int] = dict(cache.position)
-        self.vectors = adapter.unit(
-            np.asarray(cache.embeddings(mmap=False), dtype=np.float32)
+        # `embeddings`를 주면 **그 행렬로 바꿔** 잽니다. 다른 임베딩 모델이 이 과제에서
+        # 나은지 보려면 그것만 바꾸고 나머지는 같아야 합니다(ADR-039). 행 순서가
+        # 파생 캐시와 같아야 하므로 길이를 확인합니다 - 어긋나면 조용히 다른 논문의
+        # 벡터로 점수가 나옵니다.
+        raw = (
+            np.load(embeddings) if embeddings is not None
+            else cache.embeddings(mmap=False)
         )
+        if raw.shape[0] != len(self.ids):
+            raise ValueError(
+                f"임베딩 행 수가 말뭉치와 다릅니다: {raw.shape[0]} != {len(self.ids)}"
+            )
+        self.embedding_source = str(embeddings).replace("\\", "/") if embeddings else None
+        self.embedding_dimensions = int(raw.shape[1])
+        self.vectors = adapter.unit(np.asarray(raw, dtype=np.float32))
         self.size = len(self.ids)
         self.feature_cut = feature_cut
         cites: dict[str, set[str]] = collections.defaultdict(set)
@@ -311,6 +329,10 @@ def main() -> int:
     parser.add_argument("--variants", nargs="+", choices=VARIANTS, default=list(VARIANTS),
                         help="PPR만 재려면 --variants ppr. 어댑터 학습을 건너뛰어 빠릅니다.")
     parser.add_argument(
+        "--embeddings", type=Path,
+        help="파생 캐시 대신 쓸 임베딩 행렬(.npy). 행 순서가 embedding_ids.json과 같아야 합니다.",
+    )
+    parser.add_argument(
         "--feature-cut",
         help="YYYY-MM. 이 달 이전 인용자가 만든 인용만 씁니다. 정답 파일이 feature_cut을 "
              "적어 두면 그 값을 쓰며, 다르게 주면 거부합니다.",
@@ -335,7 +357,7 @@ def main() -> int:
         )
     cut_label = declared or args.feature_cut
     feature_cut = parse_month(cut_label) if cut_label else None
-    graph = Graph(snap, feature_cut=feature_cut)
+    graph = Graph(snap, feature_cut=feature_cut, embeddings=args.embeddings)
     if feature_cut is not None:
         print(f"그래프를 {cut_label} 이전으로 잘랐습니다: 간선 {graph.dropped_edges}개 제외")
 
@@ -505,6 +527,9 @@ def main() -> int:
         # 어느 그래프에서 잰 점수인지. 없으면 전체 스냅샷이고, 미래 라벨 과제에서는
         # 반드시 있어야 합니다(ADR-035).
         "feature_cut": cut_label,
+        # 어느 임베딩으로 잰 점수인지. 비어 있으면 파생 캐시(text-embedding-3-large)입니다.
+        "embeddings": graph.embedding_source,
+        "embedding_dimensions": graph.embedding_dimensions,
         "dropped_edges_outside_feature_window": graph.dropped_edges,
         "variants": list(chosen),
         "gold": str(args.cases).replace("\\", "/"),

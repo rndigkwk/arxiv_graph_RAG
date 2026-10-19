@@ -263,3 +263,56 @@ def test_the_gbm_failure_is_ranking_not_retrieval(future_report):
     assert ceiling is not None, "후보 상한이 없으면 실패의 종류를 말할 수 없습니다"
     assert ceiling > 0.9
     assert thin["gbm"]["recall_at_k"] < ceiling * 0.7
+
+
+def test_a_swapped_embedding_matrix_must_match_the_corpus():
+    """행 수가 어긋나면 **조용히 다른 논문의 벡터**로 점수가 나옵니다(ADR-039)."""
+    import numpy as np
+
+    from evals.related_study import Graph
+
+    try:
+        from pipeline import snapshot as snapshot_module
+
+        snap = snapshot_module.latest()
+        graph = Graph(snap)
+    except Exception as exc:  # noqa: BLE001 - 스냅샷 캐시가 없으면 CI입니다.
+        pytest.skip(f"스냅샷 캐시를 읽을 수 없습니다: {type(exc).__name__}")
+
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as directory:
+        wrong = Path(directory) / "wrong.npy"
+        np.save(wrong, np.zeros((graph.size - 1, 768), dtype=np.float32))
+        with pytest.raises(ValueError, match="임베딩 행 수가 말뭉치와 다릅니다"):
+            Graph(snap, embeddings=wrong)
+
+
+def test_the_embedding_comparison_refuses_reports_from_different_golds():
+    """사례 수가 다른 보고서를 비교하면 모델이 아니라 **다른 과제**를 비교하게 됩니다."""
+    from evals.embedding_slice_study import compare
+
+    with pytest.raises(ValueError, match="사례 수가 다릅니다"):
+        compare({"cases": 10, "results": []}, {"cases": 11, "results": []})
+
+
+def test_the_recorded_embedding_comparison_still_separates_the_models():
+    """11-5의 "동등"이 분해능의 사실이었다는 측정을 고정합니다(ADR-039).
+
+    같은 `bge-base` 행렬이 인용 과제에서는 0을 포함하고(−0.0109 [−0.0250, +0.0032])
+    여기서는 0을 제외합니다. 점 추정이 거의 같으므로 바뀐 것은 **구간**입니다.
+    """
+    recorded = Path("reports/embedding_slice_study.json")
+    if not recorded.exists():
+        pytest.skip(f"비교 보고서가 없습니다: {recorded}")
+    study = json.loads(recorded.read_text(encoding="utf-8"))
+    empty = study["by_degree_slice"]["no_citation_edges"]
+
+    assert empty["seeds"] > 1000
+    for metric in ("recall_at_k", "hit_at_k", "reciprocal_rank"):
+        assert empty[metric]["excludes_zero"], metric
+        # 후보가 기준보다 나쁩니다. 방향이 뒤집히면 기록을 다시 읽어야 합니다.
+        assert empty[metric]["candidate"] < empty[metric]["baseline"], metric
+    # 인용 과제의 구간 폭(0.0282)보다 좁아야 "분해능이 올랐다"가 성립합니다.
+    width = empty["recall_at_k"]["high"] - empty["recall_at_k"]["low"]
+    assert width < 0.0282, width
