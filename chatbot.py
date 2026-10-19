@@ -961,7 +961,8 @@ def rank_related_papers(arxiv_ids: list[str], top_k: int = 5) -> dict:
         return {"seed_ids": known, "unknown_ids": unknown, "related": [],
                 "note": "그래프에 없는 arxiv_id입니다. 먼저 논문을 찾은 뒤 그 id를 넣으세요."}
 
-    # 1단계: 공동인용 수. 300 시드에서 recall@5 0.8797로 PPR(0.3816)의 2.3배입니다.
+    # 1단계: 공동인용 수. 적격 시드 전부(3,740)에서 recall@5 0.8892로 PPR(0.3957)의 2.2배이고
+    # 쌍체 구간이 0을 제외합니다(+0.4934 [+0.4831, +0.5034], ADR-034).
     # 동점이 많으므로 top_k보다 넓게 받아 둡니다.
     counts = {
         row["arxiv_id"]: int(row["shared_citers"])
