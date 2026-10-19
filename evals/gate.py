@@ -213,6 +213,9 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
 # 조용히 사라졌고, 그러면 smoke가 "사례가 25건 빠졌다"로 거짓 실패합니다.
 CARRIED_OVER = (
     "splits",
+    # 다른 하네스(evals.related_study)가 내는 점수와 그 하한입니다. 2026-10-19 재작성에서
+    # 한 번 조용히 사라졌습니다 - 평가 보고서에 없는 값이라 merge가 만들어 줄 수 없습니다.
+    "related_slot",
     "ragas_judge_model",
     "split_rationale",
     "floor_rationale",

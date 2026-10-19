@@ -1,35 +1,35 @@
 {
-  "generated_at": "2026-10-18T13:47:08.432380+00:00",
-  "note": "2026-10-18 기준 논문 분리(ADR-024) 뒤 재채점. 같은 3회 실행을 **다시 돌리지 않고** 재채점했습니다 - 앱 행동이 바뀌지 않았으므로 재실행하면 모델 비결정성만 섞입니다. 질문이 지칭한 논문을 retrieved_ids에서 빼자 reciprocal_rank가 0.6963에서 0.9889로, recall@k가 0.9933에서 1.0000으로 올랐습니다. 하한·허용폭은 그대로 둡니다. RAGAS는 **원본 문맥**으로 채점한 보고서를 씁니다 - 제목 해석 문맥을 빼 봤더니 Context Precision은 회복됐지만 faithfulness가 1.0000에서 0.2296으로 무너졌습니다. 그 조회는 답변이 주제 논문을 언급하는 주장의 근거라서 순수한 중간 단계가 아닙니다.",
+  "generated_at": "2026-10-19T01:23:55.935990+00:00",
+  "note": "2026-10-19 resolve_paper(ADR-028) 적용 후 3회 재측정. 1회차는 전날 주간 크론이 같은 커밋(c17d5ed)·같은 모델로 돌려 준 것을 그대로 썼습니다 - 그 뒤 답변 경로 파일이 바뀌지 않은 것을 git diff로 확인했습니다. 3회차는 관련 논문 패널이 공동인용으로 바뀐 뒤 돌았습니다(ADR-030). 그 패널은 게이트 지표에 닿지 않는데, 주장으로 두지 않고 확인했습니다 - 세 실행의 게이트 지표가 전부 동일합니다(related_ids는 실제로 달라졌습니다). 하한·허용폭은 그대로 둡니다.",
   "source": {
     "mode": "compare",
     "dataset": "cases_graph.json",
     "runs": 3,
     "git_sha": null,
     "observed_spread": {
-      "answer_evidence_precision": 0.011111111111111072,
+      "answer_evidence_precision": 0.0,
       "answer_evidence_recall": 0.0,
       "answer_failure_rate": 0.0,
       "completed_cases": 0.0,
       "hit_at_k": 0.0,
       "ragas_context_precision_stable_families": 0.0,
-      "ragas_faithfulness": 0.01666666666666672,
+      "ragas_faithfulness": 0.0344444444444445,
       "recall_at_k": 0.0,
-      "reciprocal_rank": 0.01666666666666672
+      "reciprocal_rank": 0.0
     }
   },
   "primary_metric": "answer_evidence_recall",
   "metrics_split": "full",
   "metrics": {
-    "answer_evidence_precision": 0.9962962962962963,
+    "answer_evidence_precision": 1.0,
     "answer_evidence_recall": 1.0,
     "answer_failure_rate": 0.0,
     "completed_cases": 30.0,
     "hit_at_k": 1.0,
     "ragas_context_precision_stable_families": 0.9999999999,
-    "ragas_faithfulness": 0.9944444444444445,
+    "ragas_faithfulness": 0.9848148148148148,
     "recall_at_k": 1.0,
-    "reciprocal_rank": 0.9888888888888889
+    "reciprocal_rank": 1.0
   },
   "absolute_floor": {
     "answer_evidence_recall": 0.99,

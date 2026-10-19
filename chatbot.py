@@ -931,25 +931,67 @@ def category_pagerank(code, limit=20, include_secondary=True, scope="global"):
             "papers": with_details(chosen, lambda i: score[graph["index"][i]])}
 
 
+# 시드와 **함께 인용된** 논문을 공유 인용자 수로 셉니다. 2홉이고, 개인화 PageRank가
+# 근사하려 했던 바로 그 값입니다(ADR-030).
+# 동점이 많아 top_k만 받으면 PPR로 깰 여지가 없습니다. 몇 배로 받아 두고 잘라냅니다.
+COCITED_FETCH = 4
+COCITED_PAPERS = """
+MATCH (s:ArxivPaper)<-[:REFERENCES]-(c:ArxivPaper)-[:REFERENCES]->(p:ArxivPaper)
+WHERE s.arxiv_id IN $ids AND NOT p.arxiv_id IN $ids
+RETURN p.arxiv_id AS arxiv_id, count(DISTINCT c) AS shared_citers
+ORDER BY shared_citers DESC, arxiv_id
+LIMIT $limit
+"""
+
+
 @tool
 def rank_related_papers(arxiv_ids: list[str], top_k: int = 5) -> dict:
-    """개인화 PageRank로 주어진 논문과 인용망에서 가장 가까운 논문을 찾습니다.
+    """함께 인용되는 논문을 찾습니다. 부족하면 개인화 PageRank로 채웁니다.
 
     특정 논문에 대한 질문("이 논문과 관련된 연구", "이어서 읽을 논문", "같이 읽히는 논문")에
     사용합니다. arxiv_ids에는 search_graph나 search_papers로 먼저 확인한 arxiv_id만 넣으세요.
-    시드 논문에서 출발해 인용 관계를 따라 퍼지므로, 전체에서 피인용이 많은 논문이 아니라
-    이 논문 주변에서 중요한 논문이 위로 올라옵니다.
+    시드와 **같은 논문에 함께 인용된** 횟수가 많은 순입니다. 전체에서 피인용이 많은 논문이
+    아니라 이 논문과 같이 읽히는 논문이 위로 올라옵니다.
     인용 관계가 저장되지 않은 논문은 결과가 비어 있습니다. 결과는 근거로 인용할 수 있습니다.
     """
     graph = citation_graph()
     known = [arxiv_id for arxiv_id in arxiv_ids if arxiv_id in graph["index"]]
     unknown = [arxiv_id for arxiv_id in arxiv_ids if arxiv_id not in graph["index"]]
-    score, _ = personalized_pagerank(known)
-    if score is None:
+    if not known:
         return {"seed_ids": known, "unknown_ids": unknown, "related": [],
                 "note": "그래프에 없는 arxiv_id입니다. 먼저 논문을 찾은 뒤 그 id를 넣으세요."}
-    chosen = top_by_score(score, limit=top_k, exclude=known)
-    related = with_details(chosen, lambda i: score[graph["index"][i]])
+
+    # 1단계: 공동인용 수. 300 시드에서 recall@5 0.8797로 PPR(0.3816)의 2.3배입니다.
+    # 동점이 많으므로 top_k보다 넓게 받아 둡니다.
+    counts = {
+        row["arxiv_id"]: int(row["shared_citers"])
+        for row in run_read(COCITED_PAPERS, {"ids": known, "limit": top_k * COCITED_FETCH})
+    }
+    score, _ = personalized_pagerank(known)
+
+    def pagerank_of(arxiv_id):
+        return float(score[graph["index"][arxiv_id]]) if score is not None else 0.0
+
+    # 동점은 PPR로 깹니다. **지표는 이 선택을 구별하지 못합니다** - `shared >= 2`인 논문은
+    # 정의상 전부 정답이라 상위 k 안의 순서가 recall@k를 바꾸지 않고, 실제로 300 시드 중
+    # 291건에서 순서가 달라도 세 지표가 완전히 같았습니다(ADR-030). 그래서 측정이 아니라
+    # **사용자에게 보이는 순서가 임의적이면 안 된다**는 이유로 고릅니다.
+    ranked = sorted(counts, key=lambda pid: (-counts[pid], -pagerank_of(pid), pid))[:top_k]
+
+    # 2단계: 모자라면 PPR로 채웁니다. 말뭉치의 17.2%는 공동인용 후보가 다섯 편이 안 됩니다.
+    filled = list(ranked)
+    if len(filled) < top_k and score is not None:
+        exclude = [*known, *filled]
+        filled.extend(top_by_score(score, limit=top_k - len(filled), exclude=exclude))
+
+    def rank_score(arxiv_id):
+        # 공동인용으로 뽑힌 논문은 공유 인용자 수를, PPR이 채운 논문은 PPR 점수를 적습니다.
+        return float(counts[arxiv_id]) if arxiv_id in counts else pagerank_of(arxiv_id)
+
+    related = with_details(filled, rank_score)
+    for paper in related:
+        paper["shared_citers"] = counts.get(paper["arxiv_id"])
+        paper["ranked_by"] = "cocitation" if paper["arxiv_id"] in counts else "pagerank"
     note = "" if related else "시드 논문에 저장된 인용 관계가 없어 관련 논문을 찾지 못했습니다."
     return {"seed_ids": known, "unknown_ids": unknown, "related": related, "note": note}
 

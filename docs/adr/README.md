@@ -74,3 +74,4 @@
 | [ADR-027](ADR-027-cocitation-gold-for-the-related-slot.md) | 관련 논문 슬롯의 정답은 공동인용으로 정하고 에이전트를 거치지 않고 잰다 | 채택 |
 | [ADR-028](ADR-028-resolve-titles-with-a-fulltext-index.md) | 제목은 전문 검색 인덱스를 쓰는 도구로 해석하고 못 찾으면 못 찾았다고 한다 | 채택 |
 | [ADR-029](ADR-029-ppr-beats-the-adapter-in-the-related-slot.md) | 관련 논문 슬롯은 PPR이 지킨다 — 어댑터는 그 자리에서 3.9배 진다 | 기각 |
+| [ADR-030](ADR-030-related-papers-needs-a-query-not-a-model.md) | 관련 논문은 모델이 아니라 질의가 답이었다 — 공동인용 수로 정렬한다 | 채택 |
