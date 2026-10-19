@@ -18,7 +18,7 @@
 
 | 이름 | 무엇인가 |
 |---|---|
-| `cocited` | 공동 인용자 수 우선, 부족분은 PPR 보충. **앱이 지금 쓰는 것**(ADR-030) |
+| `cocited` | 공동 인용자 수 → PPR 보충 → 임베딩 보충. **앱이 지금 쓰는 것**(ADR-030·ADR-040) |
 | `ppr` | 무방향 인용망의 개인화 PageRank. 2026-10-19까지 배포됐던 것 |
 | `vector` | 시드 임베딩의 코사인 최근접. 기준선 |
 | `adapter_cite` | 직접 인용으로 학습한 선형 어댑터(ADR-013의 정식화) |
@@ -198,6 +198,8 @@ def cocited_ranking(
     2. 그 안에서 **동점을 PPR로** 다시 끊습니다.
     3. `top_k`에 못 미치면 PPR로 채웁니다 — 말뭉치의 17.2%는 공동인용 후보가 다섯 편이
        안 됩니다(ADR-030).
+    4. 그래도 비면 **임베딩 최근접**으로 채웁니다. 인용 간선이 없으면 앞의 둘이 모두 0점이라
+       패널이 통째로 빕니다([ADR-040](../docs/adr/ADR-040-fill-the-empty-panel.md)).
 
     **이 변형의 점수는 상한입니다.** 배포 질의에는 `p.embedding IS NOT NULL`이 없어서 임베딩이
     없는 논문도 상위에 올 수 있고, 그 논문은 정답에 들어 있지 않습니다(정답은 어댑터 공정성을
@@ -215,6 +217,16 @@ def cocited_ranking(
             *ranked,
             *fill_by_score(
                 graph, score, limit=top_k - len(ranked), exclude={seed, *ranked}
+            ),
+        ]
+    # 배포가 마지막으로 하는 것과 같습니다 - 그래프가 아무것도 못 주면 임베딩으로 채웁니다.
+    # 이것을 흉내 내지 않으면 **배포된 것이 아닌 무엇**을 재게 됩니다.
+    if len(ranked) < top_k:
+        cosine = graph.vectors @ graph.vectors[graph.position[seed]]
+        ranked = [
+            *ranked,
+            *fill_by_score(
+                graph, cosine, limit=top_k - len(ranked), exclude={seed, *ranked}
             ),
         ]
     return ranked

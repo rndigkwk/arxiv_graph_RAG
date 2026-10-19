@@ -180,33 +180,36 @@ def test_the_future_report_was_measured_on_a_cut_graph(future_report):
 def test_the_aggregate_hides_two_opposite_regimes(future_report):
     """집계를 먼저 읽으면 틀립니다 - 두 체제의 가중합이라 어느 쪽도 설명하지 않습니다.
 
-    간선이 없는 시드에서 그래프 계열은 **정확히 0**이고, 간선이 1~4개인 시드에서는 0.95
-    이상입니다. 집계 0.18은 그 사이 어디에도 해당하지 않습니다(ADR-036).
+    **순수 그래프 변형(`ppr`)으로 고정합니다.** 전에는 `cocited`도 간선 0개 집단에서
+    0.0000이었는데, 그 구멍을 임베딩 보충으로 메웠습니다(ADR-040). 집계가 두 체제를
+    섞는다는 성질 자체는 그대로이고, 그것을 보이는 변형만 바뀝니다.
     """
     slices = future_report["by_degree_slice"]
     empty = slices["no_citation_edges"]
     thin = slices["degree_1_to_4"]
 
-    for variant in ("cocited", "ppr"):
-        assert empty[variant]["recall_at_k"] == 0.0, variant
-        assert empty[variant]["hit_at_k"] == 0.0, variant
-        assert thin[variant]["recall_at_k"] > 0.9, variant
+    assert empty["ppr"]["recall_at_k"] == 0.0
+    assert empty["ppr"]["hit_at_k"] == 0.0
+    assert thin["ppr"]["recall_at_k"] > 0.9
 
-    aggregate = future_report["summary"]["cocited"]["recall_at_k"]
-    assert empty["cocited"]["recall_at_k"] < aggregate < thin["cocited"]["recall_at_k"]
+    aggregate = future_report["summary"]["ppr"]["recall_at_k"]
+    assert empty["ppr"]["recall_at_k"] < aggregate < thin["ppr"]["recall_at_k"]
 
 
 def test_only_the_embedding_scores_where_the_graph_has_no_edges(future_report):
     """이 프로젝트에서 **임베딩 경로가 그래프 경로가 못 하는 일을 하는 첫 사례**입니다.
 
-    간선이 없는 시드는 공동인용도 PPR도 점수를 낼 수 없습니다(패널이 빕니다, ADR-035).
-    그 자리에서 벡터 최근접은 미래 공동인용을 상위 5 안에 **절반 가까이** 맞힙니다.
+    간선이 없는 시드는 순수 그래프 방법으로 점수를 낼 수 없습니다(ADR-035·ADR-036).
+    그 자리에서 벡터 최근접은 미래 공동인용을 상위 5 안에 **절반 가까이** 맞히고,
+    배포 경로는 이제 그것을 **보충으로 끌어다 씁니다**(ADR-040).
     """
     empty = future_report["by_degree_slice"]["no_citation_edges"]
 
     assert empty["share"] > 0.5  # 이 과제의 다수입니다
     assert empty["vector"]["hit_at_k"] > 0.4
-    assert empty["vector"]["recall_at_k"] > empty["cocited"]["recall_at_k"]
+    # 순수 그래프는 여전히 0입니다. 그것이 "임베딩만 할 수 있다"의 내용입니다.
+    assert empty["ppr"]["recall_at_k"] == 0.0
+    assert empty["vector"]["recall_at_k"] > empty["ppr"]["recall_at_k"]
 
 
 def test_the_learned_adapter_still_does_not_beat_the_plain_embedding(future_report):
@@ -225,23 +228,19 @@ def test_the_learned_adapter_still_does_not_beat_the_plain_embedding(future_repo
             assert gap < 0.01, (variant, metric, gap)
 
 
-def test_the_gbm_wins_the_average_and_loses_both_halves(future_report):
-    """**집계만 보면 "모델이 이겼다"고 적게 됩니다**(ADR-037).
+def test_the_gbm_is_best_at_neither_subpopulation(future_report):
+    """ADR-037의 핵심은 **어느 집단에서도 최선이 아니다**였고 그것은 그대로입니다.
 
-    세 지표 모두 1위인데, 다수 집단에서는 자기가 품은 임베딩보다 나쁘고 두 번째 집단에서는
-    Cypher 한 줄보다 나쁩니다. 어느 집단에서도 최선이 아닙니다.
+    당시에는 그 모델이 **집계에서 1위**였고, 배포 경로가 다수 집단에서 0.0000이었기
+    때문입니다. 그 구멍을 메우자(ADR-040) 집계 우위도 사라졌습니다 - ADR-037이 "두
+    집단의 가중합이 만든 승리"라고 읽은 것이 맞았다는 확인입니다.
     """
     if "gbm" not in future_report["summary"]:
         pytest.skip("gbm 변형이 없는 보고서입니다")
     slices = future_report["by_degree_slice"]
     empty, thin = slices["no_citation_edges"], slices["degree_1_to_4"]
 
-    # 집계에서는 이깁니다.
-    assert future_report["summary"]["gbm"]["recall_at_k"] > max(
-        future_report["summary"][v]["recall_at_k"]
-        for v in future_report["variants"] if v != "gbm"
-    )
-    # 그런데 다수 집단에서는 임베딩보다 못합니다.
+    # 다수 집단에서는 자기가 품은 임베딩보다 못합니다.
     assert empty["share"] > 0.5
     assert empty["gbm"]["recall_at_k"] < empty["vector"]["recall_at_k"]
     assert empty["gbm"]["hit_at_k"] < empty["vector"]["hit_at_k"]
@@ -316,3 +315,69 @@ def test_the_recorded_embedding_comparison_still_separates_the_models():
     # 인용 과제의 구간 폭(0.0282)보다 좁아야 "분해능이 올랐다"가 성립합니다.
     width = empty["recall_at_k"]["high"] - empty["recall_at_k"]["low"]
     assert width < 0.0282, width
+
+
+def test_the_deployed_ranker_falls_back_to_embeddings_when_the_graph_is_empty():
+    """간선이 없으면 공동인용도 PPR도 0점이라 패널이 통째로 빕니다(ADR-040).
+
+    합성 그래프로 봅니다 - 시드가 인용망에 전혀 닿지 않는데도 상위 k가 채워져야 하고,
+    채운 것이 **임베딩 최근접**이어야 합니다.
+    """
+    import numpy as np
+
+    from evals.related_study import cocited_ranking
+
+    class FakeGraph:
+        ids = ["seed", "near", "far"]
+        position = {"seed": 0, "near": 1, "far": 2}
+        size = 3
+        # 시드와 가까운 순서: near > far
+        vectors = np.array([[1.0, 0.0], [0.9, 0.44], [0.0, 1.0]], dtype=np.float32)
+
+        def cocited(self, _seed):
+            import collections
+
+            return collections.Counter()  # 공동인용 없음
+
+    graph = FakeGraph()
+    score = np.zeros(3, dtype=np.float32)  # PPR도 전부 0 - 간선이 없는 상태
+
+    ranked = cocited_ranking(graph, "seed", score, 2)
+
+    assert ranked, "그래프가 비어도 패널은 비면 안 됩니다"
+    assert "seed" not in ranked
+    assert ranked[0] == "near", ranked  # 코사인이 가까운 쪽이 먼저
+
+
+def test_filling_the_empty_panel_does_not_move_the_present_gold(future_report):
+    """현재 정답에서는 채움이 **발동하지 않아야** 합니다 - 후보가 최소 7편입니다.
+
+    발동하면 `related_slot`의 측정값(0.8892)과 하한이 함께 흔들립니다. 그 집합의 적격
+    조건이 공동인용이 넉넉한 시드만 고르므로 구조적으로 발동할 수 없고, 그것을 고정합니다
+    (ADR-040).
+    """
+    present = Path("reports/related_study.json")
+    if not present.exists():
+        pytest.skip(f"현재 정답 보고서가 없습니다: {present}")
+    report = json.loads(present.read_text(encoding="utf-8"))
+    baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+
+    assert report["summary"]["cocited"]["recall_at_k"] == baseline["related_slot"]["measured"]
+    # 그 집합의 모든 시드가 top_k 이상의 공동인용 후보를 가집니다.
+    assert min(row["cocited_candidates"] for row in report["results"]) >= report["top_k"]
+
+
+def test_the_fill_closes_the_hole_the_measurement_found(future_report):
+    """간선 0개 집단에서 배포 경로가 0.0000이던 것이 채워져야 합니다(ADR-040)."""
+    if "gbm" not in future_report["summary"]:
+        pytest.skip("gbm 변형이 없는 보고서입니다")
+    empty = future_report["by_degree_slice"]["no_citation_edges"]
+
+    assert empty["cocited"]["recall_at_k"] > 0.0
+    assert empty["cocited"]["hit_at_k"] > 0.4
+    # 그 자리에서 채우는 것은 임베딩이므로 vector와 같아야 합니다.
+    assert empty["cocited"]["recall_at_k"] == empty["vector"]["recall_at_k"]
+    # 그러면 GBM의 집계 우위가 사라집니다 - ADR-037이 "가중합이 만든 승리"라고 한 그대로.
+    assert future_report["summary"]["gbm"]["recall_at_k"] < (
+        future_report["summary"]["cocited"]["recall_at_k"]
+    )

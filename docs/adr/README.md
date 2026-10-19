@@ -84,3 +84,4 @@
 | [ADR-037](ADR-037-the-gbm-wins-the-average-and-loses-both-halves.md) | GBM은 평균을 이기고 양쪽 집단에서 다 진다 | 채택 |
 | [ADR-038](ADR-038-the-forecast-panel.md) | 예측 패널을 붙인다 — 모델이 쓰이는 첫 자리 | 채택 |
 | [ADR-039](ADR-039-measure-embeddings-where-the-signal-is-only-the-embedding.md) | 임베딩은 임베딩만이 신호인 자리에서 잰다 | 채택 |
+| [ADR-040](ADR-040-fill-the-empty-panel.md) | 빈 패널을 임베딩으로 채운다 — GBM의 집계 우위가 사라졌다 | 채택 |
