@@ -8,6 +8,43 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 
 🌐 **Live demo:** [arXiv GraphRAG Streamlit 앱](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)
 
+## 이 저장소가 주장하는 것
+
+**"GraphRAG 앱을 만들었다"가 아니라 "변화가 도움이 되는지 판별했다"입니다.** 결정은
+[결정 기록 30건](docs/adr/)에, 과정은 [`EXPERIMENTS.md`](EXPERIMENTS.md)에 있고, 품질 회귀는
+[CI 게이트](docs/adr/ADR-017-regression-gate.md)가 기준선과 대조해 막습니다.
+
+숫자 셋으로 보여 드립니다.
+
+**1. 학습 모델을 재서 기각하고, Cypher 한 줄이 2.3배 이겼습니다.**
+관련 논문 추천 자리에서 선형 어댑터 둘(직접 인용 학습 / 공동인용으로 재학습)·벡터
+최근접·개인화 PageRank를 같은 정답(공동인용 300 시드)에서 비교했습니다.
+
+| 방법 | recall@5 |
+|---|---:|
+| 공동 인용자 수로 정렬 (Cypher) | **0.8797** |
+| 개인화 PageRank (기존 배포) | 0.3816 |
+| 인용 쌍 선형 어댑터 | 0.0986 |
+| 벡터 최근접 | 0.0979 |
+
+그리고 **정답이 공동인용이므로 이 정답으로는 모델을 재지 못한다**는 것까지 적었습니다 —
+어떤 모델이든 정답의 정의를 계산하는 질의와 겨루게 됩니다
+([ADR-030](docs/adr/ADR-030-related-papers-needs-a-query-not-a-model.md)).
+
+**2. 지표가 품질이 아니라 순위 집계를 재고 있었습니다.**
+`coauthor` 질문의 hit@5가 0.167이어서 품질 문제로 읽었는데, 같은 사례의 근거 precision·recall이
+**12회 전부 1.000**이었습니다. 답변은 매번 정확했고, 평가가 검색 결과를 이어붙이는 **순서**
+때문에 정답이 6위로 밀린 것이었습니다
+([ADR-024](docs/adr/ADR-024-route-by-question-type.md)).
+
+**3. 토큰 수는 비용이 아니었습니다.**
+라우팅으로 "입력 토큰 29% 절감"을 적었다가, 입력의 **86~87%가 프리픽스 캐시 할인**임을 재고
+보정했습니다. 그 측정이 컨텍스트 압축도 함께 기각했습니다 — 압축 대상이 입력의 3%입니다
+([ADR-025](docs/adr/ADR-025-reject-context-compression.md)).
+
+> 뒤집힌 결정을 지우지 않습니다. 위 셋 중 둘이 **제가 먼저 틀리게 적고 측정으로 고친
+> 것**이고, 그 과정이 ADR에 남아 있습니다.
+
 ## Overview
 
 수집 스냅샷(2026-06-15~2026-09-14)의 arXiv Computer Science AI 논문과 해당 논문이 인용한 1-hop 참고문헌을 Neo4j Aura에 적재했습니다. Streamlit 앱은 질문에 따라 한국어→영어 번역, Text2Cypher 관계 조회, 제목·초록 벡터 검색, 개인화 PageRank를 조합해 답변과 근거를 제공합니다.
