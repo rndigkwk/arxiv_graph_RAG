@@ -16,27 +16,18 @@ name: Regression evaluation
 # 워크플로가 12시간마다 돌지만, 그것이 비활성화된 상태로 cron이 걸리면 멈춘 DB를 만납니다.
 # CLIENT_ID/CLIENT_SECRET 은 인스턴스를 삭제할 수도 있는 관리 API 자격증명이라 저장소 비밀에
 # 넣지 않았습니다. 그래서 이 작업은 멈춘 인스턴스를 깨우지 못하고 분명하게 실패합니다.
-# `evaluate`는 필수 상태 검사입니다(main 브랜치 보호). 필수 검사에 `paths:` 필터를 걸면,
-# 그 경로를 건드리지 않는 PR에서 잡이 **아예 돌지 않아** 영원히 대기합니다. 그래서 짝이 되는
-# regression-eval-skip.yml 이 같은 이름의 잡으로 보완 경로를 받아 통과를 보고합니다.
+# `evaluate`는 필수 상태 검사입니다(main 브랜치 보호).
+#
+# **필수 검사에 `paths:` 필터를 걸면 안 됩니다.** 그 경로를 건드리지 않는 PR에서 잡이 아예
+# 보고되지 않아 머지가 영원히 막힙니다. 짝 워크플로에 `paths-ignore`를 두는 방법도 틀립니다 —
+# 둘은 배타적이 아닙니다. `paths`는 "하나라도 맞으면 실행"이고 `paths-ignore`는 "하나라도
+# 안 맞으면 실행"이라, 양쪽 파일을 함께 바꾼 PR에서는 **둘 다 돌아** 같은 이름의 검사가
+# 둘 생깁니다.
+#
+# 그래서 **항상 돌고, 비싼 단계만 내부에서 가릅니다.** 답변 경로 파일이 바뀌지 않은 PR에서는
+# 평가를 건너뛰고 통과를 보고합니다 — 돌릴 이유가 없는 변경이기 때문입니다.
 on:
   pull_request:
-    paths:
-      # 답변 경로에 닿는 파일 전부. 하나라도 빠지면 그 변경은 게이트를 지나지 않습니다.
-      - chatbot.py
-      - prompts.py
-      - agent_graph.py
-      - routing.py
-      - abstain.py
-      - title_search.py
-      - pagerank.py
-      - answer_validation.py
-      - candidate_validation.py
-      - cypher_validation.py
-      - evals/**
-      - baselines/**
-      - tests/test_eval_gate.py
-      - .github/workflows/regression-eval.yml
   schedule:
     # 한국 시간 월요일 오전 7시. keep-alive(37분)와 겹치지 않게 비켜 둡니다.
     - cron: "0 22 * * 0"
@@ -93,18 +84,12 @@ jobs:
       # 30건 평가 한 번은 통과하고, 켜 둔 채 루프를 돌리면 거기서 끊깁니다.
       LANGFUSE_MAX_TRACES: ${{ vars.LANGFUSE_MAX_TRACES || '50' }}
     steps:
-      - name: Check secrets
-        run: |
-          missing=""
-          for name in OPENAI_API_KEY NEO4J_URI NEO4J_USERNAME NEO4J_PASSWORD; do
-            [ -z "${!name}" ] && missing="$missing $name"
-          done
-          if [ -n "$missing" ]; then
-            echo "::error::Set these repository secrets:$missing"
-            exit 1
-          fi
 
       - uses: actions/checkout@v4
+        with:
+          # 범위 판정이 `git diff origin/<base>...HEAD`를 씁니다. 기본 깊이 1에서는
+          # 기준 커밋이 없어 그 명령이 실패합니다.
+          fetch-depth: 0
 
       - uses: astral-sh/setup-uv@v6
         with:
@@ -117,8 +102,38 @@ jobs:
 
       - run: uv sync --locked --group dev
 
+      - name: Decide whether the answer path changed
+        id: scope
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "run=1" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          # 답변에 닿는 파일 전부. 하나라도 빠지면 그 변경이 게이트를 지나지 않습니다.
+          watched='^(chatbot|prompts|agent_graph|routing|abstain|title_search|pagerank|answer_validation|candidate_validation|cypher_validation)\.py$|^evals/|^baselines/|^tests/test_eval_gate\.py$|^\.github/workflows/regression-eval\.yml$'
+          changed=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          if echo "$changed" | grep -qE "$watched"; then
+            echo "run=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=0" >> "$GITHUB_OUTPUT"
+            echo "답변 경로 파일이 바뀌지 않아 회귀 평가를 건너뜁니다." >> "$GITHUB_STEP_SUMMARY"
+            echo "판정 규칙과 근거: docs/adr/ADR-017-regression-gate.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Check secrets
+        if: steps.scope.outputs.run == '1'
+        run: |
+          missing=""
+          for name in OPENAI_API_KEY NEO4J_URI NEO4J_USERNAME NEO4J_PASSWORD; do
+            [ -z "${!name}" ] && missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::Set these repository secrets:$missing"
+            exit 1
+          fi
+
       - name: Decide the split
         id: split
+        if: steps.scope.outputs.run == '1'
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             echo "name=smoke" >> "$GITHUB_OUTPUT"
@@ -128,9 +143,11 @@ jobs:
 
       # 드라이버와 HTTP 클라이언트만 필요합니다. 앱 의존성은 쓰지 않습니다.
       - name: Wake Aura
+        if: steps.scope.outputs.run == '1'
         run: uvx --with neo4j --with requests python scripts/keep_awake.py
 
       - name: Run the evaluation
+        if: steps.scope.outputs.run == '1'
         run: |
           split="${{ steps.split.outputs.name }}"
           ids=$(uv run --locked python -c "
@@ -147,7 +164,7 @@ jobs:
       # RAGAS는 full에서만 돌립니다. smoke는 집계 규칙을 아예 적용하지 않으므로(모수가
       # 다릅니다) 돌려도 판정에 쓰이지 않고 판정 호출 약 450회만 더 듭니다.
       - name: Score with RAGAS
-        if: steps.split.outputs.name == 'full'
+        if: steps.scope.outputs.run == '1' && (steps.split.outputs.name == 'full')
         run: |
           uv run --locked --group dev python -m evals.ragas_study \
             --report reports/regression_full.json \
@@ -155,7 +172,7 @@ jobs:
             --output reports/regression_full_ragas.json
 
       - name: Compare against the baseline
-        if: always()
+        if: steps.scope.outputs.run == '1' && (always())
         run: |
           split="${{ steps.split.outputs.name }}"
           test -f "reports/regression_${split}.json" || exit 0
@@ -169,10 +186,11 @@ jobs:
             --split "$split"
 
       - name: Judge
+        if: steps.scope.outputs.run == '1'
         run: uv run --locked python -m pytest -q tests/test_eval_gate.py --junitxml=reports/junit.xml
 
       - name: Summarize
-        if: always()
+        if: steps.scope.outputs.run == '1' && (always())
         run: |
           if [ -f reports/summary.md ]; then
             cat reports/summary.md >> "$GITHUB_STEP_SUMMARY"
@@ -181,7 +199,7 @@ jobs:
           fi
 
       - name: Upload the reports
-        if: always()
+        if: steps.scope.outputs.run == '1' && (always())
         uses: actions/upload-artifact@v4
         with:
           name: regression-eval-${{ steps.split.outputs.name }}-${{ github.run_number }}
