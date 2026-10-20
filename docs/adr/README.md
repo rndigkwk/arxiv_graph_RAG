@@ -92,3 +92,4 @@
 | [ADR-045](ADR-045-what-to-delete-before-adding-a-month.md) | 한 달을 더하기 전에 무엇을 지울지 — 지금은 지울 것이 없다 | 채택 |
 | [ADR-046](ADR-046-bge-m3-does-not-clear-the-bar.md) | BGE-M3는 바를 넘지 못했다 — 5.2배 큰 모델이 작은 형제보다 나쁘다 | 기각 |
 | [ADR-047](ADR-047-the-loader-refuses-papers-the-vector-index-cannot-see.md) | 적재가 벡터 인덱스에 안 보이는 논문을 거부한다 | 채택 |
+| [ADR-048](ADR-048-the-type-check-does-not-know-the-internet.md) | 유형 검사는 인터넷을 모른다 — 읽기로 분류되는 외부 요청을 막는다 | 채택 |

@@ -1,0 +1,454 @@
+{
+  "generated_at": "2026-10-20T03:17:38.622949+00:00",
+  "read_only_query_type": "r",
+  "probes": 43,
+  "summary": {
+    "baseline_passed": 6,
+    "baseline_total": 6,
+    "writes_blocked": 20,
+    "writes_total": 20,
+    "external_io_reached_server": [],
+    "unexpected": [],
+    "blocked_by": {
+      "accepted": 9,
+      "blocked_before_the_type_check": 4,
+      "blocked_by_the_static_check": 11,
+      "blocked_by_the_type_check": 16,
+      "read_type_defended_by_timeout": 3
+    }
+  },
+  "results": [
+    {
+      "probe": "plain_match",
+      "kind": "baseline",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": true,
+      "as_expected": true
+    },
+    {
+      "probe": "count_aggregate",
+      "kind": "baseline",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": true,
+      "as_expected": true
+    },
+    {
+      "probe": "relationship_hop",
+      "kind": "baseline",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": true,
+      "as_expected": true
+    },
+    {
+      "probe": "read_subquery",
+      "kind": "baseline",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": true,
+      "as_expected": true
+    },
+    {
+      "probe": "unwind_literal",
+      "kind": "baseline",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": true,
+      "as_expected": true
+    },
+    {
+      "probe": "order_by_count",
+      "kind": "baseline",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": true,
+      "as_expected": true
+    },
+    {
+      "probe": "create_node",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "merge_node",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "delete_all",
+      "kind": "write",
+      "query_type": "w",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "set_property",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "remove_property",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "create_relationship",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_in_call_subquery",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_in_foreach",
+      "kind": "write",
+      "query_type": "w",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_after_comment",
+      "kind": "write",
+      "query_type": null,
+      "error": "CypherSyntaxError: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: RETURN can only be used at the end of the query. (line 1, column 30 (offset: 29))",
+      "outcome": "blocked_before_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_after_block_comment",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_behind_false_predicate",
+      "kind": "folded_away",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_behind_1_eq_0",
+      "kind": "folded_away",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_behind_runtime_predicate",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_behind_limit_zero",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "write_in_union",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "optional_match_then_merge",
+      "kind": "write",
+      "query_type": "rw",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "create_index",
+      "kind": "write",
+      "query_type": "s",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "drop_constraint",
+      "kind": "write",
+      "query_type": "s",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_dbms_components",
+      "kind": "catalog",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_db_labels",
+      "kind": "catalog",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_dbms_list_queries",
+      "kind": "catalog",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_dbms_security_users",
+      "kind": "write",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_apoc_trigger",
+      "kind": "write",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_apoc_cypher_dorun",
+      "kind": "write",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_apoc_periodic_iterate",
+      "kind": "write",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "load_csv_http",
+      "kind": "external_io",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "load_csv_file",
+      "kind": "external_io",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_apoc_load_json",
+      "kind": "external_io",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "call_apoc_load_jdbc",
+      "kind": "external_io",
+      "query_type": null,
+      "error": "static",
+      "outcome": "blocked_by_the_static_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "two_statements_semicolon",
+      "kind": "parser",
+      "query_type": null,
+      "error": "CypherSyntaxError: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Expected exactly one statement per query but got: 2 (line 0, column 0 (offset: 8))",
+      "outcome": "blocked_before_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "trailing_semicolon_then_write",
+      "kind": "parser",
+      "query_type": null,
+      "error": "CypherSyntaxError: {neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Expected exactly one statement per query but got: 2 (line 0, column 0 (offset: 8))",
+      "outcome": "blocked_before_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "explain_inside",
+      "kind": "harmless_read",
+      "query_type": "r",
+      "error": null,
+      "outcome": "accepted",
+      "guard_let_it_through": true,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "profile_inside",
+      "kind": "parser",
+      "query_type": null,
+      "error": "ClientError: {neo4j_code: Neo.ClientError.Statement.ArgumentError} {message: Can't specify multiple conflicting values for execution mode} {gql_status: 22000} {gql_status_description: error: data exception}",
+      "outcome": "blocked_before_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "use_other_database",
+      "kind": "parser",
+      "query_type": "s",
+      "error": null,
+      "outcome": "blocked_by_the_type_check",
+      "guard_let_it_through": false,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "cartesian_product",
+      "kind": "exhaustion",
+      "query_type": "r",
+      "error": null,
+      "outcome": "read_type_defended_by_timeout",
+      "guard_let_it_through": true,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "huge_unwind",
+      "kind": "exhaustion",
+      "query_type": "r",
+      "error": null,
+      "outcome": "read_type_defended_by_timeout",
+      "guard_let_it_through": true,
+      "expected_to_pass": false,
+      "as_expected": true
+    },
+    {
+      "probe": "unbounded_path",
+      "kind": "exhaustion",
+      "query_type": "r",
+      "error": null,
+      "outcome": "read_type_defended_by_timeout",
+      "guard_let_it_through": true,
+      "expected_to_pass": false,
+      "as_expected": true
+    }
+  ],
+  "reading": "`guard_let_it_through`는 **유형 검사를 지났는가**입니다. 자원 소진은 지나는 것이 정상이고 타임아웃이 막습니다. `external_io`가 지났다면 그 기능을 서버가 열어 두었는지 따로 확인해야 합니다 - 유형 검사는 그것을 막지 않습니다.",
+  "safety": "EXPLAIN만 실행했습니다. 통과한 질의도 실행하지 않았습니다."
+}

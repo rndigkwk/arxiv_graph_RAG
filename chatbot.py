@@ -43,7 +43,7 @@ from answer_validation import (
     validate_evidence_ids,
 )
 from candidate_validation import QuestionVerdict, assess_and_validate, judge_content
-from cypher_validation import check_order_by
+from cypher_validation import check_external_io, check_order_by, refuse_unless_read_only
 import pagerank
 import title_search
 from pipeline import tracing
@@ -88,11 +88,15 @@ if missing:
 def run_read(cypher, params=None):
     """실행 계획이 조회 전용인 쿼리만 실행합니다."""
     params = params or {}
+    # 정적 검사가 먼저입니다. 외부 입출력은 실행 계획 유형이 '읽기'로 잡혀 아래 검사를
+    # 통과하므로(ADR-048), 보내기 전에 여기서 막습니다 - 막을 것이면 왕복할 이유가 없습니다.
+    check_external_io(cypher)
     with driver.session(database=neo4j_database, default_access_mode=READ_ACCESS) as session:
         # EXPLAIN은 데이터를 바꾸지 않고 유형만 확인합니다. r은 읽기 전용입니다.
         summary = session.run(Query("EXPLAIN " + cypher, timeout=15), params).consume()
-        if summary.query_type != "r":
-            raise ValueError("조회 전용 Cypher만 실행합니다.")
+        # 판정은 `cypher_validation`에 한 벌만 둡니다 - 가드를 때리는 탐침이 같은 규칙을
+        # 봐야 그 결과가 가드에 대한 사실이 됩니다(ADR-048).
+        refuse_unless_read_only(summary.query_type)
         return [record.data() for record in session.run(Query(cypher, timeout=30), params)]
 
 
