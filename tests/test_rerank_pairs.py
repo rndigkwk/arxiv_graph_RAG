@@ -346,3 +346,27 @@ def test_the_pair_length_measurement_is_recorded(notebook):
     config = "".join(notebook["cells"][2]["source"])
 
     assert "636" in config and "84.8" in config
+
+
+def test_the_notebook_detects_a_poisoned_cuda_context_early(notebook):
+    """`cudaErrorAssert`가 한 번 나면 **그 프로세스의 CUDA가 끝까지 망가집니다.**
+
+    2026-10-20에 길이 초과로 커널이 죽은 뒤, 설정을 고치고 다시 돌렸더니 이번에는
+    **모델 로드**(`.to(device)`)에서 터졌습니다 — 모델이 원인처럼 보이지만 피해자입니다.
+    CUDA 오류는 비동기로 보고되므로 터진 자리가 원인이 아닙니다. 작은 연산 하나로 먼저
+    가려내 "세션을 다시 시작하세요"를 띄웁니다.
+    """
+    cells = [(index, "".join(cell["source"]))
+             for index, cell in enumerate(notebook["cells"])
+             if cell["cell_type"] == "code"]
+    guard = next(source for _, source in cells if "torch.zeros(8" in source)
+
+    assert "세션 다시 시작" in guard
+    assert "망가진 상태입니다" in guard
+
+    def first(probe):
+        return next(index for index, source in cells if probe in source)
+
+    # 가드가 모델 로드보다 **앞**이어야 합니다 - 뒤면 로드에서 터지고 원인을 가립니다.
+    assert first("torch.zeros(8") < first("CrossEncoder(")
+    assert first("torch.zeros(8") < first("%pip"), "설치 전에 몇 초로 가려내야 합니다"
