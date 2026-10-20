@@ -94,3 +94,4 @@
 | [ADR-047](ADR-047-the-loader-refuses-papers-the-vector-index-cannot-see.md) | 적재가 벡터 인덱스에 안 보이는 논문을 거부한다 | 채택 |
 | [ADR-048](ADR-048-the-type-check-does-not-know-the-internet.md) | 유형 검사는 인터넷을 모른다 — 읽기로 분류되는 외부 요청을 막는다 | 채택 |
 | [ADR-049](ADR-049-no-local-embedding-clears-the-bar.md) | 로컬 임베딩 셋 다 바를 넘지 못했다 — 크기가 아무것도 사지 않았다 | 기각 |
+| [ADR-050](ADR-050-measure-the-cross-encoder-before-buying-the-host.md) | 교차 인코더를 호스팅을 사기 전에 잰다 — 바를 먼저 적는다 | 채택 |

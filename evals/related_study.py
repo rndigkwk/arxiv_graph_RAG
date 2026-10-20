@@ -65,7 +65,8 @@ TOP_K = 5
 # 11-3절의 격자 탐색이 고른 값입니다. 여기서 다시 탐색하지 않고 그대로 씁니다 - 같은 공간,
 # 같은 방법이므로 다시 고르면 평가 시드로 하이퍼파라미터를 고르는 셈이 됩니다.
 RIDGE_MULTIPLIER = 0.1
-VARIANTS = ("cocited", "ppr", "vector", "adapter_cite", "adapter_cocite", "gbm")
+VARIANTS = ("cocited", "ppr", "vector", "adapter_cite", "adapter_cocite", "gbm",
+            "rerank")
 # ADR-031에서 최고 휴리스틱을 **측정된 구간으로** 이긴 유일한 모델입니다. 저장된 가중치를
 # 그대로 씁니다 - 여기서 다시 학습하면 평가 시드로 하이퍼파라미터를 고르는 셈입니다.
 GBM_MODEL = Path("derived/link_prediction/graph-text-gbm.joblib")
@@ -232,6 +233,78 @@ def cocited_ranking(
     return ranked
 
 
+class RerankScores:
+    """밖에서 채점한 쌍 점수를 읽어 그 자리에 세웁니다(교차 인코더).
+
+    교차 인코더는 두 논문을 **함께 읽어** 점수를 내므로 GPU가 필요하고, 그래서 채점은
+    Colab/RunPod에서 하고 점수 파일만 돌려받습니다
+    ([`notebooks/rerank_pairs_colab.ipynb`](../notebooks/rerank_pairs_colab.ipynb)).
+
+    **후보가 같은지 검증합니다.** 점수 파일이 다른 스냅샷·다른 `feature_cut`·다른 풀 크기로
+    내보낸 것이면 여기서 막습니다 — 조용히 쓰면 `graph-text-gbm`과 **다른 후보 집합**의
+    점수로 순위를 매기게 되고, 그러면 "재정렬이 못 했다"와 "후보가 달랐다"를 구별할 수
+    없습니다(ADR-029). 점수만 읽고 순서는 여기서 매깁니다 — 동점 처리까지 다른 변형과
+    같아야 합니다.
+    """
+
+    def __init__(self, path: Path, *, pool: int = GBM_POOL) -> None:
+        import gzip
+
+        self.pool = pool
+        self.by_seed: dict[str, tuple[list[str], np.ndarray]] = {}
+        opener = gzip.open if path.suffix == ".gz" else open
+        with opener(path, "rt", encoding="utf-8") as handle:
+            for line in handle:
+                row = json.loads(line)
+                candidates = list(row["candidates"])
+                values = np.asarray(row["scores"], dtype=np.float64)
+                if len(candidates) != values.size:
+                    raise ValueError(
+                        f"{row['seed']}의 점수 수가 후보 수와 다릅니다: "
+                        f"{values.size} != {len(candidates)}"
+                    )
+                self.by_seed[row["seed"]] = (candidates, values)
+        if not self.by_seed:
+            raise ValueError(f"점수가 비어 있습니다: {path}")
+        self.path = path
+
+    def rank(self, graph: Graph, seed: str, scores: np.ndarray, top_k: int) -> list[str]:
+        entry = self.by_seed.get(seed)
+        if entry is None:
+            raise ValueError(
+                f"{seed}의 점수가 점수 파일에 없습니다({self.path}). 같은 정답 파일로 "
+                "내보낸 것인지 확인하세요."
+            )
+        candidates, values = entry
+        expected = pool_candidates(graph, seed, scores, pool=self.pool)
+        # 텍스트가 없어 빠진 후보는 내보내기가 세어 두었으므로, 부분집합까지는 허용하고
+        # **없던 후보가 들어온 경우**를 막습니다. 그쪽이 다른 풀을 쓴 증거입니다.
+        unexpected = sorted(set(candidates) - set(expected))
+        if unexpected:
+            raise ValueError(
+                f"{seed}의 점수 파일에 이 하네스의 후보가 아닌 논문이 있습니다: "
+                f"{unexpected[:5]}. 다른 스냅샷이나 feature_cut으로 내보낸 파일입니다."
+            )
+        order = np.argsort(-values)[:top_k]
+        return [candidates[index] for index in order]
+
+
+def pool_candidates(
+    graph: Graph, seed: str, scores: np.ndarray, *, pool: int = GBM_POOL
+) -> list[str]:
+    """The candidate set a pair-scoring model reranks: vector top-`pool` ∪ visible co-citation.
+
+    **한 벌만 둡니다.** 재정렬 모델을 밖에서 돌릴 때(교차 인코더를 Colab에서 채점하는 경우)
+    후보를 다시 만들면 **다른 후보 집합을 재게** 되고, 그러면 "재정렬이 못 했다"와 "후보가
+    달랐다"를 구별할 수 없습니다 — ADR-029가 같은 구분을 세운 이유입니다.
+    """
+    order = np.argpartition(-scores, pool)[:pool]
+    pooled = {graph.ids[index] for index in order}
+    pooled.update(graph.cocited(seed))
+    pooled.discard(seed)
+    return sorted(pooled)
+
+
 class Reranker:
     """`graph-text-gbm`을 관련 논문 자리에 세웁니다. 쌍 점수 모델이므로 후보를 재정렬합니다.
 
@@ -268,11 +341,7 @@ class Reranker:
         self.pool_sizes: list[int] = []
 
     def candidates(self, graph: Graph, seed: str, scores: np.ndarray) -> list[str]:
-        order = np.argpartition(-scores, self.pool)[: self.pool]
-        pooled = {graph.ids[index] for index in order}
-        pooled.update(graph.cocited(seed))
-        pooled.discard(seed)
-        return sorted(pooled)
+        return pool_candidates(graph, seed, scores, pool=self.pool)
 
     def rank(self, graph: Graph, seed: str, scores: np.ndarray, top_k: int) -> list[str]:
         from models.link_prediction.dataset import pair_features
@@ -338,6 +407,11 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=0, help="0이면 전부입니다.")
     parser.add_argument("--top-k", type=int, default=TOP_K)
     parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument(
+        "--rerank-scores", type=Path,
+        help=("밖에서 채점한 쌍 점수 파일(jsonl.gz). `rerank` 변형에 필요합니다 - "
+              "notebooks/rerank_pairs_colab.ipynb 가 만듭니다."),
+    )
     parser.add_argument("--variants", nargs="+", choices=VARIANTS, default=list(VARIANTS),
                         help="PPR만 재려면 --variants ppr. 어댑터 학습을 건너뛰어 빠릅니다.")
     parser.add_argument(
@@ -400,6 +474,16 @@ def main() -> int:
             )
         reranker = Reranker(snap, feature_cut=feature_cut)
 
+    rerank = None
+    if "rerank" in chosen:
+        if not args.rerank_scores:
+            parser.error(
+                "rerank 변형은 --rerank-scores가 필요합니다. "
+                "notebooks/rerank_pairs_colab.ipynb 가 만든 점수 파일을 주세요."
+            )
+        rerank = RerankScores(args.rerank_scores)
+        print(f"쌍 점수 {len(rerank.by_seed)} 시드를 읽었습니다: {args.rerank_scores}")
+
     per_seed: dict[str, dict[str, list[float]]] = {
         variant: collections.defaultdict(list) for variant in chosen
     }
@@ -415,8 +499,8 @@ def main() -> int:
                 else graph.vectors @ adapter.apply(weights[name], vector[None])[0]
             )
             # 벡터 점수가 필요한 변형만입니다. `ppr`과 `cocited`는 그래프에서 나오고,
-            # `gbm`은 벡터 점수를 **후보 생성에만** 쓰므로 따로 다룹니다.
-            for name in chosen if name not in ("ppr", "cocited", "gbm")
+            # `gbm`·`rerank`는 벡터 점수를 **후보 생성에만** 쓰므로 따로 다룹니다.
+            for name in chosen if name not in ("ppr", "cocited", "gbm", "rerank")
         }
         row: dict[str, Any] = {"id": case["id"], "seed_id": seed, "gold_size": len(gold)}
         # 공동인용 후보가 몇 편인지. 이것이 `top_k`보다 적으면 배포 경로는 **PPR로 채웁니다**
@@ -450,6 +534,8 @@ def main() -> int:
                 ranked = cocited_ranking(graph, seed, rank, args.top_k)
             elif variant == "gbm":
                 ranked = reranker.rank(graph, seed, graph.vectors @ vector, args.top_k)
+            elif variant == "rerank":
+                ranked = rerank.rank(graph, seed, graph.vectors @ vector, args.top_k)
             else:
                 ranked = rank_by_score(graph, scores[variant], seed, args.top_k)
             scored = score_retrieval(gold, ranked, k=args.top_k)
