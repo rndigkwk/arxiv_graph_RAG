@@ -64,6 +64,45 @@ def test_the_magic_stripper_keeps_the_python_and_the_line_numbers():
     assert without_magics("a != b") == "a != b"
 
 
+def test_the_notebook_does_not_rely_on_colab_only_download(notebook):
+    """2026-10-20에 배운 것입니다 — `files.download()`는 **조용히 아무것도 하지 않습니다.**
+
+    VS Code로 붙은 세션에는 그 JS를 실행할 Colab 브라우저 화면이 없어서 `Javascript object`만
+    찍히고 예외도 없습니다. 44분 실행이 끝난 뒤 파일이 오지 않았다는 것을 로컬을 뒤져서야
+    알았습니다. 돌아오는 길은 **어디서 실행해도 되는 것**이어야 합니다(ADR-046).
+    """
+    body = "\n".join(sources(notebook))
+
+    assert "files.download" not in body
+    assert "upload_file" in body, "가져가는 경로가 하나는 있어야 합니다"
+
+
+def test_the_upload_cell_stands_alone(notebook):
+    """인코딩이 끝난 뒤 커널이 끊기는 일이 있습니다. 그때 1절과 이 셀만으로 올라가야 합니다."""
+    upload = next(source for source in sources(notebook) if "upload_file" in source)
+
+    for name in ("import re", "from pathlib import Path", "import getpass"):
+        assert name in upload, name
+
+
+def test_the_batch_size_is_justified_by_a_measurement(notebook):
+    """배치를 올린 근거가 셀에 남아 있어야 합니다. 숫자만 바꿔 두면 다음 사람이 되짚지 못합니다."""
+    config = sources(notebook)[0]
+
+    assert "BATCH = " in config
+    # 실측 피크와 표본당 사용량이 적혀 있어야 합니다.
+    assert "2.7GB" in config and "27MB" in config
+
+
+def test_the_notebook_is_committed_without_outputs(notebook):
+    """모델을 바꾼 뒤 옛 출력이 남아 있으면 화면이 거짓말을 합니다."""
+    for index, cell in enumerate(notebook["cells"]):
+        if cell["cell_type"] != "code":
+            continue
+        assert not cell.get("outputs"), f"셀 {index}에 출력이 남아 있습니다"
+        assert cell.get("execution_count") is None, f"셀 {index}에 실행 번호가 남아 있습니다"
+
+
 def test_the_notebook_reads_the_frozen_text_instead_of_rebuilding_it(notebook):
     body = "\n".join(sources(notebook))
 
