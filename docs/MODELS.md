@@ -54,7 +54,7 @@
 > 둘입니다 — 최고 휴리스틱 대비 쌍체 구간이 0을 제외할 것, 순위 MRR이 0.60 이상일 것.
 > 조건이 기준선에 없으면 통과가 아니라 **거부**합니다.
 
-## 4. 재서 기각한 것 — 여섯 번
+## 4. 재서 기각한 것 — 일곱 번
 
 | 모델 | 어느 자리 | 결과 | 기록 |
 |---|---|---|---|
@@ -64,6 +64,7 @@
 | GPU 전체 파인튜닝 | 임베딩 | EXPERIMENTS 11-6 | — |
 | 선형 어댑터(미래 라벨) | 관련 논문, 그래프가 0점인 자리 | `vector` 대비 **다섯 지표 중 넷이 0 포함** | [ADR-036](adr/ADR-036-the-embedding-fills-what-the-graph-cannot.md) |
 | **`graph-text-gbm`(재정렬기)** | 관련 논문, 미래 라벨 | 집계 <!--n:reports/related_future_study.json#summary.gbm.recall_at_k-->0.1861<!--/n-->로 **1위인데 양쪽 집단에서 다 짐** | [ADR-037](adr/ADR-037-the-gbm-wins-the-average-and-loses-both-halves.md) |
+| **`BAAI/bge-m3`**(568M 다국어) | 임베딩, 간선 0개 자리 | OpenAI 대비 recall@5 <!--n:reports/embedding_slice_bge_m3.json#by_degree_slice.no_citation_edges.recall_at_k.mean-->-0.0334<!--/n-->, **작은 형제 `bge-base`보다도** <!--n:reports/embedding_slice_m3_vs_base.json#by_degree_slice.no_citation_edges.recall_at_k.mean-->-0.0232<!--/n--> (세 지표 모두 0 제외) | [ADR-046](adr/ADR-046-bge-m3-does-not-clear-the-bar.md) |
 
 마지막 줄이 가장 조심스러운 기각입니다. 세 지표 모두 1위였고 **집단으로 나눈 뒤에야** 다수
 집단(간선 0개, 80.8%)에서 자기가 품은 임베딩보다 나쁘고 둘째 집단에서 Cypher 한 줄보다
@@ -84,7 +85,7 @@
 실제로 닫혔는지 확인합니다(자르기 전에는 공동인용이 미래 정답을 전부 담고 있었고, 자른 뒤에는
 0건입니다).
 
-**4. 하이퍼파라미터보다 과제 정의를 먼저 봅니다.** 여섯 번의 기각 중 넷이 "모델이 나빠서"가
+**4. 하이퍼파라미터보다 과제 정의를 먼저 봅니다.** 일곱 번의 기각 중 넷이 "모델이 나빠서"가
 아니라 **정답의 정의를 데이터 질의가 그대로 계산할 수 있어서**였습니다. 그래서 모델을 세우기
 전에 판별 기준 셋을 먼저 통과시킵니다(ADR-031).
 

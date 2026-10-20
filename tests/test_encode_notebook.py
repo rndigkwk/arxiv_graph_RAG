@@ -30,10 +30,38 @@ def sources(notebook, kind="code"):
     return ["".join(cell["source"]) for cell in notebook["cells"] if cell["cell_type"] == kind]
 
 
+def without_magics(source: str) -> str:
+    """Comment out IPython magics so what is left is the cell's Python.
+
+    `%pip`만 걸러내고 있었는데, `!pip install ...` 꼴의 **셸 매직**에서 깨졌습니다 —
+    Colab 노트북에서 정상 문법이고 이 저장소의 지시문도 그 줄을 쓰라고 적습니다. 이 테스트가
+    보려는 것은 "셀의 파이썬이 문법에 맞는가"이므로, IPython이 하는 것과 같이 매직 줄을
+    먼저 덜어냅니다. 줄 전체를 지우지 않고 **주석으로 바꿉니다** - 지우면 줄 번호가 밀려
+    오류 위치를 못 찾습니다.
+    """
+    lines = []
+    for line in source.splitlines():
+        stripped = line.lstrip()
+        lines.append(f"# {line}" if stripped[:1] in {"!", "%"} else line)
+    return "\n".join(lines)
+
+
 def test_every_code_cell_compiles(notebook):
     for index, source in enumerate(sources(notebook)):
-        # `%pip`은 IPython 매직이라 파이썬 문법이 아닙니다.
-        compile(source.replace("%pip", "# %pip"), f"<cell {index}>", "exec")
+        compile(without_magics(source), f"<cell {index}>", "exec")
+
+
+def test_the_magic_stripper_keeps_the_python_and_the_line_numbers():
+    """매직을 지우면 줄 번호가 밀려 오류 위치를 못 찾습니다."""
+    source = "!pip install x\n  %pip install y\nvalue = 1\n"
+
+    cleaned = without_magics(source)
+
+    assert cleaned.splitlines()[2] == "value = 1"
+    assert len(cleaned.splitlines()) == len(source.splitlines())
+    compile(cleaned, "<test>", "exec")
+    # 파이썬 줄은 건드리지 않습니다 - `a != b`의 `!`가 주석이 되면 안 됩니다.
+    assert without_magics("a != b") == "a != b"
 
 
 def test_the_notebook_reads_the_frozen_text_instead_of_rebuilding_it(notebook):

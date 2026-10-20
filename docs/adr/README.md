@@ -90,3 +90,4 @@
 | [ADR-043](ADR-043-the-floor-is-checked-against-the-worst-run.md) | RAGAS 하한은 최악의 정상 실행과 심은 결함으로 검사한다 | 채택 |
 | [ADR-044](ADR-044-not-run-is-not-a-regression.md) | 돌리지 못한 것은 회귀가 아니다 — 그러나 통과도 아니다 | 채택 |
 | [ADR-045](ADR-045-what-to-delete-before-adding-a-month.md) | 한 달을 더하기 전에 무엇을 지울지 — 지금은 지울 것이 없다 | 채택 |
+| [ADR-046](ADR-046-bge-m3-does-not-clear-the-bar.md) | BGE-M3는 바를 넘지 못했다 — 5.2배 큰 모델이 작은 형제보다 나쁘다 | 기각 |

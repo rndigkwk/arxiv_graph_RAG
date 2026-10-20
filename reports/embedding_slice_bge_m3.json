@@ -1,0 +1,98 @@
+{
+  "generated_at": "2026-10-20T02:15:08.129230+00:00",
+  "gold": "evals/cases_related_future.json",
+  "variant": "vector",
+  "baseline": {
+    "report": "reports/embedding_openai.json",
+    "embeddings": "derived cache (text-embedding-3-large)",
+    "dimensions": 768
+  },
+  "candidate": {
+    "report": "reports/embedding_bge_m3.json",
+    "embeddings": "derived/2026-10-14/local-baai-bge-m3.npy",
+    "dimensions": 1024
+  },
+  "by_degree_slice": {
+    "no_citation_edges": {
+      "seeds": 1112,
+      "recall_at_k": {
+        "baseline": 0.1227,
+        "candidate": 0.0893,
+        "mean": -0.0334,
+        "low": -0.0398,
+        "high": -0.027,
+        "excludes_zero": true
+      },
+      "hit_at_k": {
+        "baseline": 0.4739,
+        "candidate": 0.3786,
+        "mean": -0.0953,
+        "low": -0.1169,
+        "high": -0.0728,
+        "excludes_zero": true
+      },
+      "reciprocal_rank": {
+        "baseline": 0.3457,
+        "candidate": 0.2766,
+        "mean": -0.0691,
+        "low": -0.0863,
+        "high": -0.0503,
+        "excludes_zero": true
+      }
+    },
+    "degree_1_to_4": {
+      "seeds": 251,
+      "recall_at_k": {
+        "baseline": 0.2154,
+        "candidate": 0.1666,
+        "mean": -0.0488,
+        "low": -0.072,
+        "high": -0.0282,
+        "excludes_zero": true
+      },
+      "hit_at_k": {
+        "baseline": 0.4422,
+        "candidate": 0.3625,
+        "mean": -0.0797,
+        "low": -0.1315,
+        "high": -0.0319,
+        "excludes_zero": true
+      },
+      "reciprocal_rank": {
+        "baseline": 0.2995,
+        "candidate": 0.2482,
+        "mean": -0.0513,
+        "low": -0.0862,
+        "high": -0.0166,
+        "excludes_zero": true
+      }
+    },
+    "degree_5_or_more": {
+      "seeds": 14,
+      "recall_at_k": {
+        "baseline": 0.0793,
+        "candidate": 0.0731,
+        "mean": -0.0062,
+        "low": -0.0465,
+        "high": 0.0317,
+        "excludes_zero": false
+      },
+      "hit_at_k": {
+        "baseline": 0.5,
+        "candidate": 0.5,
+        "mean": 0.0,
+        "low": -0.2143,
+        "high": 0.2143,
+        "excludes_zero": false
+      },
+      "reciprocal_rank": {
+        "baseline": 0.3595,
+        "candidate": 0.2667,
+        "mean": -0.0929,
+        "low": -0.2477,
+        "high": 0.0357,
+        "excludes_zero": false
+      }
+    }
+  }
+}
