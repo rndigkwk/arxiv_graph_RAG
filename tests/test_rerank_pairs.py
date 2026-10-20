@@ -261,3 +261,45 @@ def test_the_slug_in_the_notebook_matches_the_repo_rule(notebook):
     expected = "rerank-" + re.sub(r"[^a-z0-9]+", "-", "BAAI/bge-reranker-base".lower()).strip("-")
     assert expected == "rerank-baai-bge-reranker-base"
     assert expected in "\n".join(sources(notebook, "markdown"))
+
+
+def test_the_token_is_asked_once_and_before_the_long_run(notebook):
+    """한 시간 채점이 끝난 뒤 입력을 기다리며 멈춰 있지 않아야 합니다.
+
+    처음에는 업로드 셀에서 물었고, 그러면 채점이 끝난 다음에 토큰을 넣게 됩니다. 받기와
+    올리기가 **같은 토큰**을 쓰므로 한 번만 묻고 앞에 둡니다.
+    """
+    cells = [(index, "".join(cell["source"]))
+             for index, cell in enumerate(notebook["cells"])
+             if cell["cell_type"] == "code"]
+
+    assert sum(source.count("getpass.getpass") for _, source in cells) == 1
+
+    def first(probe):
+        return next(index for index, source in cells if probe in source)
+
+    assert first("getpass.getpass") < first("model.predict"), "토큰이 채점보다 뒤입니다"
+    assert first("getpass.getpass") < first("upload_file")
+    # 설치보다 뒤여야 합니다 - 설치가 의존성을 바꾸고 나서 임포트해야 합니다.
+    assert first("%pip") < first("getpass.getpass")
+    # 업로드 셀은 토큰을 다시 묻지 않고 재사용해야 합니다.
+    upload = next(source for _, source in cells if "upload_file" in source)
+    assert "HF_TOKEN" in upload and "getpass" not in upload
+
+
+def test_nothing_needs_editing_to_run_as_shipped(notebook):
+    """런타임만 고르고 전부 실행하면 돌아야 합니다. 쌍 파일은 HF에 올라가 있습니다."""
+    config = "".join(notebook["cells"][2]["source"])
+
+    assert "USE_HF = True" in config
+    assert 'DATA_REPO = "arxiv-graphrag-colab"' in config
+    assert 'MODEL = "BAAI/bge-reranker-base"' in config
+
+
+def test_the_notebook_refuses_to_score_on_the_cpu(notebook):
+    """조용히 CPU로 가면 한 시간이 아니라 몇 시간이고, 끝나고서야 압니다."""
+    body = "\n".join("".join(cell["source"]) for cell in notebook["cells"]
+                     if cell["cell_type"] == "code")
+
+    assert "parameters()).device" in body
+    assert "CPU에 올라갔습니다" in body
