@@ -286,3 +286,86 @@ def test_authored_rows_deduplicate_a_repeated_author_on_one_paper():
     rows = ingest.authored_rows([{"arxiv_id": "a", "authors": ["X", "X", "Y", ""]}])
 
     assert rows == [{"paper": "a", "author": "X"}, {"paper": "a", "author": "Y"}]
+
+
+# --- 임베딩 검사 (ADR-047) ---------------------------------------------------------
+
+
+def test_harvested_records_never_carry_an_embedding():
+    """OAI는 메타데이터만 줍니다. 이 사실이 임베딩 게이트가 필요한 이유입니다."""
+    document = ElementTree.fromstring(page_xml([record_xml("2609.00001")]))
+    record = document.find(".//{http://www.openarchives.org/OAI/2.0/}record")
+
+    parsed = oai.parse_record(record)
+
+    assert parsed is not None and parsed["arxiv_id"] == "2609.00001"
+    assert "embedding" not in parsed
+
+
+def test_a_batch_without_embeddings_is_not_ready_to_load():
+    """임베딩 없이 적재하면 그 논문은 **벡터 검색에 영원히 안 나옵니다.**"""
+    check = ingest.plan_embeddings(
+        [{"arxiv_id": "a"}, {"arxiv_id": "b"}], known_papers=set()
+    )
+
+    assert check.new_papers == 2
+    assert check.with_embedding == 0
+    assert check.missing == 2
+    assert check.coverage == 0.0
+    assert not check.ready
+
+
+def test_a_batch_with_full_coverage_is_ready():
+    rows = [{"arxiv_id": name, "embedding": [0.0] * ingest.EMBEDDING_DIMENSIONS}
+            for name in ("a", "b")]
+
+    check = ingest.plan_embeddings(rows, known_papers=set())
+
+    assert check.coverage == 1.0 and check.ready
+
+
+def test_a_wrong_dimension_is_refused_even_at_full_coverage():
+    """1024차원 행렬을 768 인덱스에 넣으면 조용히 쓸 수 없는 노드가 됩니다."""
+    rows = [{"arxiv_id": "a", "embedding": [0.0] * 1024}]
+
+    check = ingest.plan_embeddings(rows, known_papers=set())
+
+    assert check.wrong_dimensions == 1
+    assert check.with_embedding == 0
+    assert not check.ready
+
+
+def test_papers_already_in_the_graph_are_not_counted():
+    """`MERGE_PAPER`의 SET이 `embedding`을 건드리지 않으므로 기존 논문은 그대로 갖고 있습니다."""
+    rows = [{"arxiv_id": "a"}, {"arxiv_id": "b"}]
+
+    check = ingest.plan_embeddings(rows, known_papers={"a", "b"})
+
+    assert check.new_papers == 0
+    assert check.coverage == 1.0 and check.ready
+
+
+def test_the_merge_statement_really_does_not_write_the_embedding():
+    """이 검사의 전제입니다. 적재문이 임베딩을 쓰게 되면 게이트가 필요 없어집니다."""
+    assert "embedding" not in ingest.MERGE_PAPER
+
+
+def test_the_upstream_check_shares_the_snapshot_gate_constants():
+    """두 검사가 갈라지면 상류에서 통과한 배치가 하류에서 막힙니다."""
+    from pipeline import quality
+
+    assert ingest.EMBEDDING_DIMENSIONS is quality.EMBEDDING_DIMENSIONS
+    assert ingest.MIN_EMBEDDING_COVERAGE is quality.MIN_EMBEDDING_COVERAGE
+
+
+def test_loading_without_embeddings_needs_an_explicit_flag():
+    """조용히 통과시키지 않습니다. 알고 하는 경우만 넘어갑니다."""
+    import inspect
+
+    source = inspect.getsource(ingest.main)
+
+    assert "allow_missing_embeddings" in source
+    assert '"embeddings_missing"' in source
+    # 검사가 용량 검사 뒤, `--load` 분기 앞에 있어야 합니다.
+    assert source.index('"capacity"') < source.index('"embeddings_missing"')
+    assert source.index('"embeddings_missing"') < source.index('"dry_run"')

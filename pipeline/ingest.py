@@ -1,4 +1,4 @@
-"""증분 수집 파이프라인입니다. 워터마크 → 수집 → 보강 → 용량 검사 → 게이트 → 멱등 적재.
+"""증분 수집 파이프라인입니다. 워터마크 → 수집 → 보강 → 용량·임베딩 검사 → 멱등 적재.
 
     uv run python -m pipeline.ingest --dry-run
     uv run python -m pipeline.ingest --days 7 --dry-run
@@ -7,7 +7,7 @@
 기본값이 `--dry-run`입니다. `--load`를 명시하지 않으면 Aura에 아무것도 쓰지 않습니다. 이 그래프는
 관계 한도의 84.6%를 이미 쓰고 있어서, 무심코 적재하면 되돌리기 어렵습니다.
 
-## 네 가지 운영 장치
+## 다섯 가지 운영 장치
 
 **워터마크.** 지난 실행에서 본 가장 늦은 OAI 날짜도장을 저장하고, 다음 실행은 그 다음날부터
 받습니다. 전체 재수집을 하지 않으므로 실행 시간이 데이터 총량이 아니라 증가분에 비례합니다.
@@ -19,6 +19,12 @@
 **용량 검사.** 적재 전에 늘어날 노드·관계 수를 세어 Aura 무료 한도와 비교합니다. 한도를 넘으면
 적재하지 않고 멈춥니다. 이 검사는 게이트보다 먼저 돕니다. 데이터가 깨끗해도 들어갈 자리가
 없으면 적재해서는 안 됩니다.
+
+**임베딩 검사.** OAI 수집은 임베딩을 만들지 않습니다. 임베딩 없는 논문을 적재하면 그래프
+질의에는 나오지만 **벡터 검색에 영원히 안 나옵니다** — 인덱스가 `embedding` 속성에 걸려
+있기 때문입니다. 앱은 돌고 질문 일부만 그 논문을 못 찾으므로 **조용한 손상**입니다. 스냅샷
+게이트가 커버리지 100%를 요구하지만 그것은 **이미 적재된 뒤에** 걸리므로, 같은 검사를
+적재 전에 한 번 더 둡니다. 알고 넘기려면 `--allow-missing-embeddings`가 필요합니다.
 
 **멱등 적재.** 모두 `MERGE`입니다. 같은 배치를 두 번 적재해도 노드·관계 수가 변하지 않아야
 합니다. `--verify-idempotent`가 그것을 실제로 확인합니다.
@@ -35,6 +41,11 @@ from pathlib import Path
 from typing import Any
 
 from pipeline import oai
+
+# 스냅샷 게이트와 **같은 상수**를 씁니다. 여기서 다시 적으면 두 검사가 조용히 갈라지고,
+# 그러면 상류에서 통과한 배치가 하류에서 막힙니다(ADR-045에서 한도를 중복으로 적었던 것과
+# 같은 함정).
+from pipeline.quality import EMBEDDING_DIMENSIONS, MIN_EMBEDDING_COVERAGE
 
 STATE_PATH = Path("pipeline/state/ingest.json")
 DEAD_LETTER_PATH = Path("pipeline/state/ingest_dead_letter.jsonl")
@@ -240,6 +251,78 @@ def plan_capacity(
     )
 
 
+@dataclass
+class EmbeddingCheck:
+    """새 논문이 **벡터 인덱스에 보이게 되는지**를 적재 전에 셉니다.
+
+    `MERGE_PAPER`는 `embedding`을 쓰지 않습니다. 그래서 임베딩 없는 논문을 적재하면
+    그래프 질의(저자·인용·공동저자)에는 나오지만 **벡터 검색에는 영원히 안 나옵니다** —
+    인덱스가 그 속성에 걸려 있기 때문입니다. 관련 논문 패널의 3단계 임베딩 보충
+    (ADR-040)에서도 빠집니다.
+
+    **조용한 종류의 손상입니다.** 앱은 돌고, 질문 중 일부만 그 논문을 못 찾습니다.
+    스냅샷 게이트가 커버리지 100%를 요구하지만([`quality.py`](quality.py)) 그것은
+    **이미 적재된 뒤에** 걸립니다. 그래서 같은 검사를 상류에 한 번 더 둡니다 —
+    용량 검사가 "들어갈 자리가 없으면 적재하지 않는다"인 것과 같은 선입니다.
+    """
+
+    new_papers: int
+    with_embedding: int
+    wrong_dimensions: int
+
+    @property
+    def missing(self) -> int:
+        return max(0, self.new_papers - self.with_embedding)
+
+    @property
+    def coverage(self) -> float:
+        return self.with_embedding / self.new_papers if self.new_papers else 1.0
+
+    @property
+    def ready(self) -> bool:
+        """임베딩 없는 **새** 논문이 하나도 없어야 합니다. 기존 논문은 이미 갖고 있습니다."""
+        return self.missing == 0 and self.wrong_dimensions == 0
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "new_papers": self.new_papers,
+            "with_embedding": self.with_embedding,
+            "missing": self.missing,
+            "wrong_dimensions": self.wrong_dimensions,
+            "coverage": round(self.coverage, 6),
+            "required_coverage": MIN_EMBEDDING_COVERAGE,
+            "dimensions": EMBEDDING_DIMENSIONS,
+            "ready": self.ready,
+            "note": (
+                "OAI 수집은 임베딩을 만들지 않습니다. 임베딩 없이 적재하면 그 논문은 "
+                "그래프 질의에는 나오지만 **벡터 검색에 영원히 안 나옵니다.**"
+            ),
+        }
+
+
+def plan_embeddings(
+    papers: list[dict[str, Any]], *, known_papers: set[str]
+) -> EmbeddingCheck:
+    """Count the new papers that carry a usable embedding.
+
+    이미 그래프에 있는 논문은 세지 않습니다 — `MERGE_PAPER`의 `SET`이 `embedding`을
+    건드리지 않으므로 다시 적재해도 갖고 있던 것이 남습니다.
+    """
+    new = [paper for paper in papers if str(paper["arxiv_id"]) not in known_papers]
+    usable, wrong = 0, 0
+    for paper in new:
+        embedding = paper.get("embedding")
+        if not isinstance(embedding, (list, tuple)) or not embedding:
+            continue
+        if len(embedding) == EMBEDDING_DIMENSIONS:
+            usable += 1
+        else:
+            wrong += 1
+    return EmbeddingCheck(
+        new_papers=len(new), with_embedding=usable, wrong_dimensions=wrong
+    )
+
+
 def write_dead_letters(failures: list[dict[str, str]], path: Path = DEAD_LETTER_PATH) -> int:
     """Append failed papers so a later run can retry exactly those."""
     if not failures:
@@ -293,6 +376,11 @@ def main() -> int:
                         help="실제로 Aura에 적재합니다. 기본은 적재하지 않습니다.")
     parser.add_argument("--verify-idempotent", action="store_true",
                         help="같은 배치를 두 번 적재해 노드·관계 수가 그대로인지 확인합니다.")
+    parser.add_argument(
+        "--allow-missing-embeddings", action="store_true",
+        help=("임베딩 없는 논문도 적재합니다. 그 논문은 벡터 검색에 나오지 않습니다 — "
+              "적재 직후 임베딩을 채울 때만 쓰세요."),
+    )
     parser.add_argument("--output", type=Path, default=REPORT_PATH)
     args = parser.parse_args()
 
@@ -355,6 +443,9 @@ def main() -> int:
             known_papers={row["arxiv_id"] for row in known},
             known_authors={row["name"] for row in known_authors},
         )
+        embeddings = plan_embeddings(
+            harvested.records, known_papers={row["arxiv_id"] for row in known}
+        )
         report["enrichment"] = {
             "attempted": enrichment.attempted,
             "references": len(enrichment.references),
@@ -363,6 +454,7 @@ def main() -> int:
             "dead_letters_written": write_dead_letters(enrichment.failures),
         }
         report["capacity"] = capacity.as_dict()
+        report["embeddings"] = embeddings.as_dict()
 
         if enrichment.failure_rate > MAX_ENRICHMENT_FAILURE_RATE:
             report["stopped_at"] = "enrichment_failure_rate"
@@ -370,6 +462,19 @@ def main() -> int:
             return 1
         if not capacity.fits:
             report["stopped_at"] = "capacity"
+            _finish(report, args.output, state, harvested.last_datestamp, advance=False)
+            return 1
+        # 임베딩 없는 논문을 적재하면 **벡터 검색에서 영원히 빠집니다.** 앱은 돌고 질문
+        # 일부만 그 논문을 못 찾으므로 조용한 손상입니다. 알고 하는 경우만 통과시킵니다.
+        if args.load and not embeddings.ready and not args.allow_missing_embeddings:
+            report["stopped_at"] = "embeddings_missing"
+            print(
+                f"새 논문 {embeddings.new_papers}편 중 {embeddings.missing}편에 임베딩이 "
+                f"없습니다(차원 불일치 {embeddings.wrong_dimensions}편). 적재하지 않았습니다 "
+                "— 그 논문은 그래프 질의에는 나오지만 벡터 검색에 영원히 안 나옵니다.\n"
+                "임베딩을 먼저 만드세요(notebooks/arxiv_ai_kg_to_aura.ipynb). 적재한 뒤 바로 "
+                "임베딩을 채울 계획이라면 --allow-missing-embeddings 로 넘기세요."
+            )
             _finish(report, args.output, state, harvested.last_datestamp, advance=False)
             return 1
         if not args.load:

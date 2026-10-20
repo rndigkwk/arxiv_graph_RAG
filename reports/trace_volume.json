@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-18T07:51:52.953389+00:00",
+  "generated_at": "2026-10-20T08:31:52.929204+00:00",
   "cases": 30,
   "cases_file": "evals/cases_graph.json",
   "per_path": {
@@ -25,7 +25,10 @@
     "worst": 1200
   },
   "budget_key": "LANGFUSE_MAX_TRACES",
+  "budget_window": "하루(UTC)",
   "default_budget_traces": 50,
   "default_budget_observations_worst": 500,
+  "default_budget_monthly_traces": 1550,
+  "default_budget_monthly_observations_worst": 15500,
   "note": "추정이 아니라 그래프를 실제로 돌려 센 값입니다. 보내는 내용은 노드 이름·시도 번호·지연뿐이고 질문도 답변도 포함하지 않습니다(ADR-023)."
 }

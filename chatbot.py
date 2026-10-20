@@ -43,7 +43,7 @@ from answer_validation import (
     validate_evidence_ids,
 )
 from candidate_validation import QuestionVerdict, assess_and_validate, judge_content
-from cypher_validation import check_order_by
+from cypher_validation import check_external_io, check_order_by, refuse_unless_read_only
 import pagerank
 import title_search
 from pipeline import tracing
@@ -88,11 +88,15 @@ if missing:
 def run_read(cypher, params=None):
     """실행 계획이 조회 전용인 쿼리만 실행합니다."""
     params = params or {}
+    # 정적 검사가 먼저입니다. 외부 입출력은 실행 계획 유형이 '읽기'로 잡혀 아래 검사를
+    # 통과하므로(ADR-048), 보내기 전에 여기서 막습니다 - 막을 것이면 왕복할 이유가 없습니다.
+    check_external_io(cypher)
     with driver.session(database=neo4j_database, default_access_mode=READ_ACCESS) as session:
         # EXPLAIN은 데이터를 바꾸지 않고 유형만 확인합니다. r은 읽기 전용입니다.
         summary = session.run(Query("EXPLAIN " + cypher, timeout=15), params).consume()
-        if summary.query_type != "r":
-            raise ValueError("조회 전용 Cypher만 실행합니다.")
+        # 판정은 `cypher_validation`에 한 벌만 둡니다 - 가드를 때리는 탐침이 같은 규칙을
+        # 봐야 그 결과가 가드에 대한 사실이 됩니다(ADR-048).
+        refuse_unless_read_only(summary.query_type)
         return [record.data() for record in session.run(Query(cypher, timeout=30), params)]
 
 
@@ -624,8 +628,10 @@ def ask(question, history, on_answer=None):
     response = state["response"]
     response["graph_trace"] = agent_graph.summarize_trace(state["trace"])
     # 기본은 꺼짐입니다. `LANGFUSE_TRACING=1`과 키가 둘 다 있을 때만 보내고, 켠 뒤에도
-    # 프로세스당 `LANGFUSE_MAX_TRACES`개까지입니다(ADR-023) — dograg가 전부 추적해 한 달치
-    # 무료 사용량을 소진한 적이 있어서, 스위치와 상한을 둘 다 둡니다.
+    # **하루에** `LANGFUSE_MAX_TRACES`개까지입니다(ADR-023) — dograg가 전부 추적해 한 달치
+    # 무료 사용량을 소진한 적이 있어서, 스위치와 상한을 둘 다 둡니다. 단위가 하루인 것이
+    # 중요합니다: 앱 프로세스는 잠들었다 깨면 새로 뜨므로, 프로세스당으로 세면 상한이 아니라
+    # "재시작마다 앞 50건"이 됩니다.
     response["tracing"] = tracing.send_trace(
         response["graph_trace"],
         name="ask",
@@ -700,11 +706,17 @@ RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_c
        COUNT { (p)<-[:REFERENCES]-() } AS cited_by
 """
 
+# 저자 이름을 함께 읽습니다. 저장 목록을 BibTeX로 꺼낼 때 `author` 칸이 비면 그 항목은
+# 서지 관리 도구에서 쓸 수 없습니다(ADR-042). 이름은 **동명이인을 구별하지 않은** 표기이고,
+# 그 사실은 내보내는 파일의 머리말에 적습니다.
 SAVED_PAPER_DETAILS = """
 MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})
+OPTIONAL MATCH (a:ArxivAuthorName)-[:AUTHORED]->(p)
+WITH p, collect(DISTINCT a.name) AS authors
 RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.abstract AS abstract,
        p.primary_category AS primary_category, p.categories AS categories,
-       p.pdf_url AS pdf_url, toString(p.published) AS published
+       p.pdf_url AS pdf_url, toString(p.published) AS published,
+       authors AS authors
 """
 
 

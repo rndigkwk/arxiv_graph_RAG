@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-10-17T00:00:00+00:00",
+  "note": "AGENT_SYSTEM 지문만 다릅니다. prompt_version 규칙 하나만 걸려야 합니다.",
+  "source": {
+    "mode": "compare",
+    "dataset": "fixture.json",
+    "runs": 3,
+    "git_sha": null,
+    "observed_spread": null
+  },
+  "primary_metric": "answer_evidence_recall",
+  "metrics_split": "full",
+  "metrics": {
+    "answer_evidence_recall": 1.0
+  },
+  "absolute_floor": {
+    "answer_evidence_recall": 0.6
+  },
+  "allowed_drop": null,
+  "case_ids": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "stable_cases": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "ragas_judge_model": "gpt-6-luna",
+  "prompt_versions": {
+    "AGENT_SYSTEM": "72066324526a",
+    "CYPHER_RULES": "0fc2226dcb49"
+  }
+}

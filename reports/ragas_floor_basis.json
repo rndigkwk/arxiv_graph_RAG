@@ -1,0 +1,116 @@
+{
+  "stable_families": [
+    "author",
+    "topcited"
+  ],
+  "by_group": {
+    "기준선(resolve)": {
+      "runs": 3,
+      "reports": [
+        "baseline_resolve_run1_ragas.json",
+        "baseline_resolve_run2_ragas.json",
+        "baseline_resolve_run3_ragas.json"
+      ],
+      "ragas_faithfulness": {
+        "runs": 3,
+        "min": 0.9656,
+        "max": 1.0,
+        "mean": 0.9848,
+        "spread": 0.0344
+      },
+      "ragas_context_precision_stable_families": {
+        "runs": 3,
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0,
+        "spread": 0.0
+      }
+    },
+    "routed": {
+      "runs": 3,
+      "reports": [
+        "baseline_routed_run1_ragas.json",
+        "baseline_routed_run2_ragas.json",
+        "baseline_routed_run3_ragas.json"
+      ],
+      "ragas_faithfulness": {
+        "runs": 3,
+        "min": 0.9833,
+        "max": 1.0,
+        "mean": 0.9944,
+        "spread": 0.0167
+      },
+      "ragas_context_precision_stable_families": {
+        "runs": 3,
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0,
+        "spread": 0.0
+      }
+    },
+    "ragas_study_full": {
+      "runs": 6,
+      "reports": [
+        "ragas_study_full.json",
+        "ragas_study_full_rescore.json",
+        "ragas_study_full_run2.json",
+        "ragas_study_full_run3.json",
+        "ragas_study_full_run4.json",
+        "ragas_study_full_run5.json"
+      ],
+      "ragas_faithfulness": {
+        "runs": 6,
+        "min": 0.9,
+        "max": 0.9917,
+        "mean": 0.962,
+        "spread": 0.0917
+      },
+      "ragas_context_precision_stable_families": {
+        "runs": 6,
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0,
+        "spread": 0.0
+      }
+    }
+  },
+  "with_planted_defects": {
+    "ragas_perturbed_luna.json": {
+      "ragas_faithfulness": 0.4025,
+      "ragas_context_precision_stable_families": 0.5
+    },
+    "ragas_perturbed_sol.json": {
+      "ragas_faithfulness": 0.4192,
+      "ragas_context_precision_stable_families": 0.5
+    }
+  },
+  "verdict": {
+    "ragas_faithfulness": {
+      "floor": 0.8,
+      "runs_seen": 12,
+      "worst_normal_run": 0.9,
+      "worst_run_report": "ragas_study_full_run4.json",
+      "margin_to_floor": 0.1,
+      "survives_the_worst_normal_run": true,
+      "with_a_planted_defect": [
+        0.4025,
+        0.4192
+      ],
+      "a_planted_defect_trips_it": true
+    },
+    "ragas_context_precision_stable_families": {
+      "floor": 0.85,
+      "runs_seen": 12,
+      "worst_normal_run": 1.0,
+      "worst_run_report": "baseline_resolve_run1_ragas.json",
+      "margin_to_floor": 0.15,
+      "survives_the_worst_normal_run": true,
+      "with_a_planted_defect": [
+        0.5,
+        0.5
+      ],
+      "a_planted_defect_trips_it": true
+    }
+  },
+  "reading": "집단별 변동폭은 **같은 코드 상태**의 실행끼리만 냅니다. 최악값은 집단을 넘어 봅니다 - 한 번 정상이었던 점수에서 터지는 하한은 쓸 수 없기 때문입니다. `a_planted_defect_trips_it`이 거짓이면 그 하한은 상수에 걸려 있습니다."
+}

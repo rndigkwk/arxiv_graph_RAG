@@ -39,6 +39,8 @@ from pathlib import Path
 from statistics import fmean
 from typing import Any
 
+from evals import budget
+
 OUTPUT = Path("reports/ragas_study.json")
 # 앱이 쓰는 모델과 같아야 합니다. `chatbot.llm_model`의 기본값과 맞춰 두고
 # tests/test_ragas_study.py가 두 값이 갈라지지 않는지 확인합니다.
@@ -167,16 +169,31 @@ async def score_one(metrics: dict[str, Any], row: dict[str, Any]) -> dict[str, A
             if scores[name] is None:
                 scores[f"{name}_error"] = "판정이 NaN을 돌려줬습니다"
         except Exception as exc:  # noqa: BLE001 - 한 지표의 실패가 나머지를 막지 않습니다.
+            # **예산 소진만 예외입니다.** 한 지표씩 None으로 적고 계속 가면 전 지표가 None인
+            # 보고서가 나오고, 게이트는 그것을 "ragas_faithfulness이 이번 결과에 없습니다"라는
+            # **floor 위반**으로 올립니다 — 품질이 내려간 것처럼 읽힙니다. 돌리지 못한 것을
+            # 품질로 적지 않습니다(ADR-044).
+            if budget.exhausted(exc):
+                raise
             scores[name] = None
             scores[f"{name}_error"] = f"{type(exc).__name__}: {exc}"[:200]
     return scores
 
 
 async def run(
-    rows: list[dict[str, Any]], model: str, *, with_context_relevance: bool = False
+    rows: list[dict[str, Any]],
+    model: str,
+    *,
+    with_context_relevance: bool = False,
+    scored: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
+    """Score every row. `scored` lets the caller see how far we got when this raises.
+
+    예산이 바닥나면 `score_one`이 예외를 올리는데(ADR-044), 그때 **몇 건까지 채점했는지**는
+    다시 돌릴 때 알아야 하는 값입니다. 안에서만 모으면 그 수가 예외와 함께 사라집니다.
+    """
     metrics = build_metrics(model, with_context_relevance=with_context_relevance)
-    scored = []
+    scored = [] if scored is None else scored
     for index, row in enumerate(rows, start=1):
         scores = await score_one(metrics, row)
         scored.append({**row, **scores})
@@ -339,9 +356,17 @@ def main() -> int:
         return 1
 
     print(f"{len(rows)}건 채점 (판정 모델 {model})")
-    scored = asyncio.run(
-        run(rows, model, with_context_relevance=args.with_context_relevance)
-    )
+    budget.clear()
+    scored: list[dict[str, Any]] = []
+    try:
+        asyncio.run(
+            run(rows, model, with_context_relevance=args.with_context_relevance, scored=scored)
+        )
+    except Exception as exc:  # noqa: BLE001 - 예산 소진만 가로채고 나머지는 그대로 올립니다.
+        if (code := budget.exhausted(exc)) is None:
+            raise
+        budget.record(code, exc, stage="evals.ragas_study", done=len(scored))
+        return budget.EXIT_NOT_RUN
     out = {
         "generated_at": datetime.now(UTC).isoformat(),
         "label": args.label,

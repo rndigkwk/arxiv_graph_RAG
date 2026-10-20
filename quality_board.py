@@ -1,6 +1,6 @@
 """품질 게이트와 기각 기록을 **한 화면에** 모읍니다. Streamlit을 가져오지 않습니다.
 
-이 저장소의 가장 큰 자산은 측정 규율인데, 그것이 보고서 90여 개와 결정 기록 39건에 흩어져
+이 저장소의 가장 큰 자산은 측정 규율인데, 그것이 보고서 90여 개와 결정 기록 51건에 흩어져
 있습니다. 처음 보는 사람이 2분 안에 확인할 방법이 없었습니다.
 
 **새로 재지 않습니다.** 기준선 파일과 이미 커밋된 보고서를 읽어 모양만 바꿉니다 — 여기서
@@ -20,6 +20,7 @@ BASELINE = Path("baselines/eval_baseline.json")
 RELATED_STUDY = Path("reports/related_study.json")
 FUTURE_STUDY = Path("reports/related_future_study.json")
 LINK_PREDICTION = Path("reports/link_prediction.json")
+FLOOR_BASIS = Path("reports/ragas_floor_basis.json")
 
 # 게이트가 올리는 위반 규칙. `evals/gate.py`의 표와 같은 순서입니다.
 RULES = (
@@ -29,6 +30,7 @@ RULES = (
     ("drop", "기준선 대비 하락이 허용폭 이하인가"),
     ("stable_case", "기준선에서 만점이던 사례가 이번에도 통과하는가"),
     ("judge_model", "RAGAS를 기준선과 같은 모델이 채점했는가"),
+    ("prompt_version", "답을 만든 프롬프트 본문이 기준선과 같은가"),
 )
 
 # 재서 기각한 모델. 각 줄의 숫자는 보고서나 결정 기록에 있는 값입니다.
@@ -39,6 +41,12 @@ REJECTED = (
     ("GPU 전체 파인튜닝", "임베딩", "넘지 못함", "EXPERIMENTS 11-6"),
     ("선형 어댑터 (미래 라벨)", "관련 논문", "벡터 대비 다섯 중 넷이 0 포함", "ADR-036"),
     ("graph-text-gbm (재정렬기)", "관련 논문", "집계 1위인데 양쪽 집단에서 다 짐", "ADR-037"),
+    ("BGE-M3 (568M 다국어)", "임베딩",
+     "간선 0개 집단에서 −0.0334, bge-base보다도 −0.0232", "ADR-046"),
+    ("Qwen3-Embedding-0.6B (595M)", "임베딩",
+     "−0.0073 (0 제외), bge-base와는 구별 안 됨 — 크기가 사는 것이 없음", "ADR-049"),
+    ("bge-reranker-v2-m3 (교차 인코더)", "관련 논문",
+     "코사인 대비 −0.0359 (0 제외). 풀 상한 0.2690인데 0.0868", "ADR-051"),
 )
 
 
@@ -124,6 +132,55 @@ def slot_rows(baseline: dict[str, Any]) -> list[dict[str, Any]]:
     return rows
 
 
+def basis_rows(report: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """하한이 **파국을 잡는지** 한 줄로. `evals.ragas_spread --floors`가 센 값입니다.
+
+    하한에 필요한 질문은 "평균이 하한보다 큰가"가 아니라 둘입니다(ADR-004·ADR-043) —
+    정상이던 실행 중 최악이 하한을 넘지 않는가, 그리고 결함을 심으면 걸리는가. 둘째가
+    아니면 그 하한은 상수에 걸려 있고 게이트가 아닙니다.
+    """
+    if not report or not report.get("verdict"):
+        return []
+    return [
+        {
+            "metric": name,
+            "floor": entry.get("floor"),
+            "runs_seen": entry.get("runs_seen"),
+            "worst_normal_run": entry.get("worst_normal_run"),
+            "margin": entry.get("margin_to_floor"),
+            "survives": entry.get("survives_the_worst_normal_run"),
+            "with_defect": entry.get("with_a_planted_defect") or [],
+            "defect_trips_it": entry.get("a_planted_defect_trips_it"),
+        }
+        for name, entry in sorted(report["verdict"].items())
+    ]
+
+
+def prompt_rows(baseline: dict[str, Any]) -> list[dict[str, Any]]:
+    """기준선이 잰 프롬프트와 **지금 코드의 프롬프트**를 나란히 둡니다.
+
+    게이트의 `prompt_version` 규칙이 보는 값입니다(ADR-041). 지금 코드를 읽을 수 없는
+    체크아웃에서도 떠야 하므로 `prompts.py`를 못 읽으면 기준선 쪽만 적습니다.
+    """
+    recorded = baseline.get("prompt_versions") or {}
+    live: dict[str, str] = {}
+    try:
+        from pipeline.prompt_registry import manifest
+
+        live = {name: entry["sha256"] for name, entry in manifest().items()}
+    except Exception:  # noqa: BLE001 - 화면이 프롬프트 모듈 때문에 죽으면 안 됩니다.
+        live = {}
+    return [
+        {
+            "prompt": name,
+            "baseline": recorded.get(name),
+            "code": live.get(name),
+            "same": (live.get(name) == recorded.get(name)) if live and recorded else None,
+        }
+        for name in sorted(set(recorded) | set(live))
+    ]
+
+
 def variant_rows(report: dict[str, Any] | None) -> list[dict[str, Any]]:
     """변형 비교 보고서를 표로. 현직을 표시해 '무엇과 겨뤘는지'를 남깁니다."""
     if not report:
@@ -184,4 +241,9 @@ def summary(baseline: dict[str, Any]) -> dict[str, Any]:
         "judge_model": baseline.get("ragas_judge_model"),
         "metrics_split": baseline.get("metrics_split"),
         "tight_floors": tight_floors(rows),
+        # 지금 코드의 프롬프트가 기준선을 만든 실행과 다르면, 아래 숫자들은 **이 코드가 낸
+        # 점수가 아닙니다.** 화면 맨 위에서 그 사실을 먼저 말해야 합니다.
+        "prompts_drifted": sorted(
+            row["prompt"] for row in prompt_rows(baseline) if row["same"] is False
+        ),
     }

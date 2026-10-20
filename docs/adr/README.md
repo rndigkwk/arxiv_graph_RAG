@@ -85,3 +85,14 @@
 | [ADR-038](ADR-038-the-forecast-panel.md) | 예측 패널을 붙인다 — 모델이 쓰이는 첫 자리 | 채택 |
 | [ADR-039](ADR-039-measure-embeddings-where-the-signal-is-only-the-embedding.md) | 임베딩은 임베딩만이 신호인 자리에서 잰다 | 채택 |
 | [ADR-040](ADR-040-fill-the-empty-panel.md) | 빈 패널을 임베딩으로 채운다 — GBM의 집계 우위가 사라졌다 | 채택 |
+| [ADR-041](ADR-041-the-gate-reads-the-prompt.md) | 게이트가 프롬프트를 읽는다 — 지문을 적어 두기만 하고 보지 않았다 | 채택 |
+| [ADR-042](ADR-042-the-saved-list-leaves-the-app.md) | 저장 목록이 앱 밖으로 나간다 — 빈 칸은 추측하지 않고 센다 | 채택 |
+| [ADR-043](ADR-043-the-floor-is-checked-against-the-worst-run.md) | RAGAS 하한은 최악의 정상 실행과 심은 결함으로 검사한다 | 채택 |
+| [ADR-044](ADR-044-not-run-is-not-a-regression.md) | 돌리지 못한 것은 회귀가 아니다 — 그러나 통과도 아니다 | 채택 |
+| [ADR-045](ADR-045-what-to-delete-before-adding-a-month.md) | 한 달을 더하기 전에 무엇을 지울지 — 지금은 지울 것이 없다 | 채택 |
+| [ADR-046](ADR-046-bge-m3-does-not-clear-the-bar.md) | BGE-M3는 바를 넘지 못했다 — 5.2배 큰 모델이 작은 형제보다 나쁘다 | 기각 |
+| [ADR-047](ADR-047-the-loader-refuses-papers-the-vector-index-cannot-see.md) | 적재가 벡터 인덱스에 안 보이는 논문을 거부한다 | 채택 |
+| [ADR-048](ADR-048-the-type-check-does-not-know-the-internet.md) | 유형 검사는 인터넷을 모른다 — 읽기로 분류되는 외부 요청을 막는다 | 채택 |
+| [ADR-049](ADR-049-no-local-embedding-clears-the-bar.md) | 로컬 임베딩 셋 다 바를 넘지 못했다 — 크기가 아무것도 사지 않았다 | 기각 |
+| [ADR-050](ADR-050-measure-the-cross-encoder-before-buying-the-host.md) | 교차 인코더를 호스팅을 사기 전에 잰다 — 바를 먼저 적는다 | 채택 |
+| [ADR-051](ADR-051-the-cross-encoder-loses-to-cosine.md) | 교차 인코더도 코사인을 못 이겼다 — 후보 풀은 핑계가 되지 않는다 | 기각 |

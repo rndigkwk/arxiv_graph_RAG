@@ -11,7 +11,7 @@
 수 없습니다** — 통과만 시키는 게이트는 게이트가 아니므로 `tests/fixtures/eval_gate/`의 가짜
 기준선·결과 쌍으로 규칙마다 제대로 실패하는지 확인합니다.
 
-위반으로 올라오는 규칙은 여섯 개입니다. 여기에 비교가 성립하는지 보는 `metrics_split`이
+위반으로 올라오는 규칙은 일곱 개입니다. 여기에 비교가 성립하는지 보는 `metrics_split`이
 **전제로** 붙습니다 — 분할이 다르면 집계 규칙(`floor`·`drop`)을 아예 적용하지 않습니다.
 
 | 규칙 | 내용 |
@@ -22,6 +22,17 @@
 | `drop` | 기준선 대비 하락이 허용폭 이하인가 |
 | `stable_case` | 기준선에서 만점이던 사례가 이번에 깨졌는가 |
 | `judge_model` | RAGAS를 기준선과 같은 모델이 채점했는가 |
+| `prompt_version` | 답을 만든 프롬프트 본문이 기준선과 같은가 |
+
+**마지막 규칙이 늦게 들어온 이유를 적어 둡니다.**
+[ADR-018](../docs/adr/ADR-018-prompt-versioning.md)이 프롬프트 지문을 보고서에 적게
+만들었는데(`metadata.prompt_versions`), **게이트가 그 칸을 읽지 않았습니다.** 점수를 움직이는
+입력 중에 게이트가 모르는 것이 하나 남아 있었던 것입니다 — 프롬프트를 손으로 고치다 심판
+정확도 21/21 → 11/21을 낸 사고(ROADMAP 11-2)가 그 칸입니다.
+`judge_model`을 넣은 이유와 같은 모양인데 한쪽만 막혀 있었습니다.
+
+`git_sha`로는 대신할 수 없습니다. 프롬프트를 고치지 않은 커밋에서도 점수는 흔들리고, 고친
+커밋에서도 다른 파일만 바뀌었을 수 있습니다. **지문이 다르면 다른 프롬프트입니다.**
 
 **에이전트 실패와 채점 오류를 구별합니다.** 교안은 "채점 오류 0"만 두지만, 이 프로젝트는
 에이전트 실패율을 **5.6~8.3%로 측정했습니다**(`EXPERIMENTS.md` 10절: `coauthor-03` 12회 중 1회,
@@ -163,6 +174,10 @@ def normalize(report: dict[str, Any]) -> dict[str, Any]:
         "scoring_errors": int(report.get("scoring_errors", 0)),
         # 보고서가 적어 두었으면 그대로 들고 옵니다. `--ragas`로 주면 그쪽이 덮습니다.
         "ragas_judge_model": report.get("ragas_judge_model", ""),
+        # 답을 만든 프롬프트 본문의 지문입니다(ADR-018, `evals.telemetry.prompt_manifest`).
+        # 지문을 적기 전에 돌린 옛 보고서는 빈 dict가 되고, 게이트는 그것을 "기록 없음"으로
+        # 올립니다 — 조용히 통과시키면 그 보고서가 어느 프롬프트였는지 영원히 알 수 없습니다.
+        "prompt_versions": (report.get("metadata") or {}).get("prompt_versions") or {},
     }
 
 
@@ -173,6 +188,7 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
         single["runs"] = 1
         single["observed_spread"] = None
         single.setdefault("ragas_judge_model", reports[0].get("ragas_judge_model", ""))
+        single.setdefault("prompt_versions", reports[0].get("prompt_versions") or {})
         return single
     keys = sorted(set().union(*(set(report["metrics"]) for report in reports)))
     metrics, spread = {}, {}
@@ -189,6 +205,14 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
     judges = {run.get("ragas_judge_model") for run in reports if run.get("ragas_judge_model")}
     # 실행마다 판정 모델이 다르면 하나로 적을 수 없습니다. 비워 두면 게이트가 불일치로 막습니다.
     merged["ragas_judge_model"] = judges.pop() if len(judges) == 1 else ""
+    # 프롬프트도 같습니다. 실행 도중에 본문을 고쳤으면 **세 실행의 평균이 무엇의 평균인지**
+    # 말할 수 없습니다. 비워 두어 게이트가 "기록 없음"으로 막게 합니다.
+    fingerprints = {
+        json.dumps(report.get("prompt_versions") or {}, sort_keys=True) for report in reports
+    }
+    merged["prompt_versions"] = (
+        reports[0].get("prompt_versions") or {} if len(fingerprints) == 1 else {}
+    )
     merged["cases"] = {
         case_id: {
             "failed": any(report["cases"].get(case_id, {}).get("failed") for report in reports),
@@ -302,6 +326,38 @@ def compares_aggregates(baseline: dict[str, Any], split: str) -> bool:
     return split == baseline.get("metrics_split", "full")
 
 
+def prompt_drift(
+    expected: dict[str, str] | None, actual: dict[str, str] | None
+) -> list[Violation]:
+    """Which prompts this run did not share with the baseline.
+
+    **기준선이 지문을 들고 있지 않으면 아무것도 말하지 않습니다.** 규칙을 넣기 전에 쓴
+    기준선에 이 규칙을 소급 적용하면 매 실행이 실패하고, 그러면 게이트가 꺼집니다
+    (`stable_case`가 실패율을 두 번 세지 않는 것과 같은 선).
+
+    반대로 기준선이 들고 있는데 이번 보고서가 비어 있으면 **올립니다.** 지문이 없는 실행은
+    "같았다"가 아니라 "모른다"이고, 모르는 것을 통과시키면 규칙이 없는 것과 같습니다.
+    """
+    if not expected:
+        return []
+    if not actual:
+        return [Violation(
+            "prompt_version",
+            "이번 보고서에 프롬프트 지문이 없습니다(metadata.prompt_versions). 어느 프롬프트로 "
+            "낸 점수인지 알 수 없어 기준선과 비교할 수 없습니다.",
+        )]
+    changed = sorted(
+        name for name in set(expected) | set(actual) if expected.get(name) != actual.get(name)
+    )
+    if not changed:
+        return []
+    detail = ", ".join(
+        f"{name} {expected.get(name) or '(없음)'} -> {actual.get(name) or '(없음)'}"
+        for name in changed
+    )
+    return [Violation("prompt_version", f"프롬프트 본문이 기준선과 다릅니다: {detail}")]
+
+
 def check(
     baseline: dict[str, Any], report: dict[str, Any], *, split: str = "full"
 ) -> list[Violation]:
@@ -328,6 +384,11 @@ def check(
                 f"RAGAS 판정 모델이 기준선과 다릅니다: 기준선 {expected_judge!r}, "
                 f"이번 {actual_judge or '(기록 없음)'!r}",
             ))
+
+    # 프롬프트 본문이 바뀌면 점수가 움직이고, 그 움직임은 회귀가 아니라 **다른 것을 쟀다**
+    # 입니다. `metrics_split`과 달리 분할에 매이지 않습니다 — 집계를 비교하지 않는 smoke
+    # 분할에서도 `stable_case` 규칙이 돌고, 그 규칙은 프롬프트가 바뀌면 뜻이 달라집니다.
+    violations.extend(prompt_drift(baseline.get("prompt_versions"), report.get("prompt_versions")))
 
     if report["scoring_errors"]:
         violations.append(
@@ -395,12 +456,22 @@ def _worse(name: str, value: float, floor: float) -> bool:
 def write_summary(path: Path, baseline: dict[str, Any], report: dict[str, Any],
                   violations: list[Violation]) -> None:
     """A table for the CI step summary, so a failure is readable without the artifact."""
+    # 프롬프트가 같았는지를 통과한 실행에서도 적어 둡니다. 그래야 나중에 "무엇으로 낸
+    # 점수인가"를 되짚을 때 본문을 찾으러 가지 않습니다(ADR-041). 세 상태를 구별합니다 -
+    # 같다 / 다르다 / **기준선이 지문을 안 들고 있어 말할 수 없다**.
+    if not baseline.get("prompt_versions"):
+        prompts_line = "기준선에 지문이 없어 대조하지 않았습니다"
+    elif prompt_drift(baseline.get("prompt_versions"), report.get("prompt_versions")):
+        prompts_line = "**기준선과 다릅니다**"
+    else:
+        prompts_line = "기준선과 같습니다"
     lines = [
         "## 회귀 평가",
         "",
         f"- 분할 `{report.get('split', 'full')}` · 사례 {len(report['cases'])}건 "
         f"· 기준선 {baseline['source']['runs']}회 실행분",
         f"- 판정: {'실패' if violations else '통과'} (위반 {len(violations)}건)",
+        f"- 프롬프트: {prompts_line}",
         *(
             []
             if compares_aggregates(baseline, report.get("split", "full"))
@@ -485,6 +556,25 @@ def main() -> int:
             )
         if measured_judge:
             carried["ragas_judge_model"] = measured_judge
+        # 프롬프트도 같은 이유로 멈춥니다. 다만 여기서는 **고의로 고친 경우가 정상**이므로
+        # (프롬프트를 바꿨으니 기준선을 다시 쓰는 것) 멈추는 조건이 하나 더 붙습니다 —
+        # 실행들끼리 지문이 갈린 경우입니다. 그때는 평균이 무엇의 평균인지 말할 수 없습니다.
+        measured_prompts = merged.get("prompt_versions") or {}
+        if len(args.report) > 1 and not measured_prompts:
+            parser.error(
+                "실행마다 프롬프트 지문이 다릅니다. 같은 본문으로 돌린 실행들만 하나의 "
+                "기준선이 될 수 있습니다(metadata.prompt_versions 확인)."
+            )
+        if measured_prompts:
+            carried["prompt_versions"] = measured_prompts
+        else:
+            # 빈 값으로 덮지 않습니다. 보고서가 지문을 안 적는다는 사실이 기준선의 지문을
+            # 지울 이유가 될 수 없습니다 — `splits`·`related_slot`·`model_registry`가
+            # 조용히 사라진 세 번(ADR-034·ADR-032)과 같은 모양입니다.
+            print(
+                "주의: 보고서에 프롬프트 지문이 없습니다. 기준선의 prompt_versions는 "
+                f"{'그대로 둡니다' if carried.get('prompt_versions') else '비어 있습니다'}."
+            )
         baseline = make_baseline(
             merged,
             primary_metric=args.primary_metric,

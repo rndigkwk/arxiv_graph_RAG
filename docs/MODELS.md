@@ -54,7 +54,7 @@
 > 둘입니다 — 최고 휴리스틱 대비 쌍체 구간이 0을 제외할 것, 순위 MRR이 0.60 이상일 것.
 > 조건이 기준선에 없으면 통과가 아니라 **거부**합니다.
 
-## 4. 재서 기각한 것 — 여섯 번
+## 4. 재서 기각한 것 — 아홉 번
 
 | 모델 | 어느 자리 | 결과 | 기록 |
 |---|---|---|---|
@@ -64,12 +64,15 @@
 | GPU 전체 파인튜닝 | 임베딩 | EXPERIMENTS 11-6 | — |
 | 선형 어댑터(미래 라벨) | 관련 논문, 그래프가 0점인 자리 | `vector` 대비 **다섯 지표 중 넷이 0 포함** | [ADR-036](adr/ADR-036-the-embedding-fills-what-the-graph-cannot.md) |
 | **`graph-text-gbm`(재정렬기)** | 관련 논문, 미래 라벨 | 집계 <!--n:reports/related_future_study.json#summary.gbm.recall_at_k-->0.1861<!--/n-->로 **1위인데 양쪽 집단에서 다 짐** | [ADR-037](adr/ADR-037-the-gbm-wins-the-average-and-loses-both-halves.md) |
+| **`BAAI/bge-m3`**(568M 다국어) | 임베딩, 간선 0개 자리 | OpenAI 대비 recall@5 <!--n:reports/embedding_slice_bge_m3.json#by_degree_slice.no_citation_edges.recall_at_k.mean-->-0.0334<!--/n-->, **작은 형제 `bge-base`보다도** <!--n:reports/embedding_slice_m3_vs_base.json#by_degree_slice.no_citation_edges.recall_at_k.mean-->-0.0232<!--/n--> (세 지표 모두 0 제외) | [ADR-046](adr/ADR-046-bge-m3-does-not-clear-the-bar.md) |
+| **`Qwen3-Embedding-0.6B`**(595M) | 임베딩, 간선 0개 자리 | OpenAI 대비 recall@5 <!--n:reports/embedding_slice_qwen3_06b.json#by_degree_slice.no_citation_edges.recall_at_k.mean-->-0.0073<!--/n--> (0 제외). **`bge-base`(1/5.5 크기)와는 구별되지 않습니다** | [ADR-049](adr/ADR-049-no-local-embedding-clears-the-bar.md) |
+| **`bge-reranker-v2-m3`**(교차 인코더) | 관련 논문, 간선 0개 자리 | 코사인 대비 recall@5 **−0.0359** (0 제외). **후보 풀은 핑계가 아닙니다** — 풀 상한 0.2690인데 0.0868 | [ADR-051](adr/ADR-051-the-cross-encoder-loses-to-cosine.md) |
 
 마지막 줄이 가장 조심스러운 기각입니다. 세 지표 모두 1위였고 **집단으로 나눈 뒤에야** 다수
 집단(간선 0개, 80.8%)에서 자기가 품은 임베딩보다 나쁘고 둘째 집단에서 Cypher 한 줄보다
 나쁘다는 것이 드러났습니다.
 
-## 5. 조정 방식 — 네 가지 규율
+## 5. 조정 방식 — 다섯 가지 규율
 
 **1. 격자 탐색은 검증에서만, 한 번만.** 어댑터의 ridge를 11-3절에서 격자로 고르고, 이후
 실험에서는 **다시 탐색하지 않고 그 값을 씁니다**(`RIDGE_MULTIPLIER = 0.1`). 다시 고르면 평가
@@ -84,7 +87,7 @@
 실제로 닫혔는지 확인합니다(자르기 전에는 공동인용이 미래 정답을 전부 담고 있었고, 자른 뒤에는
 0건입니다).
 
-**4. 하이퍼파라미터보다 과제 정의를 먼저 봅니다.** 여섯 번의 기각 중 넷이 "모델이 나빠서"가
+**4. 하이퍼파라미터보다 과제 정의를 먼저 봅니다.** 아홉 번의 기각 중 넷이 "모델이 나빠서"가
 아니라 **정답의 정의를 데이터 질의가 그대로 계산할 수 있어서**였습니다. 그래서 모델을 세우기
 전에 판별 기준 셋을 먼저 통과시킵니다(ADR-031).
 
@@ -93,6 +96,13 @@
 | 1 | 라벨이 **데이터 질의로 계산되지 않아야** 합니다 |
 | 2 | **양성이 충분해야** 합니다 |
 | 3 | 배포 제약에 맞아야 합니다(torch 불가, Streamlit 690MB, Aura 관계 한도) |
+
+**5. 조정한 것이 무엇인지 게이트가 압니다.** 이 표의 첫 줄처럼 가중치를 조정하지 않는 모델도
+**프롬프트는 조정합니다.** 그 조정을 손으로 하다 심판 정확도 21/21 → 11/21을 냈고, 둘 다 고친
+뒤에 알았습니다. 그래서 프롬프트 본문의 지문을 평가 보고서에 적고([ADR-018](adr/ADR-018-prompt-versioning.md)),
+**게이트가 기준선과 대조합니다**([ADR-041](adr/ADR-041-the-gate-reads-the-prompt.md) — 적어 두기만
+하고 보지 않던 칸입니다). 같은 선에서 하한의 근거도 "평균이 하한보다 큰가"가 아니라 **최악의
+정상 실행과 심은 결함**으로 검사합니다([ADR-043](adr/ADR-043-the-floor-is-checked-against-the-worst-run.md)).
 
 ## 6. 측정을 반영한 것과 아직 아닌 것
 

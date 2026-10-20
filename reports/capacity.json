@@ -1,0 +1,279 @@
+{
+  "generated_at": "2026-10-20T01:10:21.645573+00:00",
+  "snapshot": "2026-10-14",
+  "usage": {
+    "nodes": {
+      "used": 149025,
+      "limit": 200000,
+      "share": 0.7451,
+      "free": 50975,
+      "parts": {
+        "ArxivPaper": 37854,
+        "ArxivAuthorName": 111171
+      }
+    },
+    "relationships": {
+      "used": 338366,
+      "limit": 400000,
+      "share": 0.8459,
+      "free": 61634,
+      "parts": {
+        "AUTHORED": 268928,
+        "REFERENCES": 69438
+      },
+      "authored_share_of_relationships": 0.7948
+    }
+  },
+  "rate": {
+    "authored_per_paper": 7.1043,
+    "references_per_paper": 1.8344,
+    "relationships_per_paper": 8.9387,
+    "recent_months": {
+      "2026-03": 844,
+      "2026-04": 811,
+      "2026-05": 1017,
+      "2026-06": 1518,
+      "2026-07": 1672,
+      "2026-08": 2322
+    },
+    "partial_last_month": {
+      "2026-09": 902
+    },
+    "papers_per_month": 1364.0,
+    "peak_month": [
+      "2026-08",
+      2322
+    ]
+  },
+  "headroom": {
+    "nodes_per_paper": 3.9368,
+    "relationships_per_paper": 8.9387,
+    "papers_by_relationships": 6895,
+    "papers_by_nodes": 12948,
+    "binding_axis": "relationships",
+    "papers_that_fit": 6895,
+    "months_that_fit": 5.1,
+    "months_at_peak_rate": 3.0,
+    "safety_ceiling": 0.95,
+    "within_safety_ceiling": {
+      "free_nodes": 40975,
+      "free_relationships": 41634,
+      "papers_by_relationships": 4657,
+      "papers_by_nodes": 10408,
+      "binding_axis": "relationships",
+      "papers_that_fit": 4657,
+      "months_that_fit": 3.4,
+      "months_at_peak_rate": 2.0
+    }
+  },
+  "eval_dependency": {
+    "available": true,
+    "author_cases": [
+      {
+        "id": "author-01",
+        "name_degree": 2,
+        "positions": [
+          6,
+          11
+        ],
+        "deepest": 11
+      },
+      {
+        "id": "author-02",
+        "name_degree": 3,
+        "positions": [
+          6,
+          14,
+          25
+        ],
+        "deepest": 25
+      },
+      {
+        "id": "author-03",
+        "name_degree": 3,
+        "positions": [
+          4,
+          5,
+          1
+        ],
+        "deepest": 5
+      },
+      {
+        "id": "author-04",
+        "name_degree": 3,
+        "positions": [
+          4,
+          7,
+          3
+        ],
+        "deepest": 7
+      },
+      {
+        "id": "author-05",
+        "name_degree": 2,
+        "positions": [
+          12,
+          4
+        ],
+        "deepest": 12
+      },
+      {
+        "id": "author-06",
+        "name_degree": 2,
+        "positions": [
+          13,
+          9
+        ],
+        "deepest": 13
+      }
+    ],
+    "author_min_degree": 2,
+    "author_deepest_position": 25,
+    "coauthor": {
+      "cases": [
+        {
+          "id": "coauthor-01",
+          "resolved": true,
+          "deepest": 860
+        },
+        {
+          "id": "coauthor-02",
+          "resolved": true,
+          "deepest": 5
+        },
+        {
+          "id": "coauthor-03",
+          "resolved": true,
+          "deepest": 14
+        },
+        {
+          "id": "coauthor-04",
+          "resolved": true,
+          "deepest": 2
+        },
+        {
+          "id": "coauthor-05",
+          "resolved": true,
+          "deepest": 4
+        },
+        {
+          "id": "coauthor-06",
+          "resolved": true,
+          "deepest": 5
+        }
+      ],
+      "deepest_position": 860
+    },
+    "deepest_author_position_the_eval_needs": 860
+  },
+  "candidates": [
+    {
+      "candidate": "논문당 저자 상한 5명",
+      "relationships_freed": 111643,
+      "nodes_freed": 40515,
+      "papers_touched": 17429,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 5은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 10명",
+      "relationships_freed": 57983,
+      "nodes_freed": 22275,
+      "papers_touched": 4395,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 10은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 15명",
+      "relationships_freed": 42835,
+      "nodes_freed": 17415,
+      "papers_touched": 1744,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 15은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 20명",
+      "relationships_freed": 36011,
+      "nodes_freed": 15055,
+      "papers_touched": 968,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 20은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 30명",
+      "relationships_freed": 29059,
+      "nodes_freed": 12550,
+      "papers_touched": 472,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 30은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 50명",
+      "relationships_freed": 22712,
+      "nodes_freed": 10307,
+      "papers_touched": 209,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 50은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 100명",
+      "relationships_freed": 16142,
+      "nodes_freed": 7721,
+      "papers_touched": 88,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 100은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 200명",
+      "relationships_freed": 10217,
+      "nodes_freed": 5021,
+      "papers_touched": 40,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 200은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 500명",
+      "relationships_freed": 4682,
+      "nodes_freed": 2397,
+      "papers_touched": 7,
+      "breaks_the_eval": true,
+      "why": "평가가 860번째 저자까지 의지합니다. 상한 500은 그 저자를 지워 정답을 깨뜨립니다."
+    },
+    {
+      "candidate": "논문당 저자 상한 1000명",
+      "relationships_freed": 2716,
+      "nodes_freed": 1488,
+      "papers_touched": 3,
+      "breaks_the_eval": false,
+      "why": "평가가 의지하는 가장 뒤 위치(860)를 넘기므로 정답은 그대로입니다."
+    },
+    {
+      "candidate": "한 편에만 등장하는 저자 이름 삭제",
+      "relationships_freed": 69627,
+      "nodes_freed": 69627,
+      "papers_touched": 23648,
+      "breaks_the_eval": false,
+      "why": "차수 1인 이름은 두 논문을 이을 수 없어 공동저자 답이 구조적으로 그대로이고, 저자 질문의 정답은 2편 이상을 요구하므로 차수 2 이상만 씁니다. 그러나 **3144편(8.3%)이 저자를 전부 잃고** 6460편은 1저자를 잃습니다 - 평가가 묻지 않는 손실입니다."
+    },
+    {
+      "candidate": "인용 간선이 없는 논문 삭제",
+      "relationships_freed": 16202,
+      "nodes_freed": 9944,
+      "papers_touched": 2958,
+      "breaks_the_eval": true,
+      "gold_papers_deleted": [
+        "2510.15144"
+      ],
+      "why": "정답에 들어 있는 논문 1편을 지웁니다 - 그만큼 재는 대상 자체가 줄어듭니다. 수확도 다른 방안보다 작습니다."
+    },
+    {
+      "candidate": "AUTHORED를 ArxivPaper 속성 배열로 접기",
+      "relationships_freed": 268928,
+      "nodes_freed": 111171,
+      "papers_touched": 37854,
+      "breaks_the_eval": null,
+      "why": "수확이 가장 큽니다 - 관계의 79.5%와 노드의 74.6%. 이름을 하나도 잃지 않습니다. 대신 공동저자 질의가 노드 경유 대신 전체 논문 스캔이 되고, **그 지연은 DB에서만 잴 수 있습니다** - 여기서 판정하지 않습니다."
+    }
+  ],
+  "reading": "묶이는 축을 먼저 봅니다 - 노드만 줄이는 방안은 자리를 만들지 못합니다. `breaks_the_eval`이 참인 방안은 자리를 만들지만 대답을 잃습니다. None은 여기서 판정할 수 없다는 뜻이며, 무엇을 더 재야 하는지가 `why`에 있습니다."
+}

@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-10-17T00:00:00+00:00",
+  "note": "보고서에 지문이 없습니다. 모르는 것을 통과시키면 규칙이 없는 것과 같습니다.",
+  "source": {
+    "mode": "compare",
+    "dataset": "fixture.json",
+    "runs": 3,
+    "git_sha": null,
+    "observed_spread": null
+  },
+  "primary_metric": "answer_evidence_recall",
+  "metrics_split": "full",
+  "metrics": {
+    "answer_evidence_recall": 1.0
+  },
+  "absolute_floor": {
+    "answer_evidence_recall": 0.6
+  },
+  "allowed_drop": null,
+  "case_ids": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "stable_cases": [
+    "c1",
+    "c2",
+    "c3"
+  ],
+  "ragas_judge_model": "gpt-6-luna",
+  "prompt_versions": {
+    "AGENT_SYSTEM": "72066324526a",
+    "CYPHER_RULES": "0fc2226dcb49"
+  }
+}

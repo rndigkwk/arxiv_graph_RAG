@@ -26,6 +26,8 @@ pipeline/state/
 .pytest_tmp/
 exports/
 reports/eval_gate.json
+# 예산이 바닥나 평가를 돌리지 못했다는 표식입니다(ADR-044). CI 안에서만 생깁니다.
+reports/eval_not_run.json
 reports/summary.md
 reports/regression_*.json
 reports/junit.xml

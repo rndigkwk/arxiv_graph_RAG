@@ -9,6 +9,7 @@ from statistics import fmean
 from time import perf_counter
 from typing import Any
 
+from evals import budget
 from evals.metrics import score_answer, score_related, score_retrieval, summarize
 from evals.telemetry import (
     build_run_metadata,
@@ -491,6 +492,54 @@ def summarize_comparison(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return summary
 
 
+def one_case(
+    chatbot: Any,
+    case: dict[str, Any],
+    *,
+    mode: str,
+    top_k: int,
+    rates: dict[str, float | str] | None,
+) -> dict[str, Any]:
+    """Run one case in whichever mode was asked for.
+
+    세 갈래를 `main`의 루프 안에 두고 있었습니다. 떼어 낸 이유는 **루프가 한 줄이어야 그
+    한 줄을 감쌀 수 있기** 때문입니다(ADR-044의 예산 판별).
+    """
+    if mode == "compare":
+        return compare_case(chatbot, case, top_k=top_k, rates=rates)
+    if mode == "retrieval":
+        response = chatbot.search_papers.invoke(
+            {"query": case["search_query"], "top_k": top_k}
+        )
+        return evaluate_case(case, response, mode=mode, top_k=top_k)
+    # agent 모드도 토큰과 지연을 적습니다. compare 모드만 적고 있었는데, 그러면 벡터
+    # 기준선까지 돌리지 않고는 비용을 비교할 수 없습니다 - 라우팅 측정이 정확히 그
+    # 경우였습니다(ADR-024).
+    start = perf_counter()
+    response, messages = chatbot.ask(case["question"], [])
+    row = evaluate_case(case, response, mode=mode, top_k=top_k)
+    agent_input, agent_output = _token_totals(messages)
+    agent_cached = cached_input_tokens(messages)
+    row.update({
+        "elapsed_seconds": perf_counter() - start,
+        "chat_input_tokens": agent_input,
+        # 캐시 읽기는 같은 접두사를 다시 보낼 때 할인되는 부분입니다. 빼고 보면 이번 답변이
+        # 실제로 새로 읽힌 양이 나옵니다.
+        "chat_input_tokens_cached": agent_cached,
+        "chat_input_tokens_fresh": (
+            None if agent_input is None or agent_cached is None
+            else agent_input - agent_cached
+        ),
+        "chat_output_tokens": agent_output,
+        "estimated_api_cost_usd": estimate_api_cost(agent_input, agent_output, 0, rates),
+        # 어떤 도구를 불렀는지입니다. 임베딩 토큰으로 추정하지 않고 직접 셉니다.
+        "tool_names": [
+            call.get("name", "") for call in response.get("tool_calls", []) or []
+        ],
+    })
+    return row
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Run a small arXiv GraphRAG retrieval/answer evaluation."
@@ -528,43 +577,20 @@ def main() -> None:
 
     rates = pricing_from_env(os.environ)
 
+    # 앞 실행이 남긴 표식이 이번 실패를 설명하면 안 됩니다.
+    budget.clear()
     rows = []
     for case in cases:
-        if args.mode == "compare":
-            rows.append(compare_case(chatbot, case, top_k=args.top_k, rates=rates))
-            continue
-        if args.mode == "retrieval":
-            response = chatbot.search_papers.invoke(
-                {"query": case["search_query"], "top_k": args.top_k}
-            )
-            rows.append(evaluate_case(case, response, mode=args.mode, top_k=args.top_k))
-            continue
-        # agent 모드도 토큰과 지연을 적습니다. compare 모드만 적고 있었는데, 그러면 벡터
-        # 기준선까지 돌리지 않고는 비용을 비교할 수 없습니다 - 라우팅 측정이 정확히 그
-        # 경우였습니다(ADR-024).
-        start = perf_counter()
-        response, messages = chatbot.ask(case["question"], [])
-        row = evaluate_case(case, response, mode=args.mode, top_k=args.top_k)
-        agent_input, agent_output = _token_totals(messages)
-        agent_cached = cached_input_tokens(messages)
-        row.update({
-            "elapsed_seconds": perf_counter() - start,
-            "chat_input_tokens": agent_input,
-            # 캐시 읽기는 같은 접두사를 다시 보낼 때 할인되는 부분입니다. 빼고 보면 이번 답변이
-            # 실제로 새로 읽힌 양이 나옵니다.
-            "chat_input_tokens_cached": agent_cached,
-            "chat_input_tokens_fresh": (
-                None if agent_input is None or agent_cached is None
-                else agent_input - agent_cached
-            ),
-            "chat_output_tokens": agent_output,
-            "estimated_api_cost_usd": estimate_api_cost(agent_input, agent_output, 0, rates),
-            # 어떤 도구를 불렀는지입니다. 임베딩 토큰으로 추정하지 않고 직접 셉니다.
-            "tool_names": [
-                call.get("name", "") for call in response.get("tool_calls", []) or []
-            ],
-        })
-        rows.append(row)
+        try:
+            rows.append(one_case(chatbot, case, mode=args.mode, top_k=args.top_k, rates=rates))
+        except Exception as exc:  # noqa: BLE001 - 예산 소진만 가로채고 나머지는 그대로 올립니다.
+            # 예산이 바닥난 것은 **품질 회귀가 아니라 평가를 돌리지 못한 것**입니다. 지금까지는
+            # 둘이 똑같은 빨간 X였고, 어느 쪽인지 알려면 로그 40줄을 열어야 했습니다(ADR-044).
+            # 재시도는 소용없습니다 - 기다려도 풀리지 않는 종류의 429입니다.
+            if (code := budget.exhausted(exc)) is None:
+                raise
+            budget.record(code, exc, stage="evals.run", done=len(rows))
+            raise SystemExit(budget.EXIT_NOT_RUN) from None
     metadata = build_run_metadata(
         cases_path=args.cases,
         case_ids=[case["id"] for case in cases],

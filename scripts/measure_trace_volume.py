@@ -51,7 +51,7 @@ def paths() -> dict[str, dict[str, int]]:
 
 def main() -> int:
     from pipeline.console import use_utf8_stdout
-    from pipeline.tracing import BUDGET_KEY, DEFAULT_BUDGET
+    from pipeline.tracing import BUDGET_KEY, DEFAULT_BUDGET, monthly_traces
 
     use_utf8_stdout()
     per_path = paths()
@@ -72,8 +72,13 @@ def main() -> int:
         },
         # 예산은 trace 단위(답변 하나 = trace 하나)입니다. observation이 아닙니다.
         "budget_key": BUDGET_KEY,
+        "budget_window": "하루(UTC)",
         "default_budget_traces": DEFAULT_BUDGET,
         "default_budget_observations_worst": DEFAULT_BUDGET * worst,
+        # **손잡이는 하루 단위인데 한도는 월 단위입니다.** 31을 곱한 값을 여기 적어 두면
+        # 문서가 그 수를 손으로 베끼지 않아도 됩니다 — 베낀 수는 노드가 늘면 갈라집니다.
+        "default_budget_monthly_traces": monthly_traces(DEFAULT_BUDGET),
+        "default_budget_monthly_observations_worst": monthly_traces(DEFAULT_BUDGET) * worst,
         "note": (
             "추정이 아니라 그래프를 실제로 돌려 센 값입니다. 보내는 내용은 노드 이름·시도 "
             "번호·지연뿐이고 질문도 답변도 포함하지 않습니다(ADR-023)."
