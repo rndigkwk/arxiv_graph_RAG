@@ -32,14 +32,25 @@
 <!--n:reports/capacity.json#headroom.nodes_per_paper-->3.9368<!--/n-->개를 데려옵니다.
 **관계가 먼저 찹니다.**
 
-| | 값 |
-|---|---:|
-| 들어갈 논문 | <!--n:reports/capacity.json#headroom.papers_that_fit-->6895<!--/n-->편 |
-| 최근 6개월 평균 생산량 | <!--n:reports/capacity.json#rate.papers_per_month-->1364.0<!--/n-->편/월 |
-| **들어갈 달** | **<!--n:reports/capacity.json#headroom.months_that_fit-->5.1<!--/n-->개월** |
-| 가장 많았던 달(2026-08)의 속도로는 | <!--n:reports/capacity.json#headroom.months_at_peak_rate-->3.0<!--/n-->개월 |
+| | 생 한도까지 | **적재가 허용하는 선(95%)** |
+|---|---:|---:|
+| 여유 관계 | <!--n:reports/capacity.json#usage.relationships.free-->61634<!--/n-->개 | **<!--n:reports/capacity.json#headroom.within_safety_ceiling.free_relationships-->41634<!--/n-->개** |
+| 들어갈 논문 | <!--n:reports/capacity.json#headroom.papers_that_fit-->6895<!--/n-->편 | **<!--n:reports/capacity.json#headroom.within_safety_ceiling.papers_that_fit-->4657<!--/n-->편** |
+| **들어갈 달** | <!--n:reports/capacity.json#headroom.months_that_fit-->5.1<!--/n-->개월 | **<!--n:reports/capacity.json#headroom.within_safety_ceiling.months_that_fit-->3.4<!--/n-->개월** |
+| 가장 많았던 달(2026-08)의 속도로는 | <!--n:reports/capacity.json#headroom.months_at_peak_rate-->3.0<!--/n-->개월 | **<!--n:reports/capacity.json#headroom.within_safety_ceiling.months_at_peak_rate-->2.0<!--/n-->개월** |
 
-**지금 지울 것이 없습니다.** 다음 달 스냅샷은 아무것도 지우지 않고 들어갑니다.
+최근 6개월 평균 생산량은 <!--n:reports/capacity.json#rate.papers_per_month-->1364.0<!--/n-->편/월입니다.
+
+> **오른쪽 열이 답입니다.** 처음 이 절을 쓸 때 왼쪽 열만 적었는데, `pipeline.ingest`가
+> `CAPACITY_SAFETY`(95%)에서 **적재를 거부합니다.** 생 한도로 센 6,895편에는 적재가 받아 주지
+> 않는 2,238편이 들어 있었습니다. 원인은 단순합니다 — 한도 상수를 `ingest.py`에서 가져오지 않고
+> `capacity.py`에 **다시 적으면서** 차단선을 빼먹었습니다. 손으로 적은 중복이 조용히 갈라진
+> 다섯 번째 자리입니다(ADR-034·ADR-032). 지금은 `ingest.py`에서 가져오고 테스트가 두 모듈이
+> 같은 값을 쓰는지 봅니다.
+>
+> **결론은 바뀌지 않습니다** — 3.4개월에서 한 달을 쓰는 것이므로 여전히 지울 것이 없습니다.
+
+**지금 지울 것이 없습니다.** 다음 달 스냅샷은 아무것도 지우지 않고 들어갑니다 — 적재가 멈추는 선 안에서도 3.4개월이 남습니다.
 
 마지막 달(2026-09, 902편)은 수집 시점에 잘린 **부분값**이라 평균에서 뺐습니다. 넣으면 월
 생산량이 작아지고 남은 달 수가 과대평가됩니다.
@@ -117,7 +128,7 @@ AUTHORED를 `ArxivPaper`의 속성 배열로 접으면 관계의 **79.5%** 와 �
 
 **새 달의 관계 밀도를 지금 말뭉치로 어림했습니다.** 새 논문은 말뭉치 안의 논문을 더 많이 인용할
 수도 있습니다(최근 논문이 최근 논문을 인용합니다). 그러면 논문당 8.94가 낮은 추정이 되고 달 수가
-줄어듭니다. 5.1개월에 한 달을 쓰는 결정이라 이 불확실성이 결론을 바꾸지 않습니다.
+줄어듭니다. 3.4개월에서 한 달을 쓰는 결정이라 이 불확실성이 결론을 바꾸지 않습니다.
 
 ## 재현
 

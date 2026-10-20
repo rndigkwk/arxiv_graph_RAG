@@ -40,11 +40,54 @@ def test_the_module_does_not_touch_the_database():
     assert not re.search(r"^\s*(import openai|from openai)", source, re.MULTILINE)
 
 
+def test_the_limits_come_from_the_module_that_blocks_writes():
+    """같은 숫자를 두 벌 적으면 조용히 갈라집니다 - 이 저장소에서 이미 네 번 그랬습니다."""
+    from pipeline import ingest
+
+    assert capacity.NODE_LIMIT is ingest.NODE_LIMIT
+    assert capacity.RELATIONSHIP_LIMIT is ingest.RELATIONSHIP_LIMIT
+    assert capacity.CAPACITY_SAFETY is ingest.CAPACITY_SAFETY
+    # 여기서 다시 적지 않았는지 원문으로 확인합니다.
+    source = Path("pipeline/capacity.py").read_text(encoding="utf-8")
+    assert "200_000" not in source and "400_000" not in source
+
+
+def test_the_loadable_headroom_is_smaller_than_the_raw_limit(report):
+    """적재는 95%에서 멈춥니다. 생 한도로 센 수는 **거부당할 구간을 포함합니다.**"""
+    room = report["headroom"]
+    within = room["within_safety_ceiling"]
+
+    assert 0 < within["papers_that_fit"] < room["papers_that_fit"]
+    assert within["months_that_fit"] < room["months_that_fit"]
+    assert room["safety_ceiling"] == capacity.CAPACITY_SAFETY
+    # 차단선 안에서도 한 달은 들어가야 ADR-045의 결론이 성립합니다.
+    assert within["months_that_fit"] >= 1.0
+    assert within["months_at_peak_rate"] >= 1.0
+
+
+def test_a_ceiling_already_passed_reports_no_room_not_negative_room():
+    """음수 여유는 "자리가 없다"이고 "마이너스만큼 있다"가 아닙니다."""
+    use = {
+        "nodes": {"used": 199_000, "free": 1_000,
+                  "parts": {"ArxivPaper": 1_000, "ArxivAuthorName": 2_000}},
+        "relationships": {"used": 399_000, "free": 1_000},
+    }
+    rate = {"relationships_per_paper": 10.0, "papers_per_month": 50.0, "peak_month": ("x", 100)}
+
+    within = capacity.headroom(use, rate)["within_safety_ceiling"]
+
+    assert within["free_nodes"] == 0
+    assert within["free_relationships"] == 0
+    assert within["papers_that_fit"] == 0
+    assert within["months_that_fit"] == 0.0
+
+
 def test_the_binding_axis_decides_how_many_papers_fit():
     """관계가 먼저 차면 노드 여유는 답을 바꾸지 않습니다."""
     use = {
-        "nodes": {"free": 100_000, "parts": {"ArxivPaper": 1_000, "ArxivAuthorName": 2_000}},
-        "relationships": {"free": 1_000},
+        "nodes": {"used": 100_000, "free": 100_000,
+                  "parts": {"ArxivPaper": 1_000, "ArxivAuthorName": 2_000}},
+        "relationships": {"used": 100_000, "free": 1_000},
     }
     rate = {"relationships_per_paper": 10.0, "papers_per_month": 50.0, "peak_month": ("x", 100)}
 
@@ -59,8 +102,9 @@ def test_the_binding_axis_decides_how_many_papers_fit():
 
 def test_the_other_axis_can_bind_too():
     use = {
-        "nodes": {"free": 300, "parts": {"ArxivPaper": 1_000, "ArxivAuthorName": 2_000}},
-        "relationships": {"free": 1_000_000},
+        "nodes": {"used": 300, "free": 300,
+                  "parts": {"ArxivPaper": 1_000, "ArxivAuthorName": 2_000}},
+        "relationships": {"used": 300, "free": 1_000_000},
     }
     rate = {"relationships_per_paper": 10.0, "papers_per_month": 50.0, "peak_month": ("x", 100)}
 
@@ -143,15 +187,16 @@ def test_the_partial_last_month_is_kept_out_of_the_rate(report):
 def test_one_more_month_fits_without_deleting_anything(report):
     """제가 "한 달치를 더하면 한도를 칩니다"라고 적었던 것이 틀렸습니다(ADR-045).
 
-    깨지면 그 결론이 바뀐 것이므로 ADR-045와 ROADMAP을 함께 고쳐야 합니다.
+    깨지면 그 결론이 바뀐 것이므로 ADR-045와 ROADMAP을 함께 고쳐야 합니다. 판정은
+    **적재가 허용하는 쪽**으로 합니다 - 생 한도로 보면 거부당할 구간까지 세게 됩니다.
     """
-    room = report["headroom"]
+    within = report["headroom"]["within_safety_ceiling"]
 
-    assert room["binding_axis"] == "relationships"
-    assert room["papers_that_fit"] > report["rate"]["papers_per_month"]
-    assert room["months_that_fit"] >= 1.0
+    assert within["binding_axis"] == "relationships"
+    assert within["papers_that_fit"] > report["rate"]["papers_per_month"]
+    assert within["months_that_fit"] >= 1.0
     # 가장 생산량이 많았던 달의 속도로도 한 달은 들어갑니다.
-    assert room["months_at_peak_rate"] >= 1.0
+    assert within["months_at_peak_rate"] >= 1.0
 
 
 def test_the_biggest_candidate_is_not_judged_here(report):

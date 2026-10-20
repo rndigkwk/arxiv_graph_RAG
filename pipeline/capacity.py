@@ -35,10 +35,12 @@ from typing import Any
 
 from pipeline import snapshot as snapshot_module
 
-# ADR-001의 실측 한도입니다. 공식 문서 셋이 서로 다르게 적고 있어, 이 인스턴스가 실제로
-# 보관하며 동작하는 값(149,025노드·338,366관계)이 들어가는 쪽을 씁니다.
-NODE_LIMIT = 200_000
-RELATIONSHIP_LIMIT = 400_000
+# **한도와 차단선을 적재 쪽에서 가져옵니다.** 여기서 다시 적으면 같은 숫자가 두 벌이 되고,
+# 이 저장소에서 손으로 적은 중복은 이미 네 번 조용히 갈라졌습니다(ADR-034·ADR-032).
+# 권위는 `ingest.py`에 둡니다 — 쓰기를 막는 쪽이 한도를 들고 있어야 합니다. 실제로 처음
+# 쓸 때 두 한도를 여기에 다시 적었고, 그러면서 `CAPACITY_SAFETY`를 빼먹어 **적재가 거부할
+# 구간까지 "들어간다"고 셌습니다**(ADR-045의 덧붙임).
+from pipeline.ingest import CAPACITY_SAFETY, NODE_LIMIT, RELATIONSHIP_LIMIT
 
 CASES = Path("evals/cases_graph.json")
 OUTPUT = Path("reports/capacity.json")
@@ -115,28 +117,52 @@ def monthly(snap: snapshot_module.Snapshot, *, recent: int = 6) -> dict[str, Any
 
 
 def headroom(use: dict[str, Any], rate: dict[str, Any]) -> dict[str, Any]:
-    """How many papers and months fit, on whichever axis binds first."""
+    """How many papers and months fit, on whichever axis binds first.
+
+    **두 수를 냅니다.** 생 한도까지의 자리와, 적재가 실제로 허용하는 자리입니다 —
+    `pipeline.ingest`가 `CAPACITY_SAFETY`(95%)에서 멈추므로 생 한도로 센 수는 **적재가
+    거부할 구간을 포함합니다.** 처음 쓸 때 그 차이를 빼먹었고, 5.1개월이라고 적은 값이
+    실제로는 3.4개월이었습니다.
+    """
     per_paper_rel = rate["relationships_per_paper"]
     # 새 논문은 새 저자 이름도 데려옵니다. 지금 말뭉치에서 이름 하나가 평균 몇 편에 걸리는지로
     # 어림합니다 - 보수적으로 보려면 이 값이 작을수록(새 이름이 많을수록) 노드가 빨리 찹니다.
     names_per_paper = use["nodes"]["parts"]["ArxivAuthorName"] / use["nodes"]["parts"]["ArxivPaper"]
     per_paper_node = 1 + names_per_paper
-    by_relationships = use["relationships"]["free"] / per_paper_rel if per_paper_rel else 0
-    by_nodes = use["nodes"]["free"] / per_paper_node if per_paper_node else 0
-    binding = "relationships" if by_relationships <= by_nodes else "nodes"
-    papers = min(by_relationships, by_nodes)
     rate_per_month = rate["papers_per_month"] or 1
+
+    def fit(node_free: float, rel_free: float) -> dict[str, Any]:
+        by_rel = rel_free / per_paper_rel if per_paper_rel else 0
+        by_node = node_free / per_paper_node if per_paper_node else 0
+        papers = max(0.0, min(by_rel, by_node))
+        return {
+            "papers_by_relationships": int(by_rel),
+            "papers_by_nodes": int(by_node),
+            "binding_axis": "relationships" if by_rel <= by_node else "nodes",
+            "papers_that_fit": int(papers),
+            "months_that_fit": round(papers / rate_per_month, 1),
+            "months_at_peak_rate": (
+                round(papers / rate["peak_month"][1], 1) if rate["peak_month"] else None
+            ),
+        }
+
+    # 적재가 멈추는 선입니다. 생 한도에서 95%를 빼면 이미 쓴 양을 넘을 수도 있으므로 0에서
+    # 자릅니다 - 음수 여유는 "자리가 없다"이고 "마이너스만큼 있다"가 아닙니다.
+    allowed_nodes = NODE_LIMIT * CAPACITY_SAFETY - use["nodes"]["used"]
+    allowed_rels = RELATIONSHIP_LIMIT * CAPACITY_SAFETY - use["relationships"]["used"]
+    at_limit = fit(use["nodes"]["free"], use["relationships"]["free"])
     return {
         "nodes_per_paper": round(per_paper_node, 4),
         "relationships_per_paper": per_paper_rel,
-        "papers_by_relationships": int(by_relationships),
-        "papers_by_nodes": int(by_nodes),
-        "binding_axis": binding,
-        "papers_that_fit": int(papers),
-        "months_that_fit": round(papers / rate_per_month, 1),
-        "months_at_peak_rate": (
-            round(papers / rate["peak_month"][1], 1) if rate["peak_month"] else None
-        ),
+        **at_limit,
+        # **이쪽이 실제로 적재할 수 있는 양입니다.** 위의 값은 생 한도까지이고 `pipeline.ingest`가
+        # 그 전에 멈춥니다. 둘을 함께 적어 두지 않으면 "들어간다"가 거부당합니다.
+        "safety_ceiling": CAPACITY_SAFETY,
+        "within_safety_ceiling": {
+            "free_nodes": int(max(0.0, allowed_nodes)),
+            "free_relationships": int(max(0.0, allowed_rels)),
+            **fit(max(0.0, allowed_nodes), max(0.0, allowed_rels)),
+        },
     }
 
 
