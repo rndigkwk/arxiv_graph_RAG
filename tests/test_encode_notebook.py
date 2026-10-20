@@ -94,13 +94,29 @@ def test_the_batch_size_is_justified_by_a_measurement(notebook):
     assert "2.7GB" in config and "27MB" in config
 
 
-def test_the_notebook_is_committed_without_outputs(notebook):
-    """모델을 바꾼 뒤 옛 출력이 남아 있으면 화면이 거짓말을 합니다."""
-    for index, cell in enumerate(notebook["cells"]):
+def test_the_notebook_is_committed_without_outputs():
+    """모델을 바꾼 뒤 옛 출력이 남아 있으면 화면이 거짓말을 합니다.
+
+    **작업 사본이 아니라 커밋을 봅니다.** VS Code로 Colab에 붙여 돌리는 동안에는 로컬
+    파일에 실행 출력이 계속 쓰이고, 그것은 정상입니다 — 고정하려는 성질은 "커밋된 노트북이
+    실행 전 상태인가"입니다. 작업 사본을 보면 돌리는 중에 매번 깨집니다.
+    """
+    import subprocess
+
+    try:
+        blob = subprocess.run(
+            ["git", "show", f"HEAD:{NOTEBOOK.as_posix()}"],
+            capture_output=True, text=True, encoding="utf-8", check=True,
+        ).stdout
+    except (OSError, subprocess.CalledProcessError) as exc:
+        pytest.skip(f"커밋된 노트북을 읽지 못했습니다: {exc}")
+
+    committed = json.loads(blob)
+    for index, cell in enumerate(committed["cells"]):
         if cell["cell_type"] != "code":
             continue
-        assert not cell.get("outputs"), f"셀 {index}에 출력이 남아 있습니다"
-        assert cell.get("execution_count") is None, f"셀 {index}에 실행 번호가 남아 있습니다"
+        assert not cell.get("outputs"), f"커밋된 셀 {index}에 출력이 남아 있습니다"
+        assert cell.get("execution_count") is None, f"커밋된 셀 {index}에 실행 번호가 있습니다"
 
 
 def test_the_notebook_reads_the_frozen_text_instead_of_rebuilding_it(notebook):
