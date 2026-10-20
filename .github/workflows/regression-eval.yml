@@ -81,7 +81,9 @@ jobs:
       LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
       LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_SECRET_KEY }}
       LANGFUSE_BASE_URL: ${{ vars.LANGFUSE_BASE_URL }}
-      # 30건 평가 한 번은 통과하고, 켜 둔 채 루프를 돌리면 거기서 끊깁니다.
+      # 30건 평가 한 번은 통과하고, 켜 둔 채 루프를 돌리면 거기서 끊깁니다. 단위는
+      # 하루(UTC)지만, 러너가 매번 새로 만들어져 계수기 파일이 남지 않으므로 여기서는
+      # 사실상 실행당입니다 — 평가 한 번이 한 실행이라 그래도 맞습니다(ADR-023).
       LANGFUSE_MAX_TRACES: ${{ vars.LANGFUSE_MAX_TRACES || '50' }}
     steps:
 

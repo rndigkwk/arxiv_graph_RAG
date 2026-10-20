@@ -628,8 +628,10 @@ def ask(question, history, on_answer=None):
     response = state["response"]
     response["graph_trace"] = agent_graph.summarize_trace(state["trace"])
     # 기본은 꺼짐입니다. `LANGFUSE_TRACING=1`과 키가 둘 다 있을 때만 보내고, 켠 뒤에도
-    # 프로세스당 `LANGFUSE_MAX_TRACES`개까지입니다(ADR-023) — dograg가 전부 추적해 한 달치
-    # 무료 사용량을 소진한 적이 있어서, 스위치와 상한을 둘 다 둡니다.
+    # **하루에** `LANGFUSE_MAX_TRACES`개까지입니다(ADR-023) — dograg가 전부 추적해 한 달치
+    # 무료 사용량을 소진한 적이 있어서, 스위치와 상한을 둘 다 둡니다. 단위가 하루인 것이
+    # 중요합니다: 앱 프로세스는 잠들었다 깨면 새로 뜨므로, 프로세스당으로 세면 상한이 아니라
+    # "재시작마다 앞 50건"이 됩니다.
     response["tracing"] = tracing.send_trace(
         response["graph_trace"],
         name="ask",
