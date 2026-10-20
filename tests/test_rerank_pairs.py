@@ -293,7 +293,9 @@ def test_nothing_needs_editing_to_run_as_shipped(notebook):
 
     assert "USE_HF = True" in config
     assert 'DATA_REPO = "arxiv-graphrag-colab"' in config
-    assert 'MODEL = "BAAI/bge-reranker-base"' in config
+    # 같은 계열 셋 중 1024를 받는 것은 v2-m3뿐입니다(base·large는 둘 다 512).
+    assert 'MODEL = "BAAI/bge-reranker-v2-m3"' in config
+    assert "MAX_SEQ = 1024" in config
 
 
 def test_the_notebook_refuses_to_score_on_the_cpu(notebook):
@@ -303,3 +305,44 @@ def test_the_notebook_refuses_to_score_on_the_cpu(notebook):
 
     assert "parameters()).device" in body
     assert "CPU에 올라갔습니다" in body
+
+
+def test_the_notebook_checks_the_position_limit_before_downloading_weights(notebook):
+    """2026-10-20에 여기서 터졌습니다 — `cudaErrorAssert`에는 길이 이야기가 없습니다.
+
+    `bge-reranker-base`는 위치 임베딩이 514(실사용 512)인데 MAX_SEQ를 1024로 줬습니다.
+    범위를 벗어난 인덱스를 조회해 GPU 커널이 죽었고, 메시지만 보고는 원인을 알 수
+    없었습니다. 설정은 몇 KB이므로 **가중치 2.3GB를 받기 전에** 확인합니다.
+    """
+    cells = [(index, "".join(cell["source"]))
+             for index, cell in enumerate(notebook["cells"])
+             if cell["cell_type"] == "code"]
+    check = next(source for _, source in cells if "AutoConfig.from_pretrained" in source)
+
+    assert "max_position_embeddings" in check
+    assert "MAX_SEQ > _limit" in check
+    assert "cudaErrorAssert" in check, "무엇이 터지는지 메시지에 적어야 합니다"
+
+    def first(probe):
+        return next(index for index, source in cells if probe in source)
+
+    assert first("AutoConfig.from_pretrained") < first("CrossEncoder(")
+    assert first("AutoConfig.from_pretrained") < first("model.predict")
+
+
+def test_the_oom_handler_does_not_rely_on_one_exception_type(notebook):
+    """형으로만 보면 다른 형으로 올라온 OOM을 놓치고 반감 장치가 비껴갑니다."""
+    body = "\n".join(sources(notebook))
+
+    assert "def is_oom" in body
+    assert "out of memory" in body
+    # 채점 셀이 torch를 스스로 가져와야 세션을 다시 시작해도 돕니다.
+    score_cell = next(source for source in sources(notebook) if "model.predict" in source)
+    assert "import torch" in score_cell
+
+
+def test_the_pair_length_measurement_is_recorded(notebook):
+    """1024를 고른 근거가 셀에 남아 있어야 합니다. 숫자만 바꿔 두면 되짚지 못합니다."""
+    config = "".join(notebook["cells"][2]["source"])
+
+    assert "636" in config and "84.8" in config
