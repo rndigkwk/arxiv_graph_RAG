@@ -1030,6 +1030,23 @@ Day 74의 원래 경로인 모델 파인튜닝으로 가려면 **튜닝 전 출�
 | 60 | 판사 편향, GEPA | 🟡 혼동 행렬까지 / 🟢 **편향·GEPA** |
 | 61 | MLflow + 회귀 게이트 CI | 🟢 **값이 가장 큼** |
 
+> **2026-10-21 — 위 표는 2026-10-16의 기록입니다. 덮지 않고 바뀐 줄만 적습니다.**
+>
+> | Day | 그때 | 지금 |
+> |---|---|---|
+> | 47 라우팅 | 🟢 | ✅ [ADR-024](docs/adr/ADR-024-route-by-question-type.md) (10-18) |
+> | 48 압축 | 🟢 | ✅ 기각 [ADR-025](docs/adr/ADR-025-reject-context-compression.md) (10-18) |
+> | 50~53 LangGraph | ✅ | 그대로 |
+> | 56 예산·fork | 🟢 | 🟡 겹친 재시도만 ([ADR-015](docs/adr/ADR-015-retry-not-higher-timeout.md)). **fork 재개와 `connection_acquisition_timeout`은 아직** |
+> | 58 ADR·지배·민감도 | 🟢 | 🟡 ADR 51개. **민감도는 검사기까지(10-21), 지배 관계는 3개뿐** |
+> | 59 RAGAS | 🟢 | ✅ 넷 측정 ([ADR-021](docs/adr/ADR-021-ragas-four-of-six.md)), 하한 검사 ([ADR-043](docs/adr/ADR-043-the-floor-is-checked-against-the-worst-run.md)) |
+> | 60 편향·GEPA | 🟢 | 🟡 위치 편향만 ([ADR-020](docs/adr/ADR-020-judge-called-once.md)). **사람 라벨 성적표와 GEPA는 아직** |
+> | 61 게이트 | 🟢 | ✅ 규칙 7개 + 자가채점 fixture + smoke/full 분할 |
+>
+> **표를 손으로 고치는 것이 이 절의 병입니다.** 다섯 줄이 닷새 동안 틀려 있었고 아무것도
+> 막지 않았습니다. 그래서 11-3의 민감도 규칙은 **문장이 아니라 검사기**로 옮겼습니다
+> ([`scripts/check_adr_rules.py`](scripts/check_adr_rules.py)).
+
 ### 11-1. Day 61 — 회귀 게이트 (최우선)
 
 `luna_gate_ci`에 **판정 규칙과 자가채점 fixture가 그대로** 있습니다.
@@ -1048,6 +1065,15 @@ PR에서는 smoke, cron에서는 full로 나누는 구조도 교안에 있습니
 
 > **선행 조건은 이미 충족됐습니다.** 5절이 "keep-alive가 먼저 필요하다"고 적었는데,
 > [`keep-alive.yml`](.github/workflows/keep-alive.yml)이 12시간마다 돌고 있습니다. 막는 것이 없습니다.
+
+> **완료 — [ADR-017](docs/adr/ADR-017-regression-gate.md)과 그 뒤 여섯 번의 덧붙임.**
+> 위 표의 다섯 규칙이 전부 있고, **지금은 일곱 개**입니다 — `judge_model`과
+> `prompt_version`([ADR-041](docs/adr/ADR-041-the-gate-reads-the-prompt.md))이 더 붙었습니다.
+> 자가채점 fixture는 [`tests/fixtures/eval_gate`](tests/fixtures/eval_gate)에 있고,
+> smoke/full 분할도 들어갔습니다 — PR은 가족마다 한 건씩 5건, cron과 수동은 30건
+> 전부입니다([`regression-eval.yml`](.github/workflows/regression-eval.yml)).
+> 하한이 하한 노릇을 하는지는 [ADR-043](docs/adr/ADR-043-the-floor-is-checked-against-the-worst-run.md)에서
+> 심은 결함으로 확인했습니다.
 
 ### 11-2. Day 61 부록 — MLflow 프롬프트 버전 관리
 
@@ -1074,6 +1100,31 @@ PR에서는 smoke, cron에서는 full로 나누는 구조도 교안에 있습니
 
 - **지배 관계로 후보 지우기** — 모든 축에서 다른 후보에 밀리는 안은 점수 계산 전에 버립니다.
 - **민감도** — "가정이 바뀌면 1위가 바뀌는가". 결론이 한 측정값에 얼마나 매달려 있는지 적습니다.
+
+> **2026-10-21 덧붙임 — ADR은 51개가 됐고, 둘 중 하나는 지켜지지 않고 있었습니다.**
+>
+> | | 상태 |
+> |---|---|
+> | ADR로 고정 | ✅ **51개** ([`docs/adr/`](docs/adr/README.md)) |
+> | **민감도** | 🟡 **32개에 있고 19개에 없습니다.** 규칙은 색인에 적혀 있었지만 **아무도 세지 않았습니다** |
+> | **지배 관계** | ✗ **51개 중 3개**(015·020·025). 사실상 미적용입니다 |
+>
+> 민감도 쪽은 **문장을 검사기로 바꿨습니다**
+> ([`scripts/check_adr_rules.py`](scripts/check_adr_rules.py), 테스트
+> [`tests/test_adr_rules.py`](tests/test_adr_rules.py)). 없는 19개를 지금 채우지 않습니다 —
+> **없던 민감도를 뒤늦게 지어내는 일**이고, 색인의 "뒤집힌 결정을 지우지 않습니다"와 같은
+> 선입니다. 대신 명시적인 빚으로 적고, 그 목록은 **늘지 않고 줄기만** 합니다 — 절이 생겼는데
+> 목록에 남아 있으면 검사기가 막습니다.
+>
+> **세는 방법에서 한 번 틀렸습니다.** 처음에 `민감도`라는 글자만 세어 "032부터 20개 연속
+> 없음"으로 봤는데, ADR-046·049·051은 `이 결정이 바뀌는 조건`, ADR-030은
+> `한계 — 가장 큰 가정`, ADR-037은 `이 측정이 말하지 않는 것`으로 **같은 일을 합니다.**
+> 글자를 세면 규칙이 아니라 어휘를 재게 됩니다. 그래서 검사기가 제목 **넷**을 허용하고,
+> 범위를 적는 절(`넘지 않은 선`·`아직 아닌 것`)은 **인정하지 않습니다** — 섞으면 032 이후가
+> 거의 전부 통과해서 아무것도 막지 않습니다.
+>
+> **지배 관계는 남깁니다.** 색인이 규칙으로 선언한 것은 민감도뿐이고, 지배는 "안 써 본 방법"
+> 으로 가져온 기법입니다. 규칙이 아닌 것을 검사기에 넣지 않습니다.
 
 ### 11-4. Day 59 — RAGAS 6지표
 
