@@ -23,6 +23,25 @@ OpenAI 프로젝트가 설정된 지출 한도에 닿아 첫 임베딩 호출이
 풀리므로** 재시도가 맞는 대응이고, 이미 `neo4j_graphrag`와 `tenacity`가 그렇게 합니다. 예산
 소진(`insufficient_quota` 계열)은 **기다려도 풀리지 않습니다** — 재시도는 시간만 씁니다.
 그래서 예산 소진만 여기서 잡고, 일시적 한도는 건드리지 않습니다.
+
+## 상류 장애 — 2026-10-21에 찾은 세 번째 범주 (ADR-054)
+
+PR #16의 `evaluate`가 `openai.APIError: Our servers are currently overloaded. Please try
+again later.`로 떨어졌습니다. 재실행하니 통과했습니다. 즉 **기다리면 풀리는 쪽**이므로 예산
+범주가 아닌데, 위 문단이 "그건 이미 재시도된다"고 적어 둔 것과 달리 **재시도되지 않았습니다.**
+
+이유가 있습니다. `chatbot.llm`은 `streaming=True`이고 그 오류는 **열린 스트림 안에서**
+왔습니다(`openai/_streaming.py`의 `__stream__`). SDK의 `max_retries`는 **최초 HTTP 요청**만
+덮습니다 — 200으로 열린 스트림이 나중에 오류 이벤트를 흘리면 그건 재시도 대상이 아닙니다.
+그래서 재시도할 수 있는 층은 **평가 루프**뿐입니다.
+
+| 범주 | 기다리면 풀리나 | 처방 |
+|---|---|---|
+| `rate_limit_exceeded` | 예 | 아래 층이 이미 재시도 |
+| **상류 장애**(과부하·5xx) | **예** | **사례 단위로 재시도**, 그래도 안 되면 "다시 돌리세요" |
+| 예산 소진 | 아니오 | 한도를 올리거나 다음 주기 |
+
+세 범주 모두 **통과로 바뀌지 않습니다.** 돌리지 못한 검사는 통과가 아닙니다.
 """
 
 from __future__ import annotations
@@ -49,6 +68,26 @@ EXHAUSTED_CODES = (
     "billing_hard_limit_reached",
     "account_deactivated",
 )
+
+# 공급자가 "지금은 안 되지만 다시 해 보라"고 말하는 표시들입니다. 2026-10-21에 실제로 본
+# 문구는 "Our servers are currently overloaded. Please try again later."입니다.
+# **좁게 둡니다** - 여기에 걸리면 돈을 더 쓰고 다시 돌리므로, 넓게 잡으면 진짜 결함을
+# 재시도로 덮습니다.
+TRANSIENT_MARKERS = (
+    "currently overloaded",
+    "overloaded_error",
+    "server_error",
+    "service_unavailable",
+    "Service Unavailable",
+    "Bad gateway",
+    "bad_gateway",
+    "APIConnectionError",
+    "APITimeoutError",
+)
+
+# 두 범주를 구별하는 표식의 값. 처방이 다르므로 사유도 달라야 합니다.
+REASON_EXHAUSTED = "budget_exhausted"
+REASON_UPSTREAM = "upstream_unavailable"
 
 
 def _texts(exc: BaseException) -> list[str]:
@@ -87,7 +126,30 @@ def exhausted(exc: BaseException) -> str | None:
     return None
 
 
-def record(code: str, exc: BaseException, *, stage: str, done: int = 0) -> dict[str, Any]:
+def transient(exc: BaseException) -> str | None:
+    """The marker when this means "try again", else None.
+
+    **예산 소진이 먼저입니다.** 둘 다 걸리면 예산으로 봅니다 - 기다려도 풀리지 않는 쪽이
+    더 강한 사실이고, 재시도는 시간과 돈만 씁니다.
+    """
+    if exhausted(exc) is not None:
+        return None
+    haystack = " ".join(_texts(exc)) + " " + type(exc).__name__
+    for marker in TRANSIENT_MARKERS:
+        if marker in haystack:
+            return marker
+    return None
+
+
+def record(
+    code: str,
+    exc: BaseException,
+    *,
+    stage: str,
+    done: int = 0,
+    reason: str = REASON_EXHAUSTED,
+    retries: int = 0,
+) -> dict[str, Any]:
     """Write the marker the workflow reads, and annotate the CI log.
 
     **어디까지 돌았는지 적습니다**(`done`). 0이면 한 건도 못 돌린 것이고, 그보다 크면 도중에
@@ -95,17 +157,24 @@ def record(code: str, exc: BaseException, *, stage: str, done: int = 0) -> dict[
     """
     entry = {
         "not_run": True,
-        "reason": "budget_exhausted",
+        "reason": reason,
         "provider_code": code,
         "stage": stage,
         "cases_done": done,
+        # 재시도를 몇 번 썼는지. 0인데 상류 장애로 떨어졌다면 첫 사례에서 죽은 것이고,
+        # 크면 상류가 오래 불안했다는 뜻입니다 - 다시 돌릴지 미룰지의 입력입니다.
+        "retries": retries,
         "detail": f"{type(exc).__name__}: {exc}"[:500],
         "recorded_at": datetime.now(UTC).isoformat(),
     }
     MARKER.parent.mkdir(parents=True, exist_ok=True)
     MARKER.write_text(json.dumps(entry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    what = (
+        "예산이 바닥났습니다" if reason == REASON_EXHAUSTED
+        else "공급자가 일시적으로 응답하지 못했습니다"
+    )
     message = (
-        f"평가를 돌리지 못했습니다(품질 회귀가 아닙니다): {stage}에서 예산이 바닥났습니다 "
+        f"평가를 돌리지 못했습니다(품질 회귀가 아닙니다): {stage}에서 {what} "
         f"[{code}]. 돌린 사례 {done}건."
     )
     # GitHub가 이 줄을 잡아 검사 제목에 올립니다. 로컬에서는 평범한 줄로 보입니다.
@@ -126,16 +195,25 @@ def explain(path: Path = MARKER) -> str:
         entry = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return ""
+    # **처방이 범주마다 다릅니다.** 상류 장애에 "지출 한도를 올리세요"라고 적으면 사람이
+    # 엉뚱한 곳을 봅니다 - 그게 이 구별을 만든 이유입니다(ADR-054).
+    remedy = (
+        "지출 한도를 올리거나 다음 예산 주기를 기다린 뒤 이 작업을 다시 돌리세요."
+        if entry.get("reason") != REASON_UPSTREAM
+        else "공급자 쪽 일시적 장애입니다. 사례 단위 재시도를 다 쓰고도 실패했으니 "
+             "**이 작업을 다시 돌리면 됩니다** - 바꿀 설정이 없습니다."
+    )
     return "\n".join([
         "## 평가를 돌리지 못했습니다 — 품질 회귀가 아닙니다",
         "",
+        f"- 사유: `{entry.get('reason')}`",
         f"- 단계: `{entry.get('stage')}`",
         f"- 공급자 코드: `{entry.get('provider_code')}`",
         f"- 돌린 사례: {entry.get('cases_done')}건",
+        *([f"- 재시도: {entry['retries']}회"] if entry.get("retries") else []),
         "",
-        "지출 한도를 올리거나 다음 예산 주기를 기다린 뒤 이 작업을 다시 돌리세요. "
-        "**게이트는 통과로 바뀌지 않습니다** — 돌리지 못한 검사는 통과가 아닙니다"
-        "(ADR-044).",
+        remedy + " **게이트는 통과로 바뀌지 않습니다** — 돌리지 못한 검사는 통과가 "
+        "아닙니다(ADR-044).",
         "",
     ])
 
@@ -145,6 +223,14 @@ def main() -> int:
     parser.add_argument("--explain", action="store_true")
     parser.add_argument("--marker", type=Path, default=MARKER)
     args = parser.parse_args()
+
+    # **출력 글자 때문에 작업이 실패하는 것은 작업의 실패가 아닙니다.** `explain()`에 em
+    # dash가 들어 있고 이 PC의 콘솔 코드페이지는 cp949입니다. `pipeline/console.py`가
+    # 같은 함정을 두 번 적어 뒀는데(`evals.gate`의 요약 줄, `pipeline.register_run`)
+    # 이 진입점이 그 보호를 부르지 않고 있었습니다.
+    from pipeline.console import use_utf8_stdout
+
+    use_utf8_stdout()
     if args.explain:
         print(explain(args.marker), end="")
     return 0
