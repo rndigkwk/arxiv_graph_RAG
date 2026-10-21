@@ -10,7 +10,7 @@ from time import perf_counter
 from time import sleep as _sleep
 from typing import Any
 
-from evals import budget
+from evals import budget, ledger
 from evals.metrics import score_answer, score_related, score_retrieval, summarize
 from evals.telemetry import (
     build_run_metadata,
@@ -496,6 +496,8 @@ def summarize_comparison(rows: list[dict[str, Any]]) -> dict[str, Any]:
 # 상류가 과부하라고 말할 때 사례 하나를 다시 돌려 봅니다(ADR-054). 전체 작업을 다시
 # 돌리는 것보다 **훨씬 쌉니다** - 30건 중 한 건만 다시 치릅니다. 횟수를 작게 두는 이유는
 # 재시도가 돈을 쓰기 때문입니다: 상류 장애가 길면 그건 재시도로 덮을 일이 아닙니다.
+# 장부에 남기는 지표. 게이트의 `primary_metric`과 같아야 그 질문에 답할 수 있습니다.
+LEDGER_PRIMARY = "answer_evidence_recall"
 CASE_RETRIES = 2
 CASE_BACKOFF = (5.0, 15.0)
 
@@ -674,6 +676,12 @@ def main() -> None:
     args.output.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
+    # **실행마다 사례별 지표 한 줄을 장부에 남깁니다**(ADR-055). 보고서 자체는
+    # `reports/regression_*.json`이 gitignore라 CI에서 버려지는데, 그 안의 사례별
+    # 값이 `stable_case`가 변동으로 터지는지를 재는 데 필요한 유일한 데이터입니다.
+    # 한 줄이면 diff가 읽히고, 담는 것은 지표 값과 묶음 열쇠뿐입니다.
+    if ledger.record(report, primary=LEDGER_PRIMARY):
+        print(f"장부에 한 줄 남겼습니다: {ledger.LEDGER}")
     print(json.dumps(report["summary"], ensure_ascii=False, indent=2))
 
 
