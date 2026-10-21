@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 from statistics import fmean
 from time import perf_counter
+from time import sleep as _sleep
 from typing import Any
 
 from evals import budget
@@ -492,6 +493,46 @@ def summarize_comparison(rows: list[dict[str, Any]]) -> dict[str, Any]:
     return summary
 
 
+# 상류가 과부하라고 말할 때 사례 하나를 다시 돌려 봅니다(ADR-054). 전체 작업을 다시
+# 돌리는 것보다 **훨씬 쌉니다** - 30건 중 한 건만 다시 치릅니다. 횟수를 작게 두는 이유는
+# 재시도가 돈을 쓰기 때문입니다: 상류 장애가 길면 그건 재시도로 덮을 일이 아닙니다.
+CASE_RETRIES = 2
+CASE_BACKOFF = (5.0, 15.0)
+
+
+def case_with_retry(
+    chatbot: Any,
+    case: dict[str, Any],
+    *,
+    mode: str,
+    top_k: int,
+    rates: dict[str, float | None],
+    sleep: Any = _sleep,
+) -> tuple[dict[str, Any], int]:
+    """한 사례를 돌리고 `(행, 재시도 횟수)`를 돌려줍니다.
+
+    **상류 장애만 다시 시도합니다.** 예산 소진은 기다려도 풀리지 않고(`budget.transient`가
+    None을 돌려줍니다), 다른 예외는 결함일 수 있으므로 재시도가 그것을 덮으면 안 됩니다.
+
+    `chatbot.llm`이 `streaming=True`라서 **이 층이 아니면 재시도할 수 없습니다.** SDK의
+    `max_retries`는 최초 HTTP 요청만 덮고, 200으로 열린 스트림이 나중에 오류 이벤트를
+    흘리면 거기까지 가지 않습니다 - 2026-10-21 PR #16이 그렇게 떨어졌습니다.
+    """
+    for attempt in range(CASE_RETRIES + 1):
+        try:
+            return one_case(chatbot, case, mode=mode, top_k=top_k, rates=rates), attempt
+        except Exception as exc:  # noqa: BLE001 - 상류 장애만 가로채고 나머지는 올립니다.
+            if attempt == CASE_RETRIES or budget.transient(exc) is None:
+                raise
+            wait = CASE_BACKOFF[min(attempt, len(CASE_BACKOFF) - 1)]
+            print(
+                f"  상류 장애로 다시 시도합니다({attempt + 1}/{CASE_RETRIES}, {wait:.0f}초 뒤): "
+                f"{case['id']} [{type(exc).__name__}]"
+            )
+            sleep(wait)
+    raise RuntimeError("재시도를 모두 소진했습니다")
+
+
 def one_case(
     chatbot: Any,
     case: dict[str, Any],
@@ -573,6 +614,12 @@ def main() -> None:
         cases = cases[: args.limit]
     if not cases:
         parser.error("no evaluation cases found")
+
+    # 형제 평가 모듈 14개가 이미 부르는 보호입니다. 이 PC의 콘솔은 cp949이고, 출력 글자
+    # 때문에 평가가 실패하는 것은 평가의 실패가 아닙니다(`pipeline/console.py`).
+    from pipeline.console import use_utf8_stdout
+
+    use_utf8_stdout()
     import chatbot
 
     rates = pricing_from_env(os.environ)
@@ -580,17 +627,30 @@ def main() -> None:
     # 앞 실행이 남긴 표식이 이번 실패를 설명하면 안 됩니다.
     budget.clear()
     rows = []
+    retried = 0
     for case in cases:
         try:
-            rows.append(one_case(chatbot, case, mode=args.mode, top_k=args.top_k, rates=rates))
-        except Exception as exc:  # noqa: BLE001 - 예산 소진만 가로채고 나머지는 그대로 올립니다.
+            row, attempts = case_with_retry(
+                chatbot, case, mode=args.mode, top_k=args.top_k, rates=rates
+            )
+            rows.append(row)
+            retried += attempts
+        except Exception as exc:  # noqa: BLE001 - 두 범주만 가로채고 나머지는 그대로 올립니다.
             # 예산이 바닥난 것은 **품질 회귀가 아니라 평가를 돌리지 못한 것**입니다. 지금까지는
             # 둘이 똑같은 빨간 X였고, 어느 쪽인지 알려면 로그 40줄을 열어야 했습니다(ADR-044).
             # 재시도는 소용없습니다 - 기다려도 풀리지 않는 종류의 429입니다.
-            if (code := budget.exhausted(exc)) is None:
-                raise
-            budget.record(code, exc, stage="evals.run", done=len(rows))
-            raise SystemExit(budget.EXIT_NOT_RUN) from None
+            if (code := budget.exhausted(exc)) is not None:
+                budget.record(code, exc, stage="evals.run", done=len(rows), retries=retried)
+                raise SystemExit(budget.EXIT_NOT_RUN) from None
+            # 상류 장애는 기다리면 풀리지만 재시도를 다 썼습니다. 처방이 다르므로 사유도
+            # 다르게 적습니다 - "한도를 올리세요"가 아니라 "다시 돌리세요"입니다(ADR-054).
+            if (marker := budget.transient(exc)) is not None:
+                budget.record(
+                    marker, exc, stage="evals.run", done=len(rows),
+                    reason=budget.REASON_UPSTREAM, retries=retried,
+                )
+                raise SystemExit(budget.EXIT_NOT_RUN) from None
+            raise
     metadata = build_run_metadata(
         cases_path=args.cases,
         case_ids=[case["id"] for case in cases],
