@@ -60,6 +60,13 @@ class Graph:
         if missing:
             raise ValueError(f".env에 다음 값이 없습니다: {missing}")
         self.database = env("NEO4J_DATABASE", default="neo4j")
+        # **`connection_acquisition_timeout`을 주지 않습니다 — 기본 60초를 그대로 씁니다.**
+        # 평상시에는 과하지만(최악 1.39초, 43배 여유) 그 값이 아니라 **저하 구간에서 하중을
+        # 받습니다**(ADR-052). 라우팅이 죽어 패킷이 버려지면 획득이 타임아웃을 꽉 채우므로,
+        # `read_with_retry`의 시도 간격을 사실상 이 값이 만듭니다 — 대기 2초+4초가 아닙니다.
+        # 2026-10-15의 Aura 자체 회복이 90초였고, 마지막 시도가 그 뒤에 닿으려면
+        # `2T + 6 >= 90`, 즉 **T >= 42초**가 필요합니다. 60초는 그 위에 18초 여유로 있습니다.
+        # **"43배 여유"만 보고 내리면 세 시도가 전부 저하 구간 안으로 들어갑니다.**
         self.driver = GraphDatabase.driver(
             uri, auth=(user, password), notifications_min_severity="OFF"
         )

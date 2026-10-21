@@ -80,6 +80,8 @@
 |---|---|---|
 | [ADR-014](ADR-014-remote-mlflow-tracking.md) | 학습 추적은 실행 VM이 아니라 원격 MLflow 서버에 남긴다 | 채택 |
 | [ADR-015](ADR-015-retry-not-higher-timeout.md) | 그래프 적재는 타임아웃을 올리지 않고 재시도한다 | 채택 |
+| [ADR-052](ADR-052-the-sixty-seconds-is-not-for-the-steady-state.md) | 연결 획득 60초는 평상시용이 아니다 — 낮추지 않고 마감 시간을 둔다 | 채택 |
+| [ADR-053](ADR-053-the-log-needed-a-clock-and-a-field.md) | 로그에 필요한 것은 핸들러가 아니라 시각과 `seconds=` 필드였다 | 채택 |
 | [ADR-016](ADR-016-stay-on-streamlit.md) | Cloud Run으로 옮기지 않는다 | 보류 |
 | [ADR-017](ADR-017-regression-gate.md) | 품질 회귀는 CI가 기준선과 대조해 막는다 | 채택 |
 | [ADR-018](ADR-018-prompt-versioning.md) | 프롬프트 본문은 한 모듈에 모으고 버전은 MLflow에 남긴다 | 채택 |

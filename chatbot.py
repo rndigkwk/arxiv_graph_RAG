@@ -743,15 +743,31 @@ def read_with_retry(cypher, attempts=3, delay=2.0):
     2026-10-15에 한 번 끊긴 것은 Aura가 Bolt 라우팅까지 실패하던 구간이었고 90초 뒤 자체
     회복했습니다. 만성 지연이 아니라 일시적 저하이므로, 맞는 대응은 기다리기가 아니라
     다시 시도하기입니다.
+
+    **시도마다 걸린 초를 함께 적습니다**(ADR-052·ADR-053). 예외 **유형**으로는 저하 모드가
+    구별되지 않습니다 - 패킷이 버려지는 경우와 포트가 거부하는 경우가 둘 다
+    `ServiceUnavailable`입니다. 구별하는 것은 경과 시간이고(블랙홀은 획득 타임아웃을 꽉
+    채우는 약 60초, 거부는 약 2초), 그 구분이 `connection_acquisition_timeout` 하한 42초를
+    관측 하나가 아닌 분포 위에 세웁니다.
+
+    **마지막 시도의 실패도 적습니다.** 예전에는 그냥 올려보냈으므로 세 번 실패한 사고가
+    로그에는 두 줄로만 남았습니다 - 가장 알고 싶은 줄이 빠져 있었습니다.
     """
     for attempt in range(attempts):
+        started = time.perf_counter()
         try:
             return run_read(cypher)
         except (Neo4jError, ServiceUnavailable, SessionExpired) as exc:
+            elapsed = time.perf_counter() - started
             if attempt == attempts - 1:
+                graph_logger.warning(
+                    "graph_load_failed attempt=%d reason=%s seconds=%.1f",
+                    attempt + 1, type(exc).__name__, elapsed,
+                )
                 raise
             graph_logger.warning(
-                "graph_load_retry attempt=%d reason=%s", attempt + 1, type(exc).__name__
+                "graph_load_retry attempt=%d reason=%s seconds=%.1f",
+                attempt + 1, type(exc).__name__, elapsed,
             )
             time.sleep(delay * (attempt + 1))
     raise RuntimeError("재시도를 모두 소진했습니다")
@@ -1178,6 +1194,13 @@ embedder = OpenAIEmbeddings(model=EMBEDDING_MODEL, timeout=60, max_retries=2)
 # 적재 노트북과 같이 질문 벡터도 768차원으로 고정합니다.
 embedder.embed_query = partial(embedder.embed_query, dimensions=EMBEDDING_DIMENSIONS)
 
+# **`connection_acquisition_timeout`을 주지 않습니다 — 기본 60초를 그대로 씁니다.**
+# 평상시에는 과하지만(최악 1.39초, 43배 여유) 그 값이 아니라 **저하 구간에서 하중을
+# 받습니다**(ADR-052). 라우팅이 죽어 패킷이 버려지면 획득이 타임아웃을 꽉 채우므로,
+# `read_with_retry`의 시도 간격을 사실상 이 값이 만듭니다 — 대기 2초+4초가 아닙니다.
+# 2026-10-15의 Aura 자체 회복이 90초였고, 마지막 시도가 그 뒤에 닿으려면
+# `2T + 6 >= 90`, 즉 **T >= 42초**가 필요합니다. 60초는 그 위에 18초 여유로 있습니다.
+# **"43배 여유"만 보고 내리면 세 시도가 전부 저하 구간 안으로 들어갑니다.**
 driver = GraphDatabase.driver(
     neo4j_uri, auth=(neo4j_user, neo4j_password),
     # 서버 안내성 알림(vector.queryNodes 사용 중단 예고 등)을 끕니다. 오류는 그대로 올라옵니다.
