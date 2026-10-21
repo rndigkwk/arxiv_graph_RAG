@@ -80,11 +80,18 @@ def test_the_debt_list_only_shrinks():
 
 
 def test_the_debt_is_a_minority_and_counted():
-    """빚이 몇 개인지 수로 들고 있어야 "줄었나"를 물을 수 있습니다."""
+    """빚이 몇 개인지 수로 들고 있어야 "줄었나"를 물을 수 있습니다.
+
+    **"절이 있는 ADR의 수"는 박지 않습니다.** 처음에 32를 박아 뒀는데, 그 수는 ADR이 하나
+    늘면 틀립니다 - 빚과 무관한 이유로 테스트가 깨집니다. 박아야 하는 것은 **빚의 수**이고,
+    그것은 갚을 때만 줄어야 합니다. 이 저장소에서 손으로 박은 수가 갈라진 자리를 또 만들지
+    않습니다.
+    """
     total = len(adrs())
 
     assert len(WITHOUT_SENSITIVITY) == 19
-    assert total - len(WITHOUT_SENSITIVITY) == 32
+    # 빚이 소수여야 "규약이 산다"고 말할 수 있습니다. 절반을 넘으면 규약이 아닙니다.
+    assert len(WITHOUT_SENSITIVITY) * 2 < total
 
 
 def test_the_status_vocabulary_matches_the_index():
