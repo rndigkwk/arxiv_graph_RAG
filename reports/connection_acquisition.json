@@ -1,0 +1,221 @@
+{
+  "generated_at": "2026-10-21T03:56:54.914609+00:00",
+  "driver_default_acquisition_timeout": 60.0,
+  "explain_timeout_seconds": 15,
+  "statement_timeout_seconds": 30,
+  "retries": 3,
+  "retry_waits_seconds": 6,
+  "observed_recovery_seconds": 90,
+  "minimum_timeout_for_recovery": 42.0,
+  "measured": {
+    "construct": {
+      "runs": 12,
+      "p50": 0.0003,
+      "p95": 0.0021,
+      "max": 0.0021,
+      "mean": 0.0005
+    },
+    "cold_connect": {
+      "runs": 12,
+      "p50": 0.8962,
+      "p95": 1.3901,
+      "max": 1.3901,
+      "mean": 0.9348
+    },
+    "cold_query": {
+      "runs": 12,
+      "p50": 0.0938,
+      "p95": 0.2967,
+      "max": 0.2967,
+      "mean": 0.1127
+    },
+    "warm_query": {
+      "runs": 12,
+      "p50": 0.0949,
+      "p95": 0.1019,
+      "max": 0.1019,
+      "mean": 0.0951
+    },
+    "warm_series": {
+      "runs": 40,
+      "p50": 0.0934,
+      "p95": 0.1147,
+      "max": 0.1573,
+      "mean": 0.0972
+    }
+  },
+  "worst_cold_seconds": 1.3901,
+  "failure_modes": {
+    "blackhole": {
+      "3.0": 3.015,
+      "6.0": 6.015,
+      "12.0": 12.003
+    },
+    "refused": {
+      "3.0": 2.034,
+      "6.0": 2.036,
+      "12.0": 2.029
+    }
+  },
+  "by_candidate": {
+    "60": {
+      "headroom_ratio": 43.2,
+      "healthy_one_query_seconds": 321,
+      "healthy_pagerank_tab_seconds": 642,
+      "degraded_last_attempt_starts": 126,
+      "outlasts_recovery": true
+    },
+    "45": {
+      "headroom_ratio": 32.4,
+      "healthy_one_query_seconds": 276,
+      "healthy_pagerank_tab_seconds": 552,
+      "degraded_last_attempt_starts": 96,
+      "outlasts_recovery": true
+    },
+    "42": {
+      "headroom_ratio": 30.2,
+      "healthy_one_query_seconds": 267,
+      "healthy_pagerank_tab_seconds": 534,
+      "degraded_last_attempt_starts": 90,
+      "outlasts_recovery": true
+    },
+    "30": {
+      "headroom_ratio": 21.6,
+      "healthy_one_query_seconds": 231,
+      "healthy_pagerank_tab_seconds": 462,
+      "degraded_last_attempt_starts": 66,
+      "outlasts_recovery": false
+    },
+    "15": {
+      "headroom_ratio": 10.8,
+      "healthy_one_query_seconds": 186,
+      "healthy_pagerank_tab_seconds": 372,
+      "degraded_last_attempt_starts": 36,
+      "outlasts_recovery": false
+    },
+    "10": {
+      "headroom_ratio": 7.2,
+      "healthy_one_query_seconds": 171,
+      "healthy_pagerank_tab_seconds": 342,
+      "degraded_last_attempt_starts": 26,
+      "outlasts_recovery": false
+    },
+    "5": {
+      "headroom_ratio": 3.6,
+      "healthy_one_query_seconds": 156,
+      "healthy_pagerank_tab_seconds": 312,
+      "degraded_last_attempt_starts": 16,
+      "outlasts_recovery": false
+    },
+    "3": {
+      "headroom_ratio": 2.2,
+      "healthy_one_query_seconds": 150,
+      "healthy_pagerank_tab_seconds": 300,
+      "degraded_last_attempt_starts": 12,
+      "outlasts_recovery": false
+    }
+  },
+  "note": "평상시 값은 건강한 인스턴스에서 쟀습니다. 저하가 얼마나 오래 가는지는 재지 않았습니다 - 90초는 2026-10-15의 한 번입니다. 저하 구간에서는 연결을 얻지 못하므로 EXPLAIN도 본 질의도 돌지 않고, 시도당 비용이 획득 하나입니다. 그래서 '90초를 넘길 시도가 있는가'의 식은 2T+6>=90이고 건강한 경로의 식과 다릅니다.",
+  "samples": {
+    "cold": {
+      "construct": [
+        0.0008378999773412943,
+        0.000448899925686419,
+        0.000264700036495924,
+        0.0007510000141337514,
+        0.0003515999997034669,
+        0.0002741999924182892,
+        0.0002902999985963106,
+        0.00024269998539239168,
+        0.0003217000048607588,
+        0.000319099985063076,
+        0.00026210001669824123,
+        0.0021442000288516283
+      ],
+      "cold_connect": [
+        1.3901302000740543,
+        0.9452355999965221,
+        0.8793741000117734,
+        0.9015696999849752,
+        0.8634751999052241,
+        0.8946007000049576,
+        0.8930133000249043,
+        0.9023596000624821,
+        0.8764842000091448,
+        0.9024513000622392,
+        0.8977450000820681,
+        0.8717408999800682
+      ],
+      "cold_query": [
+        0.29667919990606606,
+        0.10526310000568628,
+        0.09127900004386902,
+        0.0930261000758037,
+        0.09053710009902716,
+        0.11433689994737506,
+        0.09533599996939301,
+        0.09232619998510927,
+        0.09378240001387894,
+        0.09385860001202673,
+        0.09375189989805222,
+        0.09270200005266815
+      ],
+      "warm_query": [
+        0.09274440002627671,
+        0.09951700002420694,
+        0.09177469997666776,
+        0.09575119998771697,
+        0.09339930000714958,
+        0.09573649999219924,
+        0.10194329998921603,
+        0.09284019994083792,
+        0.09550389996729791,
+        0.0942646999610588,
+        0.09544070006813854,
+        0.09245399991050363
+      ]
+    },
+    "warm_series": [
+      0.0927,
+      0.0952,
+      0.0916,
+      0.0935,
+      0.0977,
+      0.0999,
+      0.0932,
+      0.0923,
+      0.0913,
+      0.092,
+      0.0917,
+      0.0932,
+      0.0948,
+      0.0988,
+      0.092,
+      0.0921,
+      0.092,
+      0.092,
+      0.0984,
+      0.1017,
+      0.0921,
+      0.092,
+      0.0958,
+      0.0951,
+      0.093,
+      0.0919,
+      0.0929,
+      0.0944,
+      0.0923,
+      0.0937,
+      0.0928,
+      0.1573,
+      0.1014,
+      0.1018,
+      0.101,
+      0.0931,
+      0.1147,
+      0.1005,
+      0.102,
+      0.1028
+    ]
+  }
+}
