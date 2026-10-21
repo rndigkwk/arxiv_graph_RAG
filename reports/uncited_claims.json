@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-10-21T08:48:30.842593+00:00",
+  "fingerprinted": {
+    "runs": 24,
+    "answered": 618,
+    "refusals": 0,
+    "uncited_claims": 0
+  },
+  "dropped_no_fingerprint": {
+    "runs": 11,
+    "answered": 236,
+    "refusals": 5,
+    "uncited_claims": 0
+  },
+  "families_of_claims": {},
+  "claim_cases": [],
+  "refusal_cases": [
+    "citing-03",
+    "coauthor-01",
+    "coauthor-04",
+    "coauthor-06",
+    "reference-01"
+  ],
+  "refusal_markers": [
+    "cannot confirm",
+    "could not confirm",
+    "can not confirm",
+    "could be confirmed",
+    "cannot be confirmed",
+    "no papers",
+    "not provide",
+    "no information",
+    "확인할 수 없",
+    "확인되지 않",
+    "찾을 수 없"
+  ],
+  "note": "evidence_ids가 빈 것을 전부 결함으로 세면 틀립니다 - 거절은 정직한 무주장입니다. 둘을 나누는 방법은 부정 표현 목록이고 언어에 매달린 어림입니다. 목록이 놓치면 거절을 주장으로 세므로 과대보고 쪽으로 틀립니다. 지문 없는 실행은 어느 코드 상태인지 말할 수 없어 따로 셉니다(ADR-055와 같은 선)."
+}
