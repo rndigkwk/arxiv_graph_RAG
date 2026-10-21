@@ -743,15 +743,31 @@ def read_with_retry(cypher, attempts=3, delay=2.0):
     2026-10-15에 한 번 끊긴 것은 Aura가 Bolt 라우팅까지 실패하던 구간이었고 90초 뒤 자체
     회복했습니다. 만성 지연이 아니라 일시적 저하이므로, 맞는 대응은 기다리기가 아니라
     다시 시도하기입니다.
+
+    **시도마다 걸린 초를 함께 적습니다**(ADR-052·ADR-053). 예외 **유형**으로는 저하 모드가
+    구별되지 않습니다 - 패킷이 버려지는 경우와 포트가 거부하는 경우가 둘 다
+    `ServiceUnavailable`입니다. 구별하는 것은 경과 시간이고(블랙홀은 획득 타임아웃을 꽉
+    채우는 약 60초, 거부는 약 2초), 그 구분이 `connection_acquisition_timeout` 하한 42초를
+    관측 하나가 아닌 분포 위에 세웁니다.
+
+    **마지막 시도의 실패도 적습니다.** 예전에는 그냥 올려보냈으므로 세 번 실패한 사고가
+    로그에는 두 줄로만 남았습니다 - 가장 알고 싶은 줄이 빠져 있었습니다.
     """
     for attempt in range(attempts):
+        started = time.perf_counter()
         try:
             return run_read(cypher)
         except (Neo4jError, ServiceUnavailable, SessionExpired) as exc:
+            elapsed = time.perf_counter() - started
             if attempt == attempts - 1:
+                graph_logger.warning(
+                    "graph_load_failed attempt=%d reason=%s seconds=%.1f",
+                    attempt + 1, type(exc).__name__, elapsed,
+                )
                 raise
             graph_logger.warning(
-                "graph_load_retry attempt=%d reason=%s", attempt + 1, type(exc).__name__
+                "graph_load_retry attempt=%d reason=%s seconds=%.1f",
+                attempt + 1, type(exc).__name__, elapsed,
             )
             time.sleep(delay * (attempt + 1))
     raise RuntimeError("재시도를 모두 소진했습니다")
