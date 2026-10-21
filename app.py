@@ -11,6 +11,7 @@ import abstain
 import citations
 import quality_board
 from paper_library import add_paper, compare_selection
+from pipeline import logs
 
 
 # 연결·검색기는 공유하고, 각 사용자의 대화는 아래 session_state에 따로 저장합니다.
@@ -944,6 +945,16 @@ def sidebar():
 
 def main():
     """준비를 마친 뒤 챗봇 탭과 PageRank 순위 탭을 그립니다."""
+    # **임포트가 아니라 여기서 로그를 설정합니다**(ADR-053). 모듈 최상단에 두면 `app`을
+    # 임포트하는 것만으로 전역 로깅이 바뀌고, 실제로 테스트 두 개가 그 부작용을 받았습니다.
+    # Streamlit은 이 스크립트를 `__main__`으로 돌리므로 여기도 진입점입니다.
+    #
+    # `load_chatbot()`보다 앞섭니다 - `chatbot`은 임포트 시점에 Aura에 붙으므로 설정이
+    # 늦으면 앱이 뜰 때의 줄이 형식 없이 나갑니다.
+    #
+    # 두 번 불러도 우리 핸들러가 늘지 않습니다. Streamlit은 상호작용마다 이 스크립트를
+    # 다시 돌리므로 그 보장이 없으면 재실행 수만큼 줄이 복제됩니다.
+    logs.configure()
     st.set_page_config(page_title="arXiv GraphRAG 챗봇", page_icon="📄", layout="wide")
     st.title("arXiv GraphRAG 챗봇")
     st.caption("질문에 따라 한국어→영어 번역, 인용·저자 관계 조회, 초록 의미 검색을 선택합니다.")
