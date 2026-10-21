@@ -17,6 +17,7 @@
 """
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -270,3 +271,78 @@ def test_the_committed_ledger_is_readable_and_grouped():
     assert counted, shaped
     assert all(g["runs"] >= 2 for g in shaped.values())
     assert sum(g["eligible_pairs"] for g in counted) > 0
+
+
+# ── CI가 장부를 남기는 job ─────────────────────────────────────────────────
+
+WORKFLOW = Path(".github/workflows/regression-eval.yml")
+
+
+@pytest.fixture(scope="module")
+def workflow():
+    import yaml
+
+    return yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+
+
+def test_the_ledger_job_runs_after_the_evaluation(workflow):
+    job = workflow["jobs"]["ledger"]
+
+    assert job["needs"] == "evaluate"
+
+
+def test_the_ledger_job_never_runs_on_a_pull_request(workflow):
+    """PR 실행은 **자기 코드 상태의 줄**입니다. main 장부에 섞으면 묶음이 거짓이 됩니다."""
+    condition = workflow["jobs"]["ledger"]["if"]
+
+    assert "github.event_name != 'pull_request'" in condition
+
+
+def test_only_the_ledger_job_can_write(workflow):
+    """**쓰기 권한이 PR 경로에 닿지 않게** 별도 job으로 둔 것이 요지입니다.
+
+    위 job에 `contents: write`를 주면 PR 실행에도 같은 토큰이 붙습니다.
+    """
+    assert workflow["permissions"] == {"contents": "read"}
+    assert workflow["jobs"]["ledger"]["permissions"] == {"contents": "write"}
+    assert "permissions" not in workflow["jobs"]["evaluate"]
+
+
+def test_the_commit_skips_ci():
+    """`[skip ci]`가 없으면 이 커밋이 ci.yml을 다시 띄웁니다 - 주마다 한 번씩 헛돕니다."""
+    text = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "[skip ci]" in text
+    # ci.yml이 push에서 돈다는 전제입니다. 아니게 되면 이 테스트가 먼저 말해 줍니다.
+    other = Path(".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "on:\n  push:" in other
+
+
+def test_the_ledger_is_rebuilt_from_the_report_not_uploaded_whole():
+    """**레이스에서 줄이 날아가지 않게** 하는 설계입니다.
+
+    장부 파일을 그대로 올려 쓰면 그 사이 main에 붙은 줄을 덮어씁니다. 보고서에서 다시
+    만들면 그때의 main 장부에 **덧붙이는** 것이 됩니다.
+    """
+    text = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "evals.ledger --backfill --reports downloaded" in text
+    assert "git pull --rebase" in text
+
+
+def test_the_workflow_still_forbids_continue_on_error():
+    """**게이트를 통과로 바꿀 수 있는 장치입니다.** `test_eval_budget.py`가 이미 금지하는데,
+    장부 job을 붙이면서 제가 한 번 넣었다가 그 테스트에 걸렸습니다. 여기서도 고정합니다 -
+    편의를 위해 그 불변식을 느슨하게 하지 않습니다.
+
+    검사가 파일 전체의 문자열을 보므로 **주석에도 그 낱말을 적지 않습니다.** 주석을 걸러내게
+    만들 수도 있었지만, 단순한 불변식이 더 강합니다.
+    """
+    assert "continue-on-error" not in WORKFLOW.read_text(encoding="utf-8")
+
+
+def test_a_failed_push_does_not_flip_the_verdict():
+    """장부를 못 밀어 넣은 것은 품질과 무관합니다. 경고로 적고 다음 실행이 다시 합니다."""
+    text = WORKFLOW.read_text(encoding="utf-8")
+
+    assert "::warning::" in text
