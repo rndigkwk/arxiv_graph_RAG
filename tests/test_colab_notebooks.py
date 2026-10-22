@@ -300,6 +300,18 @@ def test_the_run_is_logged_to_a_remote_server(finetune):
     assert "함께 사라집니다" in body
 
 
+def test_it_installs_the_client_not_the_server(finetune):
+    """**전체 `mlflow`는 Flask를 끌어오고 그것이 blinker 충돌에 닿습니다.**
+
+    OS 패키지로 깔린 blinker는 RECORD 파일이 없어 pip이 지우기를 거부합니다
+    (`uninstall-no-record-file`) - 2026-10-22에 RunPod 팟에서 그 자리에 걸렸습니다.
+    우리는 추적 클라이언트만 쓰므로 skinny로 충분하고, 그게 맞는 의존성입니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "install -U mlflow-skinny" in body
+    assert "install -U mlflow\n" not in body
+
 def test_the_run_records_the_cut_lines(finetune):
     """**자르는 선이 없으면 그 run이 누출된 데이터로 학습했는지 나중에 알 수 없습니다.**"""
     body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
