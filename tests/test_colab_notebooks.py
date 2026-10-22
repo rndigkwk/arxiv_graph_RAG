@@ -188,6 +188,52 @@ def test_the_output_shape_matches_the_pretrained_run(finetune):
     assert "evals.related_study" in body
 
 
+def test_the_scores_it_writes_are_what_the_judge_reads(finetune, tmp_path):
+    """**판정기를 실제로 먹여 봅니다.** 모양을 손으로 베끼면 틀립니다 - 틀렸습니다.
+
+    처음에 `scores`를 딕셔너리로 쓰고 `candidates`를 넣지 않아, 판정에서 `KeyError`로
+    죽는 파일을 만드는 노트북을 올렸습니다. 노트북 문자열만 보는 테스트로는 못 잡습니다 -
+    그래서 노트북이 쓰는 모양으로 파일을 만들어 `RerankScores`에 **넣어 봅니다.**
+    """
+    import gzip
+    import json as _json
+
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+    assert "'candidates': row['candidates']" in body, "candidates를 쓰지 않습니다"
+
+    path = tmp_path / "scores.jsonl.gz"
+    with gzip.open(path, "wt", encoding="utf-8") as handle:
+        handle.write(_json.dumps({
+            "seed": "2404.04940",
+            "candidates": ["2601.00001", "2601.00002"],
+            "scores": [0.731, 0.112],
+        }) + "\n")
+
+    from evals.related_study import RerankScores
+
+    candidates, values = RerankScores(path).by_seed["2404.04940"]
+
+    assert candidates == ["2601.00001", "2601.00002"]
+    assert values.tolist() == [0.731, 0.112]
+
+
+def test_the_judge_refuses_a_mismatched_score_count(tmp_path):
+    """수가 어긋나면 거부해야 합니다 - 잘린 파일이 조용히 판정되면 안 됩니다."""
+    import gzip
+    import json as _json
+
+    path = tmp_path / "bad.jsonl.gz"
+    with gzip.open(path, "wt", encoding="utf-8") as handle:
+        handle.write(_json.dumps({
+            "seed": "x", "candidates": ["a", "b"], "scores": [0.1],
+        }) + "\n")
+
+    from evals.related_study import RerankScores
+
+    with pytest.raises(ValueError, match="점수 수가 후보 수와"):
+        RerankScores(path)
+
+
 def test_the_slug_does_not_collide_with_the_pretrained_scores(finetune):
     """같은 이름이면 사전학습 점수를 덮어써 비교 상대를 잃습니다."""
     body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
