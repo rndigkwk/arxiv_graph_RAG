@@ -142,19 +142,28 @@ def test_it_checks_the_cuda_context_before_loading_weights(finetune):
     assert "torch.zeros(8, device='cuda')" in body
 
 
-def test_it_asks_for_the_token_once_before_the_training(finetune):
-    """두 번 묻으면 한 시간 학습이 끝난 뒤 **입력 대기로 멈춥니다.** 찍으면 유출입니다.
+def test_every_token_is_asked_before_the_training(finetune):
+    """**한 시간 학습이 끝난 뒤 입력 대기로 멈추지 않게** 합니다.
 
-    이 노트북은 토큰 하나(HF)만 씁니다 - 둘을 쓰는 노트북에는 이 규칙이 맞지 않습니다.
+    규칙은 "한 번만"이 **아닙니다.** 처음에 그렇게 적었다가 MLflow를 넣으면서 토큰이
+    둘(HF·DagsHub)이 되어 제 테스트에 걸렸습니다 - 서로 다른 토큰을 두 번 묻는 것은
+    정당하고, `finetune_embedding_colab`에서 이미 같은 실수를 했습니다.
+
+    고정하는 것은 셋입니다 — 묻는 자리가 **모두 학습보다 앞서는가**, 토큰을 **찍지
+    않는가**, 그리고 묻는 수가 **쓰는 토큰 수와 같은가**(같은 토큰을 두 번 묻지 않게).
     """
     cells = ["".join(cell["source"]) for cell in finetune["cells"]]
     body = "\n".join(cells)
 
-    assert body.count("getpass.getpass(") == 1
-    assert "print(HF_TOKEN" not in body
-    asked_at = next(i for i, text in enumerate(cells) if "getpass.getpass(" in text)
+    asked = [i for i, text in enumerate(cells) if "getpass.getpass(" in text]
     trained_at = next(i for i, text in enumerate(cells) if "model.fit(" in text)
-    assert asked_at < trained_at
+
+    assert asked, "토큰을 묻는 셀이 없습니다"
+    assert max(asked) < trained_at, (asked, trained_at)
+    # HF와 DagsHub 둘입니다. 늘면 그 토큰도 학습 전에 묻는지 위 단정이 봅니다.
+    assert body.count("getpass.getpass(") == 2
+    for secret in ("print(HF_TOKEN", "print(os.environ[\"MLFLOW_TRACKING_PASSWORD\"]"):
+        assert secret not in body, secret
 
 
 def test_the_bar_is_written_in_the_notebook(finetune):
@@ -186,6 +195,52 @@ def test_the_output_shape_matches_the_pretrained_run(finetune):
     assert "rerank-" in body and ".jsonl.gz" in body
     assert "'scores'" in body or '"scores"' in body
     assert "evals.related_study" in body
+
+
+def test_the_scores_it_writes_are_what_the_judge_reads(finetune, tmp_path):
+    """**판정기를 실제로 먹여 봅니다.** 모양을 손으로 베끼면 틀립니다 - 틀렸습니다.
+
+    처음에 `scores`를 딕셔너리로 쓰고 `candidates`를 넣지 않아, 판정에서 `KeyError`로
+    죽는 파일을 만드는 노트북을 올렸습니다. 노트북 문자열만 보는 테스트로는 못 잡습니다 -
+    그래서 노트북이 쓰는 모양으로 파일을 만들어 `RerankScores`에 **넣어 봅니다.**
+    """
+    import gzip
+    import json as _json
+
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+    assert "'candidates': row['candidates']" in body, "candidates를 쓰지 않습니다"
+
+    path = tmp_path / "scores.jsonl.gz"
+    with gzip.open(path, "wt", encoding="utf-8") as handle:
+        handle.write(_json.dumps({
+            "seed": "2404.04940",
+            "candidates": ["2601.00001", "2601.00002"],
+            "scores": [0.731, 0.112],
+        }) + "\n")
+
+    from evals.related_study import RerankScores
+
+    candidates, values = RerankScores(path).by_seed["2404.04940"]
+
+    assert candidates == ["2601.00001", "2601.00002"]
+    assert values.tolist() == [0.731, 0.112]
+
+
+def test_the_judge_refuses_a_mismatched_score_count(tmp_path):
+    """수가 어긋나면 거부해야 합니다 - 잘린 파일이 조용히 판정되면 안 됩니다."""
+    import gzip
+    import json as _json
+
+    path = tmp_path / "bad.jsonl.gz"
+    with gzip.open(path, "wt", encoding="utf-8") as handle:
+        handle.write(_json.dumps({
+            "seed": "x", "candidates": ["a", "b"], "scores": [0.1],
+        }) + "\n")
+
+    from evals.related_study import RerankScores
+
+    with pytest.raises(ValueError, match="점수 수가 후보 수와"):
+        RerankScores(path)
 
 
 def test_the_slug_does_not_collide_with_the_pretrained_scores(finetune):
@@ -224,3 +279,138 @@ def test_the_length_limit_is_checked_before_the_weights_download(finetune):
     load_at = next(i for i, text in enumerate(cells) if "CrossEncoder(MODEL" in text)
 
     assert config_at < load_at
+
+
+# ── MLflow 기록 ────────────────────────────────────────────────────────────
+
+def test_the_run_is_logged_to_a_remote_server(finetune):
+    """**실행 중인 VM 안에만 쓰면 기록이 아니라 착각입니다.**
+
+    저장된 메모리의 결정이기도 합니다 — "다음 학습은 MLflow 서버나 TensorBoard로.
+    실행 VM 안 CSV는 기록이 아니다."
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "dagshub.com" in body
+    assert "mlflow.set_tracking_uri" in body
+    # **문구가 아니라 성질을 봅니다.** 처음에 제 한국어 한 줄을 그대로 박아 뒀다가,
+    # RunPod 안내를 넣으며 "VM"을 "런타임"으로 고치자 깨졌습니다 - 표현을 고정하면
+    # 글을 다듬을 때마다 테스트가 깨지고, 깨지는 테스트는 꺼집니다.
+    assert "mlruns/" in body, "로컬 mlruns로 떨어지는 길을 막는 설명이 없습니다"
+    assert "함께 사라집니다" in body
+
+
+def test_a_smoke_run_never_produces_a_file_that_looks_real(finetune):
+    """**이름이 같으면 40시드 파일이 HF에서 전체 결과처럼 보입니다.**
+
+    전체 실행이 업로드 전에 끊기면 그 파일로 판정하게 됩니다 - 노트북 안의 누락 검사는
+    로컬에서만 돌고 파일 이름은 아무것도 말해 주지 않습니다. 그래서 SMOKE 산출물에는
+    표시를 남기고, 판정 명령도 찍지 않습니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    # 채점과 업로드 두 곳에서 같은 규칙이어야 합니다.
+    assert body.count("_slug += '-smoke'") == 2
+    assert "이 파일로 판정하지 마세요" in body
+
+
+def test_a_resumed_run_says_it_skipped_training(finetune):
+    """재개한 run의 train_minutes가 0인데 이유가 없으면 "0분에 학습됐다"로 읽힙니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "'resumed_without_training'" in body
+
+def test_a_saved_model_is_reused_only_when_the_config_matches(finetune):
+    """**2026-10-22에 조용히 틀린 결과를 낼 뻔한 자리입니다.**
+
+    SMOKE가 저장한 40시드 모델을 전체 실행이 "저장된 모델"로 보고 학습을 건너뛰었습니다.
+    그대로 가면 3,142쌍으로 8분 학습한 모델이 1,377시드를 채점하고, MLflow에는
+    train_seeds=813으로 적힙니다 - 기록이 거짓이 됩니다. 디스크에 모델만 있으면 둘을
+    구별할 수 없으므로 **무엇으로 학습했는지 적어 대조**합니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    # 설정이 다르면 자리부터 다릅니다.
+    assert "RUN_FINGERPRINT" in body
+    assert "score_chunks-" in body
+    assert "f'{SAVE_DIR}-{RUN_FINGERPRINT}'" in body
+    # 그에 더해 학습 내역을 적고 대조합니다.
+    assert "trained_on.json" in body
+    assert "_have != _want" in body
+
+
+def test_the_smoke_flag_changes_the_fingerprint(finetune):
+    """SMOKE와 전체가 같은 지문이면 조각이 섞입니다 - 그게 이번 사고의 절반입니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "'smoke': bool(SMOKE)" in body
+
+def test_the_install_check_covers_what_fit_needs_at_call_time(finetune):
+    """**임포트가 되는가"만 보면 부족합니다.**
+
+    2026-10-22에 그 자리에서 걸렸습니다 - `CrossEncoder`와 `InputExample`은 멀쩡히
+    임포트됐는데 `fit()`이 **호출 시점에** `datasets.Dataset`을 쓰고, 그 패키지가 없어
+    `NameError: name 'Dataset' is not defined`로 죽었습니다. 세 시간짜리 학습이
+    시작하자마자 죽는 것보다 설치 셀에서 한 줄이 낫습니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "install -U sentence-transformers datasets accelerate" in body
+    # `fit()`이 내부에서 쓰는 바로 그 심볼을 확인해야 합니다.
+    assert "from datasets import Dataset" in body
+    assert "import accelerate" in body
+
+def test_it_installs_the_client_not_the_server(finetune):
+    """**전체 `mlflow`는 Flask를 끌어오고 그것이 blinker 충돌에 닿습니다.**
+
+    OS 패키지로 깔린 blinker는 RECORD 파일이 없어 pip이 지우기를 거부합니다
+    (`uninstall-no-record-file`) - 2026-10-22에 RunPod 팟에서 그 자리에 걸렸습니다.
+    우리는 추적 클라이언트만 쓰므로 skinny로 충분하고, 그게 맞는 의존성입니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "install -U mlflow-skinny" in body
+    assert "install -U mlflow\n" not in body
+
+def test_the_run_records_the_cut_lines(finetune):
+    """**자르는 선이 없으면 그 run이 누출된 데이터로 학습했는지 나중에 알 수 없습니다.**"""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "'train_cut': '2026-07'" in body
+    assert "'test_cut': '2026-08'" in body
+
+
+def test_the_run_records_what_the_measurements_were(finetune):
+    """어림이 아니라 실측을 남깁니다 - 2026-10-20에 두 번 틀렸습니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    for key in ("train_minutes", "train_pairs_per_second", "vram_peak_gb", "batch_used"):
+        assert key in body, key
+
+
+def test_the_scores_file_is_not_logged_as_an_artifact(finetune):
+    """11MB를 HF와 MLflow 두 곳에 두면 둘이 갈라집니다. 요약만 둡니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "log_artifact(str(out))" not in body
+    assert "두 곳에 두면 둘이 갈라집니다" in body
+
+
+def test_the_epochs_are_not_split_just_to_get_a_curve(finetune):
+    """에폭을 쪼개 fit을 여러 번 부르면 워밍업과 LR 스케줄이 매번 다시 시작합니다.
+
+    **기록을 얻으려고 학습을 왜곡하지 않습니다** - 중간 곡선은 평가기로 받습니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert body.count("model.fit(") == 1
+    assert "evaluation_steps" in body
+    assert "기록을 얻으려고 학습을" in body
+
+
+def test_tracking_can_be_turned_off_and_says_what_is_lost(finetune):
+    """끄는 길이 있어야 토큰 없이도 돌아갑니다 - 다만 무엇을 잃는지 적습니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert 'TRACKING = "mlflow"' in body
+    assert "추적을 끕니다" in body
