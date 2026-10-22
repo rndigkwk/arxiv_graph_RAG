@@ -2871,6 +2871,98 @@ uv run --group dev python -m evals.judge_study --provider anthropic \
   --output reports/judge_study_claude.json
 ```
 
+## 11-37. 보류 질문 120개를 만들었습니다 — 61/61은 맞춰 넣은 값이 아니었고, 그래도 프롬프트는 안 고칩니다 (2026-10-22)
+
+11-36절이 `requires_content`가 공급자 의존이라는 것을 쟀는데, 그 61문항은 **프롬프트를 맞춰 넣은
+바로 그 집합**입니다. 그래서 `gpt-6-luna`의 `61/61`이 프롬프트의 성질인지 튜닝 집합의 성질인지
+구별되지 않았습니다. [ADR-059](docs/adr/ADR-059-the-judge-prompt-is-measured-on-held-out-questions.md)가
+그 구별을 집어 들었습니다.
+
+**가능했던 이유는 라벨이 기계적이라는 것뿐입니다.** 질문 문장에서 라벨이 나오므로
+(`judge_study.labelled_questions`) 사람 라벨 없이 보류 집합을 만들 수 있습니다. 라벨이 사람
+판단이면 이 절은 비용에서 막힙니다.
+
+[`evals/holdout_questions.py`](evals/holdout_questions.py)가 그래프에서 **120문항**을 만듭니다
+(`exact-title` 60 + 그래프 다섯 가족 각 12). 질문의 모양은 기존 사례의 템플릿을 그대로 쓰고,
+판정용 Cypher는 `evals/cases_graph.json`에서 읽습니다 — 베껴 두면 그 목록이 조용히 늙습니다.
+거부 36건(튜닝 집합의 논문 34, 한 토큰 이름 2)을 매니페스트에 적습니다. 진단 80 / 최종 40으로
+**가족 비율을 유지한 채** 나눕니다.
+
+### 세 갈래를 미리 적고 재습니다
+
+| 진단 80문항 | OpenAI `gpt-6-luna` | Claude `claude-haiku-5-5` |
+|---|---:|---:|
+| `requires_content` | <!--n:reports/judge_holdout_openai.json#summary.content_accuracy-->1.0000<!--/n--> | <!--n:reports/judge_holdout_claude.json#summary.content_accuracy-->0.7625<!--/n--> |
+| `requires_graph` | 1.0000 | 1.0000 |
+| `exact-title` (40문항) | 1.0000 | <!--n:reports/judge_holdout_claude.json#summary.by_family.exact-title.content_accuracy-->0.5250<!--/n--> |
+| 다른 다섯 가족 (각 8) | 1.0000 | 1.0000 |
+
+**OpenAI가 처음 보는 질문 80개에서 80/80입니다.** 그래서 "둘 다 떨어진다"는 갈래가
+배제됐습니다 — `61/61`은 튜닝 집합에 맞춰 넣은 값이 아니고, 11-36절의 해석을 고칠 필요가
+없습니다. Claude는 19건 전부 미탐이고 전부 `exact-title`입니다(튜닝 13/21 = 0.619, 보류
+19/40 = 0.475 — **같은 고장이 같은 자리에서 재현**).
+
+### 프롬프트를 대칭으로 다시 써 봤습니다 (v4)
+
+프롬프트에 두 문장이 비대칭으로 있습니다 — 제목이 **돌려줄 논문**을 가리키는 경우(A, 긴 문장의
+종속절)와 **관계의 상대편**을 가리키는 경우(B, 독립된 규칙). `gpt-6-luna`는 나눠 쓰고
+`claude-haiku-5-5`는 B를 양쪽에 적용합니다. A를 B와 나란히 다시 썼습니다
+(`edafadf5a830`, 199자 증가, 다른 구간은 손대지 않음).
+
+| | v3 | v4 |
+|---|---:|---:|
+| Claude 진단 `requires_content` | 0.7625 | <!--n:reports/judge_holdout_claude_v4.json#summary.content_accuracy-->0.8875<!--/n--> |
+| Claude `exact-title` | 0.5250 | <!--n:reports/judge_holdout_claude_v4.json#summary.by_family.exact-title.content_accuracy-->0.7750<!--/n--> |
+| 갈린 쌍 | 19 | <!--n:reports/judge_holdout_claude_v4.json#comparison.requires_content.only_new_wrong-->9<!--/n--> (p = <!--n:reports/judge_holdout_claude_v4.json#comparison.requires_content.sign_test_p-->0.0039<!--/n-->) |
+| OpenAI 진단 | 1.0000 | 1.0000, **판정 변화 0건** |
+| OpenAI 기존 61문항 | 1.0000 | 1.0000, 회귀 없음 |
+
+격차가 절반이 됐지만 **네 조건 중 둘만** 넘깁니다(틀린 비율 0.1125 > 0.05, 갈린 쌍 9 ≥ 6).
+그래서 **채택하지 않았습니다.**
+
+### 남은 9건은 문구로 닿지 않습니다
+
+9건 **전부** `requires_content=False`, `requires_graph=False`, `graph_conditions=[]`입니다 —
+"이 질문에는 조건이 하나도 없다". 제목을 그래프 조건으로 옮긴 것이 **아닙니다**(그것이 v2의
+오류 방향이었습니다). Claude는 제목 조회를 **조건이 아니라 식별**로 봅니다. 그리고 그 읽기는
+일관됩니다 — 틀린 제목과 맞은 제목의 길이가 같고(중위 10단어) 콜론 비율도 구별되지 않습니다.
+
+그러므로 이것은 추론 실수가 아니라 **스키마 해석의 차이**입니다. `requires_content`가 "주제
+제약"과 "식별"을 한 칸에 담고 있고, 우리 라벨은 둘 다 `True`입니다. 문장을 더 얹어 한쪽
+공급자를 그 묶음에 밀어 넣는 것은 고치는 일이 아니라 **맞추는 일**입니다.
+
+진짜 고침은 칸을 나누는 것(`names_a_specific_paper` + `constrains_topic`)이고, 그것은 스키마와
+`judge_content`·`candidate_validation`·`chatbot`의 분기·`judge_study`·`judge_bias`가 함께
+바뀌는 **설계 변경**입니다. 지금 사지 않습니다 — 우리는 OpenAI로 돌고, 측정한 141문항
+(튜닝 61 + 진단 80)에서 **141/141**입니다. 살 이유가 생기는 조건만 적어 뒀습니다.
+
+### 값을 적어 둡니다
+
+v4는 OpenAI의 판정을 **하나도 바꾸지 않습니다**(141문항 변화 0건). 그런데 본문이 바뀌므로
+게이트의 `prompt_version` 규칙이 막고 **기준선을 다시 재야 합니다**. "앱 동작은 그대로인데
+기준선 재측정 비용은 전액"이고, 쓰지 않는 공급자에서의 0.7625 → 0.8875를 그 값으로 사지
+않습니다.
+
+**최종 확인 조각 40문항은 열지 않았습니다.** 채택할 프롬프트가 없으므로 확인할 것이 없고,
+열면 그 조각도 튜닝 집합이 됩니다. 테스트가 그 예비를 기계로 지킵니다.
+
+```bash
+uv run python -m evals.holdout_questions --output evals/judge_holdout.json
+uv run --group dev python -m evals.judge_study --holdout evals/judge_holdout.json \
+  --split diagnostic --label openai-holdout-diagnostic \
+  --output reports/judge_holdout_openai.json
+uv run --group dev python -m evals.judge_study --holdout evals/judge_holdout.json \
+  --split diagnostic --provider anthropic --label claude-holdout-diagnostic \
+  --compare-to reports/judge_holdout_openai.json \
+  --output reports/judge_holdout_claude.json
+# 후보 프롬프트로 같은 조각을 다시
+uv run --group dev python -m evals.judge_study --holdout evals/judge_holdout.json \
+  --split diagnostic --provider anthropic \
+  --prompt evals/judge_prompts/judge-content-v4-parallel-title.txt \
+  --compare-to reports/judge_holdout_openai.json \
+  --output reports/judge_holdout_claude_v4.json
+```
+
 ## 13. 재현 방법
 
 ```bash
@@ -2967,6 +3059,8 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/rag_eval_graph_compare{,_after,_final}.json` | 7·8·9절 — 종단 비교 3회 |
 | `reports/judge_study_{before,after}.json` | 8절 — 심판 정확도 |
 | `reports/judge_study{,_claude}.json` | 11-36절 — 심판의 공급자 교차 |
+| `evals/judge_holdout.json` | 11-37절 — 보류 질문 120개(**정답이 없어 게이트에 쓸 수 없습니다**) |
+| `reports/judge_holdout_{openai,claude}{,_v4}.json` | 11-37절 — 보류 조각의 공급자 교차와 후보 프롬프트 |
 | `reports/order_study_{before,after,validated}.json` | 9절 — 정렬 오류 |
 | `reports/order_study_coauthor{,03}.json` | 10절 — `coauthor` 반복 측정 |
 | `reports/order_study_coauthor_{after,fixed}.json` | 10-1절 — 두 수정의 비교 |

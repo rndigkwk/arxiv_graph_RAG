@@ -85,6 +85,56 @@ def labelled_questions(graph_cases: Path, base_cases: Path) -> list[dict[str, An
     return questions
 
 
+SPLITS = ("diagnostic", "final", "all")
+
+
+def use_prompt(path: Path | None) -> dict[str, Any]:
+    """후보 프롬프트를 끼워 넣고, 무엇으로 쟀는지 돌려줍니다(ADR-059).
+
+    `prompts.py`를 고쳐 가며 재면 두 가지가 깨집니다 - 게이트의 `prompt_version` 규칙이
+    기준선과 다른 본문을 막고(설계상 그렇습니다), 탐색 중의 본문이 앱에 들어갑니다. 그래서
+    후보는 **파일로** 두고 이 연구에서만 끼웁니다.
+    """
+    import prompts
+    from pipeline.prompt_registry import digest
+
+    if path is None:
+        return {"source": "prompts.JUDGE_CONTENT",
+                "sha256": digest(prompts.JUDGE_CONTENT)}
+    text = path.read_text(encoding="utf-8").strip()
+    if not text:
+        raise SystemExit(f"{path}가 비어 있습니다.")
+    prompts.JUDGE_CONTENT = text
+    print(f"후보 프롬프트를 씁니다: {path} ({digest(text)})")
+    return {"source": str(path), "sha256": digest(text)}
+
+
+def holdout_questions(path: Path, split: str) -> list[dict[str, Any]]:
+    """보류 집합(ADR-059)에서 질문을 읽습니다. 라벨은 그 파일이 이미 갖고 있습니다.
+
+    **최종 확인 조각은 프롬프트를 고치는 동안 보지 않습니다.** 한 번 보고 고치면 그 조각도
+    튜닝 집합이 되고, 그러면 보류 집합이 소진됩니다. 그래서 고를 때 크게 적습니다.
+    """
+    report = json.loads(path.read_text(encoding="utf-8"))
+    if "questions" not in report:
+        raise SystemExit(
+            f"{path}는 보류 집합이 아닙니다. evals.holdout_questions가 만든 파일이어야 "
+            "합니다."
+        )
+    chosen = [
+        item for item in report["questions"]
+        if split == "all" or item.get("split") == split
+    ]
+    if not chosen:
+        raise SystemExit(f"{path}의 {split} 조각이 비어 있습니다.")
+    if split in ("final", "all"):
+        print(
+            "** 최종 확인 조각을 엽니다. 이것을 보고 프롬프트를 고치면 그 조각도 튜닝 "
+            "집합이 됩니다(ADR-059). 마지막 한 번이어야 합니다. **"
+        )
+    return chosen
+
+
 def judge_for(provider: str, model: str) -> tuple[Any, str]:
     """공급자의 심판 호출과 그 모델 이름을 돌려줍니다.
 
@@ -322,6 +372,10 @@ def compare(rows: list[dict[str, Any]], path: Path) -> dict[str, Any]:
     baseline = report["results"]
     missing = sorted({row["id"] for row in rows} - {row["id"] for row in baseline})
     return {
+        # 기준선이 어느 집합이었는지 적습니다. 옛 보고서에는 없습니다.
+        "baseline_questions_from": report.get("questions_from")
+        or "기록되지 않았습니다",
+        "baseline_prompt": report.get("prompt") or "기록되지 않았습니다",
         "baseline": {
             "path": str(path),
             "label": report.get("label", ""),
@@ -357,10 +411,20 @@ def main() -> int:
                         help=f"비우면 공급자의 기본값입니다(anthropic: {ANTHROPIC_MODEL}).")
     parser.add_argument("--compare-to", type=Path, default=None,
                         help="기준선 보고서와 쌍체로 견줍니다(ADR-058의 바를 적용합니다).")
+    parser.add_argument("--holdout", type=Path, default=None,
+                        help="보류 집합 파일입니다(ADR-059). 주면 사례 파일 대신 씁니다.")
+    parser.add_argument("--split", choices=SPLITS, default="diagnostic",
+                        help="--holdout과 함께 씁니다. 기본은 진단 조각입니다.")
+    parser.add_argument("--prompt", type=Path, default=None,
+                        help="후보 심판 프롬프트 파일입니다. 주면 그것으로 잽니다(ADR-059).")
     parser.add_argument("--output", type=Path, default=OUTPUT)
     args = parser.parse_args()
 
-    questions = labelled_questions(args.graph_cases, args.base_cases)
+    prompt = use_prompt(args.prompt)
+    if args.holdout is not None:
+        questions = holdout_questions(args.holdout, args.split)
+    else:
+        questions = labelled_questions(args.graph_cases, args.base_cases)
     if args.limit:
         questions = questions[: args.limit]
     rows, judge_model = run(questions, args.provider, args.model)
@@ -370,6 +434,16 @@ def main() -> int:
         # **심판 이름을 반드시 함께 적습니다**(ADR-021). 이것이 없으면 다른 심판으로 잰
         # 점수를 같은 표에 올려놓고 비교하게 됩니다.
         "judge": {"provider": args.provider, "model": judge_model},
+        # **어느 프롬프트로 쟀는지 적습니다.** 지문이 없으면 "같은 심판이었다"가 기억이
+        # 됩니다. 기준선의 `prompt_versions.JUDGE_CONTENT`와 같은 방식으로 셉니다.
+        "prompt": prompt,
+        # **어느 집합을 쟀는지 적습니다.** 튜닝 집합의 점수와 보류 집합의 점수를 같은 표에
+        # 올리면 "유지됐다"를 거짓으로 말하게 됩니다.
+        "questions_from": (
+            {"holdout": str(args.holdout), "split": args.split}
+            if args.holdout is not None else
+            {"cases": [str(args.graph_cases), str(args.base_cases)]}
+        ),
         "summary": summarize(rows),
         "mistakes": [
             {
@@ -388,7 +462,7 @@ def main() -> int:
     args.output.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    print(f"심판: {args.provider}/{judge_model}")
+    print(f"심판: {args.provider}/{judge_model} | 프롬프트: {prompt['sha256']}")
     print(json.dumps(report["summary"], ensure_ascii=False, indent=2))
     if "comparison" in report:
         for name in ("requires_content", "requires_graph", "both"):
