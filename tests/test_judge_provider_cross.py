@@ -155,6 +155,12 @@ def test_compare_names_the_questions_the_baseline_does_not_have(tmp_path):
 
 def test_the_openai_judge_refuses_a_model_the_app_does_not_use():
     """다른 모델로 잰 점수를 기준선과 같은 표에 올리는 사고를 막습니다(ADR-021)."""
+    # 이 경로만 앱의 모델 이름을 보므로 `chatbot`이 필요합니다. CI의 `test` job에는
+    # `.env`가 없어 임포트가 실패합니다 - 저장소의 기존 관례대로 건너뛰고 적습니다.
+    try:
+        import chatbot  # noqa: F401
+    except Exception as exc:
+        pytest.skip(f"chatbot을 가져올 수 없습니다: {type(exc).__name__}")
     with pytest.raises(SystemExit) as caught:
         judge_study.judge_for("openai", "gpt-4o-mini")
     assert "OPENAI_MODEL" in str(caught.value)
@@ -184,6 +190,30 @@ def test_an_organization_id_is_refused_before_the_call(monkeypatch):
     said = str(caught.value)
     assert judge_study.ANTHROPIC_WORKSPACE_PREFIX in said
     assert "조직" in said
+
+
+def test_the_anthropic_path_does_not_drag_in_the_app(monkeypatch):
+    """공급자를 바꿔 재는 코드가 앱 자격증명을 요구하면 안 됩니다.
+
+    `chatbot`은 `.env`의 Neo4j·OpenAI 값이 없으면 **임포트 자체가** 실패합니다. 토큰 누적
+    껍데기를 거기 두고 있었더니 2026-10-22에 CI의 `test` job에서 네 건이 터졌습니다 -
+    앱 설정과 아무 상관 없는 함수였습니다. 그래서 `candidate_validation`으로 옮겼고,
+    이 테스트가 다시 묶이는 것을 막습니다.
+    """
+    import subprocess
+    import sys
+
+    probe = (
+        "import os, sys;"
+        "os.environ['CLAUDE']='sk-ant-not-a-real-key';"
+        "os.environ.pop('CLAUDE_WORKSPACE_ID', None);"
+        "from evals import judge_study;"
+        "judge_study.judge_for('anthropic', '');"
+        "print('chatbot' in sys.modules)"
+    )
+    done = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True)
+    assert done.returncode == 0, done.stderr[-500:]
+    assert done.stdout.strip() == "False", "anthropic 경로가 chatbot을 끌고 옵니다"
 
 
 def test_a_workspace_scoped_key_needs_no_header(monkeypatch):
@@ -228,9 +258,10 @@ def test_the_anthropic_client_stays_out_of_the_app():
 def test_both_providers_share_one_usage_wrapper():
     """토큰 누적을 공급자별로 베껴 두면 다른 방식으로 센 비용을 같은 표에 올립니다."""
     source = Path("evals/judge_study.py").read_text(encoding="utf-8")
-    assert "chatbot.structured_judge" in source
+    assert "structured_judge(structured, usage)" in source
     assert "usage_metadata" not in source, (
-        "토큰 누적이 judge_study로 복제됐습니다. chatbot.structured_judge를 쓰세요."
+        "토큰 누적이 judge_study로 복제됐습니다. "
+        "candidate_validation.structured_judge를 쓰세요."
     )
 
 

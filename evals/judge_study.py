@@ -88,13 +88,17 @@ def labelled_questions(graph_cases: Path, base_cases: Path) -> list[dict[str, An
 def judge_for(provider: str, model: str) -> tuple[Any, str]:
     """공급자의 심판 호출과 그 모델 이름을 돌려줍니다.
 
-    토큰 누적은 양쪽이 `chatbot.structured_judge`를 씁니다. 공급자별로 베껴 두면 한쪽만
+    토큰 누적은 양쪽이 `candidate_validation.structured_judge`를 씁니다. 공급자별로 베껴 두면 한쪽만
     고쳐지고, **다른 방식으로 센 비용**을 같은 표에 올리게 됩니다.
     """
-    import chatbot
-    from candidate_validation import QuestionVerdict
+    from candidate_validation import QuestionVerdict, structured_judge
 
     if provider == "openai":
+        # 앱의 모델을 쓰므로 여기서만 `chatbot`이 필요합니다. anthropic 쪽은 앱 자격증명
+        # 없이도 만들어져야 합니다 - `chatbot`은 `.env`의 Neo4j·OpenAI 값이 없으면
+        # 임포트 자체가 실패하고, CI의 `test` job에는 그 값이 없습니다.
+        import chatbot
+
         if model and model != chatbot.llm_model:
             raise SystemExit(
                 f"openai 심판의 모델은 앱과 같은 {chatbot.llm_model}입니다. "
@@ -143,7 +147,7 @@ def judge_for(provider: str, model: str) -> tuple[Any, str]:
     structured = client.with_structured_output(QuestionVerdict, include_raw=True)
 
     def make(usage: dict[str, int]):
-        return chatbot.structured_judge(structured, usage)
+        return structured_judge(structured, usage)
 
     # **어디로 보냈는지도 적습니다.** `ANTHROPIC_BASE_URL`이 설정돼 있으면 호출이 다른
     # 게이트웨이로 갈 수 있고, 그러면 보고서의 모델 이름이 거짓이 됩니다.

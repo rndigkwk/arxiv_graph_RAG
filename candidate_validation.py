@@ -25,6 +25,36 @@ class QuestionVerdict(BaseModel):
     candidates: list[CandidateVerdict]
 
 
+def structured_judge(structured, usage):
+    """이미 만들어진 구조화 호출을 감싸 토큰 사용량을 `usage`에 누적합니다.
+
+    공급자가 달라도 이 껍데기는 같아야 합니다. 토큰 누적을 공급자별로 베껴 두면 한쪽만
+    고쳐지고, 두 공급자의 비용을 **다른 방식으로 센 값**을 같은 표에 올리게 됩니다
+    (ADR-058의 조건 판정 공급자 교차가 이 함수를 씁니다).
+
+    **`chatbot`이 아니라 여기 있습니다.** 이 껍데기는 앱 설정과 아무 상관이 없는데,
+    `chatbot`에 두면 쓰는 쪽이 `.env`의 Neo4j·OpenAI 값까지 끌고 와야 합니다 -
+    2026-10-22에 CI의 `test` job에서 그것으로 터졌습니다. 공급자를 바꿔 재는 코드가
+    앱 자격증명을 요구하면 안 됩니다.
+    """
+    def invoke(messages):
+        result = structured.invoke(messages)
+        if not isinstance(result, dict):
+            return result
+        reported = getattr(result.get("raw"), "usage_metadata", None)
+        if isinstance(reported, dict):
+            for key in ("input_tokens", "output_tokens"):
+                value = reported.get(key)
+                if isinstance(value, int):
+                    usage[key] = (usage.get(key) or 0) + value
+        parsed = result.get("parsed")
+        if parsed is None:
+            raise ValueError("인용 논문의 내용 판정 결과가 불완전합니다.")
+        return parsed
+
+    return invoke
+
+
 def judge_content(question, papers, invoke_model, graph_queries=()):
     """Get a complete, per-paper topic assessment from the configured model."""
     messages = [

@@ -42,7 +42,12 @@ from answer_validation import (
     reason_code,
     validate_evidence_ids,
 )
-from candidate_validation import QuestionVerdict, assess_and_validate, judge_content
+from candidate_validation import (
+    QuestionVerdict,
+    assess_and_validate,
+    judge_content,
+    structured_judge,
+)
 from cypher_validation import check_external_io, check_order_by, refuse_unless_read_only
 import pagerank
 import title_search
@@ -525,31 +530,6 @@ def partial_answer(text):
         return ""
     answer = value.get("answer", "") if isinstance(value, dict) else ""
     return answer if isinstance(answer, str) else ""
-
-
-def structured_judge(structured, usage):
-    """이미 만들어진 구조화 호출을 감싸 토큰 사용량을 `usage`에 누적합니다.
-
-    공급자가 달라도 이 껍데기는 같아야 합니다. 토큰 누적을 공급자별로 베껴 두면 한쪽만
-    고쳐지고, 두 공급자의 비용을 **다른 방식으로 센 값**을 같은 표에 올리게 됩니다
-    (ADR-058의 조건 판정 공급자 교차가 이 함수를 씁니다).
-    """
-    def invoke(messages):
-        result = structured.invoke(messages)
-        if not isinstance(result, dict):
-            return result
-        reported = getattr(result.get("raw"), "usage_metadata", None)
-        if isinstance(reported, dict):
-            for key in ("input_tokens", "output_tokens"):
-                value = reported.get(key)
-                if isinstance(value, int):
-                    usage[key] = (usage.get(key) or 0) + value
-        parsed = result.get("parsed")
-        if parsed is None:
-            raise ValueError("인용 논문의 내용 판정 결과가 불완전합니다.")
-        return parsed
-
-    return invoke
 
 
 def judging_model(usage):
