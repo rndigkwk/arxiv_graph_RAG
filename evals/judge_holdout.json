@@ -1,0 +1,1546 @@
+{
+  "generated_at": "2026-10-22T13:12:33.400540+00:00",
+  "seed": 20261022,
+  "purpose": "심판 판정(requires_content·requires_graph)의 보류 집합입니다. 정답 expected_ids가 없으므로 **회귀 게이트에 쓸 수 없습니다**(ADR-059).",
+  "targets": {
+    "exact-title": 60,
+    "author": 12,
+    "citing": 12,
+    "coauthor": 12,
+    "reference": 12,
+    "topcited": 12
+  },
+  "generated": {
+    "exact-title": {
+      "diagnostic": 40,
+      "final": 20
+    },
+    "author": {
+      "diagnostic": 8,
+      "final": 4
+    },
+    "citing": {
+      "diagnostic": 8,
+      "final": 4
+    },
+    "coauthor": {
+      "diagnostic": 8,
+      "final": 4
+    },
+    "reference": {
+      "diagnostic": 8,
+      "final": 4
+    },
+    "topcited": {
+      "diagnostic": 8,
+      "final": 4
+    }
+  },
+  "rejected": {
+    "튜닝 집합의 논문": 34,
+    "한 토큰 이름": 2
+  },
+  "tuning_set": {
+    "arxiv_ids": 10604,
+    "names": 6,
+    "topcited_pairs": 6,
+    "topics": 10
+  },
+  "questions": [
+    {
+      "id": "holdout-exact-title-01",
+      "family": "exact-title",
+      "question": "Find the paper titled: PromptLink: Leveraging Large Language Models for Cross-Source Biomedical Concept Linking",
+      "paper_ids": [
+        "2405.07500"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-02",
+      "family": "exact-title",
+      "question": "Find the paper titled: The Large N Limit of Superconformal Field Theories and Supergravity",
+      "paper_ids": [
+        "hep-th/9711200"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-03",
+      "family": "exact-title",
+      "question": "Find the paper titled: BLOOM: A 176B-Parameter Open-Access Multilingual Language Model",
+      "paper_ids": [
+        "2211.05100"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-04",
+      "family": "exact-title",
+      "question": "Find the paper titled: Naju: A Native Discrete State-Space Model with Independent Retention and Writing for Long-Sequence Memory",
+      "paper_ids": [
+        "2607.21000"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-05",
+      "family": "exact-title",
+      "question": "Find the paper titled: DGA$_2$D: Directed Graph-Guided Automated Algorithm Design with Large Language Models",
+      "paper_ids": [
+        "2608.00700"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-06",
+      "family": "exact-title",
+      "question": "Find the paper titled: Using Trusted Data to Train Deep Networks on Labels Corrupted by Severe Noise",
+      "paper_ids": [
+        "1802.05300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-07",
+      "family": "exact-title",
+      "question": "Find the paper titled: \"A Passage to India\": Pre-trained Word Embeddings for Indian Languages",
+      "paper_ids": [
+        "2112.13800"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-08",
+      "family": "exact-title",
+      "question": "Find the paper titled: Measuring Massive Multitask Language Understanding",
+      "paper_ids": [
+        "2009.03300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-09",
+      "family": "exact-title",
+      "question": "Find the paper titled: Seeing Across Views: Benchmarking Spatial Reasoning of Vision-Language Models in Robotic Scenes",
+      "paper_ids": [
+        "2510.19400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-10",
+      "family": "exact-title",
+      "question": "Find the paper titled: Generative Modeling by Estimating Gradients of the Data Distribution",
+      "paper_ids": [
+        "1907.05600"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-11",
+      "family": "exact-title",
+      "question": "Find the paper titled: Factcheck-Bench: Fine-Grained Evaluation Benchmark for Automatic Fact-checkers",
+      "paper_ids": [
+        "2311.09000"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-12",
+      "family": "exact-title",
+      "question": "Find the paper titled: RAVEL: Evaluating Interpretability Methods on Disentangling Language Model Representations",
+      "paper_ids": [
+        "2402.17700"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-13",
+      "family": "exact-title",
+      "question": "Find the paper titled: Towards Human-Bot Collaborative Software Architecting with ChatGPT",
+      "paper_ids": [
+        "2302.14600"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-14",
+      "family": "exact-title",
+      "question": "Find the paper titled: Automatic Semantic Alignment of Flow Pattern Representations for Exploration with Large Language Models",
+      "paper_ids": [
+        "2508.06300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-15",
+      "family": "exact-title",
+      "question": "Find the paper titled: StartupBench: Benchmarking General-Purpose Agents on Market-Validated End-to-End Workflows",
+      "paper_ids": [
+        "2608.17800"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-16",
+      "family": "exact-title",
+      "question": "Find the paper titled: Adaptive Chameleon or Stubborn Sloth: Revealing the Behavior of Large Language Models in Knowledge Conflicts",
+      "paper_ids": [
+        "2305.13300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-17",
+      "family": "exact-title",
+      "question": "Find the paper titled: From Text to Map: A System Dynamics Bot for Constructing Causal Loop Diagrams",
+      "paper_ids": [
+        "2402.11400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-18",
+      "family": "exact-title",
+      "question": "Find the paper titled: When Personalization Misleads: Understanding and Mitigating Hallucinations in Personalized LLMs",
+      "paper_ids": [
+        "2601.11000"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-19",
+      "family": "exact-title",
+      "question": "Find the paper titled: Towards Ontology-Mediated Planning with OWL DL Ontologies (Extended Version)",
+      "paper_ids": [
+        "2308.08200"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-20",
+      "family": "exact-title",
+      "question": "Find the paper titled: Learning Disentangled Representations with Semi-Supervised Deep Generative Models",
+      "paper_ids": [
+        "1706.00400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-21",
+      "family": "exact-title",
+      "question": "Find the paper titled: Landmark Attention: Random-Access Infinite Context Length for Transformers",
+      "paper_ids": [
+        "2305.16300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-22",
+      "family": "exact-title",
+      "question": "Find the paper titled: Imbalances in Neurosymbolic Learning: Characterization and Mitigating Strategies",
+      "paper_ids": [
+        "2407.10000"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-23",
+      "family": "exact-title",
+      "question": "Find the paper titled: ATLAS: Benchmarking and Adapting LLMs for Global Trade via Harmonized Tariff Code Classification",
+      "paper_ids": [
+        "2509.18400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-24",
+      "family": "exact-title",
+      "question": "Find the paper titled: Quantifying the Carbon Emissions of Machine Learning",
+      "paper_ids": [
+        "1910.09700"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-25",
+      "family": "exact-title",
+      "question": "Find the paper titled: LARA: Latent Action Representation Alignment for Vision-Language-Action Models",
+      "paper_ids": [
+        "2606.07100"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-26",
+      "family": "exact-title",
+      "question": "Find the paper titled: FSFM: A Biologically-Inspired Framework for Selective Forgetting of Agent Memory",
+      "paper_ids": [
+        "2604.20300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-27",
+      "family": "exact-title",
+      "question": "Find the paper titled: OSUM-EChat: Enhancing End-to-End Empathetic Spoken Chatbot via Understanding-Driven Spoken Dialogue",
+      "paper_ids": [
+        "2508.09600"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-28",
+      "family": "exact-title",
+      "question": "Find the paper titled: KVFlow: Efficient Prefix Caching for Accelerating LLM-Based Multi-Agent Workflows",
+      "paper_ids": [
+        "2507.07400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-29",
+      "family": "exact-title",
+      "question": "Find the paper titled: ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction",
+      "paper_ids": [
+        "2508.00500"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-30",
+      "family": "exact-title",
+      "question": "Find the paper titled: Chain of Draft: Thinking Faster by Writing Less",
+      "paper_ids": [
+        "2502.18600"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-31",
+      "family": "exact-title",
+      "question": "Find the paper titled: Panoramic Interests: Stylistic-Content Aware Personalized Headline Generation",
+      "paper_ids": [
+        "2501.11900"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-32",
+      "family": "exact-title",
+      "question": "Find the paper titled: Beyond Routing Weights: Faithful Response-Level Interpretation of Mixture-of-Experts Reward Models via Contribution Contrast",
+      "paper_ids": [
+        "2608.06400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-33",
+      "family": "exact-title",
+      "question": "Find the paper titled: EternalMath: A Living Benchmark of Frontier Mathematics that Evolves with Human Discovery",
+      "paper_ids": [
+        "2601.01400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-34",
+      "family": "exact-title",
+      "question": "Find the paper titled: Think Twice, Act Once: Token-Aware Compression and Action Reuse for Efficient Inference in Vision-Language-Action Models",
+      "paper_ids": [
+        "2505.21200"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-35",
+      "family": "exact-title",
+      "question": "Find the paper titled: Mitigating Over-Personalization in LLMs via Structured Memory",
+      "paper_ids": [
+        "2608.08300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-36",
+      "family": "exact-title",
+      "question": "Find the paper titled: TRACE-TS: Attribution-Grounded and Traceable Sensor-Language Reasoning for Human Activity Understanding",
+      "paper_ids": [
+        "2608.00200"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-37",
+      "family": "exact-title",
+      "question": "Find the paper titled: Latent Retrieval for Weakly Supervised Open Domain Question Answering",
+      "paper_ids": [
+        "1906.00300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-38",
+      "family": "exact-title",
+      "question": "Find the paper titled: FlowEdit: Information-Theoretic Control of LLM Reasoning Flows for Ill-posed Problems Involving Conflicts",
+      "paper_ids": [
+        "2607.20500"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-39",
+      "family": "exact-title",
+      "question": "Find the paper titled: Decentralized Evolution of Hexapod Gaits with Independent Leg Controllers",
+      "paper_ids": [
+        "2609.12400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-40",
+      "family": "exact-title",
+      "question": "Find the paper titled: GroupTravelBench: Benchmarking LLM Agents on Multi-Person Travel Planning",
+      "paper_ids": [
+        "2605.25200"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-41",
+      "family": "exact-title",
+      "question": "Find the paper titled: Fact-checking information from large language models can decrease headline discernment",
+      "paper_ids": [
+        "2308.10800"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-42",
+      "family": "exact-title",
+      "question": "Find the paper titled: Multi-Document Grounded Multi-Turn Synthetic Dialog Generation",
+      "paper_ids": [
+        "2409.11500"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-43",
+      "family": "exact-title",
+      "question": "Find the paper titled: Not All Experts are Equal: Efficient Expert Pruning and Skipping for Mixture-of-Experts Large Language Models",
+      "paper_ids": [
+        "2402.14800"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-44",
+      "family": "exact-title",
+      "question": "Find the paper titled: Decomposition Dilemmas: Does Claim Decomposition Boost or Burden Fact-Checking Performance?",
+      "paper_ids": [
+        "2411.02400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-45",
+      "family": "exact-title",
+      "question": "Find the paper titled: The FACTS Grounding Leaderboard: Benchmarking LLMs' Ability to Ground Responses to Long-Form Input",
+      "paper_ids": [
+        "2501.03200"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-46",
+      "family": "exact-title",
+      "question": "Find the paper titled: Multi-Dimensional Evaluation of Text Summarization with In-Context Learning",
+      "paper_ids": [
+        "2306.01200"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-47",
+      "family": "exact-title",
+      "question": "Find the paper titled: Spillover-Aware Multi-Value Steering for Pluralistic LLM Alignment",
+      "paper_ids": [
+        "2609.05800"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-48",
+      "family": "exact-title",
+      "question": "Find the paper titled: Jailbreaking Large Language Models in Infinitely Many Ways",
+      "paper_ids": [
+        "2501.10800"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-49",
+      "family": "exact-title",
+      "question": "Find the paper titled: Likelihood Ratios and Generative Classifiers for Unsupervised Out-of-Domain Detection In Task Oriented Dialog",
+      "paper_ids": [
+        "1912.12800"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-50",
+      "family": "exact-title",
+      "question": "Find the paper titled: Grounded Copilot: How Programmers Interact with Code-Generating Models",
+      "paper_ids": [
+        "2206.15000"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-51",
+      "family": "exact-title",
+      "question": "Find the paper titled: CogVLM2: Visual Language Models for Image and Video Understanding",
+      "paper_ids": [
+        "2408.16500"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-52",
+      "family": "exact-title",
+      "question": "Find the paper titled: Effective, Efficient, and General Information Abstraction for Imperfect-Information Extensive-Form Games",
+      "paper_ids": [
+        "2605.10900"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-53",
+      "family": "exact-title",
+      "question": "Find the paper titled: Supporting Human Raters with the Detection of Harmful Content using Large Language Models",
+      "paper_ids": [
+        "2406.12800"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-54",
+      "family": "exact-title",
+      "question": "Find the paper titled: Rethinking the Reliability of Multi-agent System: A Perspective from Byzantine Fault Tolerance",
+      "paper_ids": [
+        "2511.10400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-55",
+      "family": "exact-title",
+      "question": "Find the paper titled: Algorithmic Regularization in Learning Deep Homogeneous Models: Layers are Automatically Balanced",
+      "paper_ids": [
+        "1806.00900"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-56",
+      "family": "exact-title",
+      "question": "Find the paper titled: How Far Are LLMs from Symbolic Planners? An NLP-Based Perspective",
+      "paper_ids": [
+        "2508.01300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-57",
+      "family": "exact-title",
+      "question": "Find the paper titled: Unleashing the Emergent Cognitive Synergy in Large Language Models: A Task-Solving Agent through Multi-Persona Self-Collaboration",
+      "paper_ids": [
+        "2307.05300"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-58",
+      "family": "exact-title",
+      "question": "Find the paper titled: AVEC 2016 - Depression, Mood, and Emotion Recognition Workshop and Challenge",
+      "paper_ids": [
+        "1605.01600"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-exact-title-59",
+      "family": "exact-title",
+      "question": "Find the paper titled: A Tutorial on Principal Component Analysis",
+      "paper_ids": [
+        "1404.1100"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-exact-title-60",
+      "family": "exact-title",
+      "question": "Find the paper titled: When Agents Meet Electric Bus Fleet Operations: Pricing Behavior, Trade-offs, and Policy Implications in an Aggregator Framework",
+      "paper_ids": [
+        "2606.26400"
+      ],
+      "expect_content": true,
+      "expect_graph": false,
+      "why": "정확한 제목만 묻습니다. 그래프 조건이 없습니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-author-01",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Sachidanand VS?",
+      "paper_ids": [
+        "2604.11969",
+        "2609.00226"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-author-02",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Jinzhe Ma?",
+      "paper_ids": [
+        "2512.16969",
+        "2512.19458"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-author-03",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Minghua Ma?",
+      "paper_ids": [
+        "2208.03938",
+        "2305.15778"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-author-04",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Te I?",
+      "paper_ids": [
+        "2507.06261",
+        "2607.02770"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-author-05",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Sehoon Ha?",
+      "paper_ids": [
+        "1812.05905",
+        "2304.00410"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-author-06",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Da Ma?",
+      "paper_ids": [
+        "2308.13149",
+        "2401.14818"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-author-07",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Satya Sai Srinath Namburi GNVV?",
+      "paper_ids": [
+        "2603.00039",
+        "2609.04298"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-author-08",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Ying Ba?",
+      "paper_ids": [
+        "2605.10730",
+        "2605.28091"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-author-09",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Zhongjie Ba?",
+      "paper_ids": [
+        "2407.16667",
+        "2512.04864"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-author-10",
+      "family": "author",
+      "question": "Which papers in this collection list an author named He Ma?",
+      "paper_ids": [
+        "2405.16363",
+        "2510.07784"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-author-11",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Yongjia Ma?",
+      "paper_ids": [
+        "2407.02034",
+        "2410.21299"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-author-12",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Ye Ma?",
+      "paper_ids": [
+        "2412.00127",
+        "2510.12635"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-citing-01",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Latent Retrieval for Weakly Supervised Open Domain Question Answering?",
+      "paper_ids": [
+        "2606.09316",
+        "2608.02163"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-citing-02",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled T2I-RiskyPrompt: A Benchmark for Safety Evaluation, Attack, and Defense on Text-to-Image Model?",
+      "paper_ids": [
+        "2607.17779",
+        "2608.26535"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-citing-03",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled FigureQA: An Annotated Figure Dataset for Visual Reasoning?",
+      "paper_ids": [
+        "2606.19782",
+        "2607.15176"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-citing-04",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled CODA-BENCH: Can Code Agents Handle Data-Intensive Tasks??",
+      "paper_ids": [
+        "2607.26724",
+        "2609.08944"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-citing-05",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled CALF: Aligning LLMs for Time Series Forecasting via Cross-modal Fine-Tuning?",
+      "paper_ids": [
+        "2605.30002",
+        "2608.03339"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-citing-06",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Analyzing Differentiable Fuzzy Logic Operators?",
+      "paper_ids": [
+        "2608.04285",
+        "2608.11136"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-citing-07",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Trajectory-Informed Memory Generation for Self-Improving Agent Systems?",
+      "paper_ids": [
+        "2603.29678",
+        "2607.17621"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-citing-08",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Learning Generalizable Skills from Offline Multi-Task Data for Multi-Agent Cooperation?",
+      "paper_ids": [
+        "2507.10142",
+        "2606.25389"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-citing-09",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Selective Classification for Deep Neural Networks?",
+      "paper_ids": [
+        "2606.02965",
+        "2606.15782"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-citing-10",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled DA-GCN: A Domain-aware Attentive Graph Convolution Network for Shared-account Cross-domain Sequential Recommendation?",
+      "paper_ids": [
+        "2608.09580",
+        "2609.01057"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-citing-11",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled BrowseComp-Plus: A More Fair and Transparent Evaluation Benchmark of Deep-Research Agent?",
+      "paper_ids": [
+        "2602.03238",
+        "2602.06486"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-citing-12",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled EternalMath: A Living Benchmark of Frontier Mathematics that Evolves with Human Discovery?",
+      "paper_ids": [
+        "2602.24173",
+        "2607.06820"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-coauthor-01",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with SpeechGPT: Empowering Large Language Models with Intrinsic Cross-Modal Conversational Abilities?",
+      "paper_ids": [
+        "2004.09984",
+        "2004.12393"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-coauthor-02",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Rethinking Key-Value Cache Compression Techniques for Large Language Model Serving?",
+      "paper_ids": [
+        "1709.05077",
+        "1809.07193"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-coauthor-03",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Conformer: Convolution-augmented Transformer for Speech Recognition?",
+      "paper_ids": [
+        "1609.08144",
+        "1611.04558"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-coauthor-04",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with SkySenseGPT: A Fine-Grained Instruction Tuning Dataset and Model for Remote Sensing Vision-Language Understanding?",
+      "paper_ids": [
+        "1709.09994",
+        "2108.12238"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-coauthor-05",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Can We Break LLMs Out of Self-Loops? Fine-Grained Reasoning Control with Activation Steering?",
+      "paper_ids": [
+        "1506.04757",
+        "1506.08839"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-coauthor-06",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with When LLMs Meet Cunning Texts: A Fallacy Understanding Benchmark for Large Language Models?",
+      "paper_ids": [
+        "1701.04783",
+        "1901.00596"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-coauthor-07",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Personalizing Prostate Cancer Education for Patients Using an EHR-Integrated LLM Agent?",
+      "paper_ids": [
+        "1409.4842",
+        "1705.08422"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-coauthor-08",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with LARA: Latent Action Representation Alignment for Vision-Language-Action Models?",
+      "paper_ids": [
+        "1708.00945",
+        "1808.08473"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-coauthor-09",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Imbalances in Neurosymbolic Learning: Characterization and Mitigating Strategies?",
+      "paper_ids": [
+        "1608.01413",
+        "1609.08824"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-coauthor-10",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Robust Text-to-SQL Generation with Execution-Guided Decoding?",
+      "paper_ids": [
+        "1611.01989",
+        "1703.07469"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-coauthor-11",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Learning to Solve Vehicle Routing Problems with Time Windows through Joint Attention?",
+      "paper_ids": [
+        "1205.2618",
+        "2101.02118"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-coauthor-12",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with XGrammar: Flexible and Efficient Structured Generation Engine for Large Language Models?",
+      "paper_ids": [
+        "1505.00853",
+        "1511.05641"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-01",
+      "family": "reference",
+      "question": "Among the papers cited by Can We Break LLMs Out of Self-Loops? Fine-Grained Reasoning Control with Activation Steering, which ones have primary category cs.SE?",
+      "paper_ids": [
+        "2402.16906"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-reference-02",
+      "family": "reference",
+      "question": "Among the papers cited by Decentralized Evolution of Hexapod Gaits with Independent Leg Controllers, which ones have primary category cs.RO?",
+      "paper_ids": [
+        "cs/0412052"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-reference-03",
+      "family": "reference",
+      "question": "Among the papers cited by CaSKG: Counterfactual-Causal Skill Graphs for Scalable Agent Skill Retrieval, which ones have primary category cs.AI?",
+      "paper_ids": [
+        "2403.00839",
+        "2604.05333"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-04",
+      "family": "reference",
+      "question": "Among the papers cited by Different representation learning objectives recover distinct latent structures from the same psychometric data, which ones have primary category cs.LG?",
+      "paper_ids": [
+        "1807.03748",
+        "2002.05709"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-05",
+      "family": "reference",
+      "question": "Among the papers cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction, which ones have primary category eess.SY?",
+      "paper_ids": [
+        "2211.01539"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-06",
+      "family": "reference",
+      "question": "Among the papers cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction, which ones have primary category cs.CL?",
+      "paper_ids": [
+        "2005.04118",
+        "2302.04761"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-07",
+      "family": "reference",
+      "question": "Among the papers cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction, which ones have primary category cs.AI?",
+      "paper_ids": [
+        "2308.11432",
+        "2312.01959"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-reference-08",
+      "family": "reference",
+      "question": "Among the papers cited by The Lifecycle of LLM-as-a-Judge for Large-Scale Recommendation Explanations, which ones have primary category cs.IR?",
+      "paper_ids": [
+        "1804.11192"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-09",
+      "family": "reference",
+      "question": "Among the papers cited by Beyond Black-Box Obfuscation: Mechanistic Analysis and Defense of White-Box Monitors, which ones have primary category cs.CY?",
+      "paper_ids": [
+        "2311.08379",
+        "2403.10462"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-10",
+      "family": "reference",
+      "question": "Among the papers cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction, which ones have primary category cs.PL?",
+      "paper_ids": [
+        "2212.07329"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-11",
+      "family": "reference",
+      "question": "Among the papers cited by GameWAM: A World Action Model for Video Games, which ones have primary category cs.RO?",
+      "paper_ids": [
+        "2303.04137",
+        "2304.13705"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-reference-12",
+      "family": "reference",
+      "question": "Among the papers cited by BrainAgent: A Large Language Model-Driven Multi-Agent Framework for Autonomous Brain Signal Understanding, which ones have primary category eess.SP?",
+      "paper_ids": [
+        "2203.11279",
+        "2208.02405"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-topcited-01",
+      "family": "topcited",
+      "question": "Within primary category cs.RO, which 5 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2307.15818",
+        "2406.09246"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-topcited-02",
+      "family": "topcited",
+      "question": "Within primary category cs.MA, which 5 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2503.01935",
+        "2505.00212"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-topcited-03",
+      "family": "topcited",
+      "question": "Within primary category cs.SI, which 5 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2502.08691",
+        "1706.02216"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-topcited-04",
+      "family": "topcited",
+      "question": "Within primary category cs.SD, which 10 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "1609.03499",
+        "2204.02152"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-topcited-05",
+      "family": "topcited",
+      "question": "Within primary category eess.SP, which 10 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2402.09450",
+        "2412.07236"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-topcited-06",
+      "family": "topcited",
+      "question": "Within primary category cs.GT, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2101.05853",
+        "2309.05898"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-topcited-07",
+      "family": "topcited",
+      "question": "Within primary category cs.HC, which 3 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2304.03442",
+        "2501.04227"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-topcited-08",
+      "family": "topcited",
+      "question": "Within primary category cs.CY, which 10 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2009.03300",
+        "2008.02275"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-topcited-09",
+      "family": "topcited",
+      "question": "Within primary category cs.DC, which 10 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2304.11277",
+        "2407.00079"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-topcited-10",
+      "family": "topcited",
+      "question": "Within primary category math.OC, which 5 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2106.01946",
+        "0901.0633"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    },
+    {
+      "id": "holdout-topcited-11",
+      "family": "topcited",
+      "question": "Within primary category cs.GT, which 5 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "2101.05853",
+        "2309.05898"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "final"
+    },
+    {
+      "id": "holdout-topcited-12",
+      "family": "topcited",
+      "question": "Within primary category stat.ML, which 10 papers are cited most often by other papers in this collection?",
+      "paper_ids": [
+        "1706.03741",
+        "1503.02531"
+      ],
+      "expect_content": false,
+      "expect_graph": true,
+      "why": "질문의 제목·이름·분류는 관계의 상대편을 가리킵니다. 돌려줄 논문의 주제 조건이 아닙니다.",
+      "split": "diagnostic"
+    }
+  ]
+}

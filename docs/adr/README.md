@@ -87,6 +87,7 @@
 | [ADR-056](ADR-056-no-mechanical-check-for-the-uncited-claim.md) | 인용 없는 주장에 기계적 검사를 붙이지 않는다 — 붙이려던 검사가 거짓 양성만 냈다 | 기각 |
 | [ADR-057](ADR-057-fine-tune-the-reranker-on-cocitation.md) | 재정렬기를 공동인용으로 미세조정한다 — 바를 먼저 적는다 | 채택 |
 | [ADR-058](ADR-058-the-independent-judge-only-means-something-with-labels.md) | 독립 공급자 판정은 라벨이 있는 조건 판정에서만 한다 — 재 보니 61/61은 프롬프트가 아니라 그 모델의 성질이었다 | 채택 |
+| [ADR-059](ADR-059-the-judge-prompt-is-measured-on-held-out-questions.md) | 심판 프롬프트는 보류 질문에서 잰다 — 라벨이 기계적이라 사람 없이 집합을 만들 수 있다 | 채택 |
 | [ADR-016](ADR-016-stay-on-streamlit.md) | Cloud Run으로 옮기지 않는다 | 보류 |
 | [ADR-017](ADR-017-regression-gate.md) | 품질 회귀는 CI가 기준선과 대조해 막는다 | 채택 |
 | [ADR-018](ADR-018-prompt-versioning.md) | 프롬프트 본문은 한 모듈에 모으고 버전은 MLflow에 남긴다 | 채택 |

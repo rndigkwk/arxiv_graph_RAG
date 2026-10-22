@@ -239,6 +239,132 @@ def test_the_cheap_judge_is_the_one_the_adr_names():
     assert f"`{judge_study.ANTHROPIC_MODEL}`" in text
 
 
+# ── 보류 집합과 후보 프롬프트 (ADR-059) ─────────────────────────────────
+
+def holdout_file(tmp_path, items):
+    import json
+
+    path = tmp_path / "holdout.json"
+    path.write_text(json.dumps({"questions": items}), encoding="utf-8")
+    return path
+
+
+def test_the_holdout_split_is_honoured(tmp_path):
+    path = holdout_file(tmp_path, [
+        {"id": "a", "split": "diagnostic"},
+        {"id": "b", "split": "final"},
+        {"id": "c", "split": "diagnostic"},
+    ])
+    assert [i["id"] for i in judge_study.holdout_questions(path, "diagnostic")] \
+        == ["a", "c"]
+    assert [i["id"] for i in judge_study.holdout_questions(path, "final")] == ["b"]
+    assert len(judge_study.holdout_questions(path, "all")) == 3
+
+
+def test_an_empty_split_is_refused_instead_of_measuring_nothing(tmp_path):
+    path = holdout_file(tmp_path, [{"id": "a", "split": "diagnostic"}])
+    with pytest.raises(SystemExit) as caught:
+        judge_study.holdout_questions(path, "final")
+    assert "final" in str(caught.value)
+
+
+def test_a_file_that_is_not_a_holdout_set_is_refused(tmp_path):
+    import json
+
+    path = tmp_path / "other.json"
+    path.write_text(json.dumps({"summary": {}}), encoding="utf-8")
+    with pytest.raises(SystemExit) as caught:
+        judge_study.holdout_questions(path, "all")
+    assert "holdout_questions" in str(caught.value)
+
+
+def test_opening_the_final_split_says_so_out_loud(tmp_path, capsys):
+    """최종 조각을 보고 프롬프트를 고치면 그 조각도 튜닝 집합이 됩니다(ADR-059)."""
+    path = holdout_file(tmp_path, [{"id": "b", "split": "final"}])
+    judge_study.holdout_questions(path, "final")
+    said = capsys.readouterr().out
+    assert "최종 확인 조각" in said and "ADR-059" in said
+
+
+def test_the_live_prompt_digest_matches_what_the_baseline_pins():
+    """프롬프트를 고치고 기준선을 그대로 두면 게이트가 막습니다. 여기서 먼저 잡습니다."""
+    import json
+
+    recorded = judge_study.use_prompt(None)
+    pinned = json.loads(
+        Path("baselines/eval_baseline.json").read_text(encoding="utf-8")
+    )["prompt_versions"]["JUDGE_CONTENT"]
+    assert recorded["sha256"] == pinned, (
+        "JUDGE_CONTENT가 기준선과 다릅니다. 프롬프트를 바꿨다면 기준선을 다시 재야 "
+        "합니다(게이트의 prompt_version 규칙)."
+    )
+
+
+def test_a_candidate_prompt_is_swapped_in_and_recorded(tmp_path, monkeypatch):
+    import prompts
+
+    # **되돌립니다.** 이 함수는 모듈 전역을 바꾸므로 복구하지 않으면 다른 테스트로 샙니다.
+    monkeypatch.setattr(prompts, "JUDGE_CONTENT", prompts.JUDGE_CONTENT)
+    path = tmp_path / "candidate.txt"
+    path.write_text("  judge differently  ", encoding="utf-8")
+    recorded = judge_study.use_prompt(path)
+    assert prompts.JUDGE_CONTENT == "judge differently"
+    assert recorded["source"] == str(path)
+    assert len(recorded["sha256"]) == 12
+
+
+def test_an_empty_candidate_prompt_is_refused(tmp_path, monkeypatch):
+    import prompts
+
+    monkeypatch.setattr(prompts, "JUDGE_CONTENT", prompts.JUDGE_CONTENT)
+    path = tmp_path / "candidate.txt"
+    path.write_text("   \n", encoding="utf-8")
+    with pytest.raises(SystemExit):
+        judge_study.use_prompt(path)
+
+
+def test_the_final_split_is_still_unopened():
+    """예비 조각을 **기계로** 지킵니다(ADR-059).
+
+    최종 조각을 보고 프롬프트를 고치면 그 조각도 튜닝 집합이 되고, 보류 집합이 소진됩니다.
+    정말 열었다면 이 테스트를 지우고 ADR-059에 "소진됐다"를 적으세요 - 조용히 열리는 것만
+    막습니다.
+    """
+    import json
+
+    for path in sorted(Path("reports").glob("judge*.json")):
+        came = json.loads(path.read_text(encoding="utf-8")).get("questions_from") or {}
+        assert came.get("split") != "final", (
+            f"{path}가 최종 확인 조각으로 잰 보고서입니다. ADR-059의 예비가 소진됐다면 "
+            "그것을 ADR에 적고 이 테스트를 지우세요."
+        )
+
+
+def test_the_candidate_prompt_is_the_one_the_adr_measured():
+    """ADR이 적은 지문과 파일이 갈라지면 둘 중 하나는 거짓말입니다."""
+    import prompts
+    from pipeline.prompt_registry import digest
+
+    candidate = Path("evals/judge_prompts/judge-content-v4-parallel-title.txt")
+    text = candidate.read_text(encoding="utf-8").strip()
+    assert text != prompts.JUDGE_CONTENT, "후보가 현재 프롬프트와 같습니다"
+    adr = Path(
+        "docs/adr/ADR-059-the-judge-prompt-is-measured-on-held-out-questions.md"
+    ).read_text(encoding="utf-8")
+    assert f"`{digest(text)}`" in adr, (
+        f"ADR-059에 후보의 지문 {digest(text)}이 적혀 있지 않습니다"
+    )
+    # 채택하지 않았으므로 앱의 프롬프트는 그대로여야 합니다.
+    assert "채택하지 않습니다" in adr
+
+
+def test_the_report_records_the_set_and_the_prompt():
+    """튜닝 집합의 점수와 보류 집합의 점수를 같은 표에 올리면 거짓이 됩니다."""
+    source = Path("evals/judge_study.py").read_text(encoding="utf-8")
+    assert '"questions_from"' in source
+    assert '"prompt": prompt,' in source
+
+
 # ── 의존성은 평가 전용입니다 ─────────────────────────────────────────────
 
 def test_the_anthropic_client_stays_out_of_the_app():

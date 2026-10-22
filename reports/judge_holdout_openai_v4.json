@@ -1,0 +1,1497 @@
+{
+  "generated_at": "2026-10-22T13:30:21.896670+00:00",
+  "label": "openai-holdout-v4",
+  "judge": {
+    "provider": "openai",
+    "model": "gpt-6-luna"
+  },
+  "prompt": {
+    "source": "evals\\judge_prompts\\judge-content-v4-parallel-title.txt",
+    "sha256": "edafadf5a830"
+  },
+  "questions_from": {
+    "holdout": "evals\\judge_holdout.json",
+    "split": "diagnostic"
+  },
+  "summary": {
+    "questions": 80,
+    "content_accuracy": 1.0,
+    "graph_accuracy": 1.0,
+    "both_correct": 1.0,
+    "graph_false_positive": 0,
+    "graph_false_negative": 0,
+    "content_false_positive": 0,
+    "content_false_negative": 0,
+    "by_family": {
+      "author": {
+        "questions": 8,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "citing": {
+        "questions": 8,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "coauthor": {
+        "questions": 8,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "exact-title": {
+        "questions": 40,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "reference": {
+        "questions": 8,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "topcited": {
+        "questions": 8,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      }
+    },
+    "tokens": {
+      "input": 79258,
+      "output": 10634
+    }
+  },
+  "mistakes": [],
+  "results": [
+    {
+      "id": "holdout-exact-title-02",
+      "family": "exact-title",
+      "question": "Find the paper titled: The Large N Limit of Superconformal Field Theories and Supergravity",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 876,
+        "output_tokens": 92
+      }
+    },
+    {
+      "id": "holdout-exact-title-03",
+      "family": "exact-title",
+      "question": "Find the paper titled: BLOOM: A 176B-Parameter Open-Access Multilingual Language Model",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 824,
+        "output_tokens": 77
+      }
+    },
+    {
+      "id": "holdout-exact-title-05",
+      "family": "exact-title",
+      "question": "Find the paper titled: DGA$_2$D: Directed Graph-Guided Automated Algorithm Design with Large Language Models",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 888,
+        "output_tokens": 80
+      }
+    },
+    {
+      "id": "holdout-exact-title-08",
+      "family": "exact-title",
+      "question": "Find the paper titled: Measuring Massive Multitask Language Understanding",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 812,
+        "output_tokens": 79
+      }
+    },
+    {
+      "id": "holdout-exact-title-09",
+      "family": "exact-title",
+      "question": "Find the paper titled: Seeing Across Views: Benchmarking Spatial Reasoning of Vision-Language Models in Robotic Scenes",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 992,
+        "output_tokens": 91
+      }
+    },
+    {
+      "id": "holdout-exact-title-10",
+      "family": "exact-title",
+      "question": "Find the paper titled: Generative Modeling by Estimating Gradients of the Data Distribution",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 845,
+        "output_tokens": 83
+      }
+    },
+    {
+      "id": "holdout-exact-title-11",
+      "family": "exact-title",
+      "question": "Find the paper titled: Factcheck-Bench: Fine-Grained Evaluation Benchmark for Automatic Fact-checkers",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 820,
+        "output_tokens": 92
+      }
+    },
+    {
+      "id": "holdout-exact-title-12",
+      "family": "exact-title",
+      "question": "Find the paper titled: RAVEL: Evaluating Interpretability Methods on Disentangling Language Model Representations",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 802,
+        "output_tokens": 79
+      }
+    },
+    {
+      "id": "holdout-exact-title-13",
+      "family": "exact-title",
+      "question": "Find the paper titled: Towards Human-Bot Collaborative Software Architecting with ChatGPT",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 925,
+        "output_tokens": 88
+      }
+    },
+    {
+      "id": "holdout-exact-title-14",
+      "family": "exact-title",
+      "question": "Find the paper titled: Automatic Semantic Alignment of Flow Pattern Representations for Exploration with Large Language Models",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 842,
+        "output_tokens": 113
+      }
+    },
+    {
+      "id": "holdout-exact-title-16",
+      "family": "exact-title",
+      "question": "Find the paper titled: Adaptive Chameleon or Stubborn Sloth: Revealing the Behavior of Large Language Models in Knowledge Conflicts",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 919,
+        "output_tokens": 77
+      }
+    },
+    {
+      "id": "holdout-exact-title-17",
+      "family": "exact-title",
+      "question": "Find the paper titled: From Text to Map: A System Dynamics Bot for Constructing Causal Loop Diagrams",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 814,
+        "output_tokens": 82
+      }
+    },
+    {
+      "id": "holdout-exact-title-19",
+      "family": "exact-title",
+      "question": "Find the paper titled: Towards Ontology-Mediated Planning with OWL DL Ontologies (Extended Version)",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 846,
+        "output_tokens": 46
+      }
+    },
+    {
+      "id": "holdout-exact-title-20",
+      "family": "exact-title",
+      "question": "Find the paper titled: Learning Disentangled Representations with Semi-Supervised Deep Generative Models",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 830,
+        "output_tokens": 79
+      }
+    },
+    {
+      "id": "holdout-exact-title-23",
+      "family": "exact-title",
+      "question": "Find the paper titled: ATLAS: Benchmarking and Adapting LLMs for Global Trade via Harmonized Tariff Code Classification",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 925,
+        "output_tokens": 78
+      }
+    },
+    {
+      "id": "holdout-exact-title-24",
+      "family": "exact-title",
+      "question": "Find the paper titled: Quantifying the Carbon Emissions of Machine Learning",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 764,
+        "output_tokens": 82
+      }
+    },
+    {
+      "id": "holdout-exact-title-25",
+      "family": "exact-title",
+      "question": "Find the paper titled: LARA: Latent Action Representation Alignment for Vision-Language-Action Models",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 887,
+        "output_tokens": 85
+      }
+    },
+    {
+      "id": "holdout-exact-title-26",
+      "family": "exact-title",
+      "question": "Find the paper titled: FSFM: A Biologically-Inspired Framework for Selective Forgetting of Agent Memory",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 928,
+        "output_tokens": 82
+      }
+    },
+    {
+      "id": "holdout-exact-title-27",
+      "family": "exact-title",
+      "question": "Find the paper titled: OSUM-EChat: Enhancing End-to-End Empathetic Spoken Chatbot via Understanding-Driven Spoken Dialogue",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 952,
+        "output_tokens": 86
+      }
+    },
+    {
+      "id": "holdout-exact-title-29",
+      "family": "exact-title",
+      "question": "Find the paper titled: ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 974,
+        "output_tokens": 96
+      }
+    },
+    {
+      "id": "holdout-exact-title-30",
+      "family": "exact-title",
+      "question": "Find the paper titled: Chain of Draft: Thinking Faster by Writing Less",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 789,
+        "output_tokens": 81
+      }
+    },
+    {
+      "id": "holdout-exact-title-31",
+      "family": "exact-title",
+      "question": "Find the paper titled: Panoramic Interests: Stylistic-Content Aware Personalized Headline Generation",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 816,
+        "output_tokens": 101
+      }
+    },
+    {
+      "id": "holdout-exact-title-32",
+      "family": "exact-title",
+      "question": "Find the paper titled: Beyond Routing Weights: Faithful Response-Level Interpretation of Mixture-of-Experts Reward Models via Contribution Contrast",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 867,
+        "output_tokens": 80
+      }
+    },
+    {
+      "id": "holdout-exact-title-35",
+      "family": "exact-title",
+      "question": "Find the paper titled: Mitigating Over-Personalization in LLMs via Structured Memory",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 831,
+        "output_tokens": 85
+      }
+    },
+    {
+      "id": "holdout-exact-title-36",
+      "family": "exact-title",
+      "question": "Find the paper titled: TRACE-TS: Attribution-Grounded and Traceable Sensor-Language Reasoning for Human Activity Understanding",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 927,
+        "output_tokens": 86
+      }
+    },
+    {
+      "id": "holdout-exact-title-37",
+      "family": "exact-title",
+      "question": "Find the paper titled: Latent Retrieval for Weakly Supervised Open Domain Question Answering",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 831,
+        "output_tokens": 77
+      }
+    },
+    {
+      "id": "holdout-exact-title-38",
+      "family": "exact-title",
+      "question": "Find the paper titled: FlowEdit: Information-Theoretic Control of LLM Reasoning Flows for Ill-posed Problems Involving Conflicts",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 984,
+        "output_tokens": 97
+      }
+    },
+    {
+      "id": "holdout-exact-title-41",
+      "family": "exact-title",
+      "question": "Find the paper titled: Fact-checking information from large language models can decrease headline discernment",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 916,
+        "output_tokens": 46
+      }
+    },
+    {
+      "id": "holdout-exact-title-44",
+      "family": "exact-title",
+      "question": "Find the paper titled: Decomposition Dilemmas: Does Claim Decomposition Boost or Burden Fact-Checking Performance?",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 823,
+        "output_tokens": 79
+      }
+    },
+    {
+      "id": "holdout-exact-title-45",
+      "family": "exact-title",
+      "question": "Find the paper titled: The FACTS Grounding Leaderboard: Benchmarking LLMs' Ability to Ground Responses to Long-Form Input",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 881,
+        "output_tokens": 92
+      }
+    },
+    {
+      "id": "holdout-exact-title-47",
+      "family": "exact-title",
+      "question": "Find the paper titled: Spillover-Aware Multi-Value Steering for Pluralistic LLM Alignment",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 846,
+        "output_tokens": 46
+      }
+    },
+    {
+      "id": "holdout-exact-title-48",
+      "family": "exact-title",
+      "question": "Find the paper titled: Jailbreaking Large Language Models in Infinitely Many Ways",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 837,
+        "output_tokens": 87
+      }
+    },
+    {
+      "id": "holdout-exact-title-50",
+      "family": "exact-title",
+      "question": "Find the paper titled: Grounded Copilot: How Programmers Interact with Code-Generating Models",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 788,
+        "output_tokens": 79
+      }
+    },
+    {
+      "id": "holdout-exact-title-51",
+      "family": "exact-title",
+      "question": "Find the paper titled: CogVLM2: Visual Language Models for Image and Video Understanding",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 864,
+        "output_tokens": 98
+      }
+    },
+    {
+      "id": "holdout-exact-title-52",
+      "family": "exact-title",
+      "question": "Find the paper titled: Effective, Efficient, and General Information Abstraction for Imperfect-Information Extensive-Form Games",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 931,
+        "output_tokens": 83
+      }
+    },
+    {
+      "id": "holdout-exact-title-53",
+      "family": "exact-title",
+      "question": "Find the paper titled: Supporting Human Raters with the Detection of Harmful Content using Large Language Models",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 836,
+        "output_tokens": 78
+      }
+    },
+    {
+      "id": "holdout-exact-title-55",
+      "family": "exact-title",
+      "question": "Find the paper titled: Algorithmic Regularization in Learning Deep Homogeneous Models: Layers are Automatically Balanced",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 910,
+        "output_tokens": 95
+      }
+    },
+    {
+      "id": "holdout-exact-title-56",
+      "family": "exact-title",
+      "question": "Find the paper titled: How Far Are LLMs from Symbolic Planners? An NLP-Based Perspective",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 959,
+        "output_tokens": 86
+      }
+    },
+    {
+      "id": "holdout-exact-title-59",
+      "family": "exact-title",
+      "question": "Find the paper titled: A Tutorial on Principal Component Analysis",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 765,
+        "output_tokens": 97
+      }
+    },
+    {
+      "id": "holdout-exact-title-60",
+      "family": "exact-title",
+      "question": "Find the paper titled: When Agents Meet Electric Bus Fleet Operations: Pricing Behavior, Trade-offs, and Policy Implications in an Aggregator Framework",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 973,
+        "output_tokens": 83
+      }
+    },
+    {
+      "id": "holdout-author-01",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Sachidanand VS?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Sachidanand VS"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1041,
+        "output_tokens": 128
+      }
+    },
+    {
+      "id": "holdout-author-02",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Jinzhe Ma?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"an author named Jinzhe Ma\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1107,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "holdout-author-03",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Minghua Ma?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Minghua Ma"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1051,
+        "output_tokens": 120
+      }
+    },
+    {
+      "id": "holdout-author-04",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Te I?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Te I"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1063,
+        "output_tokens": 115
+      }
+    },
+    {
+      "id": "holdout-author-05",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Sehoon Ha?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Sehoon Ha"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1206,
+        "output_tokens": 111
+      }
+    },
+    {
+      "id": "holdout-author-06",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Da Ma?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Da Ma"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1181,
+        "output_tokens": 109
+      }
+    },
+    {
+      "id": "holdout-author-11",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Yongjia Ma?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Yongjia Ma"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1208,
+        "output_tokens": 116
+      }
+    },
+    {
+      "id": "holdout-author-12",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Ye Ma?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Ye Ma"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1152,
+        "output_tokens": 132
+      }
+    },
+    {
+      "id": "holdout-citing-01",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Latent Retrieval for Weakly Supervised Open Domain Question Answering?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"cite the paper titled Latent Retrieval for Weakly Supervised Open Domain Question Answering\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1217,
+        "output_tokens": 187
+      }
+    },
+    {
+      "id": "holdout-citing-02",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled T2I-RiskyPrompt: A Benchmark for Safety Evaluation, Attack, and Defense on Text-to-Image Model?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled T2I-RiskyPrompt: A Benchmark for Safety Evaluation, Attack, and Defense on Text-to-Image Model"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1309,
+        "output_tokens": 152
+      }
+    },
+    {
+      "id": "holdout-citing-03",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled FigureQA: An Annotated Figure Dataset for Visual Reasoning?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled FigureQA: An Annotated Figure Dataset for Visual Reasoning"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1269,
+        "output_tokens": 153
+      }
+    },
+    {
+      "id": "holdout-citing-07",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Trajectory-Informed Memory Generation for Self-Improving Agent Systems?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled Trajectory-Informed Memory Generation for Self-Improving Agent Systems"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1155,
+        "output_tokens": 178
+      }
+    },
+    {
+      "id": "holdout-citing-09",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Selective Classification for Deep Neural Networks?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled Selective Classification for Deep Neural Networks"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1296,
+        "output_tokens": 146
+      }
+    },
+    {
+      "id": "holdout-citing-10",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled DA-GCN: A Domain-aware Attentive Graph Convolution Network for Shared-account Cross-domain Sequential Recommendation?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled DA-GCN: A Domain-aware Attentive Graph Convolution Network for Shared-account Cross-domain Sequential Recommendation"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1197,
+        "output_tokens": 173
+      }
+    },
+    {
+      "id": "holdout-citing-11",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled BrowseComp-Plus: A More Fair and Transparent Evaluation Benchmark of Deep-Research Agent?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled BrowseComp-Plus: A More Fair and Transparent Evaluation Benchmark of Deep-Research Agent"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1102,
+        "output_tokens": 173
+      }
+    },
+    {
+      "id": "holdout-citing-12",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled EternalMath: A Living Benchmark of Frontier Mathematics that Evolves with Human Discovery?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled EternalMath: A Living Benchmark of Frontier Mathematics that Evolves with Human Discovery"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1152,
+        "output_tokens": 130
+      }
+    },
+    {
+      "id": "holdout-coauthor-01",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with SpeechGPT: Empowering Large Language Models with Intrinsic Cross-Modal Conversational Abilities?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "share an author with SpeechGPT: Empowering Large Language Models with Intrinsic Cross-Modal Conversational Abilities"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1080,
+        "output_tokens": 146
+      }
+    },
+    {
+      "id": "holdout-coauthor-04",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with SkySenseGPT: A Fine-Grained Instruction Tuning Dataset and Model for Remote Sensing Vision-Language Understanding?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "share an author with SkySenseGPT: A Fine-Grained Instruction Tuning Dataset and Model for Remote Sensing Vision-Language Understanding"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1002,
+        "output_tokens": 208
+      }
+    },
+    {
+      "id": "holdout-coauthor-05",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Can We Break LLMs Out of Self-Loops? Fine-Grained Reasoning Control with Activation Steering?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"share an author with Can We Break LLMs Out of Self-Loops? Fine-Grained Reasoning Control with Activation Steering?\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1108,
+        "output_tokens": 179
+      }
+    },
+    {
+      "id": "holdout-coauthor-07",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Personalizing Prostate Cancer Education for Patients Using an EHR-Integrated LLM Agent?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "“share an author with Personalizing Prostate Cancer Education for Patients Using an EHR-Integrated LLM Agent”"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1052,
+        "output_tokens": 151
+      }
+    },
+    {
+      "id": "holdout-coauthor-08",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with LARA: Latent Action Representation Alignment for Vision-Language-Action Models?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "“share an author with LARA: Latent Action Representation Alignment for Vision-Language-Action Models”"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1057,
+        "output_tokens": 156
+      }
+    },
+    {
+      "id": "holdout-coauthor-09",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Imbalances in Neurosymbolic Learning: Characterization and Mitigating Strategies?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"share an author with Imbalances in Neurosymbolic Learning: Characterization and Mitigating Strategies?\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 989,
+        "output_tokens": 173
+      }
+    },
+    {
+      "id": "holdout-coauthor-11",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Learning to Solve Vehicle Routing Problems with Time Windows through Joint Attention?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"share an author with Learning to Solve Vehicle Routing Problems with Time Windows through Joint Attention\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1173,
+        "output_tokens": 167
+      }
+    },
+    {
+      "id": "holdout-coauthor-12",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with XGrammar: Flexible and Efficient Structured Generation Engine for Large Language Models?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "share an author with XGrammar: Flexible and Efficient Structured Generation Engine for Large Language Models"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1025,
+        "output_tokens": 167
+      }
+    },
+    {
+      "id": "holdout-reference-03",
+      "family": "reference",
+      "question": "Among the papers cited by CaSKG: Counterfactual-Causal Skill Graphs for Scalable Agent Skill Retrieval, which ones have primary category cs.AI?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"cited by CaSKG: Counterfactual-Causal Skill Graphs for Scalable Agent Skill Retrieval\"",
+        "\"have primary category cs.AI\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1291,
+        "output_tokens": 234
+      }
+    },
+    {
+      "id": "holdout-reference-04",
+      "family": "reference",
+      "question": "Among the papers cited by Different representation learning objectives recover distinct latent structures from the same psychometric data, which ones have primary category cs.LG?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"cited by Different representation learning objectives recover distinct latent structures from the same psychometric data\"",
+        "\"primary category cs.LG\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1092,
+        "output_tokens": 184
+      }
+    },
+    {
+      "id": "holdout-reference-05",
+      "family": "reference",
+      "question": "Among the papers cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction, which ones have primary category eess.SY?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction",
+        "primary category eess.SY"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 856,
+        "output_tokens": 279
+      }
+    },
+    {
+      "id": "holdout-reference-06",
+      "family": "reference",
+      "question": "Among the papers cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction, which ones have primary category cs.CL?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction",
+        "primary category cs.CL"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1065,
+        "output_tokens": 251
+      }
+    },
+    {
+      "id": "holdout-reference-08",
+      "family": "reference",
+      "question": "Among the papers cited by The Lifecycle of LLM-as-a-Judge for Large-Scale Recommendation Explanations, which ones have primary category cs.IR?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"cited by The Lifecycle of LLM-as-a-Judge for Large-Scale Recommendation Explanations\"",
+        "\"primary category cs.IR\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 953,
+        "output_tokens": 204
+      }
+    },
+    {
+      "id": "holdout-reference-09",
+      "family": "reference",
+      "question": "Among the papers cited by Beyond Black-Box Obfuscation: Mechanistic Analysis and Defense of White-Box Monitors, which ones have primary category cs.CY?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"Among the papers cited by Beyond Black-Box Obfuscation: Mechanistic Analysis and Defense of White-Box Monitors\"",
+        "\"primary category cs.CY\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1137,
+        "output_tokens": 243
+      }
+    },
+    {
+      "id": "holdout-reference-10",
+      "family": "reference",
+      "question": "Among the papers cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction, which ones have primary category cs.PL?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cited by ProbGuard: Proactive Runtime Monitoring for LLM Agent Safety via Probabilistic Prediction",
+        "primary category cs.PL"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 720,
+        "output_tokens": 175
+      }
+    },
+    {
+      "id": "holdout-reference-11",
+      "family": "reference",
+      "question": "Among the papers cited by GameWAM: A World Action Model for Video Games, which ones have primary category cs.RO?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"Among the papers cited by GameWAM: A World Action Model for Video Games\"",
+        "\"primary category cs.RO\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1155,
+        "output_tokens": 217
+      }
+    },
+    {
+      "id": "holdout-topcited-01",
+      "family": "topcited",
+      "question": "Within primary category cs.RO, which 5 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category cs.RO",
+        "5 papers are cited most often by other papers in this collection"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1431,
+        "output_tokens": 243
+      }
+    },
+    {
+      "id": "holdout-topcited-02",
+      "family": "topcited",
+      "question": "Within primary category cs.MA, which 5 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"Within primary category cs.MA\"",
+        "\"cited most often by other papers in this collection\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1089,
+        "output_tokens": 247
+      }
+    },
+    {
+      "id": "holdout-topcited-04",
+      "family": "topcited",
+      "question": "Within primary category cs.SD, which 10 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"Within primary category cs.SD\"",
+        "\"10 papers are cited most often by other papers in this collection\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1016,
+        "output_tokens": 219
+      }
+    },
+    {
+      "id": "holdout-topcited-05",
+      "family": "topcited",
+      "question": "Within primary category eess.SP, which 10 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category eess.SP",
+        "which 10 papers are cited most often by other papers in this collection?"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1242,
+        "output_tokens": 228
+      }
+    },
+    {
+      "id": "holdout-topcited-08",
+      "family": "topcited",
+      "question": "Within primary category cs.CY, which 10 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"Within primary category cs.CY\"",
+        "\"10 papers\"",
+        "\"cited most often by other papers in this collection\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 991,
+        "output_tokens": 204
+      }
+    },
+    {
+      "id": "holdout-topcited-09",
+      "family": "topcited",
+      "question": "Within primary category cs.DC, which 10 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "\"Within primary category cs.DC\"",
+        "\"which 10 papers\"",
+        "\"cited most often by other papers in this collection\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1083,
+        "output_tokens": 241
+      }
+    },
+    {
+      "id": "holdout-topcited-10",
+      "family": "topcited",
+      "question": "Within primary category math.OC, which 5 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category math.OC",
+        "5 papers",
+        "cited most often by other papers in this collection"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1079,
+        "output_tokens": 272
+      }
+    },
+    {
+      "id": "holdout-topcited-12",
+      "family": "topcited",
+      "question": "Within primary category stat.ML, which 10 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category stat.ML",
+        "10 papers are cited most often by other papers in this collection"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1027,
+        "output_tokens": 261
+      }
+    }
+  ],
+  "comparison": {
+    "baseline_questions_from": {
+      "holdout": "evals\\judge_holdout.json",
+      "split": "diagnostic"
+    },
+    "baseline_prompt": "기록되지 않았습니다",
+    "baseline": {
+      "path": "reports\\judge_holdout_openai.json",
+      "label": "openai-holdout-diagnostic",
+      "judge": {
+        "provider": "openai",
+        "model": "gpt-6-luna"
+      },
+      "both_correct": 1.0
+    },
+    "questions_missing_from_baseline": [],
+    "requires_content": {
+      "questions": 80,
+      "both_right": 80,
+      "only_new_wrong": 0,
+      "only_baseline_wrong": 0,
+      "both_wrong": 0,
+      "sign_test_p": null,
+      "verdict": "전사됨",
+      "only_new_wrong_ids": [],
+      "only_baseline_wrong_ids": [],
+      "both_wrong_ids": []
+    },
+    "requires_graph": {
+      "questions": 80,
+      "both_right": 80,
+      "only_new_wrong": 0,
+      "only_baseline_wrong": 0,
+      "both_wrong": 0,
+      "sign_test_p": null,
+      "verdict": "전사됨",
+      "only_new_wrong_ids": [],
+      "only_baseline_wrong_ids": [],
+      "both_wrong_ids": []
+    },
+    "both": {
+      "questions": 80,
+      "both_right": 80,
+      "only_new_wrong": 0,
+      "only_baseline_wrong": 0,
+      "both_wrong": 0,
+      "sign_test_p": null,
+      "verdict": "전사됨",
+      "only_new_wrong_ids": [],
+      "only_baseline_wrong_ids": [],
+      "both_wrong_ids": []
+    }
+  }
+}
