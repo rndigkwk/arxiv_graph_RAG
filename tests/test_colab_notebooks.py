@@ -300,6 +300,26 @@ def test_the_run_is_logged_to_a_remote_server(finetune):
     assert "함께 사라집니다" in body
 
 
+def test_a_smoke_run_never_produces_a_file_that_looks_real(finetune):
+    """**이름이 같으면 40시드 파일이 HF에서 전체 결과처럼 보입니다.**
+
+    전체 실행이 업로드 전에 끊기면 그 파일로 판정하게 됩니다 - 노트북 안의 누락 검사는
+    로컬에서만 돌고 파일 이름은 아무것도 말해 주지 않습니다. 그래서 SMOKE 산출물에는
+    표시를 남기고, 판정 명령도 찍지 않습니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    # 채점과 업로드 두 곳에서 같은 규칙이어야 합니다.
+    assert body.count("_slug += '-smoke'") == 2
+    assert "이 파일로 판정하지 마세요" in body
+
+
+def test_a_resumed_run_says_it_skipped_training(finetune):
+    """재개한 run의 train_minutes가 0인데 이유가 없으면 "0분에 학습됐다"로 읽힙니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "'resumed_without_training'" in body
+
 def test_a_saved_model_is_reused_only_when_the_config_matches(finetune):
     """**2026-10-22에 조용히 틀린 결과를 낼 뻔한 자리입니다.**
 
