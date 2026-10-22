@@ -42,7 +42,12 @@ from answer_validation import (
     reason_code,
     validate_evidence_ids,
 )
-from candidate_validation import QuestionVerdict, assess_and_validate, judge_content
+from candidate_validation import (
+    QuestionVerdict,
+    assess_and_validate,
+    judge_content,
+    structured_judge,
+)
 from cypher_validation import check_external_io, check_order_by, refuse_unless_read_only
 import pagerank
 import title_search
@@ -528,29 +533,16 @@ def partial_answer(text):
 
 
 def judging_model(usage):
-    """조건 판정용 구조화 모델 호출을 감싸 토큰 사용량을 `usage`에 누적합니다.
+    """앱이 쓰는 조건 판정 호출입니다. 공급자는 OpenAI 하나입니다.
 
     이 호출은 에이전트 메시지 스트림 밖에서 일어납니다. 따로 기록해 두지 않으면
     평가 리포트의 토큰 합계에서 빠져 비용이 과소 보고됩니다.
     """
-    structured = llm.with_structured_output(QuestionVerdict, strict=True, include_raw=True)
-
-    def invoke(messages):
-        result = structured.invoke(messages)
-        if not isinstance(result, dict):
-            return result
-        reported = getattr(result.get("raw"), "usage_metadata", None)
-        if isinstance(reported, dict):
-            for key in ("input_tokens", "output_tokens"):
-                value = reported.get(key)
-                if isinstance(value, int):
-                    usage[key] = (usage.get(key) or 0) + value
-        parsed = result.get("parsed")
-        if parsed is None:
-            raise ValueError("인용 논문의 내용 판정 결과가 불완전합니다.")
-        return parsed
-
-    return invoke
+    # `strict=True`는 OpenAI의 구조화 출력 경로입니다. 다른 공급자에는 그 인자가 없습니다 -
+    # 그래서 스키마를 강제하는 방법이 공급자마다 다르고, ADR-058이 그 차이를 적어 둡니다.
+    return structured_judge(
+        llm.with_structured_output(QuestionVerdict, strict=True, include_raw=True), usage
+    )
 
 
 def stream_agent_answer(messages, on_answer=None):

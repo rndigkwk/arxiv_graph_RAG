@@ -1,0 +1,1318 @@
+{
+  "generated_at": "2026-10-22T08:49:36.638532+00:00",
+  "label": "claude-haiku-cross-2026-10-22",
+  "judge": {
+    "provider": "anthropic",
+    "model": "claude-haiku-5-5@https://api.anthropic.com"
+  },
+  "summary": {
+    "questions": 61,
+    "content_accuracy": 0.7869,
+    "graph_accuracy": 1.0,
+    "both_correct": 0.7869,
+    "graph_false_positive": 0,
+    "graph_false_negative": 0,
+    "content_false_positive": 0,
+    "content_false_negative": 13,
+    "by_family": {
+      "author": {
+        "questions": 6,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "citing": {
+        "questions": 6,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "coauthor": {
+        "questions": 6,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "exact-title": {
+        "questions": 21,
+        "content_accuracy": 0.381,
+        "graph_accuracy": 1.0
+      },
+      "reference": {
+        "questions": 6,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "topcited": {
+        "questions": 6,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      },
+      "topic": {
+        "questions": 10,
+        "content_accuracy": 1.0,
+        "graph_accuracy": 1.0
+      }
+    },
+    "tokens": {
+      "input": 123749,
+      "output": 10556
+    }
+  },
+  "mistakes": [
+    {
+      "id": "title-01",
+      "family": "exact-title",
+      "question": "Find the paper titled: AutoScientist-Quant: Self-Evolving Coding Agents for Automatic Research in Quantitative Investment",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-04",
+      "family": "exact-title",
+      "question": "Find the paper titled: Agentic AI-based Framework for Mitigating Premature Diagnostic Handoff and Silent Hallucination in Healthcare Applications",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-06",
+      "family": "exact-title",
+      "question": "Find the paper titled: When Does AI Augment Work? A Workflow-Level Framework for Human-Agent Collaboration",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-07",
+      "family": "exact-title",
+      "question": "Find the paper titled: Structure-Induced Information for Rerooting Levin Tree Search",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-08",
+      "family": "exact-title",
+      "question": "Find the paper titled: INSIDE the Student's Mind: Jointly Modeling Latent Reasoning and Action in LLM Student Simulators",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-09",
+      "family": "exact-title",
+      "question": "Find the paper titled: sLTN: Structural Logic Tensor Networks",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-10",
+      "family": "exact-title",
+      "question": "Find the paper titled: A Strong Linear Baseline for Whole-Heart Cardiac Shape Completion on CT, with an Open Eleven-Structure Statistical Shape Model",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-12",
+      "family": "exact-title",
+      "question": "Find the paper titled: Graph Sparse Sampling: Breaking the Curse of the Horizon in Continuous MDP Planning",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-14",
+      "family": "exact-title",
+      "question": "Find the paper titled: From Attention Masks to Inert Zero-Vector Tokens: OAttention and O-Closure for Token Dynamics",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-17",
+      "family": "exact-title",
+      "question": "Find the paper titled: Can Large Language Models Explain Flight Safety Events? A Prior-Guided Semantic LLM-based Approach",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-18",
+      "family": "exact-title",
+      "question": "Find the paper titled: DSAEval: Evaluating Data Science Agents on a Wide Range of Real-World Data Science Problems",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-19",
+      "family": "exact-title",
+      "question": "Find the paper titled: Fun-TSG: A Function-Driven Multivariate Time Series Generator with Variable-Level Anomaly Labeling",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    },
+    {
+      "id": "title-20",
+      "family": "exact-title",
+      "question": "Find the paper titled: Monitoring Web Agents Without Internal Signals: Observable Trajectories and Key-Step Supervision",
+      "expect_content": true,
+      "got_content": false,
+      "expect_graph": false,
+      "got_graph": false,
+      "graph_conditions": []
+    }
+  ],
+  "results": [
+    {
+      "id": "author-01",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Yuquan Deng?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Yuquan Deng"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2491,
+        "output_tokens": 176
+      }
+    },
+    {
+      "id": "author-02",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Finbarr Timbers?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "list an author named Finbarr Timbers"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1899,
+        "output_tokens": 178
+      }
+    },
+    {
+      "id": "author-03",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Evgenia Nitishinskaya?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Papers list an author named Evgenia Nitishinskaya"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2348,
+        "output_tokens": 185
+      }
+    },
+    {
+      "id": "author-04",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Limin Sun?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "list an author named Limin Sun"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2389,
+        "output_tokens": 175
+      }
+    },
+    {
+      "id": "author-05",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Matteo Gallici?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Papers that list an author named Matteo Gallici"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2255,
+        "output_tokens": 181
+      }
+    },
+    {
+      "id": "author-06",
+      "family": "author",
+      "question": "Which papers in this collection list an author named Adina Yakefu?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "an author named Adina Yakefu"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2159,
+        "output_tokens": 176
+      }
+    },
+    {
+      "id": "citing-01",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled The Alignment Problem from a Deep Learning Perspective?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "papers that cite the paper titled \"The Alignment Problem from a Deep Learning Perspective\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1923,
+        "output_tokens": 198
+      }
+    },
+    {
+      "id": "citing-02",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Which papers in this collection cite the paper titled Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities?"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2318,
+        "output_tokens": 215
+      }
+    },
+    {
+      "id": "citing-03",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Needle in the Haystack for Memory Based Large Language Models?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled Needle in the Haystack for Memory Based Large Language Models"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2227,
+        "output_tokens": 193
+      }
+    },
+    {
+      "id": "citing-04",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "papers that cite the paper titled DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2274,
+        "output_tokens": 206
+      }
+    },
+    {
+      "id": "citing-05",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Deeply-Supervised Nets?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "cite the paper titled Deeply-Supervised Nets"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2479,
+        "output_tokens": 184
+      }
+    },
+    {
+      "id": "citing-06",
+      "family": "citing",
+      "question": "Which papers in this collection cite the paper titled Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "papers that cite the paper titled \"Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2294,
+        "output_tokens": 215
+      }
+    },
+    {
+      "id": "reference-01",
+      "family": "reference",
+      "question": "Among the papers cited by PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation, which ones have primary category cs.CV?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "papers cited by PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation",
+        "primary category cs.CV"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2227,
+        "output_tokens": 213
+      }
+    },
+    {
+      "id": "reference-02",
+      "family": "reference",
+      "question": "Among the papers cited by Forethought: Verifiable Reasoning from Neurosymbolic Primitive Programming, which ones have primary category cs.AI?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Papers cited by 'Forethought: Verifiable Reasoning from Neurosymbolic Primitive Programming' (citation condition)",
+        "primary category cs.AI"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2379,
+        "output_tokens": 221
+      }
+    },
+    {
+      "id": "reference-03",
+      "family": "reference",
+      "question": "Among the papers cited by Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning, which ones have primary category cs.CR?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "papers cited by 'Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning'",
+        "primary category cs.CR"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2200,
+        "output_tokens": 233
+      }
+    },
+    {
+      "id": "reference-04",
+      "family": "reference",
+      "question": "Among the papers cited by StagedWorkspace: A Versioned Workspace for Knowledge-Work Agents, which ones have primary category cs.LG?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "papers cited by StagedWorkspace: A Versioned Workspace for Knowledge-Work Agents",
+        "which ones have primary category cs.LG"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2036,
+        "output_tokens": 214
+      }
+    },
+    {
+      "id": "reference-05",
+      "family": "reference",
+      "question": "Among the papers cited by Reinforcement learning for Quantum Tiq-Taq-Toe, which ones have primary category cs.LG?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Among the papers cited by Reinforcement learning for Quantum Tiq-Taq-Toe",
+        "which ones have primary category cs.LG"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2142,
+        "output_tokens": 212
+      }
+    },
+    {
+      "id": "reference-06",
+      "family": "reference",
+      "question": "Among the papers cited by BRIDGE: Predicting Human Task Completion Time From Model Performance, which ones have primary category cs.LG?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "papers cited by BRIDGE: Predicting Human Task Completion Time From Model Performance",
+        "primary category cs.LG"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2230,
+        "output_tokens": 206
+      }
+    },
+    {
+      "id": "coauthor-01",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Fuzzy K-Means Clustering without Cluster Centroids?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Which other papers in this collection share an author with Fuzzy K-Means Clustering without Cluster Centroids"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2264,
+        "output_tokens": 201
+      }
+    },
+    {
+      "id": "coauthor-02",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Which other papers in this collection share an author with Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study?"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2014,
+        "output_tokens": 214
+      }
+    },
+    {
+      "id": "coauthor-03",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Shares an author with the paper 'When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference'"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1924,
+        "output_tokens": 218
+      }
+    },
+    {
+      "id": "coauthor-04",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with When to Plan: Learning to Select Between Reactive Control and Deliberative Planning?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Which other papers in this collection share an author with \"When to Plan: Learning to Select Between Reactive Control and Deliberative Planning\""
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2095,
+        "output_tokens": 210
+      }
+    },
+    {
+      "id": "coauthor-05",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Lifted Variable Elimination: Decoupling the Operators from the Constraint Language?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Which other papers in this collection share an author with Lifted Variable Elimination: Decoupling the Operators from the Constraint Language?"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1936,
+        "output_tokens": 208
+      }
+    },
+    {
+      "id": "coauthor-06",
+      "family": "coauthor",
+      "question": "Which other papers in this collection share an author with Hyperbolic Neural Networks?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "papers that share an author with Hyperbolic Neural Networks"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2175,
+        "output_tokens": 185
+      }
+    },
+    {
+      "id": "topcited-01",
+      "family": "topcited",
+      "question": "Within primary category cs.CL, which 3 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category cs.CL",
+        "which 3 papers are cited most often by other papers in this collection"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2189,
+        "output_tokens": 196
+      }
+    },
+    {
+      "id": "topcited-02",
+      "family": "topcited",
+      "question": "Within primary category cs.LG, which 3 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category cs.LG",
+        "which 3 papers are cited most often by other papers in this collection"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1888,
+        "output_tokens": 196
+      }
+    },
+    {
+      "id": "topcited-03",
+      "family": "topcited",
+      "question": "Within primary category cs.AI, which 3 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category cs.AI",
+        "cited most often by other papers in this collection (top 3 by citation count)"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2251,
+        "output_tokens": 199
+      }
+    },
+    {
+      "id": "topcited-04",
+      "family": "topcited",
+      "question": "Within primary category cs.CV, which 3 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category cs.CV",
+        "which 3 papers are cited most often by other papers in this collection"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2395,
+        "output_tokens": 196
+      }
+    },
+    {
+      "id": "topcited-05",
+      "family": "topcited",
+      "question": "Within primary category cs.RO, which 3 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category cs.RO",
+        "which 3 papers are cited most often by other papers in this collection"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2396,
+        "output_tokens": 196
+      }
+    },
+    {
+      "id": "topcited-06",
+      "family": "topcited",
+      "question": "Within primary category cs.SE, which 3 papers are cited most often by other papers in this collection?",
+      "expect_content": false,
+      "expect_graph": true,
+      "got_content": false,
+      "got_graph": true,
+      "graph_conditions": [
+        "Within primary category cs.SE",
+        "cited most often by other papers in this collection",
+        "which 3 papers"
+      ],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2161,
+        "output_tokens": 197
+      }
+    },
+    {
+      "id": "topic-graph-neural-network",
+      "family": "topic",
+      "question": "Find arXiv papers about graph neural network.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1828,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-retrieval-augmented-generation",
+      "family": "topic",
+      "question": "Find arXiv papers about retrieval augmented generation.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2288,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-diffusion-model",
+      "family": "topic",
+      "question": "Find arXiv papers about diffusion model.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2066,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-reinforcement-learning",
+      "family": "topic",
+      "question": "Find arXiv papers about reinforcement learning.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1991,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-multimodal",
+      "family": "topic",
+      "question": "Find arXiv papers about multimodal.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1758,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-knowledge-graph",
+      "family": "topic",
+      "question": "Find arXiv papers about knowledge graph.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2134,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-code-generation",
+      "family": "topic",
+      "question": "Find arXiv papers about code generation.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1892,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-medical-imaging",
+      "family": "topic",
+      "question": "Find arXiv papers about medical imaging.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2046,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-federated-learning",
+      "family": "topic",
+      "question": "Find arXiv papers about federated learning.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2009,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "topic-AI-agents",
+      "family": "topic",
+      "question": "Find arXiv papers about AI agents.",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1903,
+        "output_tokens": 164
+      }
+    },
+    {
+      "id": "title-01",
+      "family": "exact-title",
+      "question": "Find the paper titled: AutoScientist-Quant: Self-Evolving Coding Agents for Automatic Research in Quantitative Investment",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1685,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-02",
+      "family": "exact-title",
+      "question": "Find the paper titled: The Emerging Paradigm of Geospatial Foundation Models: From Pre-Training to Agentic Reasoning",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1886,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-03",
+      "family": "exact-title",
+      "question": "Find the paper titled: Semantic Compression Trees: Multi-Resolution Knowledge Retrieval via Hierarchical Semantic Residuals",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1948,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-04",
+      "family": "exact-title",
+      "question": "Find the paper titled: Agentic AI-based Framework for Mitigating Premature Diagnostic Handoff and Silent Hallucination in Healthcare Applications",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1896,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-05",
+      "family": "exact-title",
+      "question": "Find the paper titled: Beyond Imitation: Filtering On-Policy Distillation by Reasoning Progress",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1718,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-06",
+      "family": "exact-title",
+      "question": "Find the paper titled: When Does AI Augment Work? A Workflow-Level Framework for Human-Agent Collaboration",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1617,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-07",
+      "family": "exact-title",
+      "question": "Find the paper titled: Structure-Induced Information for Rerooting Levin Tree Search",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1697,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-08",
+      "family": "exact-title",
+      "question": "Find the paper titled: INSIDE the Student's Mind: Jointly Modeling Latent Reasoning and Action in LLM Student Simulators",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1689,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-09",
+      "family": "exact-title",
+      "question": "Find the paper titled: sLTN: Structural Logic Tensor Networks",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1716,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-10",
+      "family": "exact-title",
+      "question": "Find the paper titled: A Strong Linear Baseline for Whole-Heart Cardiac Shape Completion on CT, with an Open Eleven-Structure Statistical Shape Model",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1956,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-11",
+      "family": "exact-title",
+      "question": "Find the paper titled: Residual Modeling for High-Fidelity Learned Compression of Scientific Data",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1950,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-12",
+      "family": "exact-title",
+      "question": "Find the paper titled: Graph Sparse Sampling: Breaking the Curse of the Horizon in Continuous MDP Planning",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1793,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-13",
+      "family": "exact-title",
+      "question": "Find the paper titled: BlockPython: A Process-Aware Agent-Supported Platform for the Transition from Block-Based to Python Programming",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1748,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-14",
+      "family": "exact-title",
+      "question": "Find the paper titled: From Attention Masks to Inert Zero-Vector Tokens: OAttention and O-Closure for Token Dynamics",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 2020,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-15",
+      "family": "exact-title",
+      "question": "Find the paper titled: AI-Driven Synthesis for High-Tech System Design: Automating Innovation",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1509,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-16",
+      "family": "exact-title",
+      "question": "Find the paper titled: Reasoning in Real World Clinical Care: Why Large Language Models Are Not Yet Safe for Autonomous Clinical Decision Support",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1940,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-17",
+      "family": "exact-title",
+      "question": "Find the paper titled: Can Large Language Models Explain Flight Safety Events? A Prior-Guided Semantic LLM-based Approach",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1917,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-18",
+      "family": "exact-title",
+      "question": "Find the paper titled: DSAEval: Evaluating Data Science Agents on a Wide Range of Real-World Data Science Problems",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1857,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-19",
+      "family": "exact-title",
+      "question": "Find the paper titled: Fun-TSG: A Function-Driven Multivariate Time Series Generator with Variable-Level Anomaly Labeling",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1722,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-20",
+      "family": "exact-title",
+      "question": "Find the paper titled: Monitoring Web Agents Without Internal Signals: Observable Trajectories and Key-Step Supervision",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": false,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": false,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1709,
+        "output_tokens": 139
+      }
+    },
+    {
+      "id": "title-21",
+      "family": "exact-title",
+      "question": "Find the paper titled: Collaborative Multi-Agent Scripts Generation for Enhancing Imperfect-Information Reasoning in Murder Mystery Games",
+      "expect_content": true,
+      "expect_graph": false,
+      "got_content": true,
+      "got_graph": false,
+      "graph_conditions": [],
+      "content_correct": true,
+      "graph_correct": true,
+      "tokens": {
+        "input_tokens": 1903,
+        "output_tokens": 139
+      }
+    }
+  ],
+  "comparison": {
+    "baseline": {
+      "path": "reports\\judge_study.json",
+      "label": "openai-baseline-2026-10-22",
+      "judge": {
+        "provider": "openai",
+        "model": "gpt-6-luna"
+      },
+      "both_correct": 1.0
+    },
+    "questions_missing_from_baseline": [],
+    "requires_content": {
+      "questions": 61,
+      "both_right": 48,
+      "only_new_wrong": 13,
+      "only_baseline_wrong": 0,
+      "both_wrong": 0,
+      "sign_test_p": 0.0002,
+      "verdict": "공급자 의존",
+      "only_new_wrong_ids": [
+        "title-01",
+        "title-04",
+        "title-06",
+        "title-07",
+        "title-08",
+        "title-09",
+        "title-10",
+        "title-12",
+        "title-14",
+        "title-17",
+        "title-18",
+        "title-19",
+        "title-20"
+      ],
+      "only_baseline_wrong_ids": [],
+      "both_wrong_ids": []
+    },
+    "requires_graph": {
+      "questions": 61,
+      "both_right": 61,
+      "only_new_wrong": 0,
+      "only_baseline_wrong": 0,
+      "both_wrong": 0,
+      "sign_test_p": null,
+      "verdict": "전사됨",
+      "only_new_wrong_ids": [],
+      "only_baseline_wrong_ids": [],
+      "both_wrong_ids": []
+    },
+    "both": {
+      "questions": 61,
+      "both_right": 48,
+      "only_new_wrong": 13,
+      "only_baseline_wrong": 0,
+      "both_wrong": 0,
+      "sign_test_p": 0.0002,
+      "verdict": "공급자 의존",
+      "only_new_wrong_ids": [
+        "title-01",
+        "title-04",
+        "title-06",
+        "title-07",
+        "title-08",
+        "title-09",
+        "title-10",
+        "title-12",
+        "title-14",
+        "title-17",
+        "title-18",
+        "title-19",
+        "title-20"
+      ],
+      "only_baseline_wrong_ids": [],
+      "both_wrong_ids": []
+    }
+  }
+}
