@@ -300,6 +300,31 @@ def test_the_run_is_logged_to_a_remote_server(finetune):
     assert "함께 사라집니다" in body
 
 
+def test_a_saved_model_is_reused_only_when_the_config_matches(finetune):
+    """**2026-10-22에 조용히 틀린 결과를 낼 뻔한 자리입니다.**
+
+    SMOKE가 저장한 40시드 모델을 전체 실행이 "저장된 모델"로 보고 학습을 건너뛰었습니다.
+    그대로 가면 3,142쌍으로 8분 학습한 모델이 1,377시드를 채점하고, MLflow에는
+    train_seeds=813으로 적힙니다 - 기록이 거짓이 됩니다. 디스크에 모델만 있으면 둘을
+    구별할 수 없으므로 **무엇으로 학습했는지 적어 대조**합니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    # 설정이 다르면 자리부터 다릅니다.
+    assert "RUN_FINGERPRINT" in body
+    assert "score_chunks-" in body
+    assert "f'{SAVE_DIR}-{RUN_FINGERPRINT}'" in body
+    # 그에 더해 학습 내역을 적고 대조합니다.
+    assert "trained_on.json" in body
+    assert "_have != _want" in body
+
+
+def test_the_smoke_flag_changes_the_fingerprint(finetune):
+    """SMOKE와 전체가 같은 지문이면 조각이 섞입니다 - 그게 이번 사고의 절반입니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "'smoke': bool(SMOKE)" in body
+
 def test_the_install_check_covers_what_fit_needs_at_call_time(finetune):
     """**임포트가 되는가"만 보면 부족합니다.**
 
