@@ -142,19 +142,28 @@ def test_it_checks_the_cuda_context_before_loading_weights(finetune):
     assert "torch.zeros(8, device='cuda')" in body
 
 
-def test_it_asks_for_the_token_once_before_the_training(finetune):
-    """두 번 묻으면 한 시간 학습이 끝난 뒤 **입력 대기로 멈춥니다.** 찍으면 유출입니다.
+def test_every_token_is_asked_before_the_training(finetune):
+    """**한 시간 학습이 끝난 뒤 입력 대기로 멈추지 않게** 합니다.
 
-    이 노트북은 토큰 하나(HF)만 씁니다 - 둘을 쓰는 노트북에는 이 규칙이 맞지 않습니다.
+    규칙은 "한 번만"이 **아닙니다.** 처음에 그렇게 적었다가 MLflow를 넣으면서 토큰이
+    둘(HF·DagsHub)이 되어 제 테스트에 걸렸습니다 - 서로 다른 토큰을 두 번 묻는 것은
+    정당하고, `finetune_embedding_colab`에서 이미 같은 실수를 했습니다.
+
+    고정하는 것은 셋입니다 — 묻는 자리가 **모두 학습보다 앞서는가**, 토큰을 **찍지
+    않는가**, 그리고 묻는 수가 **쓰는 토큰 수와 같은가**(같은 토큰을 두 번 묻지 않게).
     """
     cells = ["".join(cell["source"]) for cell in finetune["cells"]]
     body = "\n".join(cells)
 
-    assert body.count("getpass.getpass(") == 1
-    assert "print(HF_TOKEN" not in body
-    asked_at = next(i for i, text in enumerate(cells) if "getpass.getpass(" in text)
+    asked = [i for i, text in enumerate(cells) if "getpass.getpass(" in text]
     trained_at = next(i for i, text in enumerate(cells) if "model.fit(" in text)
-    assert asked_at < trained_at
+
+    assert asked, "토큰을 묻는 셀이 없습니다"
+    assert max(asked) < trained_at, (asked, trained_at)
+    # HF와 DagsHub 둘입니다. 늘면 그 토큰도 학습 전에 묻는지 위 단정이 봅니다.
+    assert body.count("getpass.getpass(") == 2
+    for secret in ("print(HF_TOKEN", "print(os.environ[\"MLFLOW_TRACKING_PASSWORD\"]"):
+        assert secret not in body, secret
 
 
 def test_the_bar_is_written_in_the_notebook(finetune):
@@ -270,3 +279,62 @@ def test_the_length_limit_is_checked_before_the_weights_download(finetune):
     load_at = next(i for i, text in enumerate(cells) if "CrossEncoder(MODEL" in text)
 
     assert config_at < load_at
+
+
+# ── MLflow 기록 ────────────────────────────────────────────────────────────
+
+def test_the_run_is_logged_to_a_remote_server(finetune):
+    """**실행 중인 VM 안에만 쓰면 기록이 아니라 착각입니다.**
+
+    저장된 메모리의 결정이기도 합니다 — "다음 학습은 MLflow 서버나 TensorBoard로.
+    실행 VM 안 CSV는 기록이 아니다."
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "dagshub.com" in body
+    assert "mlflow.set_tracking_uri" in body
+    assert "mlruns/를 이 VM에 쓰면" in body
+
+
+def test_the_run_records_the_cut_lines(finetune):
+    """**자르는 선이 없으면 그 run이 누출된 데이터로 학습했는지 나중에 알 수 없습니다.**"""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "'train_cut': '2026-07'" in body
+    assert "'test_cut': '2026-08'" in body
+
+
+def test_the_run_records_what_the_measurements_were(finetune):
+    """어림이 아니라 실측을 남깁니다 - 2026-10-20에 두 번 틀렸습니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    for key in ("train_minutes", "train_pairs_per_second", "vram_peak_gb", "batch_used"):
+        assert key in body, key
+
+
+def test_the_scores_file_is_not_logged_as_an_artifact(finetune):
+    """11MB를 HF와 MLflow 두 곳에 두면 둘이 갈라집니다. 요약만 둡니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "log_artifact(str(out))" not in body
+    assert "두 곳에 두면 둘이 갈라집니다" in body
+
+
+def test_the_epochs_are_not_split_just_to_get_a_curve(finetune):
+    """에폭을 쪼개 fit을 여러 번 부르면 워밍업과 LR 스케줄이 매번 다시 시작합니다.
+
+    **기록을 얻으려고 학습을 왜곡하지 않습니다** - 중간 곡선은 평가기로 받습니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert body.count("model.fit(") == 1
+    assert "evaluation_steps" in body
+    assert "기록을 얻으려고 학습을" in body
+
+
+def test_tracking_can_be_turned_off_and_says_what_is_lost(finetune):
+    """끄는 길이 있어야 토큰 없이도 돌아갑니다 - 다만 무엇을 잃는지 적습니다."""
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert 'TRACKING = "mlflow"' in body
+    assert "추적을 끕니다" in body
