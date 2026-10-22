@@ -527,14 +527,13 @@ def partial_answer(text):
     return answer if isinstance(answer, str) else ""
 
 
-def judging_model(usage):
-    """조건 판정용 구조화 모델 호출을 감싸 토큰 사용량을 `usage`에 누적합니다.
+def structured_judge(structured, usage):
+    """이미 만들어진 구조화 호출을 감싸 토큰 사용량을 `usage`에 누적합니다.
 
-    이 호출은 에이전트 메시지 스트림 밖에서 일어납니다. 따로 기록해 두지 않으면
-    평가 리포트의 토큰 합계에서 빠져 비용이 과소 보고됩니다.
+    공급자가 달라도 이 껍데기는 같아야 합니다. 토큰 누적을 공급자별로 베껴 두면 한쪽만
+    고쳐지고, 두 공급자의 비용을 **다른 방식으로 센 값**을 같은 표에 올리게 됩니다
+    (ADR-058의 조건 판정 공급자 교차가 이 함수를 씁니다).
     """
-    structured = llm.with_structured_output(QuestionVerdict, strict=True, include_raw=True)
-
     def invoke(messages):
         result = structured.invoke(messages)
         if not isinstance(result, dict):
@@ -551,6 +550,19 @@ def judging_model(usage):
         return parsed
 
     return invoke
+
+
+def judging_model(usage):
+    """앱이 쓰는 조건 판정 호출입니다. 공급자는 OpenAI 하나입니다.
+
+    이 호출은 에이전트 메시지 스트림 밖에서 일어납니다. 따로 기록해 두지 않으면
+    평가 리포트의 토큰 합계에서 빠져 비용이 과소 보고됩니다.
+    """
+    # `strict=True`는 OpenAI의 구조화 출력 경로입니다. 다른 공급자에는 그 인자가 없습니다 -
+    # 그래서 스키마를 강제하는 방법이 공급자마다 다르고, ADR-058이 그 차이를 적어 둡니다.
+    return structured_judge(
+        llm.with_structured_output(QuestionVerdict, strict=True, include_raw=True), usage
+    )
 
 
 def stream_agent_answer(messages, on_answer=None):

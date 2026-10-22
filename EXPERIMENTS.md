@@ -2805,6 +2805,72 @@ distractor만 늘립니다. 이 측정이 사 준 것은 **①의 상금 크기*
 
 ---
 
+## 11-36. 심판을 다른 공급자로 바꿨습니다 — 61/61은 프롬프트가 아니라 그 모델의 성질이었습니다 (2026-10-22)
+
+[ADR-021](docs/adr/ADR-021-ragas-four-of-six.md)이 "진짜 독립 판정은 다른 공급자의 모델로 재야
+한다"를 적어 두고 끝났습니다. 그 공백을 메우려다 먼저 **어느 심판에서 메울 수 있는지**를
+정해야 했습니다 — RAGAS 지표에는 정답 라벨이 없어서 두 공급자가 갈려도 어느 쪽이 맞는지
+말할 수 없습니다. 조건 판정에는 라벨이 질문 문장에서 기계적으로 나오므로, 거기서는 일치율이
+아니라 **정확도**가 나옵니다. 그래서 조건 판정에서만 쟀습니다
+([ADR-058](docs/adr/ADR-058-the-independent-judge-only-means-something-with-labels.md)).
+
+**바를 먼저 적었습니다.** 기준선이 천장(61/61)이라 Claude는 이길 수 없고, 쌍체표에서 움직이는
+칸은 "Claude만 틀림" 하나입니다. `b=0`이면 양측 부호검정의 p는 `2 × 0.5^c`이므로 **한 방향
+6건부터** "다르다"고 말할 수 있고, 5건 이하는 "구별 못 함"으로 적기로 했습니다.
+
+61문항, 같은 프롬프트(v3), 같은 스키마, 같은 논문. 두 공급자를 **같은 날 연달아** 돌렸습니다.
+
+| 판정 | OpenAI `gpt-6-luna` | Claude `claude-haiku-5-5` | Claude만 틀림 | p | 판정 |
+|---|---:|---:|---:|---:|---|
+| `requires_graph` | 1.0000 | <!--n:reports/judge_study_claude.json#summary.graph_accuracy-->1.0000<!--/n--> | 0 | — | **전사됨** |
+| `requires_content` | <!--n:reports/judge_study.json#summary.content_accuracy-->1.0000<!--/n--> | <!--n:reports/judge_study_claude.json#summary.content_accuracy-->0.7869<!--/n--> | <!--n:reports/judge_study_claude.json#comparison.requires_content.only_new_wrong-->13<!--/n--> | <!--n:reports/judge_study_claude.json#comparison.requires_content.sign_test_p-->0.0002<!--/n--> | **공급자 의존** |
+
+**13건 전부가 `exact-title` 한 가족**이고, 전부 미탐입니다(거짓 양성 0건). `Find the paper
+titled: AutoScientist-Quant: ...`에 Claude가 `requires_content=False`를 돌려줍니다 — 제목이
+요청 전체인데도 "질문의 제목은 돌려줄 논문의 주제 조건이 아니다"를 과적용합니다.
+
+### 같은 문장이 공급자에 따라 반대 방향으로 틀립니다
+
+그 문장은 2026-10-13에 넣은 v3 수정입니다(8절). 수정 전 OpenAI의 오류와 나란히 놓으면 대칭이
+보입니다.
+
+| | 틀린 방향 | 가족 | 건수 | `exact-title` 정확도 |
+|---|---|---|---:|---:|
+| OpenAI v2 (수정 전) | **거짓 양성** | `citing`·`coauthor`·`reference` | 16 | 1.0000 |
+| OpenAI v3 (수정 후) | — | — | 0 | 1.0000 |
+| Claude, **같은 v3 프롬프트** | **미탐** | `exact-title` | 13 | <!--n:reports/judge_study_claude.json#summary.by_family.exact-title.content_accuracy-->0.381<!--/n--> |
+
+**겹치는 질문은 0건입니다.** 한 문장이 한 모델에서는 거짓 양성 16건을 없애고 다른 모델에서는
+반대 방향으로 13건을 만듭니다. 그 문장은 **기울기**이고 두 모델이 서로 다른 쪽에 서 있습니다.
+그러므로 8절의 `61/61`은 프롬프트의 성질이 아니라 **`gpt-6-luna`의 성질**입니다.
+
+### 무엇을 하지 않았는지
+
+프롬프트를 Claude에 맞게 고치지 **않았습니다.** 고치면 더 이상 같은 심판이 아니고, 기울기의
+반대쪽이므로 OpenAI의 16건이 돌아올 수 있습니다. 게이트의 심판도 바꾸지 않았습니다 —
+`judge_model` 규칙이 설계상 그것을 막습니다(ADR-017).
+
+`requires_graph`의 "전사됨"도 **결론이 아닙니다.** 0건의 95% 상한은 `3/61 = 0.049`이고, 이
+61문항은 프롬프트를 맞춰 넣은 집합입니다. 말할 수 있는 것은 "이 집합에서 구별하지 못했다"입니다.
+
+### 비용과 토큰
+
+| | 입력 | 출력 | 비용 |
+|---|---:|---:|---:|
+| OpenAI | <!--n:reports/judge_study.json#summary.tokens.input-->62121<!--/n--> | <!--n:reports/judge_study.json#summary.tokens.output-->9004<!--/n--> | — |
+| Claude | <!--n:reports/judge_study_claude.json#summary.tokens.input-->123749<!--/n--> | <!--n:reports/judge_study_claude.json#summary.tokens.output-->10556<!--/n--> | **$0.0177** |
+
+입력 토큰이 **두 배**입니다. 스키마를 도구 정의로 보내는 경로와 토크나이저가 다르기 때문이며,
+공급자 교차에서 토큰 수를 "같은 입력"의 증거로 쓸 수 없다는 뜻입니다.
+
+```bash
+uv run --group dev python -m evals.judge_study \
+  --label openai-baseline-2026-10-22 --output reports/judge_study.json
+uv run --group dev python -m evals.judge_study --provider anthropic \
+  --label claude-haiku-cross-2026-10-22 --compare-to reports/judge_study.json \
+  --output reports/judge_study_claude.json
+```
+
 ## 13. 재현 방법
 
 ```bash
@@ -2900,6 +2966,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/link_prediction_ablation.json` | 6-1·6-2절 — 절제와 cold-start |
 | `reports/rag_eval_graph_compare{,_after,_final}.json` | 7·8·9절 — 종단 비교 3회 |
 | `reports/judge_study_{before,after}.json` | 8절 — 심판 정확도 |
+| `reports/judge_study{,_claude}.json` | 11-36절 — 심판의 공급자 교차 |
 | `reports/order_study_{before,after,validated}.json` | 9절 — 정렬 오류 |
 | `reports/order_study_coauthor{,03}.json` | 10절 — `coauthor` 반복 측정 |
 | `reports/order_study_coauthor_{after,fixed}.json` | 10-1절 — 두 수정의 비교 |
