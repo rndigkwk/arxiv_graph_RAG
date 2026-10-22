@@ -300,6 +300,21 @@ def test_the_run_is_logged_to_a_remote_server(finetune):
     assert "함께 사라집니다" in body
 
 
+def test_the_install_check_covers_what_fit_needs_at_call_time(finetune):
+    """**임포트가 되는가"만 보면 부족합니다.**
+
+    2026-10-22에 그 자리에서 걸렸습니다 - `CrossEncoder`와 `InputExample`은 멀쩡히
+    임포트됐는데 `fit()`이 **호출 시점에** `datasets.Dataset`을 쓰고, 그 패키지가 없어
+    `NameError: name 'Dataset' is not defined`로 죽었습니다. 세 시간짜리 학습이
+    시작하자마자 죽는 것보다 설치 셀에서 한 줄이 낫습니다.
+    """
+    body = "\n".join("".join(cell["source"]) for cell in finetune["cells"])
+
+    assert "install -U sentence-transformers datasets accelerate" in body
+    # `fit()`이 내부에서 쓰는 바로 그 심볼을 확인해야 합니다.
+    assert "from datasets import Dataset" in body
+    assert "import accelerate" in body
+
 def test_it_installs_the_client_not_the_server(finetune):
     """**전체 `mlflow`는 Flask를 끌어오고 그것이 blinker 충돌에 닿습니다.**
 
