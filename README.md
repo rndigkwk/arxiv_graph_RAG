@@ -259,6 +259,25 @@ Streamlit Community Cloud 앱은 한동안 사용하지 않으면 잠들 수 있
 
 동일한 arXiv ID는 하나의 논문으로 통합합니다. 적재 결과는 논문 **37,854개**, 저자 이름 **111,171개**, `AUTHORED` **268,928개**, `REFERENCES` **69,438개**입니다.
 
+### GPU 노트북 — 배지를 누르면 Colab에서 바로 열립니다
+
+**런타임 > 런타임 유형 변경**에서 GPU를 고르고 위에서 아래로 실행하면 됩니다. 고칠 셀은
+각 노트북의 **1절 하나**입니다.
+
+| | 무엇 |
+|---|---|
+| [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rndigkwk/arxiv_graph_RAG/blob/main/notebooks/rerank_finetune_colab.ipynb) [`rerank_finetune_colab.ipynb`](notebooks/rerank_finetune_colab.ipynb) | 재정렬기를 공동인용으로 미세조정합니다. **바가 노트북에 적혀 있습니다**(ADR-057) — 결과를 보고 움직일 수 없게 |
+| [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rndigkwk/arxiv_graph_RAG/blob/main/notebooks/rerank_pairs_colab.ipynb) [`rerank_pairs_colab.ipynb`](notebooks/rerank_pairs_colab.ipynb) | 사전학습 교차 인코더로 후보를 재정렬해 채점합니다(ADR-050·051) |
+| [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rndigkwk/arxiv_graph_RAG/blob/main/notebooks/encode_corpus_colab.ipynb) [`encode_corpus_colab.ipynb`](notebooks/encode_corpus_colab.ipynb) | 로컬 인코더로 말뭉치를 임베딩합니다(ADR-039·046·049) |
+| [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rndigkwk/arxiv_graph_RAG/blob/main/notebooks/finetune_embedding_colab.ipynb) [`finetune_embedding_colab.ipynb`](notebooks/finetune_embedding_colab.ipynb) | 임베딩 어댑터를 미세조정합니다(ADR-013) |
+
+노트북이 지키는 것이 셋입니다(`tests/test_colab_notebooks.py`가 고정합니다).
+
+- **출력 없이 커밋됩니다.** 커밋된 노트북은 실행 전 상태여야 diff가 읽힙니다.
+- **코드 셀이 전부 컴파일됩니다.** 구문 오류를 올리면 사용자가 GPU를 띄운 뒤에 압니다.
+- **`files.download()`를 쓰지 않습니다.** VS Code↔Colab 세션에서 **예외 없이 아무 일도
+  하지 않습니다**(2026-10-20에 겪었습니다). 가져가기는 허깅페이스를 거칩니다.
+
 ### 실행 노트북 파일
 
 - [`arxiv_computer_science_recent_3months_to_jsonl_oai_pmh.ipynb`](notebooks/arxiv_computer_science_recent_3months_to_jsonl_oai_pmh.ipynb) — arXiv OAI-PMH에서 CS 메타데이터를 수집하고 `published`, `primary_category`로 필터링

@@ -85,6 +85,7 @@
 | [ADR-054](ADR-054-the-upstream-blip-is-a-third-category.md) | 상류의 일시적 장애는 세 번째 범주다 — 재시도하고 처방을 다르게 적는다 | 채택 |
 | [ADR-055](ADR-055-the-stable-case-rule-is-not-resolved.md) | `stable_case`가 변동으로 터지는지는 측정되지 않았다 — 규칙을 고치지 않는다 | 채택 |
 | [ADR-056](ADR-056-no-mechanical-check-for-the-uncited-claim.md) | 인용 없는 주장에 기계적 검사를 붙이지 않는다 — 붙이려던 검사가 거짓 양성만 냈다 | 기각 |
+| [ADR-057](ADR-057-fine-tune-the-reranker-on-cocitation.md) | 재정렬기를 공동인용으로 미세조정한다 — 바를 먼저 적는다 | 채택 |
 | [ADR-016](ADR-016-stay-on-streamlit.md) | Cloud Run으로 옮기지 않는다 | 보류 |
 | [ADR-017](ADR-017-regression-gate.md) | 품질 회귀는 CI가 기준선과 대조해 막는다 | 채택 |
 | [ADR-018](ADR-018-prompt-versioning.md) | 프롬프트 본문은 한 모듈에 모으고 버전은 MLflow에 남긴다 | 채택 |
