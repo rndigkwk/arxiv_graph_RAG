@@ -293,7 +293,11 @@ def test_the_run_is_logged_to_a_remote_server(finetune):
 
     assert "dagshub.com" in body
     assert "mlflow.set_tracking_uri" in body
-    assert "mlruns/를 이 VM에 쓰면" in body
+    # **문구가 아니라 성질을 봅니다.** 처음에 제 한국어 한 줄을 그대로 박아 뒀다가,
+    # RunPod 안내를 넣으며 "VM"을 "런타임"으로 고치자 깨졌습니다 - 표현을 고정하면
+    # 글을 다듬을 때마다 테스트가 깨지고, 깨지는 테스트는 꺼집니다.
+    assert "mlruns/" in body, "로컬 mlruns로 떨어지는 길을 막는 설명이 없습니다"
+    assert "함께 사라집니다" in body
 
 
 def test_the_run_records_the_cut_lines(finetune):
