@@ -4,7 +4,7 @@
 씁니다. 비교가 성립하려면 과제가 하나여야 하므로 채점 경로를 복제하지 않습니다.
 
     uv run python -m models.embedding_tuning.train
-    uv run python -m models.embedding_tuning.train --negative-weight 0.5 --ridge 0.3
+    uv run python -m models.embedding_tuning.train --negative-weight 0.5 --ridge-multiplier 0.5
 
 과제는 **"이 논문이 인용할 논문을 찾아라"**입니다. 질의는 논문의 제목+초록 임베딩이고 정답은 그
 논문이 실제로 인용한 논문들입니다. 라벨 생성 비용이 0입니다 — 인용 관계가 그대로 정답입니다.
