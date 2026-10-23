@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-10-23T14:07:19.729435+00:00",
+  "host": "https://us.cloud.langfuse.com",
+  "wait_seconds": 120,
+  "note": "하루 예산(LANGFUSE_MAX_TRACES)을 쓰지 않습니다 - 예산이 소진된 날에도 진단은 돌아야 합니다. 유닛은 하나 씁니다.",
+  "auth_check": true,
+  "trace_id": "c10b862aa85102df4752928ad191d5de",
+  "trace_url": "https://us.cloud.langfuse.com/project/cmuvyl2ky01auad0c8dk7m66p/traces/c10b862aa85102df4752928ad191d5de",
+  "read_back": {
+    "found": true,
+    "observations": 1,
+    "attempts": 3,
+    "waited_seconds": 5.2
+  },
+  "verdict": "저장됩니다"
+}

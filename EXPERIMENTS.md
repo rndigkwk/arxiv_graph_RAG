@@ -3186,6 +3186,69 @@ uv run python -m evals.related_study --cases evals/cases_related_future.json --v
 uv run python -m evals.rerank_selective --output reports/rerank_selective.json
 ```
 
+## 11-41. Langfuse에 저장되는지 되읽어 봤습니다 — 저장되고, 기한이 사라졌습니다 (2026-10-23)
+
+[ADR-023](docs/adr/ADR-023-what-to-trace.md)이 구멍 하나를 열어 둔 채 끝났습니다 — *"코드
+쪽에서는 구분할 방법이 없습니다 — **Langfuse UI를 직접 봐야** 합니다."* 한도가 소진되면 전송은
+성공하고 UI는 빕니다. 즉 **켜도 동작하는지 몰랐습니다.**
+
+[`scripts/probe_langfuse_delivery.py`](scripts/probe_langfuse_delivery.py)가 trace 하나를
+보내고 **같은 id를 되읽습니다**([ADR-062](docs/adr/ADR-062-read-back-whether-langfuse-stored-it.md)).
+
+### 비동기 수집이 함정입니다
+
+SDK가 적어 뒀습니다 — *"`flush()`는 API 전달만 보장하고 읽기 가시성은 보장하지 않습니다(보통
+15~30초, 부하가 크면 더)"*. 한 번 보고 "없음"으로 적으면 **성공한 trace를 버려진 것으로
+읽습니다.** 그래서 2초 간격으로 **120초까지** 기다립니다.
+
+### 결과
+
+| | |
+|---|---|
+| `auth_check` | 통과 |
+| 되읽기 | **찾음** — observation 1개, **5.2초**, 3번째 시도 |
+| 보내지 않은 무작위 id | **못 찾음** (11.5초, 5번 시도) |
+| 판정 | **저장됩니다** |
+
+**바가 예측한 것과 반대입니다.** 한도가 소진돼 있다고 알고 있었으므로 "못 찾음"이 나와야
+했고, 찾으면 *"검출기를 믿지 않고 원인을 찾는다"* 고 미리 적어 뒀습니다. 음성 대조군(보내지
+않은 id)이 **못 찾음**을 내므로 검출기는 구별합니다. 그러므로
+
+> **한도가 소진돼 있지 않습니다.** ADR-023이 2026-10-20에 대시보드에서 읽은 "dograg가 이미 다
+> 썼습니다"가 **사흘 만에 낡았습니다.** 11월 6일은 더 이상 기한이 아닙니다.
+
+왜 열려 있는지는 **모릅니다.** 대시보드를 다시 보지 않았고, 이 프로브는 "저장된다"와 "여유가
+얼마나 남았다"를 구별하지 못합니다. 우리 몫이 작다는 것만 그대로입니다(주간 크론 840~1,200
+유닛, 50k의 2.4% 아래).
+
+### 음성 대조군이 제 버그를 잡았습니다
+
+**첫 실행은 틀렸습니다.** `api.trace.get`을 불러 `AttributeError`를 60번 내고 그것을
+**"저장되지 않음"으로 보고했습니다.** 그 메서드는 langfuse 5.0.2에 없습니다(`api.trace`에는
+`delete`·`delete_multiple`뿐) — SDK가 `api.observations.get_many(trace_id=...)`를 쓰라고
+적어 뒀는데 읽고도 다르게 불렀습니다.
+
+**한도가 닫힌 달에 만든 것이 그래서 값을 했습니다.** 11월에 만들었다면 "못 찾음"이 나왔을
+것이고 **한도 탓으로 읽었을 것입니다.** 음성 대조군이 없으면 고장 난 검출기와 버려지는 전송이
+같은 출력을 냅니다.
+
+그 자리에서 둘째 결함도 드러났습니다 — **프로그래밍 오류를 60번 재시도했습니다.** 아직 안
+보이는 것은 빈 목록으로 오므로 예외는 재시도할 것이 아니라 즉시 보고할 것입니다. 둘 다
+테스트로 고정했습니다.
+
+### 켜는 데 걸리는 것은 한도가 아니라 키입니다
+
+| | 지금 가능한가 | 왜 |
+|---|---|---|
+| 로컬·수동 진단 | ✅ | 키가 로컬 `.env`에 있고 저장이 확인됐습니다 |
+| 주간 평가 크론(CI) | ❌ 아직 | Langfuse 키를 GitHub Secrets에 올려야 하고, 그것은 **별개 결정**입니다 |
+
+측정으로 답할 수 있는 문제가 아니므로 ADR-062가 그 결정을 대신 내리지 않습니다.
+
+```bash
+uv run --group dev python scripts/probe_langfuse_delivery.py
+```
+
 ## 13. 재현 방법
 
 ```bash
@@ -3277,6 +3340,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/rerank_bge_v2_m3.json` | 11-34절 — 교차 인코더 재정렬 대 코사인 |
 | `reports/rerank_cocite_ft.json` | 11-39절 — 공동인용 미세조정 재정렬기(기각) |
 | `reports/rerank_selective.json` | 11-40절 — 재정렬기의 선택적 사용(기각) |
+| `reports/langfuse_delivery.json` | 11-41절 — 추적이 실제로 저장되는지 되읽기 |
 | `reports/pool_ceiling.json` | 11-35절 — 후보 풀 크기별 상한 |
 | `evals/cases_related.json` | 11-18절 — 공동인용 정답 300 시드 |
 | `reports/link_prediction.json` | 5·6절 — 기준선 사다리 |
