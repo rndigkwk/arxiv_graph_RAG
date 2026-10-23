@@ -1,0 +1,219 @@
+{
+  "generated_at": "2026-10-23T13:37:52.631748+00:00",
+  "snapshot_version": "2026-10-14",
+  "feature_cut": "2026-08",
+  "scores": "derived/2026-10-14/rerank-baai-bge-reranker-v2-m3-cocite-ft.jsonl.gz",
+  "pool": 50,
+  "top_k": 5,
+  "seed": 20261023,
+  "features_considered": [
+    "cos_top1",
+    "cos_margin_5_6",
+    "cos_spread_1_5",
+    "rr_top1",
+    "agree_at_5",
+    "pool_size"
+  ],
+  "cohort": {
+    "no_citation_edges": 1112,
+    "diagnostic": 741,
+    "final": 371,
+    "degree_1_to_4": 251
+  },
+  "per_seed_outcome": {
+    "diagnostic": {
+      "rerank_wins": 99,
+      "ties": 490,
+      "rerank_loses": 152
+    },
+    "final": {
+      "rerank_wins": 40,
+      "ties": 253,
+      "rerank_loses": 78
+    }
+  },
+  "rules_searched": 186,
+  "diagnostic_top_rules": [
+    {
+      "feature": "cos_top1",
+      "threshold": 0.697263,
+      "above": false,
+      "seeds_using_rerank": 222,
+      "recall_at_k": {
+        "mean": 0.0016,
+        "low": -0.0031,
+        "high": 0.0064,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "cos_top1",
+      "threshold": 0.637516,
+      "above": false,
+      "seeds_using_rerank": 74,
+      "recall_at_k": {
+        "mean": 0.0012,
+        "low": -0.001,
+        "high": 0.0035,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "cos_top1",
+      "threshold": 0.671133,
+      "above": false,
+      "seeds_using_rerank": 148,
+      "recall_at_k": {
+        "mean": 0.0012,
+        "low": -0.0026,
+        "high": 0.0052,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "cos_spread_1_5",
+      "threshold": 0.163016,
+      "above": true,
+      "seeds_using_rerank": 38,
+      "recall_at_k": {
+        "mean": 0.0011,
+        "low": -0.0005,
+        "high": 0.003,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "cos_top1",
+      "threshold": 0.659503,
+      "above": false,
+      "seeds_using_rerank": 111,
+      "recall_at_k": {
+        "mean": 0.001,
+        "low": -0.0025,
+        "high": 0.0047,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "cos_top1",
+      "threshold": 0.686597,
+      "above": false,
+      "seeds_using_rerank": 185,
+      "recall_at_k": {
+        "mean": 0.001,
+        "low": -0.0032,
+        "high": 0.0054,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "cos_spread_1_5",
+      "threshold": 0.017421,
+      "above": false,
+      "seeds_using_rerank": 37,
+      "recall_at_k": {
+        "mean": 0.001,
+        "low": -0.0002,
+        "high": 0.0022,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "cos_spread_1_5",
+      "threshold": 0.022357,
+      "above": false,
+      "seeds_using_rerank": 74,
+      "recall_at_k": {
+        "mean": 0.0009,
+        "low": -0.0006,
+        "high": 0.0025,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "rr_top1",
+      "threshold": 0.657025,
+      "above": true,
+      "seeds_using_rerank": 38,
+      "recall_at_k": {
+        "mean": 0.0005,
+        "low": -0.0016,
+        "high": 0.0029,
+        "excludes_zero": false
+      }
+    },
+    {
+      "feature": "rr_top1",
+      "threshold": 0.219763,
+      "above": true,
+      "seeds_using_rerank": 112,
+      "recall_at_k": {
+        "mean": 0.0003,
+        "low": -0.0033,
+        "high": 0.0041,
+        "excludes_zero": false
+      }
+    }
+  ],
+  "note": "diagnostic_top_rules는 **결론이 아닙니다**. 여섯 특징에 문턱을 훑으면 우연히 좋아 보이는 규칙이 반드시 하나 나옵니다. 판정은 final 조각의 confirmed입니다.",
+  "chosen_rule": {
+    "feature": "cos_top1",
+    "threshold": 0.697263,
+    "above": false
+  },
+  "diagnostic_gain": {
+    "mean": 0.0016,
+    "low": -0.0031,
+    "high": 0.0064,
+    "excludes_zero": false
+  },
+  "confirmed": {
+    "recall_at_k": {
+      "mean": -0.0103,
+      "low": -0.0172,
+      "high": -0.0036,
+      "excludes_zero": true
+    },
+    "hit_at_k": {
+      "mean": -0.035,
+      "low": -0.0593,
+      "high": -0.0081,
+      "excludes_zero": true
+    },
+    "reciprocal_rank": {
+      "mean": -0.0172,
+      "low": -0.0361,
+      "high": 0.0009,
+      "excludes_zero": false
+    },
+    "seeds_using_rerank": 112,
+    "seeds": 371,
+    "passes_bar_1_recall_up": false,
+    "passes_bar_2_others_not_down": false
+  },
+  "adjacent_cohort": {
+    "recall_at_k": {
+      "mean": 0.004,
+      "low": -0.0126,
+      "high": 0.0216,
+      "excludes_zero": false
+    },
+    "hit_at_k": {
+      "mean": -0.008,
+      "low": -0.0398,
+      "high": 0.0279,
+      "excludes_zero": false
+    },
+    "reciprocal_rank": {
+      "mean": -0.0026,
+      "low": -0.0262,
+      "high": 0.0226,
+      "excludes_zero": false
+    },
+    "seeds_using_rerank": 76,
+    "seeds": 251,
+    "passes_bar_1_recall_up": false,
+    "passes_bar_2_others_not_down": true
+  },
+  "verdict": "바를 넘지 못했습니다"
+}
