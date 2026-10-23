@@ -85,7 +85,7 @@
 | [ADR-054](ADR-054-the-upstream-blip-is-a-third-category.md) | 상류의 일시적 장애는 세 번째 범주다 — 재시도하고 처방을 다르게 적는다 | 채택 |
 | [ADR-055](ADR-055-the-stable-case-rule-is-not-resolved.md) | `stable_case`가 변동으로 터지는지는 측정되지 않았다 — 규칙을 고치지 않는다 | 채택 |
 | [ADR-056](ADR-056-no-mechanical-check-for-the-uncited-claim.md) | 인용 없는 주장에 기계적 검사를 붙이지 않는다 — 붙이려던 검사가 거짓 양성만 냈다 | 기각 |
-| [ADR-057](ADR-057-fine-tune-the-reranker-on-cocitation.md) | 재정렬기를 공동인용으로 미세조정한다 — 바를 먼저 적는다 | 채택 |
+| [ADR-057](ADR-057-fine-tune-the-reranker-on-cocitation.md) | 재정렬기를 공동인용으로 미세조정한다 — **재 보니 코사인에 졌다**(격차는 절반으로 줄었다) | 기각 |
 | [ADR-058](ADR-058-the-independent-judge-only-means-something-with-labels.md) | 독립 공급자 판정은 라벨이 있는 조건 판정에서만 한다 — 재 보니 61/61은 프롬프트가 아니라 그 모델의 성질이었다 | 채택 |
 | [ADR-059](ADR-059-the-judge-prompt-is-measured-on-held-out-questions.md) | 심판 프롬프트는 보류 질문에서 잰다 — 라벨이 기계적이라 사람 없이 집합을 만들 수 있다 | 채택 |
 | [ADR-060](ADR-060-what-the-gate-catches-when-the-judge-collapses.md) | 심판이 무너지면 게이트는 총 실패 4건부터 잡는다 — 옳은 결정 둘이 곱해져 3건의 구멍을 만들었다 | 채택 |
