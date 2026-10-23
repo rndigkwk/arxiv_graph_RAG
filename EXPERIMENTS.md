@@ -3249,6 +3249,79 @@ SDK가 적어 뒀습니다 — *"`flush()`는 API 전달만 보장하고 읽기 
 uv run --group dev python scripts/probe_langfuse_delivery.py
 ```
 
+## 11-42. 주 단위 창으로 수집을 시험했습니다 — "몇 주 안에 부딪힙니다"가 4.2회입니다 (2026-10-24)
+
+11절이 **2일 창**(2026-10-13~15, 315편)으로 파이프라인이 끝까지 도는 것을 보이고 이렇게
+닫았습니다 — *"관계 한도의 84.6%를 이미 쓰고 있어서 자동 적재를 켜면 **몇 주 안에**
+부딪힙니다."* 그 "몇 주"가 숫자가 아니었습니다.
+
+주간 크론이 실제로 받는 창은 **7일**입니다. 그 창으로 시험 실행했습니다(아무것도 쓰지
+않습니다 — `--load`를 주지 않으면 기본이 시험 실행입니다).
+
+| | 값 |
+|---|---:|
+| 창 | 2026-10-16 ~ 10-23 (7일) |
+| cs 전체 레코드 | 9,431 |
+| 그중 `cs.AI` | <!--n:reports/ingest_weekly_window.json#harvest.records-->1114<!--/n--> |
+| 건너뜀 | <!--n:reports/ingest_weekly_window.json#harvest.skipped-->8317<!--/n--> |
+| 인용 보강 | <!--n:reports/ingest_weekly_window.json#enrichment.references-->1289<!--/n-->건, 실패 **<!--n:reports/ingest_weekly_window.json#enrichment.failures-->0<!--/n-->** |
+
+`--categories cs.AI` 기본값이 8,317편을 걸렀습니다. 보강은 1,114편 전부에서 **실패 0건**이라
+dead letter도 비었습니다(임계값 10%).
+
+### 묶는 제약은 관계이고, 여유가 4.2회입니다
+
+| | 현재 | 적재 후 | 한도 | 사용률 |
+|---|---:|---:|---:|---:|
+| 노드 | 149,025 | <!--n:reports/ingest_weekly_window.json#capacity.projected_nodes-->152100<!--/n--> | 200,000 | <!--n:reports/ingest_weekly_window.json#capacity.node_usage-->0.7605<!--/n--> |
+| **관계** | 338,366 | <!--n:reports/ingest_weekly_window.json#capacity.projected_relationships-->346390<!--/n--> | 400,000 | **<!--n:reports/ingest_weekly_window.json#capacity.relationship_usage-->0.866<!--/n-->** |
+
+`fits: true`, 묶는 제약은 **관계**입니다. 안전 천장(95%)까지 남는 양을 이 배치 크기로 나누면:
+
+| | 한 배치가 더하는 양 | 천장까지 | 이런 배치 |
+|---|---:|---:|---:|
+| **관계** | 8,024 | 33,610 | **약 4.2회** |
+| 노드 | 3,075 | 37,900 | 약 12.3회 |
+
+> **11절의 "몇 주"는 주 1회 기준 약 4주입니다.** 노드는 12.3회라 여유가 세 배이고, 그래서
+> 삭제를 고민할 대상은 노드가 아니라 **관계**입니다([ADR-045](docs/adr/ADR-045-what-to-delete-before-adding-a-month.md)가
+> 그때 읽을 문서입니다).
+
+**이 수가 한 배치 크기에 달려 있다는 것을 적어 둡니다.** `--categories`를 넓히면 배치가 커지고
+4.2회가 그만큼 줄어듭니다. cs 전체(9,431편)를 받으면 대략 8.5배이므로 **한 배치도 못 들어갑니다**
+— 분류를 넓히는 결정은 용량 결정과 같은 결정입니다.
+
+### `--load`를 줘도 지금은 막힙니다
+
+```
+new_papers 967 / with_embedding 0 / coverage 0.0 / ready false
+```
+
+새 논문 **<!--n:reports/ingest_weekly_window.json#embeddings.new_papers-->967<!--/n-->편 전부에
+임베딩이 없습니다.** OAI 수집은 임베딩을 만들지 않으므로 당연한 결과이고,
+[ADR-047](docs/adr/ADR-047-the-loader-refuses-papers-the-vector-index-cannot-see.md)의 검사가
+`embeddings_missing`으로 막습니다 — 적재하면 그래프 질의에는 나오지만 **벡터 검색에 영원히 안
+나옵니다.**
+
+그러므로 적재 순서는 **임베딩 967편 먼저 → `--load`** 입니다. `--allow-missing-embeddings`는
+"적재 직후 바로 임베딩을 채울 때만" 쓰는 탈출구입니다.
+
+### 11절이 아직 검증하지 않았다고 적은 것 중 하나가 닫혔습니다
+
+11절의 *"워터마크는 Git에서 제외했으므로 CI 실행 사이에 이어지지 않고, 매 실행이 `--days`만큼
+되돌아봅니다"* 를 이 실행이 그대로 보여 줍니다 — 워터마크가 비어 있어
+`--days 7`로 떨어졌고, 창이 7일로 잡혔습니다. **설계대로 동작하며, 그것이 한계라는 것도
+그대로입니다.**
+
+### 재현
+
+```bash
+uv run python -m pipeline.ingest --days 7 --output reports/ingest_weekly_window.json
+```
+
+Aura를 읽고 arXiv OAI를 받습니다. **아무것도 쓰지 않습니다**(`--load` 없음). 유료 API는
+쓰지 않습니다.
+
 ## 13. 재현 방법
 
 ```bash
@@ -3355,6 +3428,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/order_study_coauthor{,03}.json` | 10절 — `coauthor` 반복 측정 |
 | `reports/order_study_coauthor_{after,fixed}.json` | 10-1절 — 두 수정의 비교 |
 | `reports/ingest.json` | 11절 — 수집 시험 실행 |
+| `reports/ingest_weekly_window.json` | 11-42절 — 주 단위 창의 용량 여유 |
 | `reports/variant_study_{graph,base}.json` | 11-1절 — 변형 비교 |
 | `reports/index_cost.json` | 11-2절 — 색인 비용과 커버리지 |
 | `reports/embedding_tuning.json` | 11-3절 — 어댑터와 격자 탐색 |
