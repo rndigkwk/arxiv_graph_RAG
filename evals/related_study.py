@@ -76,6 +76,9 @@ GBM_POOL = 50
 # **배포된 경로가 현직입니다.** 2026-10-19까지 `ppr`이었고 ADR-030이 공동인용 우선으로
 # 바꿨는데, 이 하네스의 현직은 그대로 `ppr`이었습니다 - 그러면 구간이 "배포된 것을 이기는가"가
 # 아니라 "옛 배포를 이기는가"를 답합니다(ADR-034).
+# 쌍체 구간의 **기준** 변형입니다. 기본은 공동인용이지만 `--incumbent`로 바꿉니다 -
+# ADR-057의 바는 **코사인(vector)을** 기준으로 적혀 있고, 하드코딩이면 그 바를 이
+# 하네스로 확인할 수 없습니다(2026-10-23에 손으로 구해야 했습니다).
 INCUMBENT = "cocited"
 # `chatbot.COCITED_FETCH`와 같은 값입니다. 배포는 DB에서 `top_k * COCITED_FETCH`만 받아
 # 오므로, 한도를 흉내 내지 않으면 **배포가 보지 못하는 후보**로 점수를 매기게 됩니다.
@@ -412,6 +415,9 @@ def main() -> int:
         help=("밖에서 채점한 쌍 점수 파일(jsonl.gz). `rerank` 변형에 필요합니다 - "
               "notebooks/rerank_pairs_colab.ipynb 가 만듭니다."),
     )
+    parser.add_argument("--incumbent", choices=VARIANTS, default=INCUMBENT,
+                        help="쌍체 구간의 기준 변형입니다. 그 변형도 --variants에 있어야 "
+                             "합니다.")
     parser.add_argument("--variants", nargs="+", choices=VARIANTS, default=list(VARIANTS),
                         help="PPR만 재려면 --variants ppr. 어댑터 학습을 건너뛰어 빠릅니다.")
     parser.add_argument(
@@ -590,6 +596,19 @@ def main() -> int:
                 }
                 for variant in chosen
             },
+            # **구간도 집단별로 둡니다.** 바가 집단별로 적혀 있으므로(ADR-057은 간선 0개
+            # 집단에서 이기라고 합니다), 전체 구간만 내면 그 바를 확인할 수 없습니다.
+            "vs_incumbent": {
+                variant: {
+                    metric: paired_bootstrap(
+                        [row[args.incumbent][metric] for row in group],
+                        [row[variant][metric] for row in group],
+                    )
+                    for metric in ("recall_at_k", "hit_at_k", "reciprocal_rank")
+                }
+                for variant in chosen
+                if variant != args.incumbent and args.incumbent in chosen
+            },
         }
         for name, group in degree_groups.items()
         if group
@@ -610,11 +629,13 @@ def main() -> int:
     }
     against = {
         variant: {
-            metric: paired_bootstrap(per_seed[INCUMBENT][metric], per_seed[variant][metric])
+            metric: paired_bootstrap(
+                per_seed[args.incumbent][metric], per_seed[variant][metric]
+            )
             for metric in ("recall_at_k", "hit_at_k", "reciprocal_rank")
         }
         for variant in chosen
-        if variant != INCUMBENT and INCUMBENT in chosen
+        if variant != args.incumbent and args.incumbent in chosen
     }
 
     report = {
@@ -631,7 +652,11 @@ def main() -> int:
         "dropped_edges_outside_feature_window": graph.dropped_edges,
         "variants": list(chosen),
         "gold": str(args.cases).replace("\\", "/"),
-        "incumbent": INCUMBENT,
+        # **쌍 점수 변형이 재정렬한 후보 풀의 크기입니다.** `gbm_pool`은 gbm을 돌릴 때만
+        # 채워지므로, rerank만 돌린 보고서에는 풀이 적히지 않았습니다 - ADR-051과
+        # ADR-057의 비교가 "같은 풀 50"에 달려 있는데 그 값이 기록에 없었습니다.
+        "pool": GBM_POOL,
+        "incumbent": args.incumbent,
         "training": training,
         "split": (
             "평가 시드를 학습 앵커에서 제외한 **시드 단위** 분리입니다. 11-3절의 시간 분리보다 "

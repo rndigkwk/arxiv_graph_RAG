@@ -2963,6 +2963,78 @@ uv run --group dev python -m evals.judge_study --holdout evals/judge_holdout.jso
   --output reports/judge_holdout_claude_v4.json
 ```
 
+## 11-39. 재정렬기를 공동인용으로 미세조정해 쟀습니다 — 졌지만 격차가 절반으로 줄었습니다 (2026-10-23)
+
+[ADR-057](docs/adr/ADR-057-fine-tune-the-reranker-on-cocitation.md)이 2026-10-21에 바를 적고,
+2026-10-23에 쟀습니다. RunPod A5000에서 813시드·56,451쌍으로 1에폭(약 3시간), 평가 시드
+1,377개의 풀 68,182쌍을 채점했습니다.
+
+**간선 0개 집단(1,112시드), 후보 풀 50** — 바가 적힌 그 자리입니다.
+
+| 지표 | 코사인 | **미세조정** | 차이 [95% 쌍체] | 0 제외 | 바 |
+|---|---:|---:|---|---|---|
+| recall@5 | <!--n:reports/rerank_cocite_ft.json#by_degree_slice.no_citation_edges.vector.recall_at_k-->0.1227<!--/n--> | <!--n:reports/rerank_cocite_ft.json#by_degree_slice.no_citation_edges.rerank.recall_at_k-->0.1057<!--/n--> | −0.0170 [−0.0235, −0.0099] | ✅ | ❌ |
+| hit@5 | <!--n:reports/rerank_cocite_ft.json#by_degree_slice.no_citation_edges.vector.hit_at_k-->0.4739<!--/n--> | <!--n:reports/rerank_cocite_ft.json#by_degree_slice.no_citation_edges.rerank.hit_at_k-->0.4308<!--/n--> | −0.0432 [−0.0692, −0.0180] | ✅ | ❌ |
+| MRR | <!--n:reports/rerank_cocite_ft.json#by_degree_slice.no_citation_edges.vector.reciprocal_rank-->0.3457<!--/n--> | <!--n:reports/rerank_cocite_ft.json#by_degree_slice.no_citation_edges.rerank.reciprocal_rank-->0.2928<!--/n--> | −0.0529 [−0.0745, −0.0318] | ✅ | ❌ |
+
+**동점이 아닙니다.** 세 구간이 전부 0 아래에 있습니다 — 측정된 패배이고, 그래서 기각입니다.
+
+### 계측기가 성립했습니다
+
+코사인 값이 ADR-057에 **재기 전에** 적어 둔 기준선과 **소수 넷째 자리까지 같습니다**
+(0.1227 / 0.4739 / 0.3457). 다른 날, 다른 명령, 다른 변형 집합인데 같은 값입니다. 기준선이
+흔들렸다면 이 결과를 "기준선이 달라서"로 치울 수 있었습니다 — 바를 미리 적는 일의 값이 여기서
+드러납니다.
+
+### 가설은 맞았고, 거리가 모자랐습니다
+
+| | recall@5 | 코사인과의 차 |
+|---|---:|---:|
+| 코사인 | 0.1227 | — |
+| 사전학습 재정렬기 (11-34절, ADR-051) | 0.0868 | −0.0359 |
+| **공동인용 미세조정** | **0.1057** | **−0.0170** |
+
+ADR-051의 가설은 *"재정렬기는 질의-문서 적합성으로 학습됐고 우리 과제는 두 논문이 앞으로 함께
+인용될 것인가다"* 였습니다. **격차가 절반 이상 줄었습니다** — 학습 신호를 바꾼 것이 실제로
+그 방향으로 움직였습니다. 그래서 이 기각은 "재정렬기가 쓸모없다"가 아니라 **"이 설정으로는
+그 거리를 못 간다"** 입니다.
+
+간선 1~4개 집단(251시드)은 **깨뜨리지 않았습니다** — 세 지표 모두 구간이 0을 포함합니다
+(recall −0.0086, hit −0.0159, MRR −0.0097). 그러나 이기지도 못했으므로 바가 열어 둔 "자리를
+나눠 쓴다"는 선택지도 없습니다.
+
+### 기각의 원인을 학습 쪽으로 돌리지 않으려고 두 가지를 확인했습니다
+
+- **올린 가중치가 그 점수를 만든 가중치입니다.** HF에서 받아 같은 구성(`num_labels=1`,
+  `max_length=1024`)으로 네 쌍을 다시 채점해 저장된 점수와 비교했더니 **최대 차이
+  4.31e-07** — float32 반올림 수준입니다.
+- **파일이 온전합니다.** safetensors 헤더의 데이터 끝 오프셋이 파일 크기와 바이트 단위로
+  같고(2,271,071,852), `classifier.out_proj`가 `[1, 1024]`, 전부 F32입니다.
+  `trained_on.json`은 `smoke: false`, `train_seeds: 813`, `train_pairs: 56451`입니다.
+
+점수 분포도 학습이 일어난 모양입니다 — 중앙 0.0059, 최대 0.9916으로 대부분을 낮게 주고 소수를
+높게 줍니다(1:14.5의 사전 확률과 맞습니다).
+
+### 하네스가 이 바를 확인할 수 없었습니다 — 고쳤습니다
+
+`related_study`의 `vs_incumbent`가 두 군데서 바와 어긋났습니다.
+
+| | 하네스 | 바(ADR-057) |
+|---|---|---|
+| 기준 변형 | `cocited`로 **하드코딩** | **코사인(`vector`)** |
+| 구간의 범위 | **전체 시드** | **간선 0개 집단** |
+
+그래서 위 숫자를 처음에는 손으로 구했습니다. `--incumbent`를 더하고 **집단별 구간**을
+`by_degree_slice`에 넣어, 아래 한 명령이 바의 판정을 그대로 내게 했습니다. **바를 적어 두고
+그것을 확인할 수 없는 도구를 두는 것은 바를 안 적은 것과 크게 다르지 않습니다.**
+
+```bash
+uv run python -m evals.related_study --cases evals/cases_related_future.json --variants rerank vector --incumbent vector --rerank-scores derived/2026-10-14/rerank-baai-bge-reranker-v2-m3-cocite-ft.jsonl.gz --output reports/rerank_cocite_ft.json
+```
+
+판정은 15초입니다 — `rerank` 변형은 점수 파일을 읽고 순위만 매기므로 모델 추론도 API 호출도
+없습니다.
+
 ## 13. 재현 방법
 
 ```bash
@@ -3052,6 +3124,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/embedding_slice_qwen3_06b.json` | 11-33절 — Qwen3-0.6B 대 OpenAI |
 | `reports/embedding_slice_qwen_vs_base.json` | 11-33절 — Qwen3-0.6B 대 bge-base |
 | `reports/rerank_bge_v2_m3.json` | 11-34절 — 교차 인코더 재정렬 대 코사인 |
+| `reports/rerank_cocite_ft.json` | 11-39절 — 공동인용 미세조정 재정렬기(기각) |
 | `reports/pool_ceiling.json` | 11-35절 — 후보 풀 크기별 상한 |
 | `evals/cases_related.json` | 11-18절 — 공동인용 정답 300 시드 |
 | `reports/link_prediction.json` | 5·6절 — 기준선 사다리 |
