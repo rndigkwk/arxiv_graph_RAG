@@ -100,6 +100,6 @@ ADR-045가 센 것은 **자리**이고 그 숫자는 그대로입니다(관계 4
 ## 재현
 
 ```bash
-uv run python -m pipeline.ingest --days 7 --dry-run   # 임베딩 상태가 보고서에 적힙니다
+uv run python -m pipeline.ingest --days 7   # 임베딩 상태가 보고서에 적힙니다
 uv run --group dev python -m pytest tests/test_ingest_pipeline.py -k embedding
 ```

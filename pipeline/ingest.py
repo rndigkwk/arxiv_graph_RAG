@@ -1,7 +1,7 @@
 """증분 수집 파이프라인입니다. 워터마크 → 수집 → 보강 → 용량·임베딩 검사 → 멱등 적재.
 
-    uv run python -m pipeline.ingest --dry-run
-    uv run python -m pipeline.ingest --days 7 --dry-run
+    uv run python -m pipeline.ingest
+    uv run python -m pipeline.ingest --days 7
     uv run python -m pipeline.ingest --days 7 --load
 
 기본값이 `--dry-run`입니다. `--load`를 명시하지 않으면 Aura에 아무것도 쓰지 않습니다. 이 그래프는
