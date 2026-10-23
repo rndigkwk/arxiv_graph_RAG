@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-10-23T16:41:50.089864+00:00",
+  "window": {
+    "from": "2026-10-16",
+    "until": "2026-10-23"
+  },
+  "harvest": {
+    "records": 1114,
+    "pages": 8,
+    "deleted": 0,
+    "skipped": 8317,
+    "last_datestamp": "2026-10-23",
+    "truncated_by_page_limit": false
+  },
+  "loaded": false,
+  "enrichment": {
+    "attempted": 1114,
+    "references": 1289,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "dead_letters_written": 0
+  },
+  "capacity": {
+    "current_nodes": 149025,
+    "current_relationships": 338366,
+    "projected_nodes": 152100,
+    "projected_relationships": 346390,
+    "node_limit": 200000,
+    "relationship_limit": 400000,
+    "node_usage": 0.7605,
+    "relationship_usage": 0.866,
+    "safety_ceiling": 0.95,
+    "fits": true,
+    "binding_constraint": "relationships"
+  },
+  "embeddings": {
+    "new_papers": 967,
+    "with_embedding": 0,
+    "missing": 967,
+    "wrong_dimensions": 0,
+    "coverage": 0.0,
+    "required_coverage": 1.0,
+    "dimensions": 768,
+    "ready": false,
+    "note": "OAI 수집은 임베딩을 만들지 않습니다. 임베딩 없이 적재하면 그 논문은 그래프 질의에는 나오지만 **벡터 검색에 영원히 안 나옵니다.**"
+  },
+  "stopped_at": "dry_run"
+}
