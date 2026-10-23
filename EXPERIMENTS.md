@@ -2963,6 +2963,81 @@ uv run --group dev python -m evals.judge_study --holdout evals/judge_holdout.jso
   --output reports/judge_holdout_claude_v4.json
 ```
 
+## 11-38. 심판 붕괴를 심었습니다 — 옳은 결정 둘이 곱해져 총 실패 3건의 구멍을 만들었습니다 (2026-10-23)
+
+11-37절이 조건 판정 심판이 **한 문장의 기울기 위에** 있다는 것을 보였습니다. 그리고 게이트의
+`prompt_version` 규칙은 **본문이 바뀌면** 막지만 **같은 본문이 다르게 행동하면** 못 잡습니다.
+그래서 남은 질문이 "심판이 무너지면 게이트가 잡는가"였습니다
+([ADR-060](docs/adr/ADR-060-what-the-gate-catches-when-the-judge-collapses.md)).
+
+**재지 않아도 확정인 것부터.** 게이트의 기준선은 그래프 5가족 **30건뿐이고 `exact-title`은 한
+건도 없습니다**. 그러므로 11-37절이 잰 붕괴는 **용량과 무관하게 탐지율 0%** 입니다 — 게이트가
+약한 것이 아니라 덮지 않는 것입니다. 한 문장으로:
+
+> 게이트가 덮는 가족에서는 심판이 흔들리지 않았고(두 공급자 모두 전부 정답), 심판이 흔들리는
+> 가족은 게이트가 덮지 않습니다.
+
+### LLM 없이 쟀습니다
+
+`validate_mixed_candidates`는 `requires_content`와 `requires_graph`가 **둘 다 참일 때만**
+작동합니다. 게이트의 30건은 라벨이 `content=False`이므로 평상시 그 검증은 아무것도 하지
+않습니다. 그래서 이 케이스들을 망치는 심판 오류는 **거짓 양성 하나**이고, 그 모드는 v2
+프롬프트에서 16건이 **실제로** 그랬습니다(11-37절).
+
+그때 일어나는 일이 코드로 이어져 있습니다 — 심판이 `requires_content=True` → `ValueError` →
+`evals/run.py`의 `except ValueError` → **0점 + `failed: True`**. 마지막 줄이 측정을 싸게
+만듭니다: 실패 행은 파이프라인이 `evaluate_case`를 **빈 응답으로** 부른 결과이므로, 변형이 그
+함수를 그대로 부르면 손으로 지은 숫자가 하나도 없습니다. 집계도 `summarize_comparison`을
+그대로 씁니다. `evals/ragas_perturbations.py`가 RAGAS에서 이미 쓴 방법입니다.
+
+### 결과: 예측이 두 군데 틀렸습니다
+
+| 예측 | 실제 |
+|---|---|
+| `stable_case`가 1건부터 잡는다 | **한 번도 서지 않습니다** |
+| `answer_evidence_recall` 하한이 1건부터 | **움직이지 않습니다**(3건을 심어도 1.0000) |
+| `answer_failure_rate`가 5건부터 | **총 4건부터** — 유일하게 잡는 규칙 |
+
+**게이트가 새 위반을 올리지 않는 최대 총 실패:
+<!--n:reports/judge_collapse.json#largest_total_failures_that_slipped-->3<!--/n-->건.**
+대조군(실제 실행)에 이미 실패가
+<!--n:reports/judge_collapse.json#control_failures-->1<!--/n-->건 있어서(`coauthor-03`, 10절이
+"12회 중 1회"로 적어 둔 그 사례), 용량 3의 부분집합 40개 중 4개가 빠져나가고 **그 넷 모두
+`coauthor-03`을 품고 있습니다**. 실무적으로는 **새로 생길 수 있는 조직적 실패 2건**이 숨습니다.
+
+### 틀린 이유가 둘 다 의도된 설계입니다
+
+- **`stable_case`가 실패 사례를 건너뜁니다.** 근거는 `evals/gate.py`에 있습니다 — *"안정 사례
+  29건에 사례당 실패율 5.6%면 적어도 한 건이 실패할 확률이 81%"*, 두 번 세면 회귀 없는 날에도
+  게이트가 다섯 번 중 네 번 빨갛게 되고 **그런 게이트는 꺼집니다.**
+- **품질 집계가 실패 사례를 뺍니다.** 근거는 `gate.normalize`에 있습니다 — 섞으면 *"근거
+  recall이 품질이 아니라 실패율을 재게"* 됩니다(2026-10-16 3회차: 섞으면 0.9667 → 0.9000,
+  답한 사례만 보면 세 실행 모두 1.0000).
+
+둘 다 맞는 결정입니다. **그런데 곱해 본 사람이 없었습니다.** 합치면 실패로 나타나는 붕괴를 볼
+수 있는 규칙이 `answer_failure_rate` 하나뿐이고, 그 하한은 변덕 비율보다 **위로 일부러** 놓여
+있습니다(0.1333 대 측정된 5.6~8.3%). 구멍은 그 두 결정의 **산술**이고, 각 결정의 근거에는
+상대의 존재가 적혀 있는데 **그 규칙 하나가 얼마나 둔한지는 재어진 적이 없었습니다.**
+
+### 장치는 만들지 않았습니다
+
+바에 "구멍을 보기 전에 장치를 만들지 않습니다"를 적어 뒀고, 숫자가 나왔으니 이제 별개
+결정입니다. 후보는 **실패의 사유 코드를 보는 규칙**입니다 — 변덕은 사유가 흩어지고 조직적
+붕괴는 사유가 하나로 뭉칩니다. 그러나 그 규칙에는 자기 바(거짓 빨강 허용 비율)가 필요하고,
+커밋된 보고서에 실패가 **한 건뿐**이라 사유 분포가 아직 없습니다. **그 한 건으로 규칙을
+정하지 않습니다.**
+
+### 계측기의 한계
+
+대조군이 `floor`·`judge_model`·`prompt_version`을 이미 올립니다(그 보고서가
+`metadata.prompt_versions`와 `ragas_*`보다 먼저 만들어졌습니다). 그래서 위반을 **(규칙, 사유)
+쌍**으로 비교해 새로 생긴 것만 셌습니다. RAGAS 두 하한의 몫은 재지 못했고, 실제 붕괴에서는
+faithfulness도 움직일 수 있으므로 **구멍 3건은 상한**입니다.
+
+```bash
+uv run python -m evals.judge_collapse --output reports/judge_collapse.json
+```
+
 ## 11-39. 재정렬기를 공동인용으로 미세조정해 쟀습니다 — 졌지만 격차가 절반으로 줄었습니다 (2026-10-23)
 
 [ADR-057](docs/adr/ADR-057-fine-tune-the-reranker-on-cocitation.md)이 2026-10-21에 바를 적고,
@@ -3134,6 +3209,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/judge_study{,_claude}.json` | 11-36절 — 심판의 공급자 교차 |
 | `evals/judge_holdout.json` | 11-37절 — 보류 질문 120개(**정답이 없어 게이트에 쓸 수 없습니다**) |
 | `reports/judge_holdout_{openai,claude}{,_v4}.json` | 11-37절 — 보류 조각의 공급자 교차와 후보 프롬프트 |
+| `reports/judge_collapse.json` | 11-38절 — 게이트의 심판 붕괴 탐지 용량 |
 | `reports/order_study_{before,after,validated}.json` | 9절 — 정렬 오류 |
 | `reports/order_study_coauthor{,03}.json` | 10절 — `coauthor` 반복 측정 |
 | `reports/order_study_coauthor_{after,fixed}.json` | 10-1절 — 두 수정의 비교 |

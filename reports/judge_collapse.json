@@ -1,0 +1,216 @@
+{
+  "generated_at": "2026-10-22T16:34:48.400148+00:00",
+  "baseline": "baselines\\eval_baseline.json",
+  "control": "reports\\rag_eval_graph_compare_final.json",
+  "split": "full",
+  "control_violations": [
+    {
+      "rule": "judge_model",
+      "detail": "RAGAS 판정 모델이 기준선과 다릅니다: 기준선 'gpt-6-luna', 이번 '(기록 없음)'"
+    },
+    {
+      "rule": "prompt_version",
+      "detail": "이번 보고서에 프롬프트 지문이 없습니다(metadata.prompt_versions). 어느 프롬프트로 낸 점수인지 알 수 없어 기준선과 비교할 수 없습니다."
+    },
+    {
+      "rule": "floor",
+      "detail": "ragas_faithfulness이 이번 결과에 없습니다"
+    },
+    {
+      "rule": "floor",
+      "detail": "ragas_context_precision_stable_families이 이번 결과에 없습니다"
+    },
+    {
+      "rule": "floor",
+      "detail": "retrieval_precision이 이번 결과에 없습니다"
+    },
+    {
+      "rule": "floor",
+      "detail": "retrieval_recall이 이번 결과에 없습니다"
+    }
+  ],
+  "rules_already_on_in_the_control": [
+    "floor",
+    "judge_model",
+    "prompt_version"
+  ],
+  "note": "대조군에서 이미 켜져 있는 규칙은 결함을 심어도 켜져 있습니다. 그 규칙이 잡은 것은 결함이 아니므로, 구멍은 **그 규칙을 뺀** 나머지로 읽어야 합니다.",
+  "control_failures": 1,
+  "largest_total_failures_that_slipped": 3,
+  "rounds": [
+    {
+      "dose": 1,
+      "subsets_tried": 30,
+      "subsets_the_gate_did_not_newly_flag": 30,
+      "examples_that_slipped": [
+        [
+          "author-01"
+        ],
+        [
+          "citing-01"
+        ],
+        [
+          "reference-01"
+        ],
+        [
+          "coauthor-01"
+        ],
+        [
+          "topcited-01"
+        ]
+      ],
+      "total_failures_when_slipped": [
+        1,
+        2
+      ],
+      "new_rules_raised": {},
+      "one_detail_per_rule": {}
+    },
+    {
+      "dose": 2,
+      "subsets_tried": 40,
+      "subsets_the_gate_did_not_newly_flag": 40,
+      "examples_that_slipped": [
+        [
+          "author-01",
+          "author-02"
+        ],
+        [
+          "citing-01",
+          "citing-02"
+        ],
+        [
+          "reference-01",
+          "reference-02"
+        ],
+        [
+          "coauthor-01",
+          "coauthor-02"
+        ],
+        [
+          "topcited-01",
+          "topcited-02"
+        ]
+      ],
+      "total_failures_when_slipped": [
+        2,
+        3
+      ],
+      "new_rules_raised": {},
+      "one_detail_per_rule": {}
+    },
+    {
+      "dose": 3,
+      "subsets_tried": 40,
+      "subsets_the_gate_did_not_newly_flag": 4,
+      "examples_that_slipped": [
+        [
+          "coauthor-01",
+          "coauthor-02",
+          "coauthor-03"
+        ],
+        [
+          "citing-03",
+          "coauthor-03",
+          "reference-03"
+        ],
+        [
+          "coauthor-03",
+          "reference-03",
+          "topcited-03"
+        ],
+        [
+          "author-04",
+          "coauthor-03",
+          "topcited-03"
+        ]
+      ],
+      "total_failures_when_slipped": [
+        3
+      ],
+      "new_rules_raised": {
+        "drop": 36,
+        "floor": 36
+      },
+      "one_detail_per_rule": {
+        "floor": "answer_failure_rate 0.1333이 하한 0.1333을 넘었습니다",
+        "drop": "answer_failure_rate 0.0000 -> 0.1333, 허용폭 0.1000을 넘었습니다"
+      }
+    },
+    {
+      "dose": 4,
+      "subsets_tried": 40,
+      "subsets_the_gate_did_not_newly_flag": 0,
+      "examples_that_slipped": [],
+      "total_failures_when_slipped": [],
+      "new_rules_raised": {
+        "drop": 40,
+        "floor": 40
+      },
+      "one_detail_per_rule": {
+        "floor": "answer_failure_rate 0.1667이 하한 0.1333을 넘었습니다",
+        "drop": "answer_failure_rate 0.0000 -> 0.1667, 허용폭 0.1000을 넘었습니다"
+      }
+    },
+    {
+      "dose": 5,
+      "subsets_tried": 40,
+      "subsets_the_gate_did_not_newly_flag": 0,
+      "examples_that_slipped": [],
+      "total_failures_when_slipped": [],
+      "new_rules_raised": {
+        "drop": 40,
+        "floor": 40
+      },
+      "one_detail_per_rule": {
+        "floor": "answer_failure_rate 0.2000이 하한 0.1333을 넘었습니다",
+        "drop": "answer_failure_rate 0.0000 -> 0.2000, 허용폭 0.1000을 넘었습니다"
+      }
+    },
+    {
+      "dose": 6,
+      "subsets_tried": 40,
+      "subsets_the_gate_did_not_newly_flag": 0,
+      "examples_that_slipped": [],
+      "total_failures_when_slipped": [],
+      "new_rules_raised": {
+        "drop": 40,
+        "floor": 40
+      },
+      "one_detail_per_rule": {
+        "floor": "answer_failure_rate 0.2333이 하한 0.1333을 넘었습니다",
+        "drop": "answer_failure_rate 0.0000 -> 0.2333, 허용폭 0.1000을 넘었습니다"
+      }
+    },
+    {
+      "dose": 7,
+      "subsets_tried": 40,
+      "subsets_the_gate_did_not_newly_flag": 0,
+      "examples_that_slipped": [],
+      "total_failures_when_slipped": [],
+      "new_rules_raised": {
+        "drop": 40,
+        "floor": 40
+      },
+      "one_detail_per_rule": {
+        "floor": "answer_failure_rate 0.2667이 하한 0.1333을 넘었습니다",
+        "drop": "answer_failure_rate 0.0000 -> 0.2667, 허용폭 0.1000을 넘었습니다"
+      }
+    },
+    {
+      "dose": 8,
+      "subsets_tried": 40,
+      "subsets_the_gate_did_not_newly_flag": 0,
+      "examples_that_slipped": [],
+      "total_failures_when_slipped": [],
+      "new_rules_raised": {
+        "drop": 40,
+        "floor": 40
+      },
+      "one_detail_per_rule": {
+        "floor": "answer_failure_rate 0.3000이 하한 0.1333을 넘었습니다",
+        "drop": "answer_failure_rate 0.0000 -> 0.3000, 허용폭 0.1000을 넘었습니다"
+      }
+    }
+  ]
+}
