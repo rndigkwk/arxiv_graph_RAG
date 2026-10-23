@@ -78,6 +78,52 @@ class Graph:
             result = session.run(Query(cypher, timeout=READ_TIMEOUT), params or {})
             return [record.data() for record in result]
 
+    def plan(self, cypher: str, params: dict[str, Any] | None = None) -> list[str]:
+        """`EXPLAIN`의 연산자 이름을 돌려줍니다. **아무것도 실행하지 않습니다.**
+
+        계획은 레코드가 아니라 **결과 요약**에 실립니다. `read`는 레코드만 돌려주므로
+        계획을 볼 수 없었습니다(2026-10-24, ADR-063을 재면서 빈 목록을 받았습니다).
+
+        시간은 환경에 흔들리지만 **`NodeIndexSeek`가 `NodeByLabelScan`으로 바뀌는 것**은
+        흔들리지 않습니다. 질의 모양을 바꾸는 결정에는 그쪽이 단단한 증거입니다.
+
+        읽기 세션에서 돕니다. `EXPLAIN`은 계획만 만들고 실행하지 않으므로 쓰기가 섞일
+        여지가 없습니다.
+        """
+        with self.driver.session(
+            database=self.database, default_access_mode=READ_ACCESS
+        ) as session:
+            summary = session.run(
+                Query(f"EXPLAIN {cypher}", timeout=READ_TIMEOUT), params or {}
+            ).consume()
+        names: list[str] = []
+
+        def walk(node: Any) -> None:
+            if node is None:
+                return
+            name = getattr(node, "operator_type", None)
+            if isinstance(name, str):
+                names.append(name.split("@")[0])
+            for child in getattr(node, "children", ()) or ():
+                walk(child)
+
+        walk(summary.plan if isinstance(summary.plan, dict) else None)
+        if not names and isinstance(summary.plan, dict):
+            # 드라이버 판에 따라 계획이 평평한 dict로 옵니다.
+            def walk_dict(node: Any) -> None:
+                if isinstance(node, dict):
+                    value = node.get("operatorType") or node.get("operator")
+                    if isinstance(value, str):
+                        names.append(value.split("@")[0])
+                    for item in node.values():
+                        walk_dict(item)
+                elif isinstance(node, list):
+                    for item in node:
+                        walk_dict(item)
+
+            walk_dict(summary.plan)
+        return names
+
     def write(self, cypher: str, params: dict[str, Any] | None = None) -> dict[str, int]:
         """Run a write and return the counters, so a caller can assert what actually changed."""
         with self.driver.session(

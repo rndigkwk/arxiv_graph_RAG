@@ -1,0 +1,621 @@
+{
+  "generated_at": "2026-10-23T17:41:41.110508+00:00",
+  "runs_per_query": 5,
+  "bar": {
+    "max_worst_ratio": 5.0,
+    "max_worst_seconds": 1.0
+  },
+  "proxy": "p.categories로 전수 주사 + 리스트 교집합을 흉내 냅니다. 시드마다 **행 수가 맞는 드문 분류**를 골라, 주사 비용에 행을 돌려주는 비용이 섞이지 않게 합니다. p.authors는 평균 7.1개(최대 3,434)이므로 이 대리는 **기각만** 할 수 있습니다.",
+  "families": {
+    "author": {
+      "cases": [
+        {
+          "case": "author-01",
+          "category": "cs.NA",
+          "category_papers": 2,
+          "now": {
+            "median_seconds": 0.1481,
+            "worst_seconds": 0.3059,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.2008,
+            "worst_seconds": 0.3422,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7829,
+            "worst_seconds": 3.5158,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1351,
+            "worst_seconds": 0.1749,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 0.57,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.12,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "author-02",
+          "category": "cond-mat.other",
+          "category_papers": 3,
+          "now": {
+            "median_seconds": 0.0915,
+            "worst_seconds": 0.1011,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1207,
+            "worst_seconds": 0.1274,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7919,
+            "worst_seconds": 3.7924,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.131,
+            "worst_seconds": 0.2437,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 2.41,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.26,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "author-03",
+          "category": "cond-mat.other",
+          "category_papers": 3,
+          "now": {
+            "median_seconds": 0.0914,
+            "worst_seconds": 0.0978,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.116,
+            "worst_seconds": 0.1225,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7626,
+            "worst_seconds": 2.87,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1342,
+            "worst_seconds": 0.1471,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 1.5,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.25,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "author-04",
+          "category": "cond-mat.other",
+          "category_papers": 3,
+          "now": {
+            "median_seconds": 0.091,
+            "worst_seconds": 0.0983,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1158,
+            "worst_seconds": 0.1203,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7412,
+            "worst_seconds": 2.8391,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1251,
+            "worst_seconds": 0.2325,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 2.37,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.22,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "author-05",
+          "category": "cs.NA",
+          "category_papers": 2,
+          "now": {
+            "median_seconds": 0.0921,
+            "worst_seconds": 0.0963,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1212,
+            "worst_seconds": 0.1219,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7644,
+            "worst_seconds": 2.8329,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1245,
+            "worst_seconds": 0.1655,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 1.72,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.27,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "author-06",
+          "category": "cs.NA",
+          "category_papers": 2,
+          "now": {
+            "median_seconds": 0.0914,
+            "worst_seconds": 0.0993,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1256,
+            "worst_seconds": 0.1314,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7947,
+            "worst_seconds": 3.3511,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1322,
+            "worst_seconds": 0.2228,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 2.24,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.32,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        }
+      ],
+      "worst_now_seconds": 0.3059,
+      "worst_folded_seconds": 0.3422,
+      "worst_wide_seconds": 3.7924,
+      "worst_long_seconds": 0.2437,
+      "long_list_within_bar": true,
+      "verdict": {
+        "worst_ratio": 1.12,
+        "within_ratio_limit": true,
+        "within_absolute_limit": true,
+        "passes": true,
+        "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+      },
+      "plan_now": [
+        "ProduceResults",
+        "Sort",
+        "Projection",
+        "Filter",
+        "Expand(All)",
+        "NodeUniqueIndexSeek"
+      ],
+      "plan_folded": [
+        "ProduceResults",
+        "Sort",
+        "Projection",
+        "Filter",
+        "NodeByLabelScan"
+      ],
+      "access_now": [
+        "NodeUniqueIndexSeek"
+      ],
+      "access_folded": [
+        "NodeByLabelScan"
+      ],
+      "index_lost": true
+    },
+    "coauthor": {
+      "cases": [
+        {
+          "case": "coauthor-01",
+          "category": "cond-mat",
+          "category_papers": 4,
+          "now": {
+            "median_seconds": 0.0919,
+            "worst_seconds": 0.1033,
+            "rows": 4,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1303,
+            "worst_seconds": 0.1437,
+            "rows": 4,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.725,
+            "worst_seconds": 2.8255,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1506,
+            "worst_seconds": 0.1992,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 1.93,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.39,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "coauthor-02",
+          "category": "cond-mat.other",
+          "category_papers": 3,
+          "now": {
+            "median_seconds": 0.0905,
+            "worst_seconds": 0.0926,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1345,
+            "worst_seconds": 0.1425,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7308,
+            "worst_seconds": 2.7977,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.146,
+            "worst_seconds": 0.2562,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 2.77,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.54,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "coauthor-03",
+          "category": "cond-mat",
+          "category_papers": 4,
+          "now": {
+            "median_seconds": 0.0909,
+            "worst_seconds": 0.0981,
+            "rows": 4,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1387,
+            "worst_seconds": 0.1569,
+            "rows": 4,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7616,
+            "worst_seconds": 2.7959,
+            "rows": 21182,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1501,
+            "worst_seconds": 0.1928,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 1.97,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.6,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "coauthor-04",
+          "category": "cs.NA",
+          "category_papers": 2,
+          "now": {
+            "median_seconds": 0.0914,
+            "worst_seconds": 0.0928,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1305,
+            "worst_seconds": 0.1402,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.735,
+            "worst_seconds": 2.7985,
+            "rows": 21182,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1379,
+            "worst_seconds": 0.2494,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 2.69,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.51,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "coauthor-05",
+          "category": "cs.NA",
+          "category_papers": 2,
+          "now": {
+            "median_seconds": 0.0904,
+            "worst_seconds": 0.0921,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1382,
+            "worst_seconds": 0.1438,
+            "rows": 2,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7332,
+            "worst_seconds": 2.8145,
+            "rows": 21182,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1517,
+            "worst_seconds": 0.2557,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 2.78,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.56,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        },
+        {
+          "case": "coauthor-06",
+          "category": "cond-mat.other",
+          "category_papers": 3,
+          "now": {
+            "median_seconds": 0.0911,
+            "worst_seconds": 0.0985,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_proxy": {
+            "median_seconds": 0.1396,
+            "worst_seconds": 0.1475,
+            "rows": 3,
+            "runs": 5
+          },
+          "folded_wide": {
+            "median_seconds": 2.7403,
+            "worst_seconds": 3.9051,
+            "rows": 21183,
+            "runs": 5
+          },
+          "folded_long": {
+            "median_seconds": 0.1413,
+            "worst_seconds": 0.2332,
+            "rows": 28,
+            "runs": 5
+          },
+          "folded_long_verdict": {
+            "worst_ratio": 2.37,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          },
+          "verdict": {
+            "worst_ratio": 1.5,
+            "within_ratio_limit": true,
+            "within_absolute_limit": true,
+            "passes": true,
+            "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+          }
+        }
+      ],
+      "worst_now_seconds": 0.1033,
+      "worst_folded_seconds": 0.1569,
+      "worst_wide_seconds": 3.9051,
+      "worst_long_seconds": 0.2562,
+      "long_list_within_bar": true,
+      "verdict": {
+        "worst_ratio": 1.52,
+        "within_ratio_limit": true,
+        "within_absolute_limit": true,
+        "passes": true,
+        "note": "넘지 못하면 접은 모양은 더 느립니다(기각 확정). 넘어도 '접어도 된다'가 아닙니다 - authors는 평균 7.1개로 categories(1.98)보다 리스트가 길어, 충실한 측정이 필요합니다(ADR-063)."
+      },
+      "plan_now": [
+        "ProduceResults",
+        "Sort",
+        "Distinct",
+        "Filter",
+        "Expand(All)",
+        "Filter",
+        "Expand(All)",
+        "NodeUniqueIndexSeek"
+      ],
+      "plan_folded": [
+        "ProduceResults",
+        "OrderedDistinct",
+        "Apply",
+        "NodeUniqueIndexSeek",
+        "Filter",
+        "NodeIndexScan"
+      ],
+      "access_now": [
+        "NodeUniqueIndexSeek"
+      ],
+      "access_folded": [
+        "NodeUniqueIndexSeek",
+        "NodeIndexScan"
+      ],
+      "index_lost": false
+    }
+  },
+  "papers": 37854,
+  "long_list": {
+    "categories": [
+      "math.GR",
+      "cs.NA",
+      "cond-mat.other",
+      "cond-mat",
+      "cs.OH",
+      "math.GT",
+      "cs.GL"
+    ],
+    "length": 7
+  },
+  "passes": true
+}

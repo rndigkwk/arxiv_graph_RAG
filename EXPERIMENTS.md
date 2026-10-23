@@ -3327,6 +3327,89 @@ uv run python -m pipeline.ingest --days 7 --output reports/ingest_weekly_window.
 Aura를 읽고 arXiv OAI를 받습니다. **아무것도 쓰지 않습니다**(`--load` 없음). 유료 API는
 쓰지 않습니다.
 
+## 11-43. AUTHORED를 접는 지연을 쟀습니다 — 처음 잰 18배는 다른 것을 재고 있었습니다 (2026-10-24)
+
+[ADR-045](docs/adr/ADR-045-what-to-delete-before-adding-a-month.md)가 관계를 지울 후보 다섯 중
+가장 큰 것(**AUTHORED를 논문 속성 배열로 접기**, 관계 −268,928 = 79.5%)만 판정을 미뤘습니다 —
+*"그 지연은 DB에서만 잴 수 있습니다."* 11-42절이 그 ADR의 "3.4개월"을 약 1.1개월로 고쳐
+시점을 네 번째 달에서 두 번째 달로 당겼으므로, 지금 쟀습니다([ADR-063](docs/adr/ADR-063-what-folding-authored-would-cost.md)에
+바를 먼저 적었습니다).
+
+`p.authors`가 아직 없으므로 **쓰기 없이** 잽니다 — 이미 있는 리스트 속성 `p.categories`로
+같은 모양(전수 주사 + 리스트 교집합)을 돌립니다. 바는 **최악이 현재 최악의 5배 이내 그리고
+절대 1.0초 이내**, 둘 다입니다.
+
+### 첫 측정은 바를 18배·35배로 넘지 못했는데, 그게 주사 비용이 아니었습니다
+
+첫 판은 대리 질의에 흔한 분류(`cs.AI`)를 넣었습니다. 그러자 대리가 **21,183행**을 돌려줬고
+진짜 질의는 2~3행입니다.
+
+> 그 18.2배·34.9배에는 **21,183행을 돌려주고 정렬하는 비용**이 섞여 있었습니다 — 접은 뒤에는
+> 일어나지 않는 일입니다. **전수 주사를 재려 했는데 행을 돌려주는 비용을 재고 있었습니다.**
+
+그래서 시드마다 **행 수가 같아지는 드문 분류**를 골라 다시 쟀습니다(2→2, 3→3, 4→4로 정확히
+맞았습니다). 같은 질의 모양, 같은 전수 주사, **행 수만** 맞춘 결과입니다.
+
+| 가족 | 지금 최악 | 접은 뒤(행 맞춤) | 배수 | 참고: 흔한 분류 | 바 |
+|---|---:|---:|---:|---:|---|
+| `author` | 0.306초 | **<!--n:reports/fold_authored.json#families.author.worst_folded_seconds-->0.3422<!--/n-->초** | 1.12배 | 3.792초 | **통과** |
+| `coauthor` | 0.103초 | **<!--n:reports/fold_authored.json#families.coauthor.worst_folded_seconds-->0.1569<!--/n-->초** | 1.52배 | 3.905초 | **통과** |
+
+**예측이 틀렸습니다.** ADR-063은 *"기각될 것으로 봅니다 — 37,854행을 주사하면 1.0초 안에
+끝나기 어렵습니다"* 라고 적었습니다. 37,854편 주사는 Aura Free에서 0.34초입니다.
+
+### 리스트가 3.5배 길어지는 외삽을 가정이 아니라 측정으로 묶었습니다
+
+`categories`는 평균 1.98개, `authors`는 7.1개입니다. 이 간격을 선형 가정으로 메우지 않으려고
+드문 분류 **7개**를 리스트로 주는 변종을 함께 돌렸습니다 — 노드마다 비교가 1.98×7 ≈ **13.9회**
+일어나므로 접은 뒤의 7.1회(`$name IN p.authors`)보다 **많습니다.**
+
+| 가족 | 리스트 7개(상한) | 바 |
+|---|---:|---|
+| `author` | <!--n:reports/fold_authored.json#families.author.worst_long_seconds-->0.2437<!--/n-->초 | 바 안 |
+| `coauthor` | <!--n:reports/fold_authored.json#families.coauthor.worst_long_seconds-->0.2562<!--/n-->초 | 바 안 |
+
+상한이 바 안이므로 **"약 3.5배"라는 외삽을 결론에 쓰지 않아도 됩니다.**
+
+### 말뭉치가 커져도 바를 넘지 못합니다 — 용량이 먼저 끝납니다
+
+주사는 말뭉치에 비례하지만 남은 자리가 **4,657편**입니다. 이 DB가 가질 수 있는 최대 말뭉치는
+37,854 + 4,657 = **42,511편**(1.123배)이고 그 때의 최악이 `author` 약 0.384초입니다.
+**무료 등급의 자리가 먼저 떨어지므로 주사가 1.0초에 닿을 수 없습니다.**
+
+### 그래도 인덱스는 잃습니다 — 시간보다 단단한 증거
+
+```
+author  지금  : ['NodeUniqueIndexSeek']
+author  접은 뒤: ['NodeByLabelScan']      <- 인덱스를 잃습니다
+coauthor 지금  : ['NodeUniqueIndexSeek']
+coauthor 접은 뒤: ['NodeUniqueIndexSeek', 'NodeIndexScan']
+```
+
+시간이 바 안인 것은 **말뭉치가 37,854편이라서이고 계획이 좋아서가 아닙니다.** 지금 이것을
+막고 있는 것은 질의 계획이 아니라 **무료 등급의 천장**입니다.
+
+`EXPLAIN`의 계획을 보려면 `pipeline.graph.plan`이 필요했습니다 — 계획은 레코드가 아니라
+**결과 요약**에 실려서, `read`로 돌리면 빈 목록이 옵니다.
+
+### 통과했지만 "접자"가 아닙니다
+
+ADR-063이 재기 **전에** 적어 둔 비대칭이 그대로 적용됩니다 — 지연은 **필요조건이고 충분조건이
+아닙니다.** 아직 재지 않은 것: `p.authors`를 실제로 써 넣은 충실한 측정(**운영 그래프에 쓰는
+일**이라 별도 승인), 유일성 제약과 FULLTEXT 인덱스의 상실(정확 일치 → 질의 분석으로 의미가
+바뀝니다), `prompts.py`를 포함한 10개 모듈 수정이 에이전트 정확도에 주는 영향.
+
+**지금 할 일은 없습니다.** ADR-045가 열어 둔 칸이 채워졌고, 그 값이 **기각이 아니라 통과**
+입니다.
+
+### 재현
+
+```bash
+uv run python scripts/measure_fold_authored.py --output reports/fold_authored.json
+```
+
+Aura를 **읽기만** 합니다. 유료 API를 쓰지 않습니다.
+
 ## 13. 재현 방법
 
 ```bash
@@ -3434,6 +3517,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/order_study_coauthor_{after,fixed}.json` | 10-1절 — 두 수정의 비교 |
 | `reports/ingest.json` | 11절 — 수집 시험 실행 |
 | `reports/ingest_weekly_window.json` | 11-42절 — 주 단위 창의 용량 여유 |
+| `reports/fold_authored.json` | 11-43절 — AUTHORED를 접은 뒤의 질의 지연 |
 | `reports/variant_study_{graph,base}.json` | 11-1절 — 변형 비교 |
 | `reports/index_cost.json` | 11-2절 — 색인 비용과 커버리지 |
 | `reports/embedding_tuning.json` | 11-3절 — 어댑터와 격자 탐색 |
