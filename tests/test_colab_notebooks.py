@@ -108,6 +108,46 @@ def test_the_notebook_does_not_rely_on_colab_only_download(path):
     assert "files.download" not in body, path.name
 
 
+@pytest.mark.parametrize("path", NOTEBOOKS, ids=ids(NOTEBOOKS))
+def test_the_commands_it_prints_run_in_one_line(path):
+    """**받는 쪽 셸을 가정하지 않습니다.**
+
+    노트북은 Linux에서 돌지만 그 명령을 치는 것은 보통 다른 컴퓨터이고, Windows면
+    PowerShell입니다. bash의 줄바꿈 백슬래시는 거기서 깨집니다 - 2026-10-23에 첫 줄만
+    실행돼 `--repo-type dataset`이 빠지고 "데이터셋을 모델로 찾는" 404가 났습니다.
+    그래서 찍는 명령은 한 줄이어야 합니다(파이썬 쪽에서 이어 붙이는 것은 자유입니다).
+    """
+    offenders = [
+        (index, line.strip())
+        for index, source in code_cells(load(path))
+        for line in source.splitlines()
+        if line.lstrip().startswith("print(") and line.rstrip().endswith("\\\\')")
+    ]
+
+    assert not offenders, (
+        f"{path.name}이 bash 줄바꿈이 섞인 명령을 찍습니다: {offenders}"
+    )
+
+
+@pytest.mark.parametrize("path", NOTEBOOKS, ids=ids(NOTEBOOKS))
+def test_a_successful_stop_is_not_announced_as_an_exception(path):
+    """`raise SystemExit(0)`을 쓰면 Jupyter가 성공한 멈춤을 **크래시처럼** 보여 줍니다.
+
+    2026-10-23에 끝까지 잘 돌아간 SMOKE 실행을 "An exception has occurred"로 읽었습니다.
+    멈출 이유가 있으면 `else`로 가르거나, 종료 코드가 0이 아닌 이유를 함께 적으세요.
+    """
+    # **주석은 보지 않습니다.** 이 규칙을 설명하는 주석 자체가 걸립니다 — 2026-10-23에
+    # 그랬고, PR #22에서 `continue-on-error` 금지가 같은 함정에 빠졌습니다.
+    code = "\n".join(
+        line
+        for _, source in code_cells(load(path))
+        for line in source.splitlines()
+        if not line.lstrip().startswith("#")
+    )
+
+    assert "SystemExit(0)" not in code, path.name
+
+
 # ── 미세조정 노트북의 고유 조건 ───────────────────────────────────────────
 
 FINETUNE = Path("notebooks/rerank_finetune_colab.ipynb")
