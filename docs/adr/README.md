@@ -90,6 +90,7 @@
 | [ADR-059](ADR-059-the-judge-prompt-is-measured-on-held-out-questions.md) | 심판 프롬프트는 보류 질문에서 잰다 — 라벨이 기계적이라 사람 없이 집합을 만들 수 있다 | 채택 |
 | [ADR-060](ADR-060-what-the-gate-catches-when-the-judge-collapses.md) | 심판이 무너지면 게이트는 총 실패 4건부터 잡는다 — 옳은 결정 둘이 곱해져 3건의 구멍을 만들었다 | 채택 |
 | [ADR-061](ADR-061-whether-the-reranker-is-worth-keeping-where-cosine-is-weak.md) | 재정렬기를 코사인이 약한 자리에만 쓰는 규칙은 없다 — 186개를 훑어 최선이 0이었다 | 기각 |
+| [ADR-062](ADR-062-read-back-whether-langfuse-stored-it.md) | 추적이 실제로 저장되는지 코드가 되읽는다 — 재 보니 저장되고 있었고 기한이 사라졌다 | 채택 |
 | [ADR-016](ADR-016-stay-on-streamlit.md) | Cloud Run으로 옮기지 않는다 | 보류 |
 | [ADR-017](ADR-017-regression-gate.md) | 품질 회귀는 CI가 기준선과 대조해 막는다 | 채택 |
 | [ADR-018](ADR-018-prompt-versioning.md) | 프롬프트 본문은 한 모듈에 모으고 버전은 MLflow에 남긴다 | 채택 |
