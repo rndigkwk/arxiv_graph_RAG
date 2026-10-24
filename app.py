@@ -397,6 +397,10 @@ def show_response(chatbot, response, index):
         st.caption("이번 검색에서 시각화할 논문이 없습니다.")
 
     with st.expander("검색 과정과 근거 확인"):
+        # 이 답변을 낼 때 예열이 어느 상태였는지. **네 상태를 모두 적습니다** -
+        # 위의 상태 줄은 끝나면 조용해야 하지만, 여기서 조용하면 "끝남"과
+        # "시작 안 함"이 같아 보입니다. 실제로 한 번 그래서 갈라내지 못했습니다(ADR-067).
+        st.caption(warmup.warmup_state_line(citation_warmup(chatbot).state()))
         if rows := latency_rows(response):
             st.write("노드별 소요 시간")
             st.dataframe(rows, hide_index=True)

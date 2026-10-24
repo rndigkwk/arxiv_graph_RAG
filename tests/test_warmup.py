@@ -11,6 +11,7 @@
 그리고 화면에 **예상 시간을 적지 않는지** 봅니다. 경과는 늙지 않지만 예상은 늙습니다.
 """
 
+import re
 import threading
 from pathlib import Path
 
@@ -71,9 +72,13 @@ def test_starting_twice_does_not_build_twice():
 
 
 def test_a_finished_warmup_says_nothing():
-    """다 된 뒤에도 줄이 남으면 매 답변 위에 쓸모없는 한 줄이 붙습니다."""
+    """다 된 뒤에도 줄이 남으면 매 답변 위에 쓸모없는 한 줄이 붙습니다.
+
+    **IDLE을 여기서 뺐습니다(2026-10-25).** 처음에는 이 시험이 "끝남도 조용하고 시작
+    안 함도 조용하다"를 지키고 있었는데, 그 둘이 같다는 것이 바로 배포 앱에서 갈라내지
+    못한 원인이었습니다. 시험이 결함을 지키고 있었습니다(ADR-067).
+    """
     assert warmup.warmup_line({"status": warmup.DONE, "seconds": 16.6, "reason": None}) == ""
-    assert warmup.warmup_line({"status": warmup.IDLE, "seconds": None, "reason": None}) == ""
 
 
 def test_the_running_line_reports_elapsed_not_a_forecast():
@@ -120,3 +125,71 @@ def test_the_app_warms_the_citation_graph_before_it_draws_the_tabs():
     assert hasattr(app, "citation_warmup")
     assert "warmup.Warmup(_chatbot.citation_graph)" in source
     assert source.index("citation_warmup(chatbot)") < source.index("st.tabs(")
+
+
+def test_a_warmup_that_never_started_says_so():
+    """IDLE은 진행 상황이 아니라 **고장 신호**입니다.
+
+    `main()`이 탭을 그리기 전에 반드시 `start()`를 부르므로, 화면이 IDLE을 보고 있다면 그
+    줄이 사라졌거나 돌고 있는 코드가 옛것입니다. 침묵하면 끝난 것과 구별되지 않습니다.
+    """
+    line = warmup.warmup_line({"status": warmup.IDLE, "seconds": None, "reason": None})
+
+    assert line
+    assert "시작되지 않았습니다" in line
+
+
+def test_the_idle_line_is_not_the_finished_silence():
+    """**이 테스트가 이 변경의 전부입니다.** 둘이 같으면 갈라낼 수 없습니다.
+
+    2026-10-25에 실제로 갈라내지 못했습니다 - 배포가 옛 코드라 예열이 안 돌았는데 화면은
+    다 끝난 앱과 똑같이 조용했고, 24.47초라는 다른 증거로 소거해야 했습니다(ADR-067).
+    """
+    idle = warmup.warmup_line({"status": warmup.IDLE, "seconds": None, "reason": None})
+    done = warmup.warmup_line({"status": warmup.DONE, "seconds": 15.4, "reason": None})
+
+    assert done == ""
+    assert idle != done
+
+
+def test_the_idle_line_does_not_forecast():
+    """고장을 알리면서 예상 시간을 적으면 ADR-016의 늙는 수가 다시 생깁니다."""
+    line = warmup.warmup_line({"status": warmup.IDLE, "seconds": None, "reason": None})
+
+    assert not re.search(r"\d", line)
+
+
+@pytest.mark.parametrize("state, expected", [
+    ({"status": warmup.IDLE, "seconds": None, "reason": None}, "시작되지 않음"),
+    ({"status": warmup.RUNNING, "seconds": 3.0, "reason": None}, "진행 중"),
+    ({"status": warmup.DONE, "seconds": 15.4, "reason": None}, "완료"),
+    ({"status": warmup.FAILED, "seconds": 2.0, "reason": "RuntimeError"}, "실패"),
+])
+def test_the_evidence_panel_line_tells_the_four_states_apart(state, expected):
+    """근거 패널은 펼쳐 봐야 나오는 자리라 **조용할 이유가 없습니다.**"""
+    line = warmup.warmup_state_line(state)
+
+    assert expected in line
+    assert line
+
+
+def test_the_evidence_panel_line_carries_the_seconds_and_the_reason():
+    """측정하는 사람이 추론하지 않고 읽을 수 있어야 합니다."""
+    done = warmup.warmup_state_line(
+        {"status": warmup.DONE, "seconds": 15.4, "reason": None})
+    failed = warmup.warmup_state_line(
+        {"status": warmup.FAILED, "seconds": 2.0, "reason": "RuntimeError"})
+
+    assert "15.4초" in done
+    assert "RuntimeError" in failed
+
+
+def test_the_evidence_panel_shows_the_warmup_state():
+    """패널에서 이 줄이 빠지면 테스트는 전부 통과하고, 다음에 또 소거법을 씁니다."""
+    pytest.importorskip("streamlit")
+    source = Path("app.py").read_text(encoding="utf-8")
+
+    panel = source.index('st.expander("검색 과정과 근거 확인")')
+    tables = source.index('st.write("노드별 소요 시간")')
+
+    assert panel < source.index("warmup.warmup_state_line(") < tables
