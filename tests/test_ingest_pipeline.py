@@ -7,8 +7,11 @@
 HTTP는 전부 주입된 가짜로 대체하므로 네트워크를 타지 않습니다.
 """
 
+import inspect
+import json
 import xml.etree.ElementTree as ElementTree
 from datetime import date
+from pathlib import Path
 
 import pytest
 
@@ -378,8 +381,6 @@ def test_the_upstream_check_shares_the_snapshot_gate_constants():
 
 def test_loading_without_embeddings_needs_an_explicit_flag():
     """조용히 통과시키지 않습니다. 알고 하는 경우만 넘어갑니다."""
-    import inspect
-
     source = inspect.getsource(ingest.main)
 
     assert "allow_missing_embeddings" in source
@@ -387,3 +388,93 @@ def test_loading_without_embeddings_needs_an_explicit_flag():
     # 검사가 용량 검사 뒤, `--load` 분기 앞에 있어야 합니다.
     assert source.index('"capacity"') < source.index('"embeddings_missing"')
     assert source.index('"embeddings_missing"') < source.index('"dry_run"')
+
+
+# ── 여유 횟수가 보고서와 문서에서 같은 수인지 ───────────────────────────────
+#
+# 11-42절은 여유를 **산출값**으로 4.2회라고 셌습니다. `plan_capacity`가 관계를 행 수 그대로
+# 세기 때문입니다(노드는 이미 있는 것을 빼는데 관계는 빼지 않습니다). 실제로 적재해 보니
+# 같은 배치 안에서 1.38배 보수적이었고, 실측 여유는 7.7회입니다. 산출 쪽은 고치지 않습니다 —
+# 용량 가드가 과대평가하는 것은 안전한 방향입니다. 고친 것은 **여유를 셀 때 쓰는 수**입니다.
+
+LOADED = Path("reports/ingest_embedded.json")
+EXPERIMENTS = Path("EXPERIMENTS.md")
+
+
+@pytest.fixture(scope="module")
+def loaded():
+    if not LOADED.exists():
+        pytest.skip(f"보고서를 읽을 수 없습니다: {LOADED}")
+    return json.loads(LOADED.read_text(encoding="utf-8"))
+
+
+def batches_left(loaded: dict, kind: str) -> float:
+    """실측 증가분으로 안전 천장까지 남은 배치 수를 셉니다."""
+    limit = ingest.RELATIONSHIP_LIMIT if kind == "relationships" else ingest.NODE_LIMIT
+    ceiling = limit * ingest.CAPACITY_SAFETY
+    now = loaded["counts"]["after"][kind]
+    if kind == "relationships":
+        grew = loaded["written"]["counters"]["authored"]["relationships_created"]
+    else:
+        grew = loaded["written"]["nodes_created"]
+
+    assert grew > 0, (kind, grew)
+    return (ceiling - now) / grew
+
+
+def test_the_headroom_in_the_docs_is_the_measured_number(loaded):
+    """**문서의 7.7회가 보고서에서 다시 나와야 합니다.** 적재가 또 돌면 이 테스트가 먼저 압니다."""
+    text = EXPERIMENTS.read_text(encoding="utf-8")
+
+    assert round(batches_left(loaded, "relationships"), 1) == 7.7
+    assert round(batches_left(loaded, "nodes"), 1) == 14.7
+    assert "약 7.7회" in text
+    assert "14.7회" in text
+
+
+def test_the_projection_was_conservative_in_the_safe_direction(loaded):
+    """과대평가는 안전하고 과소평가는 위험합니다. 부호가 뒤집히면 가드를 다시 봐야 합니다."""
+    projected = (
+        loaded["capacity"]["projected_relationships"]
+        - loaded["counts"]["before"]["relationships"]
+    )
+    actual = (
+        loaded["counts"]["after"]["relationships"]
+        - loaded["counts"]["before"]["relationships"]
+    )
+
+    assert projected > actual, (projected, actual)
+    assert round(projected / actual, 2) == 1.38
+
+
+def test_the_projection_gap_is_fully_accounted_for(loaded):
+    """설명되지 않은 차이가 남으면 1.38배가 우연일 수 있습니다. 한 개도 남지 않아야 합니다."""
+    sent, made = loaded["written"]["rows_sent"], loaded["written"]["counters"]
+    references_that_vanished = sent["references"] - made["references"]["relationships_created"]
+    authored_already_there = sent["authored"] - made["authored"]["relationships_created"]
+    projected_minus_actual = (
+        loaded["capacity"]["projected_relationships"]
+        - loaded["counts"]["after"]["relationships"]
+    )
+
+    assert references_that_vanished + authored_already_there == projected_minus_actual
+    # 참조는 가리키는 논문이 그래프에 없으면 **하나도** 만들어지지 않습니다.
+    assert made["references"]["relationships_created"] == 0
+
+
+def test_the_prediction_that_was_wrong_is_kept(loaded):
+    """4.2회를 지우면 산출이 왜 보수적인지가 같이 사라집니다."""
+    text = EXPERIMENTS.read_text(encoding="utf-8")
+
+    assert "약 4.2회" in text
+    assert "산출이고, 실측은 7.7회입니다" in text
+    # 왜 바로 비교하면 안 되는지도 적혀 있어야 합니다.
+    assert "배치 크기가 다르므로" in text
+
+
+def test_the_capacity_guard_still_counts_rows_on_purpose():
+    """이 테스트가 깨지면 가드가 과소평가하기 시작한 것입니다 — 11-42절을 다시 읽어야 합니다."""
+    source = inspect.getsource(ingest.plan_capacity)
+
+    assert "new_authored=len(authored)" in source.replace(" ", "")
+    assert "new_references=len(references)" in source.replace(" ", "")

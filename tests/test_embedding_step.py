@@ -9,6 +9,7 @@
 1. 입력 형식이 **노트북 원본과 같은 문자열**인지 (원본을 읽어서 비교합니다)
 2. 음성 대조군이 **실제로 다른 문자열**인지 — 같으면 검사가 아무것도 가려내지 못합니다
 3. 돈을 쓰는 경로에 **천장과 건너뛰기**가 있는지
+4. **워크플로가 그 경로를 실제로 부르는지** — 코드만 고치면 CI에서는 막힙니다(11-45절)
 """
 
 import json
@@ -36,6 +37,7 @@ from pipeline.embed import (
 )
 
 ADR = Path("docs/adr/ADR-064-the-pipeline-cannot-finish-without-leaving-the-pipeline.md")
+WORKFLOW = Path(".github/workflows/ingest.yml")
 NOTEBOOK = Path("notebooks/arxiv_ai_kg_to_aura.ipynb")
 REPORT = Path("reports/embedding_space.json")
 
@@ -334,3 +336,79 @@ def test_the_adr_wrote_the_bar_before_spending():
     assert "비용 천장" in text
     # 혼자 쓰면 돈을 버린다는 결함도 적혀 있어야 합니다.
     assert "돈을 쓰고 버립니다" in text
+
+
+# ── 주간 워크플로가 이 경로를 부르는지 ──────────────────────────────────────
+#
+# 코드를 고치고 손으로 돌려서 끝냈는데 워크플로에는 닿지 않았습니다. 가드를 상류에 두는 것도
+# 옳고 워크플로 기본값을 시험 실행으로 두는 것도 옳은데, **곱이 구멍이었습니다** — 사람이
+# CI에서 적재를 고르면 `embeddings_missing`에서 반드시 멈추는 상태였습니다(11-45절).
+
+
+@pytest.fixture(scope="module")
+def workflow():
+    import yaml
+
+    return yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
+
+
+@pytest.fixture(scope="module")
+def ingest_step(workflow):
+    """수집을 돌리는 step 하나를 집습니다."""
+    steps = [
+        step for step in workflow["jobs"]["ingest"]["steps"]
+        if "pipeline.ingest" in (step.get("run") or "")
+    ]
+
+    assert len(steps) == 1, [step.get("name") for step in steps]
+    return steps[0]
+
+
+def load_branch(run: str) -> str:
+    """`load=true` 분기만 떼어 냅니다. 분기를 안 가르면 시험 실행 쪽 플래그까지 섞입니다."""
+    head, _, rest = run.partition('if [ "${{ inputs.load }}" = "true" ]; then')
+
+    assert rest, run
+    branch, _, _ = rest.partition("else")
+    return branch
+
+
+def test_the_loading_branch_asks_for_embeddings(ingest_step):
+    """**이 테스트가 이 묶음의 이유입니다.** 빠지면 CI의 적재가 항상 실패합니다."""
+    branch = load_branch(ingest_step["run"])
+
+    assert "--load" in branch
+    assert "--embed" in branch, branch
+
+
+def test_the_loading_branch_has_the_key_it_needs(ingest_step):
+    """`--embed`가 있어도 키가 없으면 수집을 다 한 뒤에 죽습니다."""
+    assert "OPENAI_API_KEY" in ingest_step["env"]
+
+
+def test_the_dry_run_branch_spends_nothing(ingest_step):
+    """주 1회 크론의 기본값이 시험 실행입니다. 여기에 `--embed`가 새면 매주 돈이 나갑니다."""
+    run = ingest_step["run"]
+    _, _, after_else = run.partition("else")
+
+    assert "pipeline.ingest" in after_else
+    assert "--embed" not in after_else, after_else
+    assert "--load" not in after_else, after_else
+
+
+def test_the_loading_branch_carries_a_cost_ceiling(ingest_step, workflow):
+    """창을 넓히면 비용이 같이 커집니다. 상한이 없으면 코드 기본값($1.00)에 맡기게 됩니다."""
+    branch = load_branch(ingest_step["run"])
+    default = float(workflow[True]["workflow_dispatch"]["inputs"]["max_cost"]["default"])
+
+    assert "--max-cost" in branch
+    # 7일 창이 약 $0.035입니다. 한 자릿수 배수 여유면 충분하고, $1.00까지 열어 둘 이유가 없습니다.
+    assert 0.1 <= default <= 1.0, default
+
+
+def test_automatic_loading_stays_off(workflow):
+    """용량이 묶는 제약입니다. 크론이 스스로 적재하면 사람의 판단이 빠집니다."""
+    default = workflow[True]["workflow_dispatch"]["inputs"]["load"]["default"]
+
+    assert default == "false"
+    assert "schedule" in workflow[True]
