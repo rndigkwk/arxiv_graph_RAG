@@ -18,7 +18,7 @@ jobs:
       - run: uv lock --check
       - run: uv sync --locked --group dev
       - run: uv run --locked python -c "import networkx, plotly, streamlit"
-      - run: uv run --locked ruff check answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py tool_timing.py routing.py abstain.py pagerank.py title_search.py forecast.py quality_board.py citations.py evals tests scripts pipeline models
+      - run: uv run --locked ruff check answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py tool_timing.py warmup.py routing.py abstain.py pagerank.py title_search.py forecast.py quality_board.py citations.py evals tests scripts pipeline models
       - run: uv run --locked python -m pytest -q
       # 검사기도 손으로 적지 않고 글로브로 넘깁니다. 두 줄짜리 목록에 세 번째
       # (`check_adr_rules.py`)를 더하려다 이것이 같은 병임을 알았습니다 - 아래 compileall과
