@@ -9,9 +9,12 @@
 그대로 담고 있습니다. 90건이 이미 디스크에 있습니다.
 
 **이 스크립트가 재지 못하는 것을 먼저 적습니다.** `generate` 노드 안에서 번역·Text2Cypher·
-벡터 검색·모델 턴이 각각 얼마를 쓰는지는 **알 수 없습니다.** 도구 호출에 소요 시간이 기록되지
-않기 때문입니다(`response["tool_calls"]`에 `seconds`가 없습니다). 그래서 이 분해는 노드
-단위에서 멈춥니다. 그 아래를 보려면 도구 호출에 시간을 남기는 수정이 먼저입니다.
+벡터 검색·모델 턴이 각각 얼마를 쓰는지는, **이 파일들에서는** 알 수 없습니다. 저장된 90건은
+도구 호출에 소요 시간이 없던 때의 실행이기 때문입니다.
+
+ADR-066이 그 계측을 넣었고 `response["generate_trace"]`에 남습니다. 이 스크립트는 그 값이
+있으면 읽고, **없으면 몇 건에 없는지를 적습니다** — 0건을 조용히 넘기면 "안쪽은 원래 못 재는
+것"으로 굳습니다. 안쪽을 보려면 평가를 **다시 돌려야** 하고, 그것은 돈이 듭니다.
 
 **하네스와 앱은 같은 입구를 씁니다**(`chatbot.ask`). 그래서 이 수는 앱의 하한입니다 — 앱은
 위에 Streamlit 렌더링, 한국어 번역 도구 호출, 부분 그래프 조회, PageRank 패널을 더합니다.
@@ -75,8 +78,37 @@ def read_mode(mode: str, root: Path) -> list[dict[str, Any]]:
                 "total_seconds": trace["total_seconds"],
                 "elapsed_seconds": answer.get("elapsed_seconds"),
                 "attempts": trace.get("attempts"),
+                # ADR-066 이후의 실행에만 있습니다. 없으면 None으로 남겨 세어집니다.
+                "inside": answer.get("generate_trace"),
             })
     return cases
+
+
+def inside_generate(cases: list[dict[str, Any]]) -> dict[str, Any]:
+    """`generate` 안쪽이 **몇 건에 기록됐는지**부터 적고, 있으면 몫을 냅니다.
+
+    기록이 없을 때 빈 값을 돌려주면 "안쪽은 원래 못 재는 것"으로 읽힙니다. 그래서 분모를
+    먼저 적습니다 - 0/90은 "재지 못함"이 아니라 **"다시 돌려야 나옴"**입니다.
+    """
+    measured = [case["inside"] for case in cases if isinstance(case.get("inside"), dict)]
+    summary: dict[str, Any] = {"cases": len(measured), "of": len(cases)}
+    if not measured:
+        summary["note"] = ("이 보고서들은 ADR-066 이전 실행입니다. 안쪽을 보려면 평가를 "
+                           "다시 돌려야 합니다.")
+        return summary
+    generate = sum(entry.get("generate_seconds", 0.0) for entry in measured)
+    for key in ("tools_seconds", "model_seconds", "unattributed_seconds", "other_seconds"):
+        total = sum(entry.get(key, 0.0) for entry in measured)
+        summary[key] = round(total, 1)
+        summary[key.replace("_seconds", "_share")] = (
+            round(total / generate, 4) if generate else 0.0
+        )
+    summary["generate_seconds"] = round(generate, 1)
+    summary["model_turns"] = sum(entry.get("model_turns", 0) for entry in measured)
+    summary["tool_calls"] = sum(entry.get("tool_calls", 0) for entry in measured)
+    # 한 건이라도 두 번 셌으면 합계의 몫이 전부 흔들립니다. 세어서 적습니다.
+    summary["did_not_add_up"] = sum(1 for entry in measured if not entry.get("adds_up", True))
+    return summary
 
 
 def by_node(cases: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -137,6 +169,7 @@ def measure(root: Path) -> dict[str, Any]:
             "heavy_share": round(sum(row["share"] for row in heavy), 4),
             "other_share": round(sum(row["share"] for row in other), 4),
             "shape_held": sum(row["share"] for row in other) <= OTHER_SHARE_BAR,
+            "inside_generate": inside_generate(cases),
         }
 
     # ADR-024의 표가 어느 모드로도 재현되지 않으면, 그 수는 지금 저장소에 없는 실행에서
@@ -161,8 +194,10 @@ def measure(root: Path) -> dict[str, Any]:
             ),
         },
         "not_measured": (
-            "generate 노드 **안쪽**. 도구 호출에 소요 시간이 기록되지 않아 번역·Cypher·"
-            "벡터·모델 턴의 몫을 가를 수 없습니다."
+            "generate 노드 **안쪽**. 이 보고서들은 ADR-066 이전 실행이라 도구·모델 시간이 "
+            "없습니다. 안쪽을 보려면 평가를 다시 돌려야 합니다."
+            if not any(entry["inside_generate"]["cases"] for entry in modes.values())
+            else "모델 턴 **하나의 안쪽**. 대기와 토큰 생성의 몫은 공급자가 알려 주지 않습니다."
         ),
     }
 
@@ -190,6 +225,15 @@ def main() -> int:
         if not entry["shape_held"]:
             print(f'  ** generate·check_conditions 밖이 {entry["other_share"]:.1%}입니다 '
                   '— 분해를 다시 읽으세요.')
+        deeper = entry["inside_generate"]
+        print(f'  generate 안쪽 기록: {deeper["cases"]}/{deeper["of"]}건')
+        if deeper["cases"]:
+            print(f'    모델 {deeper["model_share"]:.1%} ({deeper["model_turns"]}턴) · '
+                  f'도구 {deeper["tools_share"]:.1%} ({deeper["tool_calls"]}회) · '
+                  f'그 외(뺀 값) {deeper["other_share"]:.1%}')
+            if deeper["did_not_add_up"]:
+                print(f'    ** {deeper["did_not_add_up"]}건은 안쪽 합이 노드 시간보다 큽니다 '
+                      '— 두 번 센 것이라 몫을 믿지 마세요.')
 
     adr = report["adr_024"]
     print(f'ADR-024 가족별 p50 재현: {"예" if adr["reproducible"] else "아니오"}'

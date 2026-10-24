@@ -51,6 +51,7 @@ from candidate_validation import (
 from cypher_validation import check_external_io, check_order_by, refuse_unless_read_only
 import pagerank
 import title_search
+import tool_timing
 from pipeline import tracing
 
 # 이 파일이 저장소 루트에 있든 하위 폴더에 있든, pyproject.toml이 있는 폴더를 루트로 봅니다.
@@ -545,13 +546,18 @@ def judging_model(usage):
     )
 
 
-def stream_agent_answer(messages, on_answer=None):
-    """에이전트를 흘려 받으며 부분 답변을 화면에 올리고, 최종 상태를 돌려줍니다."""
+def stream_agent_answer(messages, on_answer=None, callbacks=()):
+    """에이전트를 흘려 받으며 부분 답변을 화면에 올리고, 최종 상태를 돌려줍니다.
+
+    `callbacks`는 이 안쪽을 재는 자리입니다(`tool_timing`). 도구 본문을 건드리지 않고
+    도구·모델의 시작과 끝을 받으므로, 도구가 늘어도 계측을 다시 손대지 않습니다.
+    """
     result, message_id, buffer, displayed = {}, None, "", ""
     if on_answer is not None:
         on_answer("")  # 인용 수정 시 이전 초안을 지우고 새 답변으로 교체합니다.
     # messages는 생성 중인 토큰, values는 검색 기록·구조화 답변이 담긴 상태입니다.
-    for mode, event in agent.stream({"messages": messages}, stream_mode=["messages", "values"]):
+    for mode, event in agent.stream({"messages": messages}, stream_mode=["messages", "values"],
+                                    config={"callbacks": list(callbacks)}):
         if mode == "values":
             result = event
             continue
@@ -580,6 +586,9 @@ def ask(question, history, on_answer=None):
     validation_request_id = uuid.uuid4().hex[:8]
     # 재시도가 일어나면 판정 호출도 두 번이므로, 그래프 밖에서 누적합니다.
     validation_usage = {}
+    # `generate` 안쪽을 가릅니다(ADR-066). **질문마다 새로 만듭니다** - 모듈에 하나를 두면
+    # 평가 하네스가 앞 질문의 호출 시간을 다음 질문에 더합니다.
+    inside_generate = tool_timing.InsideGenerate()
 
     def check_conditions(user_question, response):
         return assess_and_validate(
@@ -601,7 +610,9 @@ def ask(question, history, on_answer=None):
         )
 
     deps = agent_graph.Dependencies(
-        stream_answer=lambda messages, attempt: stream_agent_answer(messages, on_answer),
+        stream_answer=lambda messages, attempt: stream_agent_answer(
+            messages, on_answer, [inside_generate]
+        ),
         collect=collect_response,
         check_format=validate_answer,
         check_conditions=check_conditions,
@@ -619,6 +630,18 @@ def ask(question, history, on_answer=None):
 
     response = state["response"]
     response["graph_trace"] = agent_graph.summarize_trace(state["trace"])
+    # `generate`가 지연의 72.8%인데 한 덩어리였습니다(ADR-065). 그 안을 도구·모델·나머지로
+    # 가릅니다(ADR-066). 재시도가 있으면 노드 시간도 시도 전부의 합이고 여기 모인 호출도
+    # 시도 전부이므로, **같은 범위를 비교합니다.**
+    response["generate_trace"] = inside_generate.summary(
+        response["graph_trace"]["seconds"].get("generate", 0.0)
+    )
+    # 앞 시도의 호출은 마지막 응답에 남아 있지 않습니다. 그 시간은 위 합계에만 들어가고
+    # 호출별 표에는 이번 시도의 것만 나옵니다. 몇 개에 붙었는지를 적어 두는 이유는 0이
+    # **조용한 실패**이기 때문입니다 - 콜백이 걸리지 않으면 도구가 공짜로 보입니다.
+    response["generate_trace"]["attached"] = tool_timing.attach(
+        response["tool_calls"], inside_generate.seconds()
+    )
     # 기본은 꺼짐입니다. `LANGFUSE_TRACING=1`과 키가 둘 다 있을 때만 보내고, 켠 뒤에도
     # **하루에** `LANGFUSE_MAX_TRACES`개까지입니다(ADR-023) — dograg가 전부 추적해 한 달치
     # 무료 사용량을 소진한 적이 있어서, 스위치와 상한을 둘 다 둡니다. 단위가 하루인 것이

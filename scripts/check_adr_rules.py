@@ -41,6 +41,13 @@
 
 두 번째가 핵심입니다. 빚을 갚으면 목록이 **줄어야** 하고, 줄지 않으면 검사기가 막습니다.
 목록은 늘지 않고 줄기만 합니다.
+
+## 색인 표에 줄이 빠진 것도 잡습니다 (2026-10-24)
+
+`docs/adr/README.md`의 목록 표에 **ADR-063·064·065가 없었습니다.** 세 번 연속 빠뜨리고도
+아무것도 막지 않았습니다. 파일을 쓰는 것과 색인에 줄을 넣는 것이 다른 동작인데, 검사하는
+쪽은 파일만 보고 있었습니다. **일곱 번째 손 목록**이라 같은 처방을 씁니다 - 파일과 표를
+양방향으로 맞추고, 한쪽에만 있으면 실패합니다.
 """
 
 from __future__ import annotations
@@ -50,6 +57,8 @@ from pathlib import Path
 
 ADR_DIR = Path("docs/adr")
 ADR_FILE = re.compile(r"^ADR-(\d{3})-")
+# 색인의 목록 표에 있는 줄. 본문의 링크는 셈하지 않습니다 - 참조는 누락이 아닙니다.
+INDEX_ROW = re.compile(r"^\|\s*\[ADR-(\d{3})\]", re.M)
 HEADING = re.compile(r"^##\s+(.*)$", re.M)
 STATUS = re.compile(r"^- \*\*상태:\*\*\s*(\S+)", re.M)
 
@@ -124,6 +133,30 @@ def check() -> list[str]:
         problems.append(
             f"ADR-{ghost}: WITHOUT_SENSITIVITY에 있는데 파일이 없습니다. 목록에서 지우세요"
         )
+    problems.extend(index_gaps(numbers))
+    return problems
+
+
+def index_gaps(numbers: set[str]) -> list[str]:
+    """색인의 목록 표와 파일 목록을 **양방향으로** 맞춥니다.
+
+    ADR-063·064·065가 색인에 없었습니다. 세 번 연속 빠뜨리고도 아무것도 막지 않았고, 손으로
+    세어 보고 알았습니다. 색인은 "그래서 지금 무엇을 쓰는가"에 답하는 한 장이라, 줄이 빠지면
+    **그 한 장이 거짓**이 됩니다. 손으로 유지하는 목록이 조용히 갈라진 일곱 번째입니다.
+    """
+    index = ADR_DIR / "README.md"
+    if not index.exists():
+        return [f"{index}가 없습니다"]
+    listed = set(INDEX_ROW.findall(index.read_text(encoding="utf-8")))
+    problems = [
+        f"ADR-{number}: {index}의 목록 표에 줄이 없습니다. 어느 절에 넣을지 고르고 더하세요"
+        for number in sorted(numbers - listed)
+    ]
+    problems.extend(
+        f"ADR-{number}: {index}의 목록 표에 있는데 파일이 없습니다. 번호를 바꿨으면 줄도 "
+        "고치세요"
+        for number in sorted(listed - numbers)
+    )
     return problems
 
 

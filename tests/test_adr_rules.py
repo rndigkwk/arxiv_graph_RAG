@@ -18,6 +18,7 @@ from scripts.check_adr_rules import (
     adrs,
     check,
     has_sensitivity,
+    index_gaps,
 )
 
 
@@ -119,3 +120,37 @@ def test_ci_picks_up_checkers_by_glob_not_by_hand():
     assert "for checker in scripts/check_*.py" in ci
     for named in ("scripts/check_doc_links.py", "scripts/check_adr_rules.py"):
         assert f"python {named}" not in ci, named
+
+
+# ── 색인 표에 줄이 빠진 것 (2026-10-24) ─────────────────────────────────────
+
+
+def test_the_index_lists_every_adr():
+    """**이 테스트가 막는 것이 실제로 일어났습니다** — 063·064·065가 색인에 없었습니다."""
+    assert index_gaps({number for number, _ in adrs()}) == []
+
+
+def test_an_adr_missing_from_the_index_is_named():
+    """파일을 쓰는 것과 색인에 줄을 넣는 것은 다른 동작입니다. 뒤쪽만 빠지기 쉽습니다."""
+    gaps = index_gaps({number for number, _ in adrs()} | {"777"})
+
+    assert len(gaps) == 1
+    assert "ADR-777" in gaps[0]
+    assert "줄이 없습니다" in gaps[0]
+
+
+def test_a_row_without_a_file_is_named_too():
+    """번호를 바꿨는데 표만 남으면 색인이 없는 파일을 가리킵니다."""
+    numbers = {number for number, _ in adrs()}
+    gaps = index_gaps(numbers - {"066"})
+
+    assert len(gaps) == 1
+    assert "ADR-066" in gaps[0]
+    assert "파일이 없습니다" in gaps[0]
+
+
+def test_the_index_documents_the_coverage_rule():
+    """검사기가 보는 규칙은 색인에도 적혀 있어야 합니다 - 코드에만 있으면 아무도 안 봅니다."""
+    index = (adrs()[0][1].parent / "README.md").read_text(encoding="utf-8")
+
+    assert "빠진 ADR이 없습니다" in index

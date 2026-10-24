@@ -223,6 +223,11 @@ def evaluate_case(
             row["graph_trace"] = {
                 key: trace[key] for key in ("visits", "seconds", "attempts", "total_seconds")
             }
+        # `generate` 노드 안쪽입니다 - 도구·모델·나머지(ADR-066). 보고서에 남기지 않으면
+        # 실행이 끝나는 순간 사라지고, 다시 보려면 **돈을 또 써야** 합니다.
+        inside = response.get("generate_trace")
+        if inside:
+            row["generate_trace"] = inside
     return row
 
 
