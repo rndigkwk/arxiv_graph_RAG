@@ -336,7 +336,7 @@ def test_a_wrong_dimension_is_refused_even_at_full_coverage():
 
 
 def test_papers_already_in_the_graph_are_not_counted():
-    """`MERGE_PAPER`의 SET이 `embedding`을 건드리지 않으므로 기존 논문은 그대로 갖고 있습니다."""
+    """`MERGE_PAPER`가 `coalesce`로 쓰므로 기존 논문은 갖고 있던 벡터를 그대로 둡니다."""
     rows = [{"arxiv_id": "a"}, {"arxiv_id": "b"}]
 
     check = ingest.plan_embeddings(rows, known_papers={"a", "b"})
@@ -345,9 +345,27 @@ def test_papers_already_in_the_graph_are_not_counted():
     assert check.coverage == 1.0 and check.ready
 
 
-def test_the_merge_statement_really_does_not_write_the_embedding():
-    """이 검사의 전제입니다. 적재문이 임베딩을 쓰게 되면 게이트가 필요 없어집니다."""
-    assert "embedding" not in ingest.MERGE_PAPER
+def test_the_merge_statement_writes_the_embedding_without_clobbering():
+    """2026-10-24까지 적재문은 `embedding`을 **아예 쓰지 않았습니다.**
+
+    그래서 `--embed`가 만든 벡터 934개가 조용히 버려지고 811편이 벡터 검색에 안 보이는
+    상태로 적재됐습니다. 지금은 씁니다 - 다만 `coalesce`로, 레코드가 가져왔을 때만.
+    그러지 않으면 임베딩 없이 돌린 평소 적재가 기존 벡터를 지웁니다.
+    """
+    assert "coalesce(row.embedding, p.embedding)" in ingest.MERGE_PAPER
+    for field in ("embedding_model", "embedding_dimensions", "embedding_input"):
+        assert f"coalesce(row.{field}, p.{field})" in ingest.MERGE_PAPER
+    # **레코드 쪽을 먼저 씁니다.** 순서가 뒤집히면 새 벡터가 들어가지 않습니다.
+    assert "coalesce(p.embedding, row.embedding)" not in ingest.MERGE_PAPER
+
+
+def test_the_upstream_gate_is_still_needed():
+    """적재문이 쓰게 됐어도 게이트가 필요합니다 - `--embed`는 기본이 아닙니다."""
+    rows = [{"arxiv_id": "a", "title": "t", "abstract": "b"}]
+
+    check = ingest.plan_embeddings(rows, known_papers=set())
+
+    assert not check.ready
 
 
 def test_the_upstream_check_shares_the_snapshot_gate_constants():

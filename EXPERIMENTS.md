@@ -3410,6 +3410,114 @@ uv run python scripts/measure_fold_authored.py --output reports/fold_authored.js
 
 Aura를 **읽기만** 합니다. 유료 API를 쓰지 않습니다.
 
+## 11-44. 임베딩 단계를 파이프라인 안으로 옮겼습니다 — 가드가 초록불인 채로 손상이 일어났습니다 (2026-10-24)
+
+파이프라인에 **수동 단계**가 하나 있었습니다. 가드의 오류 메시지가 그것을 직접 말합니다 —
+*"임베딩을 먼저 만드세요(notebooks/arxiv_ai_kg_to_aura.ipynb)."* 그런데 `plan_embeddings`는
+수집 레코드가 `embedding`을 갖고 있는지 **세기만** 하고, 그것을 **채우는 코드가 저장소에
+없었습니다.** 그래서 주간 크론은 적재를 끝까지 할 수 없었습니다
+([ADR-064](docs/adr/ADR-064-the-pipeline-cannot-finish-without-leaving-the-pipeline.md)).
+
+### 먼저 같은 벡터 공간인지 20편으로 쟀습니다
+
+`p.embedding_input`에는 `'title+abstract'`라는 **표찰**이 들어 있고 텍스트가 아닙니다. 형식이
+어긋나도 그래프를 봐서는 알 수 없으므로, 돈을 쓰기 전에 **저장된 벡터를 다시 만들어**
+비교했습니다. 일부러 틀린 형식(줄바꿈 둘 → 공백 하나)도 같이 쟀습니다.
+
+| | 값 | 바 |
+|---|---:|---|
+| 최소 코사인 (올바른 형식) | **<!--n:reports/embedding_space.json#min_cosine-->0.999986<!--/n-->** | ≥ 0.9999 **통과** |
+| 최대 코사인 (음성 대조군) | <!--n:reports/embedding_space.json#max_cosine_control-->0.989453<!--/n--> | 더 낮아야 함 **통과** |
+| 차이 | <!--n:reports/embedding_space.json#margin-->0.010533<!--/n--> | |
+
+**대조군이 없었다면 0.999986만 보고 "맞다"고 했을 것입니다.** 그 수가 형식 때문인지 모델이
+원래 비슷한 벡터를 주기 때문인지 구별할 수 없었습니다.
+
+### 그리고 가드가 초록불인 채로 손상이 일어났습니다
+
+934편을 임베딩하고($0.0351) 적재했습니다. 보고서는 `coverage: 1.0, ready: true`,
+`idempotent: true`였습니다. **그래프에는 811편이 임베딩 없이 들어갔습니다.**
+
+| | 그 자체로는 옳습니다 |
+|---|---|
+| `plan_embeddings`는 **수집 레코드**를 봅니다 | 적재 전에 막아야 하므로 상류에서 볼 수 있는 것을 봅니다 |
+| `MERGE_PAPER`는 `embedding`을 **쓰지 않았습니다** | 재적재가 갖고 있던 벡터를 지우지 않으려고 |
+
+> `--embed`가 레코드를 채우자 첫 번째가 `ready: true`라고 말했고, 두 번째가 그 값을
+> **버렸습니다. 가드는 의도를 재고 있었고 결과를 재지 않았습니다.**
+
+[ADR-047](docs/adr/ADR-047-the-loader-refuses-papers-the-vector-index-cannot-see.md)이 막으려고
+만든 바로 그 상태가 **그 가드가 초록불을 켠 채로** 만들어졌습니다.
+11-38절의 게이트 구멍과 같은 모양입니다 — 각각 타당한 두 결정의 **곱**이 구멍입니다.
+
+### 고친 것 셋
+
+1. **`MERGE_PAPER`가 `coalesce`로 씁니다.** 레코드가 가져왔을 때만 쓰고, 없으면 노드가 갖고
+   있던 것을 남깁니다. 두 요구를 동시에 만족합니다.
+2. **적재 뒤 되읽습니다.** 적재한 `arxiv_id`로 **그래프에** 물어보고 100%가 아니면
+   `stopped_at: "loaded_without_embeddings"`로 실패합니다. 상류 가드는 레코드를 보고, 이것은
+   결과를 봅니다 — 대신할 수 없습니다.
+3. **중복 지출을 막았습니다.** 첫 실행은 934편 중 **이미 그래프에 벡터가 있던 123편(13%)**
+   까지 임베딩했습니다.
+
+### 복구
+
+제목과 초록이 이미 노드에 있으므로 다시 수집하지 않았습니다 — `--backfill`이 채우고 되읽습니다.
+
+| | 값 |
+|---|---:|
+| 벡터가 없던 논문 | <!--n:reports/embedding_backfill.json#backfill.missing-->811<!--/n-->편 |
+| 채운 논문 | **<!--n:reports/embedding_backfill.json#backfill.upserted-->811<!--/n-->편** ($0.0305) |
+| 되읽은 뒤 남은 수 | **<!--n:reports/embedding_backfill.json#backfill.still_missing-->0<!--/n-->** |
+
+끝까지 확인했습니다 — 새 논문의 벡터로 인덱스를 조회하면 **자기 자신이 점수 1.0으로 1위**로
+돌아옵니다. 인덱스 세 개 전부 `ONLINE` 100%입니다.
+
+### 적재 결과와 남은 용량
+
+| | 적재 전 | 적재 후 | 한도 | 사용률 |
+|---|---:|---:|---:|---:|
+| 노드 | 149,025 | 151,627 | 200,000 | 0.758 |
+| **관계** | 338,366 | 343,126 | 400,000 | **0.858** |
+
+말뭉치가 37,854편 → **38,665편**입니다. 보강은 934편에서 참조 1,016건, **실패 0건**
+(dead letter 없음). 같은 배치를 두 번 적재해 수가 그대로임을 확인했습니다(`idempotent: true`).
+
+**스냅샷은 건드리지 않았습니다.** 평가는 고정된 스냅샷을 읽으므로 이 적재가 기존 수치를
+바꾸지 않습니다.
+
+### 값으로 치른 대가
+
+| | |
+|---|---:|
+| 벡터 공간 확인 | 약 $0.001 |
+| 첫 임베딩 (버려짐) | $0.0351 |
+| 복구 임베딩 | $0.0305 |
+| **합계** | **약 $0.066** (제대로 했다면 $0.0305) |
+
+버린 $0.0351이 이 결함의 값입니다. 그보다 큰 것은 **되읽기가 없었다면 811편이 조용히 안
+보이는 상태로 남았을 것**이라는 점입니다 — 앱은 돌고 질문 일부만 답을 못 찾습니다.
+
+### 지나가다 찾은 것
+
+`pipeline/ingest.py`가 `use_utf8_stdout()`을 부르지 않아 cp949 콘솔에서 `--help`가
+`UnicodeEncodeError`로 죽었습니다. AST만 읽는
+[`scripts/check_documented_commands.py`](scripts/check_documented_commands.py)는 `--help`를
+실제로 돌리지 않으므로 이 종류를 잡지 못합니다.
+
+### 재현
+
+```bash
+# 1단계: 돈을 쓰기 전에 벡터 공간이 같은지 확인합니다
+uv run python -m pipeline.embed --verify --output reports/embedding_space.json
+
+# 2단계: 수집 → 임베딩 → 적재. --embed는 --load 없이 쓸 수 없습니다(벡터가 버려집니다)
+uv run python -m pipeline.ingest --days 7 --embed --load --verify-idempotent --output reports/ingest_embedded.json
+
+# 벡터가 없는 논문을 채웁니다
+uv run python -m pipeline.embed --backfill --output reports/embedding_backfill.json
+```
+
 ## 13. 재현 방법
 
 ```bash
@@ -3518,6 +3626,9 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/ingest.json` | 11절 — 수집 시험 실행 |
 | `reports/ingest_weekly_window.json` | 11-42절 — 주 단위 창의 용량 여유 |
 | `reports/fold_authored.json` | 11-43절 — AUTHORED를 접은 뒤의 질의 지연 |
+| `reports/embedding_space.json` | 11-44절 — 새 임베딩이 같은 공간인지 |
+| `reports/embedding_backfill.json` | 11-44절 — 벡터 없는 논문의 복구 |
+| `reports/ingest_embedded.json` | 11-44절 — 수집·임베딩·적재 실행 |
 | `reports/variant_study_{graph,base}.json` | 11-1절 — 변형 비교 |
 | `reports/index_cost.json` | 11-2절 — 색인 비용과 커버리지 |
 | `reports/embedding_tuning.json` | 11-3절 — 어댑터와 격자 탐색 |
