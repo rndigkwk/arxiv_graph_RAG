@@ -92,7 +92,8 @@ def client() -> Any:
     load_env()
     key = (os.getenv("OPENAI_API_KEY") or "").strip()
     if not key:
-        raise ValueError(".env에 OPENAI_API_KEY가 없습니다")
+        # CI에는 .env가 없고 시크릿이 환경변수로 옵니다. 메시지가 한쪽만 가리키면 헤맵니다.
+        raise ValueError("OPENAI_API_KEY가 없습니다 (.env 또는 환경변수)")
     return OpenAI(api_key=key, timeout=60, max_retries=2)
 
 
