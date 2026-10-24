@@ -1,0 +1,207 @@
+{
+  "modes": {
+    "routed": {
+      "cases": 90,
+      "p50": 15.495,
+      "p90": 21.29,
+      "max": 42.51,
+      "nodes": [
+        {
+          "node": "generate",
+          "cases": 90,
+          "p50": 11.172,
+          "max": 37.696,
+          "sum": 1076.7,
+          "share": 0.728
+        },
+        {
+          "node": "check_conditions",
+          "cases": 90,
+          "p50": 4.352,
+          "max": 9.575,
+          "sum": 402.3,
+          "share": 0.272
+        },
+        {
+          "node": "route",
+          "cases": 90,
+          "p50": 0.0,
+          "max": 0.003,
+          "sum": 0.0,
+          "share": 0.0
+        },
+        {
+          "node": "collect",
+          "cases": 90,
+          "p50": 0.0,
+          "max": 0.0,
+          "sum": 0.0,
+          "share": 0.0
+        },
+        {
+          "node": "check_format",
+          "cases": 90,
+          "p50": 0.0,
+          "max": 0.0,
+          "sum": 0.0,
+          "share": 0.0
+        },
+        {
+          "node": "accept",
+          "cases": 90,
+          "p50": 0.0,
+          "max": 0.0,
+          "sum": 0.0,
+          "share": 0.0
+        },
+        {
+          "node": "revise",
+          "cases": 4,
+          "p50": 0.0,
+          "max": 0.0,
+          "sum": 0.0,
+          "share": 0.0
+        }
+      ],
+      "families": {
+        "author": {
+          "cases": 18,
+          "p50": 10.939,
+          "p90": 33.216,
+          "max": 38.467
+        },
+        "citing": {
+          "cases": 18,
+          "p50": 16.209,
+          "p90": 18.921,
+          "max": 19.217
+        },
+        "coauthor": {
+          "cases": 18,
+          "p50": 20.686,
+          "p90": 40.081,
+          "max": 42.51
+        },
+        "reference": {
+          "cases": 18,
+          "p50": 16.743,
+          "p90": 18.432,
+          "max": 18.557
+        },
+        "topcited": {
+          "cases": 18,
+          "p50": 11.969,
+          "p90": 15.012,
+          "max": 16.388
+        }
+      },
+      "heavy_share": 1.0,
+      "other_share": 0.0,
+      "shape_held": true
+    },
+    "resolve": {
+      "cases": 90,
+      "p50": 13.13,
+      "p90": 18.849,
+      "max": 38.966,
+      "nodes": [
+        {
+          "node": "generate",
+          "cases": 90,
+          "p50": 9.551,
+          "max": 36.318,
+          "sum": 943.6,
+          "share": 0.7378
+        },
+        {
+          "node": "check_conditions",
+          "cases": 90,
+          "p50": 3.691,
+          "max": 6.292,
+          "sum": 335.3,
+          "share": 0.2622
+        },
+        {
+          "node": "route",
+          "cases": 90,
+          "p50": 0.0,
+          "max": 0.007,
+          "sum": 0.0,
+          "share": 0.0
+        },
+        {
+          "node": "collect",
+          "cases": 90,
+          "p50": 0.0,
+          "max": 0.001,
+          "sum": 0.0,
+          "share": 0.0
+        },
+        {
+          "node": "check_format",
+          "cases": 90,
+          "p50": 0.0,
+          "max": 0.0,
+          "sum": 0.0,
+          "share": 0.0
+        },
+        {
+          "node": "accept",
+          "cases": 90,
+          "p50": 0.0,
+          "max": 0.0,
+          "sum": 0.0,
+          "share": 0.0
+        }
+      ],
+      "families": {
+        "author": {
+          "cases": 18,
+          "p50": 10.857,
+          "p90": 32.077,
+          "max": 38.966
+        },
+        "citing": {
+          "cases": 18,
+          "p50": 14.274,
+          "p90": 17.836,
+          "max": 22.203
+        },
+        "coauthor": {
+          "cases": 18,
+          "p50": 16.146,
+          "p90": 19.987,
+          "max": 24.109
+        },
+        "reference": {
+          "cases": 18,
+          "p50": 14.216,
+          "p90": 18.005,
+          "max": 19.503
+        },
+        "topcited": {
+          "cases": 18,
+          "p50": 10.686,
+          "p90": 12.788,
+          "max": 13.04
+        }
+      },
+      "heavy_share": 1.0,
+      "other_share": 0.0,
+      "shape_held": true
+    }
+  },
+  "adr_024": {
+    "recorded_p50": {
+      "author": 12.2,
+      "citing": 10.5,
+      "coauthor": 17.5,
+      "reference": 13.9,
+      "topcited": 11.5
+    },
+    "reproduced_by": [],
+    "reproducible": false,
+    "note": "ADR-024의 가족별 p50은 출처에 묶여 있지 않습니다. 저장소의 두 모드 어느 쪽으로도 재현되지 않으면 그 수는 덮여 쓰인 실행에서 나온 것입니다."
+  },
+  "not_measured": "generate 노드 **안쪽**. 도구 호출에 소요 시간이 기록되지 않아 번역·Cypher·벡터·모델 턴의 몫을 가를 수 없습니다."
+}
