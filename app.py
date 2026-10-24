@@ -73,6 +73,20 @@ MECHANISM_NODE_STYLE = {"cocitation": "dashed", "pagerank": "dashed", "embedding
 # 공유 인용자 수(정수)와 PPR 점수(확률)가 한 열에 섞이므로 지수 표기를 쓰지 않습니다.
 RELATED_COLUMN = {"점수": st.column_config.NumberColumn("점수", format="%.4f")}
 
+# StateGraph의 노드 이름(agent_graph.py)을 화면 말로 옮깁니다.
+NODE_LABEL = {
+    "route": "경로 판정", "generate": "답변 생성", "collect": "결과 수집",
+    "check_format": "형식·인용 검사", "check_conditions": "조건 검사",
+    "revise": "한 번 수정", "accept": "통과", "abstain": "보류",
+}
+# `generate` 안에 **번역·Text2Cypher·벡터 검색·모델 턴이 모두** 들어 있습니다. 도구 호출에
+# 소요 시간이 기록되지 않아 그 안을 가를 수 없으므로(ADR-065), 그 사실을 화면에 적습니다.
+# 적지 않으면 "답변 생성이 느리다"로 읽히는데, 사실은 "그 안의 무엇이 느린지 모른다"입니다.
+GENERATE_CONTAINS = "번역·Cypher·벡터·모델 턴 포함"
+# 11-46절이 기준선 90건에서 잰 값입니다. 이번 한 건만 보면 빠른지 느린지 알 수 없습니다.
+BASELINE_P50_SECONDS = 15.5
+BASELINE_MAX_SECONDS = 42.5
+
 
 def add_node(statements, node_id, label, shape="box", style="solid"):
     """이름의 따옴표와 줄바꿈을 보존해 노드 선언을 추가합니다."""
@@ -212,6 +226,42 @@ def show_abstention(diagnostics):
             st.caption("실행된 그래프 조회가 없습니다.")
 
 
+def latency_line(response):
+    """캡션 한 줄 — **합계와 실제로 시간을 쓴 노드**만. 0.00초 노드는 줄만 길게 합니다."""
+    trace = response.get("graph_trace") or {}
+    seconds = trace.get("seconds") or {}
+    if not seconds:
+        return ""
+    spent = sorted(((value, node) for node, value in seconds.items() if value >= 0.05),
+                   reverse=True)
+    parts = [f'지연 합계 {trace["total_seconds"]:.1f}초']
+    for value, node in spent[:2]:
+        label = NODE_LABEL.get(node, node)
+        note = f' ({GENERATE_CONTAINS})' if node == "generate" else ""
+        parts.append(f'{label} {value:.1f}초{note}')
+    if (trace.get("attempts") or 1) > 1:
+        # 재시도는 느린 답변의 흔한 이유입니다. 숨기면 합계만 보고 모델을 의심하게 됩니다.
+        parts.append(f'시도 {trace["attempts"]}회')
+    return " · ".join(parts)
+
+
+def latency_rows(response):
+    """노드별 표. **0.00초도 지우지 않습니다** - 공짜라는 것이 분해의 결론입니다."""
+    trace = response.get("graph_trace") or {}
+    seconds = trace.get("seconds") or {}
+    visits = trace.get("visits") or {}
+    rows = [{
+        "노드": NODE_LABEL.get(node, node),
+        "초": round(value, 2),
+        "방문": visits.get(node, 1),
+        "비고": GENERATE_CONTAINS if node == "generate" else "",
+    } for node, value in sorted(seconds.items(), key=lambda item: -item[1])]
+    if rows:
+        rows.append({"노드": "합계", "초": round(trace["total_seconds"], 2),
+                     "방문": sum(visits.values()) or len(rows), "비고": ""})
+    return rows
+
+
 def route_marks(response):
     """캡션 한 줄을 **호출 기록과 `ranked_by`에서** 만듭니다.
 
@@ -251,6 +301,8 @@ def route_marks(response):
 def show_response(chatbot, response, index):
     """실제 검색 방식, 답변, 검색 그래프, 상세 근거를 함께 보여줍니다."""
     st.caption(" | ".join(route_marks(response)))
+    if line := latency_line(response):
+        st.caption(line)
     for item in response["translations"]:
         st.caption(f'검색어 번역: {item["source_text"]} → {item["english"]}')
     show_answer(response, index)
@@ -280,11 +332,22 @@ def show_response(chatbot, response, index):
         st.caption("이번 검색에서 시각화할 논문이 없습니다.")
 
     with st.expander("검색 과정과 근거 확인"):
+        if rows := latency_rows(response):
+            st.write("노드별 소요 시간")
+            st.dataframe(rows, hide_index=True)
+            st.caption(
+                f"기준선 90건의 p50은 {BASELINE_P50_SECONDS}초, 최대 "
+                f"{BASELINE_MAX_SECONDS}초입니다(11-46절). **`답변 생성` 안쪽은 재지 "
+                "않았습니다** — 도구 호출에 소요 시간이 기록되지 않아 번역·Cypher·벡터·"
+                "모델 턴의 몫을 가를 수 없습니다. 0.00초인 노드는 실제로 공짜입니다."
+            )
         st.write("답변의 인용 arXiv ID:", response["evidence_ids"])
         tool_names = {"translate_to_english": "한국어→영어 번역",
                       "search_graph": "Text2Cypher 관계 조회",
                       "search_papers": "벡터 의미 검색",
-                      "rank_related_papers": "개인화 PageRank"}
+                      # 주 경로는 공동인용입니다(ADR-034·ADR-065). 보조 경로 이름으로
+                      # 부르지 않습니다.
+                      "rank_related_papers": "관련 논문 (공동인용·PageRank·임베딩)"}
         # 선택 여부와 순서는 실제 호출 기록에서 읽습니다.
         st.write("도구 요청 순서")
         for number, call in enumerate(response["tool_calls"], 1):
