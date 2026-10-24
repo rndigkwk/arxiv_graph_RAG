@@ -136,3 +136,86 @@ def test_the_related_tool_is_not_called_pagerank_in_the_process_panel():
 
     assert '"rank_related_papers": "개인화 PageRank"' not in code
     assert "공동인용" in code
+
+
+# ── ADR-066: 안쪽을 잰 뒤 ───────────────────────────────────────────────────
+
+
+def inside(**kwargs):
+    """`generate_trace`의 기본 모양. 앞 시도까지 합친 안쪽입니다."""
+    return {"generate_seconds": 35.0, "tools_seconds": 2.0, "tool_calls": 3,
+            "model_seconds": 28.0, "model_turns": 4, "unattributed_seconds": 0.0,
+            "other_seconds": 5.0, "adds_up": True, "stray_ends": 0, "attached": 3,
+            **kwargs}
+
+
+def test_the_split_replaces_the_disclaimer_when_the_inside_was_measured():
+    """**이 테스트가 ADR-066의 값입니다.** 괄호가 고백에서 분해로 바뀝니다."""
+    response = {**trace({"generate": 35.0}), "generate_trace": inside()}
+
+    line = app.latency_line(response)
+
+    assert "모델 28.0초 (4턴)" in line
+    assert "도구 2.0초 (3회)" in line
+    assert "그 외 5.0초" in line
+    assert app.GENERATE_CONTAINS not in line
+
+
+def test_the_disclaimer_comes_back_when_nothing_was_measured():
+    """옛 보고서와 콜백이 걸리지 않은 실행입니다. 빈칸보다 고백이 맞습니다."""
+    assert app.GENERATE_CONTAINS in app.latency_line(trace(FAST))
+    assert app.generate_split({}) == ""
+
+
+def test_a_decomposition_that_does_not_add_up_shows_no_numbers():
+    """잰 안쪽이 노드 시간보다 크면 두 번 센 것입니다. 수를 보여 주면 측정값처럼 읽힙니다."""
+    doubled = inside(model_seconds=35.0, other_seconds=-2.0, adds_up=False)
+
+    assert app.generate_split({"generate_trace": doubled}) == ""
+    assert app.GENERATE_CONTAINS in app.latency_line(
+        {**trace({"generate": 35.0}), "generate_trace": doubled})
+
+
+def test_a_call_whose_name_was_lost_is_not_folded_into_the_remainder():
+    """오류로 끝난 호출의 시간입니다. 숨기면 `그 외`가 그만큼 부풀어 보입니다."""
+    split = app.generate_split({"generate_trace": inside(unattributed_seconds=1.5,
+                                                         other_seconds=3.5)})
+
+    assert "이름 못 붙임 1.5초" in split
+    assert "그 외 3.5초" in split
+
+
+def test_the_node_table_carries_the_split_too():
+    rows = app.latency_rows({**trace({"generate": 35.0, "collect": 0.0}),
+                             "generate_trace": inside()})
+    generate = next(row for row in rows if row["노드"] == "답변 생성")
+
+    assert "모델 28.0초" in generate["비고"]
+
+
+def test_the_tool_table_leaves_an_unmeasured_call_blank():
+    """0초를 적으면 재지 못한 것을 공짜라고 말하게 됩니다."""
+    rows = app.tool_rows({"tool_calls": [
+        {"id": "a", "name": "search_graph", "status": "success", "seconds": 1.234},
+        {"id": "b", "name": "search_papers", "status": "success"},
+    ]})
+
+    assert [row["초"] for row in rows] == [1.23, None]
+    assert rows[0]["도구"] == "Text2Cypher 관계 조회"
+
+
+def test_the_tool_table_stays_empty_when_no_call_was_measured():
+    """옛 실행에서 초가 전부 빈 표를 띄우면 "재었는데 0"으로 보입니다."""
+    assert app.tool_rows({"tool_calls": [{"id": "a", "name": "search_graph"}]}) == []
+    assert app.tool_rows({}) == []
+
+
+def test_every_tool_the_agent_can_call_has_a_label():
+    """도구가 늘었는데 표찰이 없으면 화면에 함수 이름이 나옵니다."""
+    source = Path("chatbot.py").read_text(encoding="utf-8")
+    listed = source[source.index("tools=[") + len("tools=["):]
+    names = [name.strip() for name in listed[:listed.index("]")].split(",")]
+
+    assert len(names) >= 5, names
+    for name in names:
+        assert name in app.TOOL_LABEL, name

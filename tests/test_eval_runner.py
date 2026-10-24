@@ -325,3 +325,28 @@ def test_evaluate_case_omits_the_sort_key_when_no_query_declared_one():
     response = {"papers": [{"arxiv_id": "a"}], "evidence_ids": ["a"], "answer": "x"}
 
     assert "ordered_by" not in evaluate_case(case, response, mode="agent", top_k=5)
+
+
+def test_the_row_keeps_the_inside_of_generate():
+    """보고서에 남기지 않으면 실행이 끝나는 순간 사라지고, 다시 보려면 돈을 또 씁니다."""
+    inside = {"generate_seconds": 35.0, "tools_seconds": 2.0, "model_seconds": 28.0,
+              "other_seconds": 5.0, "adds_up": True, "tool_calls": 3, "model_turns": 4}
+    response = {"answer": "A", "evidence_ids": [], "rows": [], "papers": [],
+                "graph_trace": {"visits": {}, "seconds": {"generate": 35.0},
+                                "attempts": 1, "total_seconds": 35.0},
+                "generate_trace": inside}
+
+    row = evaluate_case({"id": "x", "category": "author", "expected_ids": ["1111.1111"]},
+                        response, mode="agent", top_k=5)
+
+    assert row["generate_trace"] == inside
+
+
+def test_an_old_run_without_the_inside_gets_no_empty_key():
+    """빈 값을 넣으면 "재었는데 0"으로 읽힙니다. 없는 것은 없는 대로 둡니다."""
+    response = {"answer": "A", "evidence_ids": [], "rows": [], "papers": []}
+
+    row = evaluate_case({"id": "x", "category": "author", "expected_ids": ["1111.1111"]},
+                        response, mode="agent", top_k=5)
+
+    assert "generate_trace" not in row

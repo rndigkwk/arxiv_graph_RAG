@@ -97,7 +97,12 @@
       },
       "heavy_share": 1.0,
       "other_share": 0.0,
-      "shape_held": true
+      "shape_held": true,
+      "inside_generate": {
+        "cases": 0,
+        "of": 90,
+        "note": "이 보고서들은 ADR-066 이전 실행입니다. 안쪽을 보려면 평가를 다시 돌려야 합니다."
+      }
     },
     "resolve": {
       "cases": 90,
@@ -188,7 +193,12 @@
       },
       "heavy_share": 1.0,
       "other_share": 0.0,
-      "shape_held": true
+      "shape_held": true,
+      "inside_generate": {
+        "cases": 0,
+        "of": 90,
+        "note": "이 보고서들은 ADR-066 이전 실행입니다. 안쪽을 보려면 평가를 다시 돌려야 합니다."
+      }
     }
   },
   "adr_024": {
@@ -203,5 +213,5 @@
     "reproducible": false,
     "note": "ADR-024의 가족별 p50은 출처에 묶여 있지 않습니다. 저장소의 두 모드 어느 쪽으로도 재현되지 않으면 그 수는 덮여 쓰인 실행에서 나온 것입니다."
   },
-  "not_measured": "generate 노드 **안쪽**. 도구 호출에 소요 시간이 기록되지 않아 번역·Cypher·벡터·모델 턴의 몫을 가를 수 없습니다."
+  "not_measured": "generate 노드 **안쪽**. 이 보고서들은 ADR-066 이전 실행이라 도구·모델 시간이 없습니다. 안쪽을 보려면 평가를 다시 돌려야 합니다."
 }

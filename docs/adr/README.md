@@ -14,6 +14,13 @@
 - **민감도를 적습니다.** "어떤 가정이 바뀌면 이 결론이 바뀌는가". 한 수치에 매달린 결정과
   여러 측정이 같은 방향을 가리키는 결정은 신뢰도가 다릅니다.
 - 설계를 바꿀 때 코드만 고치고 ADR을 빼놓지 않습니다.
+- **아래 목록에 빠진 ADR이 없습니다.** 파일은 썼는데 색인에 줄을 안 넣는 것이 가장 흔한
+  누락이고, 색인이 "무엇을 쓰는가"에 답하는 한 장이라 빠지면 그 한 장이 거짓이 됩니다.
+  [`scripts/check_adr_rules.py`](../../scripts/check_adr_rules.py)가 양방향으로 셉니다.
+
+> **2026-10-24 — 이 규칙도 글로만 있었습니다.** ADR-063·064·065가 색인에 없었습니다. 세 번
+> 연속 빠뜨리고도 아무것도 막지 않았고, 손으로 세어 보고 알았습니다. 이 저장소에서 손으로
+> 유지하는 목록이 조용히 갈라진 **일곱 번째**입니다 — 앞의 여섯처럼 검사기를 붙였습니다.
 
 ### 민감도 절의 제목 — 넷 중 하나를 씁니다
 
@@ -55,6 +62,8 @@
 | [ADR-003](ADR-003-snapshot-pinning.md) | 모델과 평가는 라이브 DB가 아니라 버전이 박힌 스냅샷만 읽는다 | 채택 |
 | [ADR-004](ADR-004-quality-gate-thresholds.md) | 품질 게이트 임계값을 실측값에 붙이지 않는다 | 채택 |
 | [ADR-005](ADR-005-reject-second-aura-account.md) | Aura Free 계정 추가로 용량을 늘리지 않는다 | 기각 |
+| [ADR-063](ADR-063-what-folding-authored-would-cost.md) | AUTHORED를 접는 값을 잰다 — 지연은 그 값의 일부일 뿐이었다 | 채택 |
+| [ADR-064](ADR-064-the-pipeline-cannot-finish-without-leaving-the-pipeline.md) | 파이프라인이 파이프라인 밖으로 나가야 끝난다 — 임베딩 단계를 안으로 가져온다 | 채택 |
 
 ### 검색과 순위
 
@@ -127,3 +136,5 @@
 | [ADR-049](ADR-049-no-local-embedding-clears-the-bar.md) | 로컬 임베딩 셋 다 바를 넘지 못했다 — 크기가 아무것도 사지 않았다 | 기각 |
 | [ADR-050](ADR-050-measure-the-cross-encoder-before-buying-the-host.md) | 교차 인코더를 호스팅을 사기 전에 잰다 — 바를 먼저 적는다 | 채택 |
 | [ADR-051](ADR-051-the-cross-encoder-loses-to-cosine.md) | 교차 인코더도 코사인을 못 이겼다 — 후보 풀은 핑계가 되지 않는다 | 기각 |
+| [ADR-065](ADR-065-say-how-each-paper-was-found.md) | 화면이 논문마다 어떻게 찾았는지 말한다 — 후보를 지우지 않는다 | 채택 |
+| [ADR-066](ADR-066-measure-inside-generate.md) | `generate` 안쪽을 잰다 — 괄호로 적어 둔 고백을 분해로 바꾼다 | 채택 |

@@ -79,10 +79,19 @@ NODE_LABEL = {
     "check_format": "형식·인용 검사", "check_conditions": "조건 검사",
     "revise": "한 번 수정", "accept": "통과", "abstain": "보류",
 }
-# `generate` 안에 **번역·Text2Cypher·벡터 검색·모델 턴이 모두** 들어 있습니다. 도구 호출에
-# 소요 시간이 기록되지 않아 그 안을 가를 수 없으므로(ADR-065), 그 사실을 화면에 적습니다.
-# 적지 않으면 "답변 생성이 느리다"로 읽히는데, 사실은 "그 안의 무엇이 느린지 모른다"입니다.
+# `generate` 안에 **번역·Text2Cypher·벡터 검색·모델 턴이 모두** 들어 있습니다. ADR-065까지는
+# 그 안을 가를 수 없어 이 말을 적었습니다 - 적지 않으면 "답변 생성이 느리다"로 읽히는데
+# 사실은 "그 안의 무엇이 느린지 모른다"였기 때문입니다. ADR-066이 안쪽을 재므로 이제는
+# **계측이 없을 때의 말**입니다(옛 보고서, 콜백이 걸리지 않은 실행).
 GENERATE_CONTAINS = "번역·Cypher·벡터·모델 턴 포함"
+# 안쪽을 잰 뒤의 말입니다. 모델 턴 하나의 안쪽(대기 대 생성)은 여전히 가를 수 없습니다.
+MODEL_TURN_OPAQUE = "모델 턴 하나의 안쪽은 재지 못합니다"
+TOOL_LABEL = {"translate_to_english": "한국어→영어 번역",
+              "search_graph": "Text2Cypher 관계 조회",
+              "search_papers": "벡터 의미 검색",
+              "resolve_paper": "제목으로 논문 특정",
+              # 주 경로는 공동인용입니다(ADR-034·ADR-065). 보조 경로 이름으로 부르지 않습니다.
+              "rank_related_papers": "관련 논문 (공동인용·PageRank·임베딩)"}
 # 11-46절이 기준선 90건에서 잰 값입니다. 이번 한 건만 보면 빠른지 느린지 알 수 없습니다.
 BASELINE_P50_SECONDS = 15.5
 BASELINE_MAX_SECONDS = 42.5
@@ -226,6 +235,27 @@ def show_abstention(diagnostics):
             st.caption("실행된 그래프 조회가 없습니다.")
 
 
+def generate_split(response):
+    """`답변 생성`을 모델·도구·나머지로 가른 한 마디. 못 가르면 빈 문자열입니다.
+
+    **`adds_up`이 false면 수를 적지 않습니다.** 잰 안쪽의 합이 노드 시간보다 크면 어딘가를
+    두 번 센 것이고, 그 상태로 숫자를 보여 주면 틀린 분해를 측정값처럼 읽게 됩니다.
+    """
+    inside = response.get("generate_trace") or {}
+    if not inside.get("adds_up", False):
+        return ""
+    if not inside.get("tool_calls") and not inside.get("model_turns"):
+        return ""
+    parts = [f'모델 {inside["model_seconds"]:.1f}초 ({inside["model_turns"]}턴)',
+             f'도구 {inside["tools_seconds"]:.1f}초 ({inside["tool_calls"]}회)']
+    if inside.get("unattributed_seconds", 0) >= 0.05:
+        # 오류로 끝난 호출입니다. 쓴 시간을 버리면 나머지가 그만큼 부풀어 보입니다.
+        parts.append(f'이름 못 붙임 {inside["unattributed_seconds"]:.1f}초')
+    # 나머지는 **뺀 값**입니다. 잰 것과 같은 자리에 두면서 이름으로 구분합니다.
+    parts.append(f'그 외 {max(inside["other_seconds"], 0.0):.1f}초')
+    return " · ".join(parts)
+
+
 def latency_line(response):
     """캡션 한 줄 — **합계와 실제로 시간을 쓴 노드**만. 0.00초 노드는 줄만 길게 합니다."""
     trace = response.get("graph_trace") or {}
@@ -234,10 +264,11 @@ def latency_line(response):
         return ""
     spent = sorted(((value, node) for node, value in seconds.items() if value >= 0.05),
                    reverse=True)
+    inside = generate_split(response)
     parts = [f'지연 합계 {trace["total_seconds"]:.1f}초']
     for value, node in spent[:2]:
         label = NODE_LABEL.get(node, node)
-        note = f' ({GENERATE_CONTAINS})' if node == "generate" else ""
+        note = f' ({inside or GENERATE_CONTAINS})' if node == "generate" else ""
         parts.append(f'{label} {value:.1f}초{note}')
     if (trace.get("attempts") or 1) > 1:
         # 재시도는 느린 답변의 흔한 이유입니다. 숨기면 합계만 보고 모델을 의심하게 됩니다.
@@ -250,16 +281,34 @@ def latency_rows(response):
     trace = response.get("graph_trace") or {}
     seconds = trace.get("seconds") or {}
     visits = trace.get("visits") or {}
+    inside = generate_split(response)
     rows = [{
         "노드": NODE_LABEL.get(node, node),
         "초": round(value, 2),
         "방문": visits.get(node, 1),
-        "비고": GENERATE_CONTAINS if node == "generate" else "",
+        "비고": (inside or GENERATE_CONTAINS) if node == "generate" else "",
     } for node, value in sorted(seconds.items(), key=lambda item: -item[1])]
     if rows:
         rows.append({"노드": "합계", "초": round(trace["total_seconds"], 2),
                      "방문": sum(visits.values()) or len(rows), "비고": ""})
     return rows
+
+
+def tool_rows(response):
+    """호출마다 몇 초였는지. **시간이 없는 호출은 빈칸으로 둡니다.**
+
+    0을 적으면 재지 못한 것을 공짜라고 말하게 됩니다. 앞 시도의 호출은 마지막 응답에 남아
+    있지 않으므로, 이 표의 합계는 `답변 생성`의 도구 몫보다 작을 수 있습니다.
+    """
+    calls = response.get("tool_calls") or []
+    if not any("seconds" in call for call in calls):
+        return []
+    return [{
+        "순서": number,
+        "도구": TOOL_LABEL.get(call["name"], call["name"]),
+        "초": round(call["seconds"], 2) if "seconds" in call else None,
+        "결과": call.get("status", ""),
+    } for number, call in enumerate(calls, 1)]
 
 
 def route_marks(response):
@@ -335,23 +384,37 @@ def show_response(chatbot, response, index):
         if rows := latency_rows(response):
             st.write("노드별 소요 시간")
             st.dataframe(rows, hide_index=True)
+            inside = response.get("generate_trace") or {}
+            note = (f"기준선 90건의 p50은 {BASELINE_P50_SECONDS}초, 최대 "
+                    f"{BASELINE_MAX_SECONDS}초입니다(11-46절). 0.00초인 노드는 실제로 "
+                    "공짜입니다. ")
+            if generate_split(response):
+                # 안쪽을 쟀습니다. 그래도 **뺀 값과 잰 값**을 섞어 말하지 않습니다.
+                note += (f"`답변 생성`의 모델·도구는 **잰 값**이고 `그 외`는 노드 시간에서 "
+                         f"뺀 나머지입니다 — 스트리밍·부분 JSON 파싱·직렬화가 거기 "
+                         f"있습니다(ADR-066). {MODEL_TURN_OPAQUE}.")
+            elif inside and not inside.get("adds_up", True):
+                # 두 번 센 상태입니다. 숫자를 보여 주는 것보다 틀렸다고 말하는 쪽이 낫습니다.
+                note += ("**`답변 생성` 안쪽의 분해가 맞지 않습니다** — 잰 안쪽의 합이 노드 "
+                         "시간보다 커서 어딘가를 두 번 셌습니다. 그래서 적지 않습니다.")
+            else:
+                note += ("**`답변 생성` 안쪽은 재지 않았습니다** — 번역·Cypher·벡터·모델 "
+                         "턴의 몫을 가를 수 없습니다.")
+            st.caption(note)
+        if calls := tool_rows(response):
+            st.write("도구 호출별 소요 시간")
+            st.dataframe(calls, hide_index=True)
             st.caption(
-                f"기준선 90건의 p50은 {BASELINE_P50_SECONDS}초, 최대 "
-                f"{BASELINE_MAX_SECONDS}초입니다(11-46절). **`답변 생성` 안쪽은 재지 "
-                "않았습니다** — 도구 호출에 소요 시간이 기록되지 않아 번역·Cypher·벡터·"
-                "모델 턴의 몫을 가를 수 없습니다. 0.00초인 노드는 실제로 공짜입니다."
+                "이번 시도의 호출만 나옵니다. 재시도가 있었으면 앞 시도의 호출 시간은 위 "
+                "`답변 생성`에만 들어 있습니다. 초가 빈칸이면 그 호출은 **재지 못한 것**이고 "
+                "공짜라는 뜻이 아닙니다."
             )
         st.write("답변의 인용 arXiv ID:", response["evidence_ids"])
-        tool_names = {"translate_to_english": "한국어→영어 번역",
-                      "search_graph": "Text2Cypher 관계 조회",
-                      "search_papers": "벡터 의미 검색",
-                      # 주 경로는 공동인용입니다(ADR-034·ADR-065). 보조 경로 이름으로
-                      # 부르지 않습니다.
-                      "rank_related_papers": "관련 논문 (공동인용·PageRank·임베딩)"}
         # 선택 여부와 순서는 실제 호출 기록에서 읽습니다.
         st.write("도구 요청 순서")
         for number, call in enumerate(response["tool_calls"], 1):
-            st.write(f'{number}. {tool_names.get(call["name"], call["name"])}')
+            spent = f' — {call["seconds"]:.2f}초' if "seconds" in call else ""
+            st.write(f'{number}. {TOOL_LABEL.get(call["name"], call["name"])}{spent}')
             if call["name"] == "translate_to_english":
                 st.write("번역할 문장:", call["args"].get("text", ""))
             elif call["name"] == "search_papers":
