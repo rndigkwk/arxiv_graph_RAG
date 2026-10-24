@@ -13,7 +13,7 @@
 
 ## 결정
 
-**BibTeX와 CSV로 내려받습니다.** 만드는 일은 [`citations.py`](../../citations.py)가 하고
+**BibTeX와 CSV로 내려받습니다.** 만드는 일은 [`citations.py`](../../src/citations.py)가 하고
 `app.py`는 버튼만 둡니다 — 나눠 두면 **접속도 Streamlit도 없이 테스트**됩니다
 (`quality_board.py`·`abstain.py`와 같은 선).
 

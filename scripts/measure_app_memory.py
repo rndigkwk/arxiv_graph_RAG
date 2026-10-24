@@ -96,7 +96,7 @@ def main() -> int:
         stages[f"imported:{name}"] = after
 
     if not args.skip_app:
-        import chatbot
+        from src import chatbot
 
         stages["chatbot_imported"] = resident_mb()
         chatbot.citation_graph()

@@ -44,7 +44,7 @@ def schema_json() -> str:
     `import chatbot`은 Aura와 OpenAI에 접속합니다. 토큰을 세는 데 접속이 필요하면 안 되므로
     모듈 본문에서 그 리터럴만 떼어 실행합니다.
     """
-    source = Path("chatbot.py").read_text(encoding="utf-8")
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
     start = source.index("graph_schema = {")
     end = source.index("\n}\n", start) + 3
     namespace: dict[str, Any] = {}
@@ -54,7 +54,7 @@ def schema_json() -> str:
 
 def tool_docs() -> dict[str, str]:
     """도구 설명도 호출마다 실립니다. 본문에서 docstring만 긁어 옵니다."""
-    source = Path("chatbot.py").read_text(encoding="utf-8")
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
     found = {}
     for name in TOOL_NAMES:
         match = re.search(rf"def {name}\(.*?\):\s+\"\"\"(.*?)\"\"\"", source, re.S)
@@ -63,7 +63,7 @@ def tool_docs() -> dict[str, str]:
 
 
 def fixed_payload(enc) -> dict[str, Any]:
-    import prompts
+    from src import prompts
 
     system = (
         prompts.AGENT_SYSTEM
@@ -89,7 +89,7 @@ def main() -> int:
     args = parser.parse_args()
 
     from pipeline.console import use_utf8_stdout
-    from routing import classify
+    from src.routing import classify
 
     use_utf8_stdout()
     enc = encoder()

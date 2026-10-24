@@ -298,7 +298,7 @@ def benchmark():
             print(name, report["queries"][name]["warm_p50_seconds"], flush=True)
     set_local_environment()
     sys.path.insert(0, str(ROOT))
-    import chatbot
+    from src import chatbot
 
     if chatbot.neo4j_uri != URI:
         raise ValueError("Application did not select the local database")

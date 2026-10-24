@@ -11,7 +11,7 @@
 
 import pytest
 
-from answer_validation import (
+from src.answer_validation import (
     log_validation_failure,
     self_reference_citations,
     validate_self_reference,

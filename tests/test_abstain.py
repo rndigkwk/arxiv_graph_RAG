@@ -14,8 +14,8 @@ from pathlib import Path
 
 import pytest
 
-from abstain import MISMATCH, REASONS, SLIP, STAGES, explain
-from answer_validation import _VALIDATION_REASON_CODES
+from src.abstain import MISMATCH, REASONS, SLIP, STAGES, explain
+from src.answer_validation import _VALIDATION_REASON_CODES
 
 ALL_CODES = [code for _, code in _VALIDATION_REASON_CODES]
 
@@ -82,7 +82,7 @@ def test_the_cyphers_are_shown_so_a_stop_is_not_mistaken_for_doing_nothing():
 
 def test_ask_still_raises_so_the_gate_baseline_stays_valid():
     """보류를 답변으로 바꾸면 하네스가 "답했다"로 세고 기준선이 무효가 됩니다."""
-    source = Path("chatbot.py").read_text(encoding="utf-8")
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
 
     assert "raise AnswerValidationError(" in source
     # 설명은 앱이 합니다. `chatbot`이 `abstain`을 가져오면 측정 경로에 표시 계층이 섞입니다.
@@ -91,7 +91,7 @@ def test_ask_still_raises_so_the_gate_baseline_stays_valid():
 
 def test_abstain_needs_no_streamlit_or_chatbot():
     """접속이나 UI 없이 전수 검사할 수 있어야 사유가 늘 때마다 확인됩니다."""
-    source = Path("abstain.py").read_text(encoding="utf-8")
+    source = Path("src/abstain.py").read_text(encoding="utf-8")
 
     for line in source.splitlines():
         stripped = line.strip()

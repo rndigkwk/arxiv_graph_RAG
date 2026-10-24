@@ -261,7 +261,7 @@ def test_neither_call_site_passes_anything_but_metadata():
     데이터가 아니므로, 서식 문자열에 "answer"가 있다고 막으면 안 됩니다. 막아야 하는 것은
     질문 문장·답변 본문·Cypher·조회한 행이 **값으로** 넘어가는 것입니다.
     """
-    calls = log_call_arguments("answer_validation.py") + log_call_arguments("chatbot.py")
+    calls = log_call_arguments("src/answer_validation.py") + log_call_arguments("src/chatbot.py")
 
     assert len(calls) == 3, [template for template, _ in calls]
     for template, arguments in calls:
@@ -271,7 +271,7 @@ def test_neither_call_site_passes_anything_but_metadata():
 
 def test_the_templates_name_the_event_and_the_fields():
     """`키=값`으로 적어야 나중에 세고 가를 수 있습니다. 산문으로 적으면 못 합니다."""
-    calls = log_call_arguments("answer_validation.py") + log_call_arguments("chatbot.py")
+    calls = log_call_arguments("src/answer_validation.py") + log_call_arguments("src/chatbot.py")
     events = {template.split()[0] for template, _ in calls}
 
     assert events == {

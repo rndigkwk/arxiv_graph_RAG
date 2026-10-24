@@ -98,7 +98,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=OUTPUT)
     args = parser.parse_args()
 
-    import chatbot
+    from src import chatbot
 
     raw = json.loads(args.cases.read_text(encoding="utf-8-sig"))
     cases = raw["cases"] if isinstance(raw, dict) else raw

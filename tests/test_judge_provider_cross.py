@@ -158,7 +158,7 @@ def test_the_openai_judge_refuses_a_model_the_app_does_not_use():
     # 이 경로만 앱의 모델 이름을 보므로 `chatbot`이 필요합니다. CI의 `test` job에는
     # `.env`가 없어 임포트가 실패합니다 - 저장소의 기존 관례대로 건너뛰고 적습니다.
     try:
-        import chatbot  # noqa: F401
+        from src import chatbot  # noqa: F401
     except Exception as exc:
         pytest.skip(f"chatbot을 가져올 수 없습니다: {type(exc).__name__}")
     with pytest.raises(SystemExit) as caught:
@@ -301,7 +301,7 @@ def test_the_live_prompt_digest_matches_what_the_baseline_pins():
 
 
 def test_a_candidate_prompt_is_swapped_in_and_recorded(tmp_path, monkeypatch):
-    import prompts
+    from src import prompts
 
     # **되돌립니다.** 이 함수는 모듈 전역을 바꾸므로 복구하지 않으면 다른 테스트로 샙니다.
     monkeypatch.setattr(prompts, "JUDGE_CONTENT", prompts.JUDGE_CONTENT)
@@ -314,7 +314,7 @@ def test_a_candidate_prompt_is_swapped_in_and_recorded(tmp_path, monkeypatch):
 
 
 def test_an_empty_candidate_prompt_is_refused(tmp_path, monkeypatch):
-    import prompts
+    from src import prompts
 
     monkeypatch.setattr(prompts, "JUDGE_CONTENT", prompts.JUDGE_CONTENT)
     path = tmp_path / "candidate.txt"
@@ -342,8 +342,8 @@ def test_the_final_split_is_still_unopened():
 
 def test_the_candidate_prompt_is_the_one_the_adr_measured():
     """ADR이 적은 지문과 파일이 갈라지면 둘 중 하나는 거짓말입니다."""
-    import prompts
     from pipeline.prompt_registry import digest
+    from src import prompts
 
     candidate = Path("evals/judge_prompts/judge-content-v4-parallel-title.txt")
     text = candidate.read_text(encoding="utf-8").strip()

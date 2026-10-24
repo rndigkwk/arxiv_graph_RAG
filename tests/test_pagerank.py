@@ -15,7 +15,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from pagerank import (
+from src.pagerank import (
     DAMPING,
     personalized,
     run_pagerank,

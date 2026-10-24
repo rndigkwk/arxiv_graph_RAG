@@ -10,12 +10,12 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-import prompts
 from pipeline.prompt_registry import DIGEST_LENGTH, digest, manifest
+from src import prompts
 
 ROOT = Path(__file__).resolve().parents[1]
 # 프롬프트가 들어 있던 두 모듈입니다. 다시 리터럴이 생기면 여기서 걸립니다.
-CONSUMERS = ("chatbot.py", "candidate_validation.py")
+CONSUMERS = ("src/chatbot.py", "src/candidate_validation.py")
 # 이 길이 아래의 문자열은 프롬프트가 아니라 오류 메시지나 라벨입니다.
 PROMPT_LIKE_LENGTH = 300
 
@@ -74,10 +74,10 @@ def test_no_long_prompt_literal_is_left_in_the_consuming_modules():
 
 
 def test_the_prompts_the_app_sends_come_from_this_module():
-    chatbot_source = (ROOT / "chatbot.py").read_text(encoding="utf-8")
+    chatbot_source = (ROOT / "src/chatbot.py").read_text(encoding="utf-8")
     assert "cypher_rules = prompts.CYPHER_RULES" in chatbot_source
     assert "prompts.AGENT_SYSTEM" in chatbot_source
-    candidate_source = (ROOT / "candidate_validation.py").read_text(encoding="utf-8")
+    candidate_source = (ROOT / "src/candidate_validation.py").read_text(encoding="utf-8")
     assert '("system", prompts.JUDGE_CONTENT)' in candidate_source
     assert "translate_system = prompts.TRANSLATE_TO_ENGLISH" in chatbot_source
     assert "korean_system = prompts.TRANSLATE_TO_KOREAN" in chatbot_source

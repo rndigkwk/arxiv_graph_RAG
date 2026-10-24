@@ -40,7 +40,7 @@
 
 Neo4j 전문 검색 인덱스를 만들고([`scripts/fulltext_index.py`](../../scripts/fulltext_index.py)),
 `resolve_paper` 도구가 그것을 씁니다. 고르는 규칙은 순수 모듈
-([`title_search.py`](../../title_search.py))에 둬서 접속 없이 전수 검사합니다.
+([`title_search.py`](../../src/title_search.py))에 둬서 접속 없이 전수 검사합니다.
 
 1. **부분문자열이 정확히 한 편이면 그것.** 짧은 구절에서 전문 검색을 이깁니다.
 2. **아니면 전문 검색 1위.**

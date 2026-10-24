@@ -4,8 +4,8 @@ import json
 
 from pydantic import BaseModel, Field
 
-import prompts
-from answer_validation import validate_mixed_candidates, validate_self_reference
+from src import prompts
+from src.answer_validation import validate_mixed_candidates, validate_self_reference
 
 
 class CandidateVerdict(BaseModel):

@@ -36,7 +36,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from title_search import query_coverage, title_coverage
+from src.title_search import query_coverage, title_coverage
 
 OUTPUT = Path("reports/title_resolution.json")
 CASES = Path("evals/cases_related.json")
@@ -174,7 +174,7 @@ def main() -> int:
     from pipeline.console import use_utf8_stdout
 
     use_utf8_stdout()
-    import chatbot
+    from src import chatbot
 
     cases = json.loads(args.cases.read_text(encoding="utf-8"))["cases"][: args.limit]
     rng = random.Random(SEED)

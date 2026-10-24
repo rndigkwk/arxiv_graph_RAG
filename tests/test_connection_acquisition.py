@@ -161,7 +161,7 @@ def test_the_report_says_what_it_did_not_measure(report):
 
 def test_the_code_comment_carries_the_floor():
     """42초가 ADR에만 있으면 코드를 고치는 사람이 못 봅니다(ADR-052 결정 2)."""
-    for path in ("chatbot.py", "pipeline/graph.py"):
+    for path in ("src/chatbot.py", "pipeline/graph.py"):
         source = Path(path).read_text(encoding="utf-8")
         assert "ADR-052" in source, path
         assert "42" in source, path

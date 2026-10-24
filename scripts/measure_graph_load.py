@@ -81,7 +81,7 @@ def main() -> int:
     from neo4j import Query
     from neo4j.api import READ_ACCESS
 
-    import chatbot
+    from src import chatbot
 
     queries = {
         "paper_rows": chatbot.PAPER_ROWS,

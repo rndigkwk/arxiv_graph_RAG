@@ -42,7 +42,7 @@ from typing import Any
 
 import numpy as np
 
-from title_search import AMBIGUITY_GAP, MIN_COVERAGE
+from src.title_search import AMBIGUITY_GAP, MIN_COVERAGE
 
 DATASET = Path("derived/title_disambiguation.jsonl")
 OUTPUT = Path("reports/title_disambiguation.json")

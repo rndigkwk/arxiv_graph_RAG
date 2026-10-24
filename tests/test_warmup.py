@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-import warmup
+from src import warmup
 
 
 def ticking(*values):

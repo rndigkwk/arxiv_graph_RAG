@@ -170,7 +170,7 @@ def main() -> int:
     args = parser.parse_args()
 
     cases = load_cases(CASES)
-    import chatbot
+    from src import chatbot
 
     if args.build:
         dataset = build(chatbot, cases[: args.limit] if args.limit else cases)

@@ -18,7 +18,7 @@ jobs:
       - run: uv lock --check
       - run: uv sync --locked --group dev
       - run: uv run --locked python -c "import networkx, plotly, streamlit"
-      - run: uv run --locked ruff check answer_validation.py candidate_validation.py cypher_validation.py prompts.py agent_graph.py tool_timing.py warmup.py routing.py abstain.py pagerank.py title_search.py forecast.py quality_board.py citations.py evals tests scripts pipeline models
+      - run: uv run --locked ruff check src app.py evals tests scripts pipeline models
       - run: uv run --locked python -m pytest -q
       # 검사기도 손으로 적지 않고 글로브로 넘깁니다. 두 줄짜리 목록에 세 번째
       # (`check_adr_rules.py`)를 더하려다 이것이 같은 병임을 알았습니다 - 아래 compileall과
@@ -28,7 +28,7 @@ jobs:
             echo "== $checker"
             uv run --locked python "$checker" || exit 1
           done
-      # 루트 모듈은 손으로 적지 않고 글로브로 넘깁니다. 손으로 적은 목록이 `forecast.py`·
-      # `quality_board.py`·`paper_library.py`를 이미 놓치고 있었습니다 - 이 저장소에서 손으로
-      # 적은 목록이 조용히 빠뜨린 다섯 번째 자리입니다(ADR-032·ADR-034).
-      - run: uv run --locked python -m compileall -q *.py evals scripts pipeline models
+      # 모듈이 src/로 들어가서 위의 ruff 줄에서 손 목록이 사라졌습니다(ADR-068). 전에는 그
+      # 목록이 `forecast.py`·`quality_board.py`·`paper_library.py`를 놓치고 있었고,
+      # `chatbot.py`와 `app.py`는 아예 검사 밖이었습니다 - 이제 둘 다 들어옵니다.
+      - run: uv run --locked python -m compileall -q app.py src evals scripts pipeline models

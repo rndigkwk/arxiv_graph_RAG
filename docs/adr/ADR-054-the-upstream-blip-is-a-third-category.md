@@ -25,7 +25,7 @@ ADR-044가 그 쪽에 대해 적어 둔 문장이 **이 경우에는 틀렸습�
 
 ## 왜 재시도되지 않았나
 
-[`chatbot.llm`](../../chatbot.py)이 `streaming=True`이고, 오류가 **열린 스트림 안에서**
+[`chatbot.llm`](../../src/chatbot.py)이 `streaming=True`이고, 오류가 **열린 스트림 안에서**
 왔습니다 — 스택이 `langchain_openai ... _stream_responses` → `openai/_streaming.py`의
 `__stream__` → `raise APIError`입니다.
 

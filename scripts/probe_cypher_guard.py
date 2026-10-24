@@ -48,7 +48,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from cypher_validation import (  # noqa: E402 - 경로를 먼저 넣어야 가져올 수 있습니다.
+from src.cypher_validation import (  # noqa: E402 - 경로를 먼저 넣어야 가져올 수 있습니다.
     READ_ONLY_QUERY_TYPE,
     check_external_io,
     refuse_unless_read_only,

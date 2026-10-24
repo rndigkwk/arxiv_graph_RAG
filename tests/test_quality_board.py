@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-import quality_board
+from src import quality_board
 
 BASELINE = Path("baselines/eval_baseline.json")
 
@@ -37,7 +37,7 @@ def test_the_board_does_not_import_streamlit():
     """화면과 읽기를 나눠 둬야 접속 없이 테스트할 수 있습니다."""
     import re
 
-    source = Path("quality_board.py").read_text(encoding="utf-8")
+    source = Path("src/quality_board.py").read_text(encoding="utf-8")
 
     assert not re.search(r"^\s*import streamlit", source, re.MULTILINE)
     assert not re.search(r"^\s*from streamlit", source, re.MULTILINE)

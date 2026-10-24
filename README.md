@@ -426,7 +426,7 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 
 **새로 재지 않습니다.** 기준선 파일과 커밋된 보고서를 읽어 모양만 바꿉니다 — 화면이 숫자를
 만들면 그 숫자의 출처가 화면 코드가 되고 되짚을 수 없습니다. 화면과 읽기를 나눠 둬
-([`quality_board.py`](quality_board.py)는 Streamlit을 가져오지 않습니다) **접속 없이
+([`quality_board.py`](src/quality_board.py)는 Streamlit을 가져오지 않습니다) **접속 없이
 테스트**합니다.
 
 **여유가 변동폭보다 좁은 하한을 세어 보여 줍니다.** 그런 하한은 품질이 아니라 운을 재기
@@ -436,16 +436,21 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 
 ```text
 .
-├── app.py                         # Streamlit 진입점 (네 탭)
-├── chatbot.py                     # 검색 도구 5개·에이전트·개인화 PageRank
-├── routing.py                     # 질문 유형으로 경로를 정하는 규칙
-├── abstain.py                     # 답하지 못한 이유를 사유 코드로 설명
-├── forecast.py                    # 승격된 가중치를 읽어 "함께 인용될 논문" 재정렬
-├── citations.py                   # 저장 목록 → BibTeX·CSV (Streamlit 미사용)
-├── quality_board.py               # 게이트·하한·기각 기록을 화면용으로 (Streamlit 미사용)
-├── paper_library.py               # 세션 논문 저장·비교 선택 처리
-├── gds_pagerank.py                # Aura Graph Analytics PageRank
-├── metagraph.py                  # 스키마·커뮤니티 시각화
+├── app.py                         # Streamlit 진입점 (네 탭). 루트에 남깁니다 - 배포가 이 경로를 가리킵니다
+├── src/                           # 앱이 쓰는 모듈 18개
+│   ├── chatbot.py                 # 검색 도구 5개·에이전트·개인화 PageRank
+│   ├── agent_graph.py             # 답변 흐름 StateGraph (노드별 소요 시간 추적)
+│   ├── routing.py                 # 질문 유형으로 경로를 정하는 규칙
+│   ├── abstain.py                 # 답하지 못한 이유를 사유 코드로 설명
+│   ├── forecast.py                # 승격된 가중치를 읽어 "함께 인용될 논문" 재정렬
+│   ├── citations.py               # 저장 목록 → BibTeX·CSV (Streamlit 미사용)
+│   ├── quality_board.py           # 게이트·하한·기각 기록을 화면용으로 (Streamlit 미사용)
+│   ├── paper_library.py           # 세션 논문 저장·비교 선택 처리
+│   ├── gds_pagerank.py            # Aura Graph Analytics PageRank
+│   ├── metagraph.py               # 스키마·커뮤니티 시각화
+│   ├── tool_timing.py             # generate 안쪽의 도구·모델 시간 (ADR-066)
+│   ├── warmup.py                  # 인용망을 배경에서 미리 올립니다 (ADR-067)
+│   └── ...                        # 프롬프트·검증·제목 검색·PageRank
 ├── APP_README.md                 # 앱 상세 문서
 ├── data/                         # JSONL 및 데모 이미지
 ├── notebooks/                    # 수집·적재·품질 분석 노트북

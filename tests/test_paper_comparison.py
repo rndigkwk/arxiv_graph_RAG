@@ -70,10 +70,10 @@ def chatbot_module():
         ),
     )
     with patches[0], patches[1], patches[2]:
-        sys.modules.pop("chatbot", None)
-        module = importlib.import_module("chatbot")
+        sys.modules.pop("src.chatbot", None)
+        module = importlib.import_module("src.chatbot")
         yield module
-        sys.modules.pop("chatbot", None)
+        sys.modules.pop("src.chatbot", None)
 
 
 def papers(*ids):

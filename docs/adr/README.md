@@ -139,3 +139,4 @@
 | [ADR-065](ADR-065-say-how-each-paper-was-found.md) | 화면이 논문마다 어떻게 찾았는지 말한다 — 후보를 지우지 않는다 | 채택 |
 | [ADR-066](ADR-066-measure-inside-generate.md) | `generate` 안쪽을 잰다 — 괄호로 적어 둔 고백을 분해로 바꾼다 | 채택 |
 | [ADR-067](ADR-067-warm-the-citation-graph-at-boot.md) | 인용망을 부팅 때 배경에서 올린다 — 첫 방문자가 15초를 혼자 내지 않는다 | 채택 |
+| [ADR-068](ADR-068-modules-live-in-src.md) | 모듈은 `src/`에 산다 — 손으로 적은 목록을 지우는 것이 목적이다 | 채택 |

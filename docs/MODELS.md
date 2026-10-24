@@ -11,10 +11,10 @@
 
 | 모델 | 어디서 | 무엇을 | 조정 방식 |
 |---|---|---|---|
-| **`gpt-6-luna`** (OpenAI chat) | [`chatbot.py`](../chatbot.py) — 에이전트, `translate_to_english`, 번역 버튼 | 도구 다섯 개를 가진 에이전트. 구조화 출력 `GroundedAnswer`(answer + evidence_ids) | **가중치 조정 없음.** 조정 대상은 프롬프트이고 MLflow에 버전으로 남깁니다([ADR-018](adr/ADR-018-prompt-versioning.md)) |
+| **`gpt-6-luna`** (OpenAI chat) | [`chatbot.py`](../src/chatbot.py) — 에이전트, `translate_to_english`, 번역 버튼 | 도구 다섯 개를 가진 에이전트. 구조화 출력 `GroundedAnswer`(answer + evidence_ids) | **가중치 조정 없음.** 조정 대상은 프롬프트이고 MLflow에 버전으로 남깁니다([ADR-018](adr/ADR-018-prompt-versioning.md)) |
 | **`text-embedding-3-large`** (768차원) | 같은 파일 — `search_papers`의 벡터 검색 | **질문만** 임베딩합니다. 논문 벡터는 적재 때 만든 것을 다시 쓰고 새로 만들지 않습니다 | 차원을 적재와 같은 768로 고정. 파인튜닝은 재고 기각했습니다(4절) |
 
-| **`graph-text-gbm`** (저장된 가중치 380KB) | [`forecast.py`](../forecast.py) — "앞으로 함께 인용될 논문" 패널 | 후보 50편을 재정렬합니다. **버튼을 눌러야 돕니다** | 학습은 오프라인. 앱은 지문을 맞춰 보고 읽기만 합니다([ADR-038](adr/ADR-038-the-forecast-panel.md)) |
+| **`graph-text-gbm`** (저장된 가중치 380KB) | [`forecast.py`](../src/forecast.py) — "앞으로 함께 인용될 논문" 패널 | 후보 50편을 재정렬합니다. **버튼을 눌러야 돕니다** | 학습은 오프라인. 앱은 지문을 맞춰 보고 읽기만 합니다([ADR-038](adr/ADR-038-the-forecast-panel.md)) |
 
 **답변 경로에는 자체 학습 모델이 없습니다.** 모델이 쓰이는 자리는 **표시 패널 하나**이고,
 에이전트 도구가 아니어서 게이트가 보는 지표에 닿지 않습니다. 그것이 결론이지 누락이
@@ -28,9 +28,9 @@
 | 방법 | 어디서 | 파라미터 | 왜 이것인가 |
 |---|---|---|---|
 | **공동 인용자 수 정렬**(Cypher) | `rank_related_papers` 1단계 | `shared_citers DESC`, DB에서 `top_k × 4`만 | recall@5 <!--n:reports/related_study.json#summary.cocited.recall_at_k-->0.8892<!--/n-->로 PPR의 2.2배([ADR-030](adr/ADR-030-related-papers-needs-a-query-not-a-model.md)·[ADR-034](adr/ADR-034-measure-every-eligible-seed.md)) |
-| **개인화 PageRank** | 같은 함수 2단계(보충), 분류별 추천 | damping 0.85 · 200회 · 허용오차 1e-11 | 공동인용이 다섯 칸을 못 채울 때만([`pagerank.py`](../pagerank.py)) |
+| **개인화 PageRank** | 같은 함수 2단계(보충), 분류별 추천 | damping 0.85 · 200회 · 허용오차 1e-11 | 공동인용이 다섯 칸을 못 채울 때만([`pagerank.py`](../src/pagerank.py)) |
 | **Lucene 전문 검색** | `resolve_paper` | 모호성 간격 0.10 · 커버리지 0.8 · 최소 단어 3자 | `CONTAINS`가 비슷한 제목에서 엉뚱한 논문을 집었습니다([ADR-028](adr/ADR-028-resolve-titles-with-a-fulltext-index.md)) |
-| **규칙 기반 라우팅** | [`routing.py`](../routing.py) | 어휘 단서 목록 | 모델 분류는 **기각** — 아끼려는 것이 토큰인데 분류가 토큰을 더 씁니다([ADR-024](adr/ADR-024-route-by-question-type.md)) |
+| **규칙 기반 라우팅** | [`routing.py`](../src/routing.py) | 어휘 단서 목록 | 모델 분류는 **기각** — 아끼려는 것이 토큰인데 분류가 토큰을 더 씁니다([ADR-024](adr/ADR-024-route-by-question-type.md)) |
 
 ## 3. 학습하고 등록까지 했지만 앱에 없는 것
 

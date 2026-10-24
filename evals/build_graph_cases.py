@@ -346,7 +346,7 @@ def build(snap: Snapshot) -> dict[str, Any]:
 
 def verify_against_db(dataset: dict[str, Any]) -> list[dict[str, Any]]:
     """Run each recorded Cypher on the live DB and compare it to the stored gold set."""
-    import chatbot
+    from src import chatbot
 
     findings = []
     for case in dataset["cases"]:

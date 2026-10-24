@@ -338,7 +338,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=OUTPUT)
     args = parser.parse_args()
 
-    import chatbot
+    from src import chatbot
 
     used = tuning_set(args.graph_cases, args.base_cases)
     cyphers = cypher_by_family(args.graph_cases)

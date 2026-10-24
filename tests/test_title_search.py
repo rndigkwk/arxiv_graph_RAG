@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import pytest
 
-from title_search import (
+from src.title_search import (
     AMBIGUITY_GAP,
     LUCENE_SPECIAL,
     MIN_COVERAGE,

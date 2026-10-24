@@ -51,13 +51,13 @@ from typing import Any
 
 import numpy as np
 
-import pagerank
 from evals.metrics import score_retrieval
 from models.embedding_tuning import adapter
 from models.link_prediction.train import parse_month
 from pipeline import features
 from pipeline import snapshot as snapshot_module
 from pipeline.snapshot import month_index
+from src import pagerank
 
 OUTPUT = Path("reports/related_study.json")
 CASES = Path("evals/cases_related.json")

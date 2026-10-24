@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 def measure(repeats: int) -> dict[str, Any]:
-    import chatbot
+    from src import chatbot
 
     cold: list[float] = []
     warm: list[float] = []

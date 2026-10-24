@@ -24,7 +24,7 @@ from pathlib import Path
 import pytest
 from langchain_core.messages import ToolMessage
 
-import tool_timing
+from src import tool_timing
 
 
 def ticking(*values):
@@ -348,7 +348,7 @@ def test_the_agent_stream_call_shape_carries_the_callbacks():
 
 def test_the_app_passes_the_recorder_into_the_stream():
     """계측이 죽는 가장 조용한 방법은 이 한 줄이 사라지는 것입니다."""
-    source = Path("chatbot.py").read_text(encoding="utf-8")
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
 
     assert "tool_timing.InsideGenerate()" in source
     assert 'config={"callbacks": list(callbacks)}' in source

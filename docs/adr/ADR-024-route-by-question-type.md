@@ -54,7 +54,7 @@ stored relationships"). **모델이 그 문장을 지키는지 아무도 세지 
 
 ## 결정
 
-[`routing.py`](../../routing.py)가 질문을 보고 경로를 정하고, [`agent_graph.py`](../../agent_graph.py)의
+[`routing.py`](../../src/routing.py)가 질문을 보고 경로를 정하고, [`agent_graph.py`](../../src/agent_graph.py)의
 `route` 노드가 그 판정을 그래프 안에 둡니다(ADR-022의 노드 중 여덟 번째).
 
 ### 도구를 빼앗지 않습니다

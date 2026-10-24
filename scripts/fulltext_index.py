@@ -86,7 +86,7 @@ def main() -> int:
     from pipeline.console import use_utf8_stdout
 
     use_utf8_stdout()
-    import chatbot
+    from src import chatbot
 
     names = [args.only] if args.only else list(CREATE)
     print("전:", json.dumps(status(chatbot), ensure_ascii=False))

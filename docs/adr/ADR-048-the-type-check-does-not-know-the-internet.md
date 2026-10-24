@@ -72,7 +72,7 @@ apoc.load.xml
 
 ## 결정 — 세 번째 겹은 **허용 목록**입니다
 
-[`cypher_validation.check_external_io`](../../cypher_validation.py)가 DB에 보내기 **전에**
+[`cypher_validation.check_external_io`](../../src/cypher_validation.py)가 DB에 보내기 **전에**
 정적으로 막습니다. 막을 것이면 왕복할 이유가 없습니다.
 
 - **`LOAD CSV`는 거부합니다.** 그래프 조회에 필요하지 않습니다.
