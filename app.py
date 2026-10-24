@@ -53,6 +53,26 @@ def ranking(code, limit, include_secondary, scope):
 # 점수가 1e-4 수준이라 기본 표시로는 전부 0.0000이 됩니다. 지수 표기로 보여 줍니다.
 SCORE_COLUMN = {"PageRank": st.column_config.NumberColumn("PageRank", format="%.3e")}
 
+# `rank_related_papers`는 공동인용으로 뽑고, 부족하면 개인화 PageRank, 그다음 임베딩으로
+# 채웁니다. 논문마다 `ranked_by`가 어느 쪽인지 말해 주는데(chatbot.py) **화면이 그것을 읽지
+# 않았습니다.** 그래서 캡션은 "개인화 PageRank: 선택됨"이라고만 적었고(주 경로는 공동인용입니다
+# - ADR-034), 임베딩이 채운 논문은 "벡터: 선택 안 됨"인 채로 그래프에 그려졌습니다.
+MECHANISM_LABEL = {
+    "cocitation": "공동인용", "pagerank": "개인화 PageRank",
+    "embedding": "임베딩 보충", "unknown": "분류 없음",
+}
+# 점수의 **단위가 메커니즘마다 다릅니다** - 공동인용은 공유 인용자 수(정수), PageRank는 확률,
+# 임베딩이 채운 논문은 둘 다 없어서 0.0입니다. 한 열에 "PageRank"라고 적으면 거짓이 됩니다.
+MECHANISM_UNIT = {
+    "cocitation": "공유 인용자 수", "pagerank": "PPR 점수",
+    "embedding": "점수 없음 (0.0)", "unknown": "",
+}
+# 근거로 인용된 논문과 후보를 테두리로 가릅니다. 후보를 지우지 않는 이유는 공동인용 결과가 이
+# 프로젝트가 재서 이긴 것이기 때문입니다(ADR-034, PPR의 2.2배).
+MECHANISM_NODE_STYLE = {"cocitation": "dashed", "pagerank": "dashed", "embedding": "dotted"}
+# 공유 인용자 수(정수)와 PPR 점수(확률)가 한 열에 섞이므로 지수 표기를 쓰지 않습니다.
+RELATED_COLUMN = {"점수": st.column_config.NumberColumn("점수", format="%.4f")}
+
 
 def add_node(statements, node_id, label, shape="box", style="solid"):
     """이름의 따옴표와 줄바꿈을 보존해 노드 선언을 추가합니다."""
@@ -87,14 +107,36 @@ def graph_ids(response):
 AUTHOR_LIMIT = 6
 
 
-def make_graph(subgraph):
-    """검색한 논문과 그 저자·인용 관계를 DOT 그래프로 반환합니다."""
+def found_by(response):
+    """관련 논문을 **어떤 메커니즘이** 올렸는지 셉니다. 값은 `ranked_by`에 이미 있습니다."""
+    counts = {}
+    for hit in response.get("related", []):
+        key = hit.get("ranked_by") or "unknown"
+        counts[key] = counts.get(key, 0) + 1
+    return counts
+
+
+def mechanism_of(response):
+    """arxiv_id → 그 논문을 올린 메커니즘. 근거로 인용된 논문은 여기 없습니다."""
+    return {hit["arxiv_id"]: hit.get("ranked_by") or "unknown"
+            for hit in response.get("related", [])}
+
+
+def make_graph(subgraph, mechanism=None):
+    """검색한 논문과 그 저자·인용 관계를 DOT 그래프로 반환합니다.
+
+    `mechanism`이 있으면 **근거로 인용된 논문과 후보를 테두리로 가릅니다.** 후보를 지우지
+    않습니다 - 공동인용으로 올라온 논문은 이 프로젝트가 재서 이긴 결과입니다(ADR-034).
+    지워야 할 것은 논문이 아니라 "어떻게 들어왔는지 말하지 않는 것"이었습니다.
+    """
+    mechanism = mechanism or {}
     statements = set()
     with_authors = len(subgraph["papers"]) <= AUTHOR_LIMIT
     for paper in subgraph["papers"]:
         label = (f'{fill(paper["title"], width=34)}\n'
                  f'{paper["arxiv_id"]} ({paper["primary_category"] or "분류 없음"})')
-        add_node(statements, paper["arxiv_id"], label)
+        add_node(statements, paper["arxiv_id"], label,
+                 style=MECHANISM_NODE_STYLE.get(mechanism.get(paper["arxiv_id"]), "solid"))
         if not with_authors:
             continue
         for name in paper["authors"]:
@@ -170,14 +212,45 @@ def show_abstention(diagnostics):
             st.caption("실행된 그래프 조회가 없습니다.")
 
 
+def route_marks(response):
+    """캡션 한 줄을 **호출 기록과 `ranked_by`에서** 만듭니다.
+
+    순수 함수로 뺀 이유는 이 줄이 두 가지를 거짓으로 적고 있었기 때문입니다 — 임베딩이
+    관련 논문을 채운 경우에도 "벡터 의미 검색: 선택 안 됨"이라고 썼고, 공동인용이 주
+    경로인 도구를 "개인화 PageRank: 선택됨"이라고만 불렀습니다. 테스트가 이 함수를
+    직접 봅니다.
+    """
+    used = {call["name"] for call in response["tool_calls"]}
+    found = found_by(response)
+    # **벡터는 두 길로 들어옵니다.** `search_papers` 호출과, `rank_related_papers`가 빈자리를
+    # 임베딩으로 채우는 경우입니다. 뒤쪽을 빼고 적어서 "선택 안 됨"이라고 쓰는 동안 임베딩이
+    # 올린 논문이 그래프에 그려졌습니다.
+    if "search_papers" in used and found.get("embedding"):
+        vector = f'선택됨 + 관련 논문 보충 {found["embedding"]}편'
+    elif "search_papers" in used:
+        vector = "선택됨"
+    elif found.get("embedding"):
+        vector = f'관련 논문 보충에만 {found["embedding"]}편'
+    else:
+        vector = "선택 안 됨"
+    # 이 도구를 "개인화 PageRank"로만 적으면 틀립니다 - 주 경로는 공동인용입니다(ADR-034).
+    if found:
+        related_mark = "관련 논문: " + " · ".join(
+            f'{MECHANISM_LABEL.get(key, key)} {count}편'
+            for key, count in sorted(found.items(), key=lambda item: -item[1]))
+    elif "rank_related_papers" in used:
+        related_mark = "관련 논문: 찾았지만 결과 없음"
+    else:
+        related_mark = "관련 논문: 선택 안 됨"
+    return [f'한국어→영어 번역: {"선택됨" if "translate_to_english" in used else "선택 안 됨"}',
+            f'벡터 의미 검색: {vector}',
+            f'Text2Cypher: {"선택됨" if "search_graph" in used else "선택 안 됨"}',
+            related_mark]
+
+
 def show_response(chatbot, response, index):
     """실제 검색 방식, 답변, 검색 그래프, 상세 근거를 함께 보여줍니다."""
-    used = {call["name"] for call in response["tool_calls"]}
-    marks = [f'한국어→영어 번역: {"선택됨" if "translate_to_english" in used else "선택 안 됨"}',
-             f'벡터 의미 검색: {"선택됨" if "search_papers" in used else "선택 안 됨"}',
-             f'Text2Cypher: {"선택됨" if "search_graph" in used else "선택 안 됨"}',
-             f'개인화 PageRank: {"선택됨" if "rank_related_papers" in used else "선택 안 됨"}']
-    st.caption(" | ".join(marks))
+    st.caption(" | ".join(route_marks(response)))
     for item in response["translations"]:
         st.caption(f'검색어 번역: {item["source_text"]} → {item["english"]}')
     show_answer(response, index)
@@ -187,12 +260,18 @@ def show_response(chatbot, response, index):
     except Exception as exc:
         subgraph = {"papers": [], "references": []}
         st.caption(f"그래프 조회 에러: {type(exc).__name__}. 답변과 근거는 그대로 확인할 수 있습니다.")
-    graph = make_graph(subgraph)
+    mechanism = mechanism_of(response)
+    graph = make_graph(subgraph, mechanism)
     if graph:
         st.write("검색된 그래프")
         st.graphviz_chart(graph, width="stretch")
         note = ("실선: 논문 사이의 REFERENCES 인용. 점선: 저장된 저자 표기 AUTHORED 연결. "
                 f"논문은 최대 {chatbot.MAX_GRAPH_NODES}개까지 그립니다.")
+        if mechanism:
+            # 후보가 섞여 있는데 테두리를 설명하지 않으면 "답변이 인용한 논문"으로 읽힙니다.
+            note += (" 테두리가 실선인 논문은 답변이 근거로 인용한 것이고, 파선은 공동인용·"
+                     "PageRank가 올린 후보, 점선은 임베딩이 채운 후보입니다 — 뒤의 둘은 "
+                     "답변이 인용하지 않았습니다.")
         if len(subgraph["papers"]) > AUTHOR_LIMIT:
             note = (f"실선: 논문 사이의 REFERENCES 인용. 논문이 {AUTHOR_LIMIT}편을 넘어 글자가 작아지지 "
                     "않도록 저자는 생략했습니다. 저자 수는 아래 표에서 확인하세요.")
@@ -228,14 +307,23 @@ def show_response(chatbot, response, index):
             st.write("Cypher 오류(에이전트가 다시 작성함):", message)
 
     if response.get("related"):
-        with st.expander("개인화 PageRank로 찾은 관련 논문"):
-            st.caption("질문한 논문에서 출발해 인용 관계를 따라 퍼뜨린 점수입니다. "
-                       "전체에서 유명한 논문이 아니라 그 논문 주변에서 중요한 논문입니다.")
+        with st.expander("관련 논문 — 공동인용 · PageRank · 임베딩"):
+            st.caption(
+                "먼저 **같은 논문에 함께 인용된** 횟수로 뽑고(ADR-034에서 개인화 PageRank의 "
+                "2.2배였습니다), 모자라면 개인화 PageRank, 그다음 임베딩으로 채웁니다. "
+                "**점수의 단위가 그래서 행마다 다릅니다** — 아래 '찾은 방법'과 '점수 단위'를 "
+                "같이 읽으세요. 답변이 근거로 인용한 논문과는 다릅니다."
+            )
             st.dataframe([{
-                "순위": hit["rank"], "PageRank": hit["score"], "arXiv ID": hit["arxiv_id"],
+                "순위": hit["rank"],
+                "찾은 방법": MECHANISM_LABEL.get(hit.get("ranked_by"), "분류 없음"),
+                "점수": hit["score"],
+                "점수 단위": MECHANISM_UNIT.get(hit.get("ranked_by"), ""),
+                "공유 인용자": hit.get("shared_citers"),
+                "arXiv ID": hit["arxiv_id"],
                 "제목": hit["title"], "대표 분류": hit["primary_category"],
                 "피인용": hit["cited_by"], "게재일": hit["published"][:10],
-            } for hit in response["related"]], hide_index=True, column_config=SCORE_COLUMN)
+            } for hit in response["related"]], hide_index=True, column_config=RELATED_COLUMN)
             seed_ids = [call.get("output", {}).get("seed_ids", [])
                         for call in response["tool_calls"]
                         if call.get("name") == "rank_related_papers"]
