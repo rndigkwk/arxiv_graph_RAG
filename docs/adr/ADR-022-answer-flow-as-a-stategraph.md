@@ -16,7 +16,7 @@
 ## 결정
 
 Day 50~53 교안의 `StateGraph`로 흐름을 세웁니다
-([`agent_graph.py`](../../agent_graph.py)). 노드는 일곱 개입니다.
+([`agent_graph.py`](../../src/agent_graph.py)). 노드는 일곱 개입니다.
 
 ```
 START → generate → collect → check_format ─(ok)→ check_conditions ─(ok)→ accept → END

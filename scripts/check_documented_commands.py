@@ -39,7 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 # 명령이 적히는 곳입니다. 마크다운과 **모듈 docstring** 둘 다 봅니다 - 오늘 틀린 쪽이
 # 후자였습니다.
 DOC_GLOBS = ("*.md", "docs/**/*.md")
-CODE_DIRS = ("pipeline", "evals", "scripts", "models")
+CODE_DIRS = ("src", "pipeline", "evals", "scripts", "models")
 # argparse가 언제나 받는 것.
 ALWAYS = frozenset({"--help"})
 # 우리 모듈이 아닌 것. 플래그를 검사할 파서가 없습니다.

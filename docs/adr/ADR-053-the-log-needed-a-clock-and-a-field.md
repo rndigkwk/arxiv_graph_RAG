@@ -71,7 +71,7 @@ Aura에 붙으므로 설정이 늦으면 앱이 뜰 때의 줄이 형식 없이 
 
 ### 2. 재시도 로그에 `seconds=`를 더합니다 — 이것이 실제 답입니다
 
-[`chatbot.read_with_retry`](../../chatbot.py)가 시도마다 걸린 초를 함께 적습니다. 그 한
+[`chatbot.read_with_retry`](../../src/chatbot.py)가 시도마다 걸린 초를 함께 적습니다. 그 한
 필드가 ADR-052의 42초 하한을 **관측 하나가 아니라 분포 위에** 세웁니다. 사고가 다시 나면
 `seconds=60.1`인지 `seconds=2.0`인지로 모드가 갈립니다.
 

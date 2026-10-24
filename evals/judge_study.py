@@ -95,8 +95,8 @@ def use_prompt(path: Path | None) -> dict[str, Any]:
     기준선과 다른 본문을 막고(설계상 그렇습니다), 탐색 중의 본문이 앱에 들어갑니다. 그래서
     후보는 **파일로** 두고 이 연구에서만 끼웁니다.
     """
-    import prompts
     from pipeline.prompt_registry import digest
+    from src import prompts
 
     if path is None:
         return {"source": "prompts.JUDGE_CONTENT",
@@ -141,13 +141,13 @@ def judge_for(provider: str, model: str) -> tuple[Any, str]:
     토큰 누적은 양쪽이 `candidate_validation.structured_judge`를 씁니다. 공급자별로 베껴 두면 한쪽만
     고쳐지고, **다른 방식으로 센 비용**을 같은 표에 올리게 됩니다.
     """
-    from candidate_validation import QuestionVerdict, structured_judge
+    from src.candidate_validation import QuestionVerdict, structured_judge
 
     if provider == "openai":
         # 앱의 모델을 쓰므로 여기서만 `chatbot`이 필요합니다. anthropic 쪽은 앱 자격증명
         # 없이도 만들어져야 합니다 - `chatbot`은 `.env`의 Neo4j·OpenAI 값이 없으면
         # 임포트 자체가 실패하고, CI의 `test` job에는 그 값이 없습니다.
-        import chatbot
+        from src import chatbot
 
         if model and model != chatbot.llm_model:
             raise SystemExit(
@@ -207,8 +207,7 @@ def judge_for(provider: str, model: str) -> tuple[Any, str]:
 def run(questions: list[dict[str, Any]], provider: str = "openai",
         model: str = "") -> tuple[list[dict[str, Any]], str]:
     """Call the judge once per question with real papers attached."""
-    import candidate_validation
-    import chatbot
+    from src import candidate_validation, chatbot
 
     make_judge, judge_model = judge_for(provider, model)
 

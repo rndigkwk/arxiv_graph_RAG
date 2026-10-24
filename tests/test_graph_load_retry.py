@@ -53,10 +53,10 @@ def read_with_retry(read, cypher, attempts=3, delay=0.0, sleep=lambda _: None,
 
 def real_source() -> str:
     """실물 `chatbot.read_with_retry`의 소스. **임포트하지 않고** 파싱만 합니다."""
-    tree = ast.parse(Path("chatbot.py").read_text(encoding="utf-8"))
+    tree = ast.parse(Path("src/chatbot.py").read_text(encoding="utf-8"))
     for node in tree.body:
         if isinstance(node, ast.FunctionDef) and node.name == "read_with_retry":
-            return ast.get_source_segment(Path("chatbot.py").read_text(encoding="utf-8"), node)
+            return ast.get_source_segment(Path("src/chatbot.py").read_text(encoding="utf-8"), node)
     raise AssertionError("chatbot.read_with_retry 를 찾지 못했습니다")
 
 

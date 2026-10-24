@@ -32,7 +32,7 @@ from pathlib import Path
 from statistics import fmean
 from typing import Any
 
-from cypher_validation import stringified_order_keys
+from src.cypher_validation import stringified_order_keys
 
 CASES = Path("evals/cases_graph.json")
 OUTPUT = Path("reports/order_study.json")
@@ -114,7 +114,7 @@ def main() -> int:
         if not cases:
             parser.error(f"{args.family} 유형의 케이스가 없습니다")
 
-    import chatbot
+    from src import chatbot
 
     rows: list[dict[str, Any]] = []
     for case in cases:

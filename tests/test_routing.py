@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from routing import ANY_ROUTE, GRAPH_ROUTE, classify
+from src.routing import ANY_ROUTE, GRAPH_ROUTE, classify
 
 RELATION_QUESTIONS = [
     "Which papers in this collection list an author named Yuquan Deng?",

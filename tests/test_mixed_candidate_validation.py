@@ -1,7 +1,7 @@
 import pytest
 
-from answer_validation import validate_mixed_candidates
-from candidate_validation import (
+from src.answer_validation import validate_mixed_candidates
+from src.candidate_validation import (
     CandidateVerdict,
     QuestionVerdict,
     assess_and_validate,

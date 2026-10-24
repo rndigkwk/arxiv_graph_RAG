@@ -10,7 +10,7 @@
 
 import pytest
 
-from cypher_validation import check_order_by, stringified_order_keys
+from src.cypher_validation import check_order_by, stringified_order_keys
 
 AGGREGATE = (
     'MATCH (p:ArxivPaper) WHERE p.primary_category = "cs.CV" '
@@ -100,7 +100,7 @@ def test_queries_without_ordering_pass(cypher):
 import json  # noqa: E402
 from pathlib import Path  # noqa: E402
 
-from cypher_validation import (  # noqa: E402
+from src.cypher_validation import (  # noqa: E402
     ALLOWED_PROCEDURES,
     READ_ONLY_QUERY_TYPE,
     check_external_io,
@@ -187,7 +187,7 @@ def test_only_a_read_plan_is_allowed_to_run():
 
 def test_the_app_runs_the_static_check_before_it_talks_to_the_database():
     """막을 질의를 보낼 이유가 없고, 유형 검사는 외부 입출력을 막지 못합니다."""
-    source = Path("chatbot.py").read_text(encoding="utf-8")
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
     body = source.split("def run_read(")[1].split("\ndef ")[0]
 
     assert "check_external_io(cypher)" in body

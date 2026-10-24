@@ -17,7 +17,7 @@ from pathlib import Path
 import networkx as nx
 import plotly.graph_objects as go
 
-import chatbot
+from src import chatbot
 
 REPORT_PATH = chatbot.root_dir / "reports" / "aura_graph_rag_quality_report.json"
 

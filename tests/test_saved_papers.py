@@ -1,7 +1,7 @@
 from streamlit.testing.v1 import AppTest
 
 import app
-from paper_library import add_paper, compare_selection, remove_paper
+from src.paper_library import add_paper, compare_selection, remove_paper
 
 
 def paper(paper_id, **values):

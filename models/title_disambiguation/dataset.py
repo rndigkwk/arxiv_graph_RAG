@@ -48,7 +48,7 @@ from typing import Any
 from pipeline import features
 from pipeline import snapshot as snapshot_module
 from pipeline.snapshot import Snapshot, month_index
-from title_search import MIN_WORD, escape_lucene, query_coverage, title_coverage, words
+from src.title_search import MIN_WORD, escape_lucene, query_coverage, title_coverage, words
 
 OUTPUT = Path("derived/title_disambiguation.jsonl")
 TITLE_INDEX = "arxiv_paper_title_fulltext"
@@ -137,7 +137,7 @@ def row_features(
 
 
 def collect(snap: Snapshot, *, papers: int, output: Path) -> dict[str, Any]:
-    import chatbot
+    from src import chatbot
 
     cache = features.Cache(snap)
     meta = {

@@ -46,7 +46,7 @@
 
 ### ① `EXPLAIN` 왕복이 빠졌습니다
 
-[`chatbot.run_read`](../../chatbot.py)는 질의마다 **두 문장**을 돌립니다 —
+[`chatbot.run_read`](../../src/chatbot.py)는 질의마다 **두 문장**을 돌립니다 —
 `EXPLAIN`(timeout <!--n:reports/connection_acquisition.json#explain_timeout_seconds-->15<!--/n-->)으로
 유형을 확인한 뒤 본 질의(timeout 30)를 돌립니다. ADR-015의 `3 × (60 + 30) + 6 = 276초`는
 그 15초를 빼놓았습니다.
@@ -106,7 +106,7 @@ ADR-015가 이것을 재지 않았고, 이것이 결정을 가릅니다. 닿지 
 
 ### 1. `connection_acquisition_timeout`을 낮추지 않습니다
 
-지금 코드는 이 값을 주지 않아 기본 60초입니다([`chatbot.py`](../../chatbot.py),
+지금 코드는 이 값을 주지 않아 기본 60초입니다([`chatbot.py`](../../src/chatbot.py),
 [`pipeline/graph.py`](../../pipeline/graph.py)). 그대로 둡니다. 측정은 "평상시에 60초가
 필요하지 않다"를 보였지만, **그 값은 평상시용이 아닙니다.**
 

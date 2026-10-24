@@ -627,7 +627,7 @@ def main() -> None:
     from pipeline.console import use_utf8_stdout
 
     use_utf8_stdout()
-    import chatbot
+    from src import chatbot
 
     rates = pricing_from_env(os.environ)
 

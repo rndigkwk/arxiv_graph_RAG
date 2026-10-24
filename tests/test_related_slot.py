@@ -124,8 +124,8 @@ def test_rerunning_a_subset_reproduces_the_report(report):
     """
     try:
         from evals.related_study import Graph, cocited_ranking, rank_by_score
-        from pagerank import personalized
         from pipeline import snapshot as snapshot_module
+        from src.pagerank import personalized
 
         snap = snapshot_module.latest()
         graph = Graph(snap)

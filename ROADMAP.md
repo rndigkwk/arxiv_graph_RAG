@@ -235,7 +235,7 @@ PageRank가 벡터 점수를 압도하지 않게 하는 것입니다.
 
 #### Day 50~53 — `ask()`를 StateGraph로 재구성 — ✅ 2026-10-18 완료
 
-[`agent_graph.py`](agent_graph.py)로 옮겼습니다(ADR-022). 노드 일곱 개 —
+[`agent_graph.py`](src/agent_graph.py)로 옮겼습니다(ADR-022). 노드 일곱 개 —
 `generate → collect → check_format → check_conditions → accept`, 실패하면 `revise`로 한 번
 돌아가고 그 뒤에는 `abstain`.
 
@@ -561,7 +561,7 @@ torch·로컬 임베딩 모델·Chroma가 없는 것이 차이입니다. 즉 **�
 - **GDS Community는 무료이고 PageRank·Leiden을 포함합니다**([GDS 문서](https://neo4j.com/docs/graph-data-science/current/introduction/)).
   제한은 동시성 4코어와 모델 카탈로그 3개이며 GPL v3입니다.
 
-두 번째가 이 프로젝트에 특히 큽니다. 지금 [`gds_pagerank.py`](gds_pagerank.py)와 품질 리포트의
+두 번째가 이 프로젝트에 특히 큽니다. 지금 [`gds_pagerank.py`](src/gds_pagerank.py)와 품질 리포트의
 Leiden은 **별도 Aura Graph Analytics 세션**을 띄워야 합니다. 자체 호스팅이면 DB 안에서 바로
 돌아갑니다. **유료 Aura로 올려도 이건 해결되지 않습니다.**
 
@@ -833,7 +833,7 @@ A가 768차원 임베딩을 텍스트 피처로 쓰므로, 임베딩 없는 논�
 결함을 하나 더 찾았습니다. 집계 순위 질문에서 에이전트가 피인용 수를 `toString()`으로 감싼 뒤
 그 값으로 정렬해, 문자열 순서에서 **9가 88보다 위로** 올라갔습니다. 질의가 성공하면서 순위만
 조용히 틀어지는 종류입니다. 프롬프트 규칙으로 47.1% → 5.9%, 실행 전 Cypher 검사
-([`cypher_validation.py`](cypher_validation.py))로 **0%**까지 내렸습니다. `topcited` 유형 6건을
+([`cypher_validation.py`](src/cypher_validation.py))로 **0%**까지 내렸습니다. `topcited` 유형 6건을
 3회씩 돌린 측정에서 근거 recall 0.519 → **1.000**([`evals/order_study.py`](evals/order_study.py)).
 
 세 번째 결함은 `coauthor` 유형을 18회 반복하다 찾았습니다. 질문이 "**other** papers"라고 제외를
@@ -1171,7 +1171,7 @@ Correctness는 쓰지 않습니다 — 전자는 골드 ID로 이미 정확히 �
 
 ### 11-6. Day 56 — 재시도 예산과 fork
 
-[`chatbot.read_with_retry`](chatbot.py)가 교안 4·5절의 구현입니다. 우리에게 없는 것은 두 개입니다.
+[`chatbot.read_with_retry`](src/chatbot.py)가 교안 4·5절의 구현입니다. 우리에게 없는 것은 두 개입니다.
 
 - ~~**겹친 재시도**~~ — 2026-10-16에 계산했습니다(ADR-015). 세 층은 한 경로에서 겹치지
   않고, 앱 경로의 지배 항은 우리 재시도가 아니라 드라이버의 연결 획득 60초였습니다. PageRank

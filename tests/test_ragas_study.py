@@ -307,7 +307,7 @@ def test_the_default_judge_model_matches_the_app():
 
     from evals.ragas_study import DEFAULT_MODEL
 
-    source = (Path(__file__).resolve().parents[1] / "chatbot.py").read_text(encoding="utf-8")
+    source = (Path(__file__).resolve().parents[1] / "src/chatbot.py").read_text(encoding="utf-8")
     app_default = None
     for node in ast.walk(ast.parse(source)):
         if (

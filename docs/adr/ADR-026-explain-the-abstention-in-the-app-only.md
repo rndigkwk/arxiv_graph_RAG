@@ -27,7 +27,7 @@
 
 **표시 계층만 바꿉니다.**
 
-- [`abstain.py`](../../abstain.py)가 사유 코드를 사람 말로 바꿉니다. Streamlit도 `chatbot`도
+- [`abstain.py`](../../src/abstain.py)가 사유 코드를 사람 말로 바꿉니다. Streamlit도 `chatbot`도
   가져오지 않는 순수 모듈이어서 열 가지 사유를 **접속 없이 전수 검사**합니다.
 - [`app.py`](../../app.py)의 `show_abstention()`이 그것을 렌더합니다 — 보류했다는 선언, 왜
   멈추는지, 무엇이 걸렸는지, 해 볼 것, 그리고 접은 "검사 기록"에 단계·시도 수·요청 ID와

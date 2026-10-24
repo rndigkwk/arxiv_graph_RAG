@@ -212,7 +212,7 @@ def test_the_tool_table_stays_empty_when_no_call_was_measured():
 
 def test_every_tool_the_agent_can_call_has_a_label():
     """도구가 늘었는데 표찰이 없으면 화면에 함수 이름이 나옵니다."""
-    source = Path("chatbot.py").read_text(encoding="utf-8")
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
     listed = source[source.index("tools=[") + len("tools=["):]
     names = [name.strip() for name in listed[:listed.index("]")].split(",")]
 

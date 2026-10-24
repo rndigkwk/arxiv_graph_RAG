@@ -21,7 +21,7 @@ from datetime import timedelta
 
 import requests
 
-import chatbot
+from src import chatbot
 
 AURA_API = "https://api.neo4j.io"
 DEFAULT_SESSION_NAME = "arxiv_graphrag"

@@ -1753,7 +1753,7 @@ Cypher 근거" 순서로 이어 붙이기 때문에, 벡터가 상위 다섯 칸
 `citing`은 질문이 "the paper **titled** X"라고 적어 줘서 0.11인데, `coauthor`
 ("share an author with X")와 `reference`("the papers cited by X")는 그 단서가 없습니다.
 
-**결론.** 경로 선택을 코드로 옮겼습니다([`routing.py`](routing.py), ADR-024). 도구를
+**결론.** 경로 선택을 코드로 옮겼습니다([`routing.py`](src/routing.py), ADR-024). 도구를
 빼앗지는 않고 그 턴에 지시만 붙입니다 — 좁히면 안 되는 질문을 좁히는 대가가 토큰보다
 비싸기 때문입니다.
 
@@ -3726,7 +3726,7 @@ uv run python -m pipeline.embed --backfill --output reports/embedding_backfill.j
 LangChain 콜백이 도구와 모델의 시작·끝을 알려 주고, **도구의 끝에는 `ToolMessage`가 따라와
 `tool_call_id`를 들고 있습니다.** 그래서 어느 호출인지 정확히 붙일 수 있습니다. 도구 5개의
 서명을 고치지 않았고, 모델에게 보이는 인자도 늘지 않았습니다 — 도구가 늘어도 계측을 다시
-손대지 않습니다([`tool_timing.py`](tool_timing.py)).
+손대지 않습니다([`tool_timing.py`](src/tool_timing.py)).
 
 **호출 순서로 짝짓지 않은 것이 이 구현의 핵심입니다.** 한 모델 턴이 도구를 여러 개 부르면
 LangGraph가 그것들을 스레드로 나눠 돌립니다. 순서로 짝지으면 겹친 두 호출이 **서로의 시간을
@@ -3845,7 +3845,7 @@ Streamlit Community Cloud는 앱을 재웁니다. 포트폴리오를 보러 온 
 한 질문을 던지고 떠납니다.** 즉 지금까지 보여 온 수는 22.7초가 아니라 46.9초였습니다.
 
 그래서 홈 화면을 그리기 전에 배경 스레드에서 미리 짓습니다
-([`warmup.py`](warmup.py), [ADR-067](docs/adr/ADR-067-warm-the-citation-graph-at-boot.md)).
+([`warmup.py`](src/warmup.py), [ADR-067](docs/adr/ADR-067-warm-the-citation-graph-at-boot.md)).
 
 ### 빨라지는 것이 아니라 겹쳐지는 것입니다 — 그리고 그것을 적습니다
 

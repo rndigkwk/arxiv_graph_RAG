@@ -1012,7 +1012,7 @@ cs.SE의 `95, 9, 8`이 그 분류의 문자열 내림차순과 정확히 일치�
 프롬프트 규칙만으로는 47.1%에서 5.9%로 줄었을 뿐 0이 되지 않았습니다. **프롬프트는 권고이고
 검사는 강제이므로**, 남은 경우는 실행 전에 막기로 했습니다.
 
-[`cypher_validation.py`](cypher_validation.py)가 `toString(x) AS alias`로 문자열이 된 별칭을
+[`cypher_validation.py`](src/cypher_validation.py)가 `toString(x) AS alias`로 문자열이 된 별칭을
 찾고, 그 별칭이 `ORDER BY`에 쓰였는지 봅니다. 쓰였으면 `search_graph`가 실행하지 않고 오류를
 돌려주며, 에이전트는 다른 Cypher 오류와 같은 경로로 한 번 고쳐 다시 호출합니다.
 

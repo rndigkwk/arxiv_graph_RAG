@@ -25,9 +25,9 @@ import json
 from pathlib import Path
 from typing import Any
 
-import prompts
 from pipeline.console import use_utf8_stdout
 from pipeline.tracking import EXPERIMENT, load_env
+from src import prompts
 
 MANIFEST = Path("reports/prompt_versions.json")
 # 지문은 짧게 적습니다. 보고서에서 눈으로 비교할 수 있는 길이면 충분하고, 충돌을 막는 것이
@@ -74,7 +74,7 @@ def register(alias: str = "production", message: str = "") -> dict[str, Any]:
                 name=prompt_name,
                 template=text,
                 commit_message=message or f"{name} {fingerprint}",
-                tags={"sha256": fingerprint, "source": "prompts.py"},
+                tags={"sha256": fingerprint, "source": "src/prompts.py"},
             )
             mlflow.genai.set_prompt_alias(prompt_name, alias=alias, version=version.version)
             results[name] = {"sha256": fingerprint, "version": version.version,

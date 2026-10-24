@@ -228,7 +228,7 @@ def main() -> int:
     if args.limit:
         cases = cases[: args.limit]
 
-    import chatbot
+    from src import chatbot
 
     snap = snapshot_module.latest()
     graph = snapshot_citation_graph(chatbot, snap)

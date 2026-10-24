@@ -10,7 +10,7 @@
 
 import pytest
 
-from answer_validation import reason_code
+from src.answer_validation import reason_code
 
 
 class AnswerValidationError(ValueError):

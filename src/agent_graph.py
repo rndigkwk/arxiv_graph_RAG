@@ -30,7 +30,7 @@ from typing import Any, Callable, TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
-import routing
+from src import routing
 
 # 한 질문에 허용하는 생성 시도 횟수입니다. 손으로 쓴 루프의 `range(2)`와 같은 값입니다.
 MAX_ATTEMPTS = 2

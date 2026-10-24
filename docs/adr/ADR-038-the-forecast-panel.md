@@ -20,7 +20,7 @@
 
 ## 결정
 
-[`forecast.py`](../../forecast.py)와 `chatbot.forecast_cocitation()`, 그리고 앱의 접힌 패널
+[`forecast.py`](../../src/forecast.py)와 `chatbot.forecast_cocitation()`, 그리고 앱의 접힌 패널
 하나입니다.
 
 - **관련 논문 패널과 섞지 않습니다.** 두 패널이 다른 질문에 답하고, 섞으면 사용자가 무엇을

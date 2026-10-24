@@ -136,18 +136,20 @@ CI는 앱 의존성 없이 `uvx --with neo4j --with requests`로 돌립니다. �
 
 ### 모듈 구성
 
+**`app.py`만 루트에 있고 나머지는 `src/`에 있습니다**([ADR-068](docs/adr/ADR-068-modules-live-in-src.md)). 배포가 `app.py` 경로를 가리키고 있어 그 파일만 자리를 지킵니다.
+
 | 파일 | 역할 | 로드 시점 |
 |---|---|---|
-| [`chatbot.py`](chatbot.py) | 연결·인덱스 확인 → 도구 5개 → 에이전트 → 답변 검증 → PageRank 계산 | 앱 시작 시 1회 |
+| [`chatbot.py`](src/chatbot.py) | 연결·인덱스 확인 → 도구 5개 → 에이전트 → 답변 검증 → PageRank 계산 | 앱 시작 시 1회 |
 | [`app.py`](app.py) | 네 탭의 화면 구성과 상태 관리 | 매 렌더 |
-| [`routing.py`](routing.py) | 질문 유형으로 경로를 정합니다. 모델이 고르게 두면 부르고도 결과를 안 쓰는 호출이 생겼습니다 | 질문마다 |
-| [`abstain.py`](abstain.py) | 답하지 못한 이유를 사유 코드로 바꿉니다 | 보류가 났을 때만 |
-| [`forecast.py`](forecast.py) | 승격된 가중치를 파일에서 읽어 "함께 인용될 논문"을 재정렬합니다 | 예측 패널을 열 때만 |
-| [`citations.py`](citations.py) | 저장 목록을 BibTeX·CSV 문자열로 만듭니다(Streamlit 미사용) | 내려받기 버튼을 그릴 때 |
-| [`quality_board.py`](quality_board.py) | 기준선·보고서를 읽어 품질 게이트 탭의 표를 만듭니다(Streamlit 미사용) | 품질 게이트 탭 렌더 시 |
-| [`paper_library.py`](paper_library.py) | 세션 저장 논문 중복 제거·상한·비교 선택 검증 | 저장 목록 사용 시 |
-| [`metagraph.py`](metagraph.py) | 홈 탭의 Plotly 메타그래프(스키마·커뮤니티) | 홈 탭 렌더 시 |
-| [`gds_pagerank.py`](gds_pagerank.py) | (선택) Aura Graph Analytics 세션 PageRank 엔진 | GDS 엔진을 고를 때만 |
+| [`routing.py`](src/routing.py) | 질문 유형으로 경로를 정합니다. 모델이 고르게 두면 부르고도 결과를 안 쓰는 호출이 생겼습니다 | 질문마다 |
+| [`abstain.py`](src/abstain.py) | 답하지 못한 이유를 사유 코드로 바꿉니다 | 보류가 났을 때만 |
+| [`forecast.py`](src/forecast.py) | 승격된 가중치를 파일에서 읽어 "함께 인용될 논문"을 재정렬합니다 | 예측 패널을 열 때만 |
+| [`citations.py`](src/citations.py) | 저장 목록을 BibTeX·CSV 문자열로 만듭니다(Streamlit 미사용) | 내려받기 버튼을 그릴 때 |
+| [`quality_board.py`](src/quality_board.py) | 기준선·보고서를 읽어 품질 게이트 탭의 표를 만듭니다(Streamlit 미사용) | 품질 게이트 탭 렌더 시 |
+| [`paper_library.py`](src/paper_library.py) | 세션 저장 논문 중복 제거·상한·비교 선택 검증 | 저장 목록 사용 시 |
+| [`metagraph.py`](src/metagraph.py) | 홈 탭의 Plotly 메타그래프(스키마·커뮤니티) | 홈 탭 렌더 시 |
+| [`gds_pagerank.py`](src/gds_pagerank.py) | (선택) Aura Graph Analytics 세션 PageRank 엔진 | GDS 엔진을 고를 때만 |
 
 `chatbot.py`는 함수를 정의한 뒤 마지막 준비 코드에서 드라이버·검색기·에이전트를 한 번 만들고,
 `app.py`의 `@st.cache_resource`가 이 모듈을 브라우저 세션 사이에 재사용합니다.
@@ -378,7 +380,7 @@ GDS 엔진을 고르면 이 행렬을 아예 만들지 않고 필요한 수치�
 
 **새로 재지 않습니다.** 기준선 파일과 이미 커밋된 보고서를 읽어 모양만 바꿉니다 — 화면이 숫자를
 만들기 시작하면 그 숫자의 출처가 화면 코드가 되고, 되짚을 수 없게 됩니다. 읽기는
-[`quality_board.py`](quality_board.py)가 하고 이 탭은 그리기만 합니다. 그 모듈은 Streamlit을
+[`quality_board.py`](src/quality_board.py)가 하고 이 탭은 그리기만 합니다. 그 모듈은 Streamlit을
 가져오지 않으므로 **접속도 화면도 없이 테스트**됩니다(`abstain.py`와 같은 선).
 
 두 가지를 **세어** 보여 줍니다.
@@ -396,7 +398,7 @@ GDS 엔진을 고르면 이 행렬을 아예 만들지 않고 필요한 수치�
 ## 에이전트
 
 `chatbot.py`가 LangChain `create_agent`로 만든 에이전트 하나가 도구 다섯 개를 들고 질문을
-처리합니다. 어느 경로로 갈지는 [`routing.py`](routing.py)가 질문 유형으로 정하고, 그 안에서
+처리합니다. 어느 경로로 갈지는 [`routing.py`](src/routing.py)가 질문 유형으로 정하고, 그 안에서
 무엇을 몇 번 부를지는 에이전트가 정합니다. 화면에는 **실제 호출 기록**만 표시합니다.
 
 ### 에이전트 도구

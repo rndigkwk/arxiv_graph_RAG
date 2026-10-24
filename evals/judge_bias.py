@@ -70,8 +70,7 @@ def disagreements(left: dict[str, Any], right: dict[str, Any]) -> list[str]:
 
 def run(questions: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Judge each question three times: same order twice, then reversed."""
-    import candidate_validation
-    import chatbot
+    from src import candidate_validation, chatbot
 
     def fetch(ids: list[str]) -> list[dict[str, Any]]:
         rows = chatbot.run_read(

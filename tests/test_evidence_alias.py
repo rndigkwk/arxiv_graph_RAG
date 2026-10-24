@@ -87,7 +87,7 @@ def test_the_rule_matches_the_final_validator():
 
     다르면 한쪽이 통과시킨 것을 다른 쪽이 막습니다.
     """
-    import answer_validation
+    from src import answer_validation
 
     # 최종 검증이 쓰는 사유 코드가 그대로 남아 있는지 확인합니다.
     codes = dict(answer_validation._VALIDATION_REASON_CODES)

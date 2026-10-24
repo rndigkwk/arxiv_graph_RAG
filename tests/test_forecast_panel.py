@@ -19,7 +19,7 @@ import json
 import numpy as np
 import pytest
 
-import forecast
+from src import forecast
 
 
 def test_the_feature_order_matches_what_the_model_was_trained_on():
@@ -137,7 +137,7 @@ def test_the_panel_is_not_an_agent_tool():
     import re
     from pathlib import Path
 
-    source = Path("chatbot.py").read_text(encoding="utf-8")
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
     decorated = re.findall(r"@tool\s*\ndef (\w+)", source)
 
     assert "forecast_cocitation" not in decorated

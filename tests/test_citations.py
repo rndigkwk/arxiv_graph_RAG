@@ -17,7 +17,7 @@ import io
 import re
 from pathlib import Path
 
-import citations
+from src import citations
 
 FULL = {
     "arxiv_id": "2301.12345",
@@ -33,7 +33,7 @@ BARE = {"arxiv_id": "cs/0701001", "title": "Old style id", "primary_category": "
 
 
 def test_the_module_does_not_import_streamlit():
-    source = Path("citations.py").read_text(encoding="utf-8")
+    source = Path("src/citations.py").read_text(encoding="utf-8")
 
     assert not re.search(r"^\s*import streamlit", source, re.MULTILINE)
     assert not re.search(r"^\s*from streamlit", source, re.MULTILINE)
@@ -124,7 +124,7 @@ def saved_paper_query() -> str:
     붙이면 `tests/test_input_tokens.py`가 지키는 성질("토큰을 세는 데 chatbot이 필요하면
     안 된다")을 **임포트 순서로** 깨뜨립니다. 실제로 한 번 깨뜨렸습니다.
     """
-    source = Path("chatbot.py").read_text(encoding="utf-8")
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
     match = re.search(r'SAVED_PAPER_DETAILS = """(.*?)"""', source, re.DOTALL)
     assert match, "SAVED_PAPER_DETAILS를 찾지 못했습니다"
     return match.group(1)

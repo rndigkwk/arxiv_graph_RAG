@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import pytest
 
-from agent_graph import (
+from src.agent_graph import (
     CONDITION_STAGE,
     FORMAT_STAGE,
     MAX_ATTEMPTS,

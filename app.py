@@ -7,12 +7,9 @@ from urllib.parse import quote
 
 import streamlit as st
 
-import abstain
-import citations
-import quality_board
-import warmup
-from paper_library import add_paper, compare_selection
 from pipeline import logs
+from src import abstain, citations, quality_board, warmup
+from src.paper_library import add_paper, compare_selection
 
 
 # 연결·검색기는 공유하고, 각 사용자의 대화는 아래 session_state에 따로 저장합니다.
@@ -20,7 +17,7 @@ from pipeline import logs
 def load_chatbot():
     """화면을 다시 그려도 연결과 검색 저장소를 재사용합니다."""
     # 준비 에러도 main에서 안내할 수 있게 여기서 검색 모듈을 불러옵니다.
-    import chatbot
+    from src import chatbot
 
     return chatbot
 
@@ -56,7 +53,7 @@ def graph_counts():
 @st.cache_data(show_spinner=False)
 def quality_report():
     """품질 리포트 노트북이 저장한 JSON입니다. 없으면 None."""
-    import metagraph
+    from src import metagraph
 
     return metagraph.load_report()
 
@@ -377,7 +374,8 @@ def show_response(chatbot, response, index):
         subgraph = chatbot.fetch_subgraph(graph_ids(response))
     except Exception as exc:
         subgraph = {"papers": [], "references": []}
-        st.caption(f"그래프 조회 에러: {type(exc).__name__}. 답변과 근거는 그대로 확인할 수 있습니다.")
+        st.caption(f"그래프 조회 에러: {type(exc).__name__}. "
+                   "답변과 근거는 그대로 확인할 수 있습니다.")
     mechanism = mechanism_of(response)
     graph = make_graph(subgraph, mechanism)
     if graph:
@@ -391,7 +389,8 @@ def show_response(chatbot, response, index):
                      "PageRank가 올린 후보, 점선은 임베딩이 채운 후보입니다 — 뒤의 둘은 "
                      "답변이 인용하지 않았습니다.")
         if len(subgraph["papers"]) > AUTHOR_LIMIT:
-            note = (f"실선: 논문 사이의 REFERENCES 인용. 논문이 {AUTHOR_LIMIT}편을 넘어 글자가 작아지지 "
+            note = (f"실선: 논문 사이의 REFERENCES 인용. 논문이 {AUTHOR_LIMIT}편을 넘어 "
+                    "글자가 작아지지 "
                     "않도록 저자는 생략했습니다. 저자 수는 아래 표에서 확인하세요.")
         st.caption(note)
     else:
@@ -721,7 +720,8 @@ def show_paper_comparison(chatbot, response, index):
         return
 
     st.markdown("#### 논문 비교")
-    st.caption("검색 결과의 제목과 초록만 비교합니다. 초록에서 확인할 수 없는 내용은 별도로 표시합니다.")
+    st.caption("검색 결과의 제목과 초록만 비교합니다. "
+               "초록에서 확인할 수 없는 내용은 별도로 표시합니다.")
     papers_by_id = {paper["arxiv_id"]: paper for paper in candidates}
     selected_ids = st.multiselect(
         "비교할 논문 (2~4편)",
@@ -753,7 +753,8 @@ def show_paper_comparison(chatbot, response, index):
         except Exception as exc:
             errors[index] = {
                 "selected_ids": list(selected_ids),
-                "message": f"논문 비교를 완료하지 못했습니다 ({type(exc).__name__}). 선택을 확인하고 다시 시도해 주세요.",
+                "message": (f"논문 비교를 완료하지 못했습니다 ({type(exc).__name__}). "
+                            "선택을 확인하고 다시 시도해 주세요."),
             }
 
     error = errors.get(index)
@@ -911,14 +912,14 @@ def show_quality_board():
         hide_index=True,
     )
     st.caption(
-        "전체 기록: [docs/MODELS.md](https://github.com/rndigkwk/arxiv_graph_RAG/blob/main/docs/MODELS.md) · "
+        "전체 기록: [docs/MODELS.md](https://github.com/rndigkwk/arxiv_graph_RAG/blob/main/docs/MODELS.md) · "  # noqa: E501
         "[결정 기록](https://github.com/rndigkwk/arxiv_graph_RAG/tree/main/docs/adr)"
     )
 
 
 def show_home(chatbot):
     """스키마와 메타그래프로 이 그래프가 무엇인지 먼저 보여 줍니다."""
-    import metagraph
+    from src import metagraph
 
     counts = graph_counts()
     st.subheader("이 앱이 질문하는 지식 그래프")
@@ -945,12 +946,15 @@ def show_home(chatbot):
             {"속성": "abstract", "타입": "STRING", "설명": "초록 (영어). 임베딩 입력의 일부"},
             {"속성": "published", "타입": "DATETIME", "설명": "게재일. 기간 필터에 씁니다"},
             {"속성": "pdf_url", "타입": "STRING", "설명": "arXiv PDF 링크"},
-            {"속성": "primary_category", "타입": "STRING", "설명": "대표 분류 하나 (cs.AI). 인덱스 있음"},
+            {"속성": "primary_category", "타입": "STRING",
+             "설명": "대표 분류 하나 (cs.AI). 인덱스 있음"},
             {"속성": "categories", "타입": "LIST<STRING>", "설명": "대표 분류를 포함한 모든 분류"},
-            {"속성": "source", "타입": "STRING", "설명": "ai=수집한 논문, reference=인용으로 딸려온 논문"},
+            {"속성": "source", "타입": "STRING",
+             "설명": "ai=수집한 논문, reference=인용으로 딸려온 논문"},
             {"속성": "embedding", "타입": "LIST<FLOAT>", "설명": "제목+초록 768차원 벡터"},
         ], hide_index=True, width="stretch")
-        st.caption("분류는 노드가 아니라 ArxivPaper의 속성입니다. 그래서 :ArxivCategory 노드는 없습니다. "
+        st.caption("분류는 노드가 아니라 ArxivPaper의 속성입니다. "
+                   "그래서 :ArxivCategory 노드는 없습니다. "
                    "ArxivAuthorName은 이름 표기 노드라 동명이인을 구분하지 않습니다.")
 
     report = quality_report()
@@ -968,7 +972,8 @@ def show_home(chatbot):
         "보조분류": row["secondary_category"] or "-",
     } for row in report["communities_top5"]], hide_index=True, width="stretch")
 
-    st.caption(f'출처: reports/aura_graph_rag_quality_report.json · 생성 {report["generated_at"]} · '
+    st.caption('출처: reports/aura_graph_rag_quality_report.json · '
+               f'생성 {report["generated_at"]} · '
                f'Leiden {report["community_mode"]}')
 
 
@@ -981,7 +986,7 @@ SCOPES = {f"전체 인용망에서 계산한 뒤 {CATEGORY}만 남기기": "glob
 
 def gds_module():
     """GDS 엔진을 고를 때만 무거운 의존성을 불러옵니다."""
-    import gds_pagerank
+    from src import gds_pagerank
 
     return gds_pagerank
 
@@ -1012,7 +1017,8 @@ def pick_session():
                    f'이고 세션 요금이 청구되지 않습니다. 한도는 메모리 {free["memory"]}, '
                    f'동시 {free["sessions"]}개, 세션 최대 {free["max_hours"]}시간입니다.')
     else:
-        st.warning(f'유료 등급(`{tier["type"] or "확인 불가"}`)입니다. 세션은 **GB-분**으로 청구되고 '
+        st.warning(f'유료 등급(`{tier["type"] or "확인 불가"}`)입니다. '
+                   '세션은 **GB-분**으로 청구되고 '
                    "최소 10분이 붙습니다. 예: 2GB 세션을 25분 쓰면 50 GB-분.")
 
     if live:
@@ -1087,7 +1093,8 @@ def show_pagerank(chatbot):
     except Exception as exc:
         st.error(f"순위 계산 에러: {type(exc).__name__}. {exc}")
         if use_gds:
-            st.caption("세션이 만료됐을 수 있습니다. 엔진을 직접 계산으로 바꾸면 바로 볼 수 있습니다.")
+            st.caption("세션이 만료됐을 수 있습니다. "
+                       "엔진을 직접 계산으로 바꾸면 바로 볼 수 있습니다.")
         return
 
     field = "categories" if include_secondary else "primary_category"
@@ -1194,7 +1201,8 @@ def main():
             chatbot = load_chatbot()
     except Exception as exc:
         st.error(f"실시간 그래프 연결을 준비하지 못했습니다 ({type(exc).__name__}).")
-        st.info("Aura 인스턴스가 일시 중지됐거나 접속 정보·벡터 인덱스가 준비되지 않았을 수 있습니다. "
+        st.info("Aura 인스턴스가 일시 중지됐거나 접속 정보·벡터 인덱스가 "
+                "준비되지 않았을 수 있습니다. "
                 "APP_README.md의 연결 점검 절차를 확인한 뒤 다시 시도하세요.")
         st.markdown("#### 데이터베이스 없이 보는 데모 화면")
         st.caption("아래는 저장소에 포함된 화면 캡처입니다. 실시간 검색 결과가 아닙니다.")
