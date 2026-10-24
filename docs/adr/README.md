@@ -138,3 +138,4 @@
 | [ADR-051](ADR-051-the-cross-encoder-loses-to-cosine.md) | 교차 인코더도 코사인을 못 이겼다 — 후보 풀은 핑계가 되지 않는다 | 기각 |
 | [ADR-065](ADR-065-say-how-each-paper-was-found.md) | 화면이 논문마다 어떻게 찾았는지 말한다 — 후보를 지우지 않는다 | 채택 |
 | [ADR-066](ADR-066-measure-inside-generate.md) | `generate` 안쪽을 잰다 — 괄호로 적어 둔 고백을 분해로 바꾼다 | 채택 |
+| [ADR-067](ADR-067-warm-the-citation-graph-at-boot.md) | 인용망을 부팅 때 배경에서 올린다 — 첫 방문자가 15초를 혼자 내지 않는다 | 채택 |

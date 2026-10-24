@@ -10,6 +10,7 @@ import streamlit as st
 import abstain
 import citations
 import quality_board
+import warmup
 from paper_library import add_paper, compare_selection
 from pipeline import logs
 
@@ -22,6 +23,22 @@ def load_chatbot():
     import chatbot
 
     return chatbot
+
+
+@st.cache_resource
+def citation_warmup(_chatbot):
+    """인용망을 배경에서 미리 올립니다. **프로세스당 한 번만** 시작합니다.
+
+    `_chatbot`에 밑줄이 붙은 것은 Streamlit에게 **해시하지 말라**고 말하는 표시입니다 -
+    모듈 객체는 해시할 수 없고, 어차피 이 프로세스에 하나뿐입니다.
+
+    배경 스레드에 `load_chatbot()`을 넘기지 않고 **이미 불러온 모듈**을 받는 이유는, 그
+    함수가 Streamlit 캐시라서 스크립트 스레드 밖에서 부르면 컨텍스트 경고가 나기
+    때문입니다. 무거운 일(`citation_graph`)만 배경으로 보냅니다.
+    """
+    task = warmup.Warmup(_chatbot.citation_graph)
+    task.start()
+    return task
 
 
 @st.cache_data(show_spinner=False)
@@ -1185,6 +1202,10 @@ def main():
         st.link_button("앱 설정 및 오류 대응", "https://github.com/rndigkwk/arxiv_graph_RAG/blob/main/APP_README.md")
         st.stop()
 
+    # 홈 화면을 읽는 동안 인용망을 올립니다. 이 줄이 없으면 첫 질문이 그 값을 혼자 냅니다
+    # (배포 실측 46.9초 대 22.7초, ADR-067). 배경이므로 아래 렌더링을 막지 않습니다.
+    citation_warmup(chatbot)
+
     sidebar()
     st.caption(f"적재된 논문 {chatbot.paper_count:,}편 / 모델 {chatbot.llm_model}")
 
@@ -1263,6 +1284,9 @@ def chat(chatbot):
         clear_chat()
     if st.button("대화 지우기"):
         clear_chat()
+    # 예열이 **끝났으면 아무 말도 하지 않습니다.** 기다리는 중이거나 실패했을 때만 적습니다.
+    if line := warmup.warmup_line(citation_warmup(chatbot).state()):
+        st.caption(line)
     show_saved_papers(chatbot)
 
     messages_area = st.container()

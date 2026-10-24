@@ -3803,6 +3803,120 @@ ADR을 쓰려고 `docs/adr/README.md`를 열었더니 **ADR-063·064·065가 목
 검사기 대상, `compileall` 모듈 목록, ADR-032 경로 목록, 용량 한도, 민감도 절). 앞의 여섯처럼
 검사기를 붙였습니다 — 파일과 표를 양방향으로 맞추고 한쪽에만 있으면 실패합니다.
 
+## 11-49. 인용망을 부팅 때 올립니다 — 첫 질문의 24초는 답과 아무 상관이 없었습니다 (2026-10-25)
+
+11-48절이 `generate` 안쪽을 가르고 **하루도 안 되어 값을 냈습니다.** 배포 앱을 재부팅한
+직후와 바로 다음 질문을 같은 앱에서 연달아 쟀습니다.
+
+| | 1회차 | 2회차 |
+|---|---:|---:|
+| 합계 | 46.9초 | 22.7초 |
+| `rank_related_papers` (관련 논문) | **26.49초** | **0.83초** |
+| `search_graph` (**답을 만든 도구**) | 0.36초 | 0.36초 |
+| 그 외(뺀 값) | 0.0초 | 0.0초 |
+
+**답을 만든 도구는 0.36초였습니다.** 그리고 뺀 값이 양쪽 모두 0.0초라 분해에 빠진 데가
+없습니다 — 24초는 전부 `rank_related_papers`가 처음 불릴 때 `citation_graph()`가 내는 값입니다.
+
+11-46절의 노드 분해로는 이 모양이 보이지 않았습니다. 그때는 `generate` 한 덩어리였고,
+"생성이 느리다"로 읽혔습니다. 실제로 느린 것은 생성이 아니라 **처음 한 번 짓는 캐시**였습니다.
+
+### 세 가지 방법으로 같은 값이 나왔습니다
+
+| 재는 법 | 차가울 때 | 더울 때 |
+|---|---:|---:|
+| 배포 앱, 도구별 (11-48절 계측) | 26.49초 | 0.83초 |
+| 로컬, `citation_graph()` 직접 | 16.66초 | 0.0000초 |
+| 로컬, 다시 짓기 3회 p50 | **<!--n:reports/citation_graph_warmup.json#build_seconds.p50-->15.39<!--/n-->초** | <!--n:reports/citation_graph_warmup.json#cached_seconds.max-->0.0<!--/n-->초 |
+
+세 번째가 [`scripts/measure_citation_graph_warmup.py`](scripts/measure_citation_graph_warmup.py)
+입니다 — 논문 <!--n:reports/citation_graph_warmup.json#papers-->38,665<!--/n-->편과 간선
+<!--n:reports/citation_graph_warmup.json#edges-->69,438<!--/n-->개를 읽어 행렬을 만듭니다.
+**모델을 부르지 않아 비용이 0원입니다.** 배포가 로컬보다 10초 더 먼 것은 Neo4j까지의 거리와
+작은 인스턴스의 CPU로 설명되고, 이 절은 그 차이를 따로 가르지 않았습니다.
+
+**차가운 시작이 아니라 다시 짓기를 쟀습니다.** 반복마다 `graph_cache`를 비우므로 파이썬과
+드라이버는 이미 더운 상태입니다. 재려던 것이 그 아래의 읽기와 행렬 만들기였으므로 그쪽이
+맞고, 진짜 첫 실행에는 임포트 시간이 더 붙습니다.
+
+### 하필 그 한 번이 거의 모든 방문자의 유일한 질문입니다
+
+Streamlit Community Cloud는 앱을 재웁니다. 포트폴리오를 보러 온 사람은 **깨어난 직후의 앱에
+한 질문을 던지고 떠납니다.** 즉 지금까지 보여 온 수는 22.7초가 아니라 46.9초였습니다.
+
+그래서 홈 화면을 그리기 전에 배경 스레드에서 미리 짓습니다
+([`warmup.py`](warmup.py), [ADR-067](docs/adr/ADR-067-warm-the-citation-graph-at-boot.md)).
+
+### 빨라지는 것이 아니라 겹쳐지는 것입니다 — 그리고 그것을 적습니다
+
+**15초는 그대로 듭니다.** 내는 시점만 사람이 홈 화면을 읽는 동안으로 옮깁니다. 그러니
+숨기면 안 되는 것이 둘 있습니다.
+
+| | 사실 | 화면이 하는 말 |
+|---|---|---|
+| 짓는 중에 물으면 | `graph_lock`에서 **끝날 때까지 기다립니다** | `지금 물으면 이 작업이 끝날 때까지 기다립니다` |
+| 예열이 죽으면 | 질문은 되지만 처음 추천할 때 그만큼 느립니다 | `인용망 예열이 실패했습니다(사유)` |
+
+두 번째가 이 구현의 절반입니다. **배경 스레드의 예외는 아무 데도 나타나지 않습니다** —
+예열이 조용히 죽으면 첫 질문이 여전히 느린 상태가 **고쳐진 것처럼** 보입니다. 11-44절에서
+"가드가 초록불인 채로 손상이 일어난" 것과 같은 모양입니다.
+
+그리고 그 줄에 **예상 시간을 적지 않습니다.** 지금까지 걸린 초만 적습니다 — 경과는 늙지
+않고 예상값은 늙습니다(ADR-016에서 화면의 수가 조용히 늙은 적이 있습니다).
+
+### 공짜가 아닙니다 — 메모리를 재서 적습니다
+
+추측하지 않고 이미 있는 측정기를 돌렸습니다(`scripts/measure_app_memory.py`).
+
+| 단계 | 상주 메모리 |
+|---|---:|
+| 인터프리터 | <!--n:reports/app_memory_warmup.json#stages_mb.interpreter-->16.7<!--/n-->MB |
+| `chatbot` 임포트 | <!--n:reports/app_memory_warmup.json#stages_mb.chatbot_imported-->223.0<!--/n-->MB |
+| **`citation_graph()` 적재** | **<!--n:reports/app_memory_warmup.json#stages_mb.citation_graph_loaded-->266.9<!--/n-->MB** (+43.9MB) |
+| `global_pagerank` | <!--n:reports/app_memory_warmup.json#stages_mb.global_pagerank-->267.2<!--/n-->MB |
+| 벡터 검색 | <!--n:reports/app_memory_warmup.json#stages_mb.vector_search-->268.5<!--/n-->MB |
+
+최고점 <!--n:reports/app_memory_warmup.json#peak_mb-->268.5<!--/n-->MB, Streamlit 보장치까지
+남은 여유 <!--n:reports/app_memory_warmup.json#headroom_mb-->421.5<!--/n-->MB입니다. 전에는
+추천을 **한 번도 안 쓴 세션이면 내지 않던** 값인데 이제 항상 냅니다. 바꿔 말하면, 이 변경은
+지연을 메모리로 삽니다.
+
+### 음성 대조를 셋 돌렸습니다
+
+| 되돌린 것 | 깨진 테스트 |
+|---|---|
+| 실패를 삼키기(`except: pass`) | 2건 |
+| 매 rerun마다 새 스레드 시작 | 1건 |
+| 부팅 때 부르지 않기 | 1건 |
+
+세 번째가 **처음에는 통과했습니다.** 시험이 `citation_warmup(chatbot)`이라는 글자만 찾았는데,
+그 글자는 상태 줄을 그리는 `chat()`에도 있습니다. **`st.tabs(`보다 앞에 있는지**를 보게
+고쳐야 갈렸습니다. 11-48절에서 음성 대조가 통과한 것과 같은 교훈입니다 — 통과하면 코드가
+옳다는 뜻이 아니라 시험이 재지 않는다는 뜻입니다.
+
+### 곁에서 나온 것 — 측정기가 날짜 붙은 보고서를 덮었습니다
+
+메모리를 재려고 `measure_app_memory.py`를 돌렸더니 `--output`의 **기본값이
+`reports/app_memory.json`**이라, 2026-10-18 라벨이 붙은 보고서가 조용히 덮였습니다. 피크가
+266.5에서 268.5로 바뀌었고, 그러자 ADR-016이 적은 **"Langfuse는 +5.2MB"**가 틀린 수가 됩니다 —
+271.7은 10-18 실행의 값이어서 둘을 빼면 **서로 다른 실행을 비교**하게 됩니다(10-1절에서
+같은 함정에 걸렸습니다).
+
+**이번에는 아무도 모르게 지나가지 않았습니다.** `check_doc_numbers.py`가 두 문서에서
+`문서 266.5 ≠ 보고서 268.5`로 막았습니다 — 11-46절에서 그 검사기를 붙인 이유가 그대로
+작동했습니다. 그래서 10-18 보고서를 되돌리고 이번 실행은
+`reports/app_memory_warmup.json`으로 따로 남겼습니다. 같은 배치에서 잰 것끼리만 뺍니다.
+
+### 재지 못한 것
+
+- **예열을 켠 뒤의 첫 질문.** 위의 46.9 대 22.7초는 **예열 없이** 잰 값입니다. 배포가
+  올라간 뒤 같은 방법으로 다시 재야 합니다.
+- **얼마나 겹쳐지는지.** 사람이 홈 화면을 몇 초 읽는지는 재지 않았습니다. 15초보다 짧으면
+  그만큼 기다립니다.
+- **남는 22.7초.** 예열이 지우는 것은 그 위의 24초뿐입니다. 나머지는 모델 턴과
+  Text2Cypher이고 이번에 건드리지 않았습니다.
+- **배포와 로컬의 10초 차이.** Neo4j까지의 거리인지 CPU인지 가르지 않았습니다.
+
 ## 13. 재현 방법
 
 ```bash
@@ -3871,6 +3985,10 @@ uv run python -m evals.language_study
 # 11-46·11-48절: 답변 지연을 노드별로 분해. 저장된 보고서만 읽습니다(API 비용 0원)
 uv run python scripts/measure_answer_latency.py --output reports/answer_latency.json
 
+# 11-49절: 인용망을 짓는 시간. 모델을 부르지 않습니다(API 비용 0원, 회당 약 1분)
+uv run python scripts/measure_citation_graph_warmup.py --repeats 3 \
+  --output reports/citation_graph_warmup.json
+
 # 11-5절: 로컬 임베딩 모델 비교. 첫 실행은 CPU 인코딩에 모델당 3시간 25분 걸립니다
 uv run --with sentence-transformers python -m models.embedding_tuning.compare_models   --model sentence-transformers/allenai-specter
 ```
@@ -3918,6 +4036,8 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/embedding_backfill.json` | 11-44절 — 벡터 없는 논문의 복구 |
 | `reports/ingest_embedded.json` | 11-44절 — 수집·임베딩·적재 실행 |
 | `reports/answer_latency.json` | 11-46절 — 답변 지연의 노드별 분해 · 11-48절 — `generate` 안쪽이 몇 건에 기록됐는지 |
+| `reports/citation_graph_warmup.json` | 11-49절 — 인용망을 짓는 시간과 캐시된 조회 |
+| `reports/app_memory_warmup.json` | 11-49절 — 예열이 항상 내는 메모리(10-18 보고서를 덮지 않도록 따로 둡니다) |
 | `reports/variant_study_{graph,base}.json` | 11-1절 — 변형 비교 |
 | `reports/index_cost.json` | 11-2절 — 색인 비용과 커버리지 |
 | `reports/embedding_tuning.json` | 11-3절 — 어댑터와 격자 탐색 |
