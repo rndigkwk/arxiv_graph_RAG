@@ -40,7 +40,8 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from pipeline import oai
+from pipeline import embed, oai
+from pipeline.console import use_utf8_stdout
 
 # 스냅샷 게이트와 **같은 상수**를 씁니다. 여기서 다시 적으면 두 검사가 조용히 갈라지고,
 # 그러면 상류에서 통과한 배치가 하류에서 막힙니다(ADR-045에서 한도를 중복으로 적었던 것과
@@ -67,7 +68,14 @@ SET p.title = row.title,
     p.categories = row.categories,
     p.pdf_url = row.pdf_url,
     p.source = row.source,
-    p.oai_datestamp = row.oai_datestamp
+    p.oai_datestamp = row.oai_datestamp,
+    // **`coalesce`입니다.** 레코드가 임베딩을 가져왔을 때만 씁니다 - 없으면 노드가 갖고
+    // 있던 것을 그대로 남깁니다. 2026-10-24에 이 줄이 없어서 `--embed`가 만든 벡터 934개가
+    // 조용히 버려졌고, 811편이 벡터 검색에 안 보이는 상태로 적재됐습니다.
+    p.embedding            = coalesce(row.embedding, p.embedding),
+    p.embedding_model      = coalesce(row.embedding_model, p.embedding_model),
+    p.embedding_dimensions = coalesce(row.embedding_dimensions, p.embedding_dimensions),
+    p.embedding_input      = coalesce(row.embedding_input, p.embedding_input)
 """
 
 MERGE_AUTHORED = """
@@ -335,6 +343,38 @@ def write_dead_letters(failures: list[dict[str, str]], path: Path = DEAD_LETTER_
     return len(failures)
 
 
+# 적재한 논문이 **그래프에서** 임베딩을 갖고 있는지 되읽습니다. 레코드를 본 가드로는
+# 적재기가 그 값을 버렸는지 알 수 없습니다(2026-10-24에 그렇게 버렸습니다).
+LOADED_EMBEDDING_CYPHER = """
+UNWIND $ids AS id
+MATCH (p:ArxivPaper {arxiv_id: id})
+RETURN count(p) AS papers,
+       count(CASE WHEN p.embedding IS NOT NULL
+                   AND size(p.embedding) = $dimensions THEN 1 END) AS with_embedding
+"""
+
+
+def verify_loaded_embeddings(
+    read: Callable[[str, dict[str, Any]], list[dict[str, Any]]],
+    papers: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """**쓴 것을 되읽습니다.** 상류 가드는 레코드를 보므로 이것을 대신하지 못합니다."""
+    ids = [str(paper["arxiv_id"]) for paper in papers]
+    if not ids:
+        return {"papers": 0, "with_embedding": 0, "coverage": 1.0, "complete": True}
+    row = read(
+        LOADED_EMBEDDING_CYPHER, {"ids": ids, "dimensions": EMBEDDING_DIMENSIONS}
+    )[0]
+    found, usable = int(row["papers"]), int(row["with_embedding"])
+    coverage = usable / found if found else 0.0
+    return {
+        "papers": found,
+        "with_embedding": usable,
+        "coverage": round(coverage, 4),
+        "complete": bool(found and usable == found),
+    }
+
+
 def load_batch(
     run_write: Callable[[str, dict[str, Any]], dict[str, int]],
     papers: list[dict[str, Any]],
@@ -366,6 +406,9 @@ def load_batch(
 
 
 def main() -> int:
+    # **`parse_args` 전에 부릅니다.** `--help`의 출력도 이 모듈의 출력이고, cp949 콘솔에서는
+    # 긴 줄표 하나에 UnicodeEncodeError로 죽습니다(2026-10-24에 그렇게 죽었습니다).
+    use_utf8_stdout()
     parser = argparse.ArgumentParser(description="증분 수집 파이프라인을 실행합니다.")
     parser.add_argument("--days", type=int, default=7,
                         help="워터마크가 없을 때 되돌아볼 일수입니다.")
@@ -381,8 +424,25 @@ def main() -> int:
         help=("임베딩 없는 논문도 적재합니다. 그 논문은 벡터 검색에 나오지 않습니다 — "
               "적재 직후 임베딩을 채울 때만 쓰세요."),
     )
+    parser.add_argument(
+        "--embed", action="store_true",
+        help=("임베딩이 없는 새 논문의 임베딩을 만듭니다(유료). --load와 함께 써야 "
+              "합니다 - 임베딩은 메모리 레코드에 붙으므로 적재하지 않으면 버려집니다."),
+    )
+    parser.add_argument(
+        "--max-cost", type=float, default=embed.MAX_COST_USD,
+        help="임베딩 추정 비용의 천장(달러). 넘으면 호출하지 않습니다.",
+    )
     parser.add_argument("--output", type=Path, default=REPORT_PATH)
     args = parser.parse_args()
+    # **임베딩만 하고 적재하지 않으면 돈을 쓰고 버립니다.** 벡터는 메모리 레코드에만
+    # 붙고 이 모듈은 그래프에 따로 쓰지 않습니다.
+    if args.embed and not args.load:
+        parser.error(
+            "--embed는 --load와 함께 써야 합니다. 임베딩은 수집 레코드에 붙으므로 "
+            "적재하지 않으면 그대로 버려집니다. 벡터 공간만 확인하려면 "
+            "`python -m pipeline.embed --verify`를 쓰세요."
+        )
 
     state = read_state()
     start, end = harvest_window(state, days=args.days)
@@ -427,10 +487,22 @@ def main() -> int:
         enrichment = enrich_references(harvested.records, lookup)
         authored = authored_rows(harvested.records)
         counts = graph.read(COUNT_CYPHER)[0]
+        harvested_ids = [str(paper["arxiv_id"]) for paper in harvested.records]
         known = graph.read(
             "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids RETURN p.arxiv_id AS arxiv_id",
-            {"ids": [str(paper["arxiv_id"]) for paper in harvested.records]},
+            {"ids": harvested_ids},
         )
+        # **이미 벡터를 가진 논문에 다시 돈을 쓰지 않습니다.** 2026-10-24의 첫 실행은
+        # 수집한 934편 중 이미 그래프에 벡터가 있던 123편(13%)까지 임베딩했습니다.
+        already_embedded = {
+            row["arxiv_id"]
+            for row in graph.read(
+                "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids "
+                "AND p.embedding IS NOT NULL AND size(p.embedding) = $dimensions "
+                "RETURN p.arxiv_id AS arxiv_id",
+                {"ids": harvested_ids, "dimensions": EMBEDDING_DIMENSIONS},
+            )
+        }
         known_authors = graph.read(
             "MATCH (a:ArxivAuthorName) WHERE a.name IN $names RETURN a.name AS name",
             {"names": sorted({row["author"] for row in authored})},
@@ -464,6 +536,28 @@ def main() -> int:
             report["stopped_at"] = "capacity"
             _finish(report, args.output, state, harvested.last_datestamp, advance=False)
             return 1
+        # **용량 검사 뒤에 둡니다.** 들어갈 자리가 없는 배치에 임베딩 비용을 쓰지 않습니다.
+        if args.embed:
+            report["embedding_run"] = embed.attach_embeddings(
+                harvested.records,
+                embed.client(),
+                max_cost_usd=args.max_cost,
+                already_embedded=already_embedded,
+            )
+            # 임베딩을 붙인 뒤 다시 셉니다. 이 수가 아래 가드가 보는 수입니다.
+            embeddings = plan_embeddings(
+                harvested.records, known_papers={row["arxiv_id"] for row in known}
+            )
+            report["embeddings"] = embeddings.as_dict()
+            if report["embedding_run"]["stopped_at"] == "cost_ceiling":
+                report["stopped_at"] = "embedding_cost_ceiling"
+                print(
+                    f"추정 비용 ${report['embedding_run']['estimated_cost_usd']}가 천장 "
+                    f"${args.max_cost}를 넘습니다. 호출하지 않았습니다 — "
+                    "올리려면 --max-cost 로 주세요."
+                )
+                _finish(report, args.output, state, harvested.last_datestamp, advance=False)
+                return 1
         # 임베딩 없는 논문을 적재하면 **벡터 검색에서 영원히 빠집니다.** 앱은 돌고 질문
         # 일부만 그 논문을 못 찾으므로 조용한 손상입니다. 알고 하는 경우만 통과시킵니다.
         if args.load and not embeddings.ready and not args.allow_missing_embeddings:
@@ -472,7 +566,7 @@ def main() -> int:
                 f"새 논문 {embeddings.new_papers}편 중 {embeddings.missing}편에 임베딩이 "
                 f"없습니다(차원 불일치 {embeddings.wrong_dimensions}편). 적재하지 않았습니다 "
                 "— 그 논문은 그래프 질의에는 나오지만 벡터 검색에 영원히 안 나옵니다.\n"
-                "임베딩을 먼저 만드세요(notebooks/arxiv_ai_kg_to_aura.ipynb). 적재한 뒤 바로 "
+                "임베딩을 먼저 만드세요(--embed). 적재한 뒤 바로 "
                 "임베딩을 채울 계획이라면 --allow-missing-embeddings 로 넘기세요."
             )
             _finish(report, args.output, state, harvested.last_datestamp, advance=False)
@@ -489,6 +583,21 @@ def main() -> int:
         after = graph.read(COUNT_CYPHER)[0]
         report["loaded"] = True
         report["counts"] = {"before": dict(before), "after": dict(after)}
+        # **쓴 것을 되읽습니다.** 상류 가드는 수집 레코드를 보므로, 적재기가 그 값을
+        # 버렸는지 알 수 없습니다 — 2026-10-24에 그렇게 버렸고 811편이 벡터 검색에
+        # 안 보이는 상태로 들어갔습니다.
+        report["loaded_embeddings"] = verify_loaded_embeddings(
+            graph.read, harvested.records
+        )
+        if not report["loaded_embeddings"]["complete"]:
+            report["stopped_at"] = "loaded_without_embeddings"
+            print(
+                f"적재한 {report['loaded_embeddings']['papers']}편 중 "
+                f"{report['loaded_embeddings']['with_embedding']}편만 그래프에서 임베딩을 "
+                f"갖고 있습니다(커버리지 "
+                f"{report['loaded_embeddings']['coverage']}). 나머지는 그래프 질의에는 "
+                "나오지만 벡터 검색에 안 나옵니다."
+            )
         if args.verify_idempotent:
             # 같은 배치를 다시 적재합니다. MERGE가 제대로라면 수가 그대로여야 합니다.
             load_batch(graph.write, harvested.records, authored, enrichment.references)

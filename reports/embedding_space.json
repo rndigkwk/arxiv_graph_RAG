@@ -1,0 +1,117 @@
+{
+  "generated_at": "2026-10-24T06:48:12.587374+00:00",
+  "model": "text-embedding-3-large",
+  "dimensions": 768,
+  "input": "title+abstract",
+  "estimated_cost_usd": 0.000881,
+  "sample": 20,
+  "min_cosine": 0.999986,
+  "max_cosine_control": 0.989453,
+  "control_is_lower": true,
+  "margin": 0.010533,
+  "passes": true,
+  "min_cosine_bar": 0.9999,
+  "cases": [
+    {
+      "arxiv_id": "0704.2711",
+      "cosine": 0.999994,
+      "cosine_control": 0.981453
+    },
+    {
+      "arxiv_id": "0704.3238",
+      "cosine": 1.0,
+      "cosine_control": 0.982437
+    },
+    {
+      "arxiv_id": "0704.3292",
+      "cosine": 0.999986,
+      "cosine_control": 0.987509
+    },
+    {
+      "arxiv_id": "0705.0911",
+      "cosine": 1.0,
+      "cosine_control": 0.988411
+    },
+    {
+      "arxiv_id": "0706.1062",
+      "cosine": 1.0,
+      "cosine_control": 0.985893
+    },
+    {
+      "arxiv_id": "0706.3188",
+      "cosine": 1.0,
+      "cosine_control": 0.988477
+    },
+    {
+      "arxiv_id": "0706.3639",
+      "cosine": 1.0,
+      "cosine_control": 0.96295
+    },
+    {
+      "arxiv_id": "0707.1762",
+      "cosine": 1.0,
+      "cosine_control": 0.978243
+    },
+    {
+      "arxiv_id": "0707.4205",
+      "cosine": 1.0,
+      "cosine_control": 0.984457
+    },
+    {
+      "arxiv_id": "0709.1667",
+      "cosine": 0.999988,
+      "cosine_control": 0.983525
+    },
+    {
+      "arxiv_id": "0709.2938",
+      "cosine": 1.0,
+      "cosine_control": 0.989453
+    },
+    {
+      "arxiv_id": "0710.2063",
+      "cosine": 1.0,
+      "cosine_control": 0.987806
+    },
+    {
+      "arxiv_id": "0711.0189",
+      "cosine": 1.0,
+      "cosine_control": 0.980895
+    },
+    {
+      "arxiv_id": "0711.2185",
+      "cosine": 1.0,
+      "cosine_control": 0.955772
+    },
+    {
+      "arxiv_id": "0712.0794",
+      "cosine": 1.0,
+      "cosine_control": 0.989057
+    },
+    {
+      "arxiv_id": "0712.3329",
+      "cosine": 1.0,
+      "cosine_control": 0.975249
+    },
+    {
+      "arxiv_id": "0801.3968",
+      "cosine": 0.999998,
+      "cosine_control": 0.976974
+    },
+    {
+      "arxiv_id": "0803.0476",
+      "cosine": 0.999989,
+      "cosine_control": 0.979928
+    },
+    {
+      "arxiv_id": "0803.2336",
+      "cosine": 1.0,
+      "cosine_control": 0.912166
+    },
+    {
+      "arxiv_id": "0803.2969",
+      "cosine": 0.999997,
+      "cosine_control": 0.981819
+    }
+  ],
+  "tokens": 6776
+}

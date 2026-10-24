@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-10-24T08:08:49.436830+00:00",
+  "window": {
+    "from": "2026-10-17",
+    "until": "2026-10-24"
+  },
+  "harvest": {
+    "records": 934,
+    "pages": 7,
+    "deleted": 0,
+    "skipped": 7030,
+    "last_datestamp": "2026-10-23",
+    "truncated_by_page_limit": false
+  },
+  "loaded": true,
+  "enrichment": {
+    "attempted": 934,
+    "references": 1016,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "dead_letters_written": 0
+  },
+  "capacity": {
+    "current_nodes": 149025,
+    "current_relationships": 338366,
+    "projected_nodes": 151627,
+    "projected_relationships": 344935,
+    "node_limit": 200000,
+    "relationship_limit": 400000,
+    "node_usage": 0.7581,
+    "relationship_usage": 0.8623,
+    "safety_ceiling": 0.95,
+    "fits": true,
+    "binding_constraint": "relationships"
+  },
+  "embeddings": {
+    "new_papers": 811,
+    "with_embedding": 811,
+    "missing": 0,
+    "wrong_dimensions": 0,
+    "coverage": 1.0,
+    "required_coverage": 1.0,
+    "dimensions": 768,
+    "ready": true,
+    "note": "OAI 수집은 임베딩을 만들지 않습니다. 임베딩 없이 적재하면 그 논문은 그래프 질의에는 나오지만 **벡터 검색에 영원히 안 나옵니다.**"
+  },
+  "embedding_run": {
+    "records": 934,
+    "skipped_already_embedded": 0,
+    "to_embed": 934,
+    "tokens": 270184,
+    "estimated_cost_usd": 0.0351,
+    "max_cost_usd": 1.0,
+    "model": "text-embedding-3-large",
+    "dimensions": 768,
+    "input": "title+abstract",
+    "embedded": 934,
+    "stopped_at": null
+  },
+  "written": {
+    "rows_sent": {
+      "papers": 934,
+      "authored": 5553,
+      "references": 1016
+    },
+    "counters": {
+      "papers": {
+        "nodes_created": 811,
+        "relationships_created": 0,
+        "properties_set": 7349
+      },
+      "authored": {
+        "nodes_created": 1791,
+        "relationships_created": 4760,
+        "properties_set": 1791
+      },
+      "references": {
+        "nodes_created": 0,
+        "relationships_created": 0,
+        "properties_set": 0
+      }
+    },
+    "nodes_created": 2602,
+    "relationships_created": 4760
+  },
+  "counts": {
+    "before": {
+      "nodes": 149025,
+      "relationships": 338366
+    },
+    "after": {
+      "nodes": 151627,
+      "relationships": 343126
+    },
+    "after_repeat": {
+      "nodes": 151627,
+      "relationships": 343126
+    }
+  },
+  "idempotent": true
+}
