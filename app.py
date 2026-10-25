@@ -408,8 +408,11 @@ def route_line(route):
     parts = [head]
     if cues:
         parts.append("단서: " + ", ".join(cues))
-    if vetoes:
-        # 좁히지 않은 이유입니다. 단서가 있는데도 넓게 간 경우가 여기서만 설명됩니다.
+    # **단서가 있을 때만 적습니다.** 거부가 뒤집은 것이 있어야 "좁히지 않은 이유"입니다.
+    # 단서가 없으면 거부가 없어도 넓은 경로이므로, 그때 거부를 적으면 **없던 인과를**
+    # 만듭니다 - 배포 앱에서 "관련된 논문" 질문이 단서 0개에 거부 `similar` 하나로
+    # 그렇게 나왔습니다(ADR-070).
+    if vetoes and cues:
         parts.append("좁히지 않은 이유: " + ", ".join(vetoes))
     return " · ".join(parts)
 
