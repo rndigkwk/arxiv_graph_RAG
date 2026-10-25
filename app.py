@@ -8,7 +8,7 @@ from urllib.parse import quote
 import streamlit as st
 
 from pipeline import logs
-from src import abstain, citations, quality_board, warmup
+from src import abstain, citations, quality_board, routing, warmup
 from src.paper_library import add_paper, compare_selection
 
 
@@ -196,6 +196,32 @@ def make_graph(subgraph, mechanism=None):
         "\n".join(sorted(statements)) + "\n}"
 
 
+def graph_legend(subgraph, max_nodes, mechanism=None):
+    """`make_graph`가 실제로 그린 선과 테두리만 설명합니다.
+
+    **두 탭이 같은 `make_graph`를 쓰는데 범례는 챗봇 쪽에만 있었습니다.** PageRank 탭은
+    표시 수를 5로 내리면 저자 점선이 그려지는데 그 말이 없었습니다(`AUTHOR_LIMIT`이 6).
+
+    그리고 챗봇 쪽은 논문이 6편을 넘으면 범례를 **갈아 끼우면서** 테두리 설명까지
+    버렸습니다. 답변 그래프는 보통 6편을 넘으므로, 후보를 테두리로 가린다는 ADR-065의
+    설명이 **거의 항상 사라지고 있었습니다.** 그래서 문장을 덮어쓰지 않고 그린 것마다
+    한 조각씩 더합니다.
+    """
+    parts = ["실선: 논문 사이의 REFERENCES 인용."]
+    if len(subgraph["papers"]) <= AUTHOR_LIMIT:
+        parts.append("점선: 저장된 저자 표기 AUTHORED 연결.")
+    else:
+        parts.append(f"논문이 {AUTHOR_LIMIT}편을 넘어 글자가 작아지지 않도록 저자는 "
+                     "생략했습니다.")
+    if mechanism:
+        # 후보가 섞여 있는데 테두리를 설명하지 않으면 "답변이 인용한 논문"으로 읽힙니다.
+        parts.append("테두리가 실선인 논문은 답변이 근거로 인용한 것이고, 파선은 공동인용·"
+                     "PageRank가 올린 후보, 점선은 임베딩이 채운 후보입니다 — 뒤의 둘은 "
+                     "답변이 인용하지 않았습니다.")
+    parts.append(f"논문은 최대 {max_nodes}개까지 그립니다.")
+    return " ".join(parts)
+
+
 def answer_text(response, body=None):
     """답변 문자열 뒤에 사용한 근거 ID를 표시합니다."""
     text = response["answer"] if body is None else body
@@ -361,6 +387,33 @@ def route_marks(response):
             related_mark]
 
 
+def route_line(route):
+    """경로 판정과 **그 이유**를 한 줄로 적습니다. 모델을 부르기 전에 쓸 수 있습니다.
+
+    `routing.classify`가 정하는 것은 **질문의 가족이 아닙니다.** `graph`냐 `any`냐와 그
+    근거가 된 단서뿐입니다 - author·citing·coauthor 같은 가족 이름은 평가 데이터셋의
+    `category`이고 질의 시점에는 없습니다(ADR-069에서 가족별 게이트를 기각한 이유가
+    이것입니다). 그래서 "author 질문으로 봅니다"라고 쓰지 않고 경로와 단서만 적습니다.
+
+    `route_marks`와 다릅니다. 저쪽은 **끝난 뒤** 어느 도구가 쓰였는지를 적고, 이쪽은
+    **시작 전** 어디로 보낼지를 적습니다. 판정이 틀렸을 때 기다리지 않고 다시 물을 수
+    있는 것이 이 줄의 목적입니다.
+    """
+    cues = list(route.get("cues") or ())
+    vetoes = list(route.get("vetoes") or ())
+    if route.get("name") == routing.GRAPH_ROUTE:
+        head = "경로 판정: 저장된 관계만 묻는 질문으로 봅니다 — 그래프 경로"
+    else:
+        head = "경로 판정: 넓은 경로 — 의미 검색도 함께 씁니다"
+    parts = [head]
+    if cues:
+        parts.append("단서: " + ", ".join(cues))
+    if vetoes:
+        # 좁히지 않은 이유입니다. 단서가 있는데도 넓게 간 경우가 여기서만 설명됩니다.
+        parts.append("좁히지 않은 이유: " + ", ".join(vetoes))
+    return " · ".join(parts)
+
+
 def show_response(chatbot, response, index):
     """실제 검색 방식, 답변, 검색 그래프, 상세 근거를 함께 보여줍니다."""
     st.caption(" | ".join(route_marks(response)))
@@ -381,18 +434,7 @@ def show_response(chatbot, response, index):
     if graph:
         st.write("검색된 그래프")
         st.graphviz_chart(graph, width="stretch")
-        note = ("실선: 논문 사이의 REFERENCES 인용. 점선: 저장된 저자 표기 AUTHORED 연결. "
-                f"논문은 최대 {chatbot.MAX_GRAPH_NODES}개까지 그립니다.")
-        if mechanism:
-            # 후보가 섞여 있는데 테두리를 설명하지 않으면 "답변이 인용한 논문"으로 읽힙니다.
-            note += (" 테두리가 실선인 논문은 답변이 근거로 인용한 것이고, 파선은 공동인용·"
-                     "PageRank가 올린 후보, 점선은 임베딩이 채운 후보입니다 — 뒤의 둘은 "
-                     "답변이 인용하지 않았습니다.")
-        if len(subgraph["papers"]) > AUTHOR_LIMIT:
-            note = (f"실선: 논문 사이의 REFERENCES 인용. 논문이 {AUTHOR_LIMIT}편을 넘어 "
-                    "글자가 작아지지 "
-                    "않도록 저자는 생략했습니다. 저자 수는 아래 표에서 확인하세요.")
-        st.caption(note)
+        st.caption(graph_legend(subgraph, chatbot.MAX_GRAPH_NODES, mechanism))
     else:
         st.caption("이번 검색에서 시각화할 논문이 없습니다.")
 
@@ -981,11 +1023,25 @@ def show_home(chatbot):
                f'Leiden {report["community_mode"]}')
 
 
-# 이 페이지는 cs.AI 한 분류만 다룹니다.
-CATEGORY = "cs.AI"
+# 처음 보여 줄 분류입니다. 수집 창이 `cs.AI` 기준이라 가장 많지만 **전부는 아닙니다** -
+# 대표 분류로 세면 cs.AI가 30.2%이고, cs.CL·cs.LG·cs.CV가 그 뒤로 48%를 더 가집니다
+# (131종, 2026-10-26). 이 값을 고정으로 두는 동안 이 탭은 저장된 논문의 30%만 보여
+# 주고 있었습니다.
+DEFAULT_CATEGORY = "cs.AI"
+# 고를 수 있게 둘 분류 수입니다. 131개 전부를 세로로 늘어놓으면 고르기가 더 어렵습니다.
+CATEGORY_CHOICES = 10
 
-SCOPES = {f"전체 인용망에서 계산한 뒤 {CATEGORY}만 남기기": "global",
-          f"{CATEGORY} 논문끼리의 인용만으로 계산하기": "subgraph"}
+
+def scopes(code):
+    """계산 범위 라디오의 문구입니다. 고른 분류가 문장에 들어갑니다."""
+    return {f"전체 인용망에서 계산한 뒤 {code}만 남기기": "global",
+            f"{code} 논문끼리의 인용만으로 계산하기": "subgraph"}
+
+
+@st.cache_data(show_spinner=False)
+def category_options():
+    """논문 수 상위 분류 목록입니다. 데이터가 늘어도 손으로 고치지 않습니다."""
+    return load_chatbot().top_categories(CATEGORY_CHOICES)
 
 
 def gds_module():
@@ -1052,9 +1108,9 @@ def pick_session():
 
 
 def show_pagerank(chatbot):
-    """cs.AI 논문의 PageRank 순위를 표와 그래프로 보여 줍니다."""
-    st.subheader(f"{CATEGORY} 인용망 PageRank 순위")
-    st.caption(f"저장된 REFERENCES 인용망에서 {CATEGORY} 논문의 PageRank를 계산합니다. "
+    """고른 분류의 PageRank 순위를 표와 그래프로 보여 줍니다."""
+    st.subheader("인용망 PageRank 순위")
+    st.caption("저장된 REFERENCES 인용망에서 고른 분류 논문의 PageRank를 계산합니다. "
                "인용을 많이 받을수록, 그리고 중요한 논문에게 인용받을수록 점수가 올라갑니다.")
 
     engine = st.radio(
@@ -1080,10 +1136,24 @@ def show_pagerank(chatbot):
             st.rerun()
         return
 
-    code = CATEGORY
+    try:
+        options = category_options()
+    except Exception as exc:
+        st.caption(f"분류 목록 조회 에러: {type(exc).__name__}. {DEFAULT_CATEGORY}로 봅니다.")
+        options = [{"code": DEFAULT_CATEGORY, "papers": None}]
+    labels = {f'{row["code"]}' + (f' ({row["papers"]:,}편)' if row["papers"] else ""):
+              row["code"] for row in options}
+    default = next((label for label, value in labels.items()
+                    if value == DEFAULT_CATEGORY), next(iter(labels)))
+    code = labels[st.selectbox("분류", list(labels),
+                               index=list(labels).index(default),
+                               help="논문 수 상위 "
+                                    f"{CATEGORY_CHOICES}개 분류입니다. 대표 분류 기준입니다.")]
+
+    choices = scopes(code)
     left, right = st.columns([3, 2])
     with left:
-        scope = SCOPES[st.radio("계산 범위", list(SCOPES), horizontal=False)]
+        scope = choices[st.radio("계산 범위", list(choices), horizontal=False)]
     with right:
         limit = st.slider("표시할 논문 수", 5, 50, 20, step=5)
         include_secondary = st.checkbox("부가 분류까지 포함", value=True)
@@ -1137,8 +1207,7 @@ def show_pagerank(chatbot):
     if graph:
         st.write(f"상위 {len(subgraph['papers'])}편 사이의 인용 관계")
         st.graphviz_chart(graph, width="stretch")
-        st.caption(f"상위 {chatbot.MAX_GRAPH_NODES}편까지만 그리고, 그 논문들 사이의 인용만 "
-                   "화살표로 표시합니다.")
+        st.caption(graph_legend(subgraph, chatbot.MAX_GRAPH_NODES))
 
     with st.expander("PageRank를 어떻게 계산했나요"):
         st.markdown(f"""
@@ -1241,6 +1310,9 @@ def answer_question(chatbot, question):
     with st.chat_message("user"):
         st.write(question)
     with st.chat_message("assistant"):
+        # 모델을 부르기 전에 어디로 보낼지 적습니다. 판정은 모델 없이 끝나므로(0원) 기다리는
+        # 동안 보이고, 틀렸으면 기다리지 않고 다시 물을 수 있습니다.
+        st.caption(route_line(routing.classify(question).as_dict()))
         answer_area = st.empty()
         try:
             with st.spinner("근거를 검색하고 답변을 생성하고 있습니다."):

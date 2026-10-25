@@ -141,3 +141,4 @@
 | [ADR-067](ADR-067-warm-the-citation-graph-at-boot.md) | 인용망을 부팅 때 배경에서 올린다 — 첫 방문자가 15초를 혼자 내지 않는다 | 채택 |
 | [ADR-068](ADR-068-modules-live-in-src.md) | 모듈은 `src/`에 산다 — 손으로 적은 목록을 지우는 것이 목적이다 | 채택 |
 | [ADR-069](ADR-069-the-condition-check-keeps-its-quarter.md) | 조건 판정은 4분의 1을 계속 받는다 — 2.2%를 바꾸고, 그 2.2%가 유일한 거름망이다 | 기각 |
+| [ADR-070](ADR-070-the-screen-says-the-category-and-the-route.md) | 화면이 고른 분류와 보낼 경로를 말한다 — 재검토 제안 셋 중 둘을 그대로, 하나를 약하게 | 채택 |
