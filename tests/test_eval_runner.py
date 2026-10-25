@@ -333,7 +333,7 @@ def test_the_row_keeps_the_inside_of_generate():
               "other_seconds": 5.0, "adds_up": True, "tool_calls": 3, "model_turns": 4}
     response = {"answer": "A", "evidence_ids": [], "rows": [], "papers": [],
                 "graph_trace": {"visits": {}, "seconds": {"generate": 35.0},
-                                "attempts": 1, "total_seconds": 35.0},
+                                "rejections": [], "attempts": 1, "total_seconds": 35.0},
                 "generate_trace": inside}
 
     row = evaluate_case({"id": "x", "category": "author", "expected_ids": ["1111.1111"]},
@@ -350,3 +350,18 @@ def test_an_old_run_without_the_inside_gets_no_empty_key():
                         response, mode="agent", top_k=5)
 
     assert "generate_trace" not in row
+
+
+def test_the_row_keeps_which_gate_rejected():
+    """보고서가 이것을 버리면 어느 단계가 막았는지는 방문 횟수에서 추론해야 합니다(ADR-069)."""
+    rejections = [{"node": "check_conditions", "stage": "mixed_candidate_conditions",
+                   "attempt": 1}]
+    response = {"answer": "A", "evidence_ids": [], "rows": [], "papers": [],
+                "graph_trace": {"visits": {"check_conditions": 2}, "seconds": {},
+                                "rejections": rejections, "attempts": 2,
+                                "total_seconds": 1.0}}
+
+    row = evaluate_case({"id": "x", "category": "coauthor", "expected_ids": ["1111.1111"]},
+                        response, mode="agent", top_k=5)
+
+    assert row["graph_trace"]["rejections"] == rejections

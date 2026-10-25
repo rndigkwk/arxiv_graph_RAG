@@ -3936,6 +3936,71 @@ IDLE일 수 없습니다), **화면이 말했어야 할 것을 추론으로 맞�
   Text2Cypher이고 이번에 건드리지 않았습니다.
 - **배포와 로컬의 10초 차이.** Neo4j까지의 거리인지 CPU인지 가르지 않았습니다.
 
+## 11-50. 조건 판정의 무게를 쟀습니다 — 4분의 1을 내고 2.2%를 바꾸며, 그 2.2%의 유일한 거름망입니다 (2026-10-25)
+
+11-46절이 조건을 하나 남겼습니다 — "끄는 결정을 하려면 그 수와 이 4.35초를 나란히 놓아야
+합니다." 그 일을 했고, **돈이 들지 않았습니다.** 기준선 리포트 6개가 노드별 초와 방문 횟수를
+담고 있어서 180회(30질문 × 2모드 × 3회)를 디스크에서 다시 셌습니다.
+
+### 값이 붙는 노드가 둘입니다
+
+| 노드 | 합 | 비중 | p50 | p90 |
+|---|---:|---:|---:|---:|
+| `generate` | <!--n:reports/condition_check_weight.json#cost.nodes.generate.sum_seconds-->2020.3<!--/n-->초 | **<!--n:reports/condition_check_weight.json#cost.nodes.generate.share_percent-->73.3<!--/n-->%** | <!--n:reports/condition_check_weight.json#cost.nodes.generate.p50_seconds-->10.13<!--/n-->초 | <!--n:reports/condition_check_weight.json#cost.nodes.generate.p90_seconds-->15.48<!--/n-->초 |
+| `check_conditions` | <!--n:reports/condition_check_weight.json#cost.nodes.check_conditions.sum_seconds-->737.6<!--/n-->초 | **<!--n:reports/condition_check_weight.json#cost.nodes.check_conditions.share_percent-->26.7<!--/n-->%** | <!--n:reports/condition_check_weight.json#cost.nodes.check_conditions.p50_seconds-->4.01<!--/n-->초 | <!--n:reports/condition_check_weight.json#cost.nodes.check_conditions.p90_seconds-->5.47<!--/n-->초 |
+| `route`·`collect`·`check_format`·`revise`·`accept` | 0.0초 | 0.0% | 0.00초 | 0.00초 |
+
+나머지 다섯 노드는 순수 계산이라 합이 **0.0초**입니다. 조건 판정은 생성을 뺀 전부입니다.
+
+### 반대쪽: 무엇을 바꿨는가
+
+| | 수 |
+|---|---:|
+| 실행 | <!--n:reports/condition_check_weight.json#runs-->180<!--/n-->회 |
+| 게이트가 막은 실행 | **<!--n:reports/condition_check_weight.json#effect.runs_rejected_once-->4<!--/n-->회 (<!--n:reports/condition_check_weight.json#effect.rejected_percent-->2.2<!--/n-->%)** |
+| 그중 `check_conditions` | **<!--n:reports/condition_check_weight.json#effect.by_gate.check_conditions.rejections-->4<!--/n-->회** |
+| `check_format` | **<!--n:reports/condition_check_weight.json#effect.by_gate.check_format.rejections-->0<!--/n-->회** |
+| 보류(`abstain`) | <!--n:reports/condition_check_weight.json#effect.abstained-->0<!--/n-->회 |
+
+네 건은 전부 `coauthor` 질문입니다(`coauthor` 36회 중 4회, 11%). 네 건 모두 **한 번의 수정으로
+통과했습니다** — 가드가 막고, 다시 쓰게 하고, 통과시켰습니다. 보류까지 간 것은 없습니다.
+
+### 네 건은 같은 질문이 아닙니다
+
+`coauthor-01`이 run1·run3에서 막히고 **run2에서는 통과했습니다.** `coauthor-04`와
+`coauthor-06`은 각각 한 번씩입니다. 질문의 성질이 아니라 **생성이 흔들리는 자리**입니다.
+이 구분이 결정을 갈랐습니다 — 네 건이 전부 한 가족이라서 "coauthor만 검사"가 떠오르는데,
+질의 시점에는 가족 라벨이 없고(평가 데이터셋의 `category`입니다), 재현되지 않는 네 점으로
+건너뛰기 규칙을 만들면 측정이 아니라 **추첨**이 됩니다.
+
+### 기각합니다
+
+**지우지 않습니다. 가족으로 가르지도 않습니다**([ADR-069](docs/adr/ADR-069-the-condition-check-keeps-its-quarter.md)).
+`check_format`이 이 세트에서 0회를 막았으므로 네 건을 거른 것은 조건 판정 하나뿐입니다.
+재시도가 전부 성공했다는 사실은 "가드가 필요 없었다"가 아니라 **"가드가 일했다"**입니다.
+싼 심판으로 바꾸는 쪽은 재지 않았습니다 — 지금 있는 증거는 심판 정확도가 라벨 61문항에서
+1.0이라는 것(11-37절)뿐이고, 그것은 바꿀 이유가 아니라 바꾸면 잃을 것을 말합니다.
+
+### 세는 동안 결함이 하나 나왔습니다
+
+**"4회 전부 `check_conditions`"를 손으로 추론해야 했습니다.** 두 게이트는 순서가 정해져
+있어서 **어느 쪽이 막아도 다음 시도에서 `check_format`을 다시 지납니다** — 방문 횟수만으로는
+가를 수 없습니다. `summarize_trace`가 `rejections`를 남기고 `evals/run.py`가 리포트로
+옮기게 했습니다. 단계 이름과 시도 번호만이라 ADR-023의 추적 제한 안입니다.
+
+11-48절의 `attached == 0`, 11-49절의 IDLE/DONE과 같은 종류입니다 — **다른 두 상태가 같은
+모양으로 보이는 결함.** 세 번째입니다. 시험에 대조군을 두었습니다: 형식 검사가 막은 실행을
+조건 판정으로 세면 터집니다(`tests/test_measure_condition_check.py`).
+
+### 재지 못한 것
+
+- **네 건이 무엇을 틀렸는지.** 실패 사유가 리포트에 남지 않습니다. 추적에 남는 것은 단계
+  이름뿐이고, 사유 코드까지 남기는 것은 다음 평가에서 확인할 일입니다.
+- **싼 심판·조건부 실행·`coauthor` 프롬프트.** 전부 평가 한 번(약 22분, 유료)이 먼저입니다.
+- **배포 앱의 비율.** 2.2%는 30문항 합성 세트의 값입니다. 앱에는 정답 라벨이 없습니다.
+- **p50 4.01초와 11-46절의 4.35초는 범위가 다릅니다**(180회 대 routed 90회). 빼서 쓰면 안 됩니다.
+
+
 ## 13. 재현 방법
 
 ```bash
@@ -4008,6 +4073,9 @@ uv run python scripts/measure_answer_latency.py --output reports/answer_latency.
 uv run python scripts/measure_citation_graph_warmup.py --repeats 3 \
   --output reports/citation_graph_warmup.json
 
+# 11-50절: 조건 판정이 받는 값과 바꾸는 값. 저장된 기준선만 읽습니다(API 비용 0원)
+uv run python scripts/measure_condition_check.py
+
 # 11-5절: 로컬 임베딩 모델 비교. 첫 실행은 CPU 인코딩에 모델당 3시간 25분 걸립니다
 uv run --with sentence-transformers python -m models.embedding_tuning.compare_models   --model sentence-transformers/allenai-specter
 ```
@@ -4057,6 +4125,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/answer_latency.json` | 11-46절 — 답변 지연의 노드별 분해 · 11-48절 — `generate` 안쪽이 몇 건에 기록됐는지 |
 | `reports/citation_graph_warmup.json` | 11-49절 — 인용망을 짓는 시간과 캐시된 조회 |
 | `reports/app_memory_warmup.json` | 11-49절 — 예열이 항상 내는 메모리(10-18 보고서를 덮지 않도록 따로 둡니다) |
+| `reports/condition_check_weight.json` | 11-50절 — 조건 판정의 비중·p50과 게이트가 막은 실행 |
 | `reports/variant_study_{graph,base}.json` | 11-1절 — 변형 비교 |
 | `reports/index_cost.json` | 11-2절 — 색인 비용과 커버리지 |
 | `reports/embedding_tuning.json` | 11-3절 — 어댑터와 격자 탐색 |

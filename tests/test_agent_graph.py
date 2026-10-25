@@ -248,3 +248,34 @@ def test_the_route_is_attached_to_the_response_so_it_can_be_counted():
 
     assert state["response"]["route"]["name"] == "graph"
     assert state["response"]["route"]["cues"] == ["citation"]
+
+
+def test_the_trace_names_the_gate_that_rejected():
+    """방문 횟수로는 두 게이트를 가를 수 없습니다.
+
+    어느 쪽이 막아도 다음 시도에서 `check_format`을 다시 지나므로 횟수가 겹칩니다.
+
+    ADR-069에서 저장된 180회 중 재시도 네 건이 어느 단계였는지 손으로 추론해야 했습니다.
+    같은 값을 다시 추론하지 않으려고 막은 게이트가 스스로 이름을 적습니다.
+    """
+    by_format = summarize_trace(run(make_deps(format_failures=1)[0])["trace"])
+    by_condition = summarize_trace(run(make_deps(condition_failures=1)[0])["trace"])
+
+    # 가르려는 두 경우가 방문 횟수에서는 같습니다 - 이것이 없으면 시험이 아무것도 재지 않습니다.
+    assert by_format["visits"]["check_format"] == 2
+    assert by_condition["visits"]["check_format"] == 2
+    assert [entry["stage"] for entry in by_format["rejections"]] == [FORMAT_STAGE]
+    assert [entry["stage"] for entry in by_condition["rejections"]] == [CONDITION_STAGE]
+    assert by_condition["rejections"][0]["node"] == "check_conditions"
+
+
+def test_a_clean_answer_records_no_rejection():
+    """빈 목록은 "한 번에 통과했다"입니다. 없는 키와 다릅니다."""
+    assert summarize_trace(run(make_deps()[0])["trace"])["rejections"] == []
+
+
+def test_both_failures_are_named_when_the_answer_is_abstained():
+    summary = summarize_trace(run(make_deps(format_failures=2)[0])["trace"])
+
+    assert [entry["attempt"] for entry in summary["rejections"]] == [1, 2]
+    assert {entry["stage"] for entry in summary["rejections"]} == {FORMAT_STAGE}

@@ -81,6 +81,13 @@ def _timed(name: str, state: AnswerState, work: Callable[[], dict[str, Any]]) ->
         "attempt": state.get("attempt", 0) + 1,
         "seconds": round(perf_counter() - start, 3),
     }
+    # 막은 게이트가 스스로 이름을 적습니다. **방문 횟수만으로는 두 게이트를 가를 수
+    # 없습니다** - `check_format`이 막아도, `check_conditions`가 막아도 다음 시도에서
+    # `check_format`을 다시 지나므로 횟수가 겹칩니다. ADR-069에서 저장된 180회의 재시도
+    # 네 건이 어느 단계였는지 손으로 추론해야 했습니다. 단계 이름과 시도 번호만 남기므로
+    # ADR-023의 추적 payload 제한 안입니다.
+    if update.get("failure") is not None:
+        entry["rejected"] = update["stage"]
     # 리듀서를 쓰지 않습니다. 노드가 순서대로 한 번씩 돌므로 직접 이어 붙이는 쪽이 읽기 쉽습니다.
     return {**update, "trace": [*state.get("trace", []), entry]}
 
@@ -227,6 +234,12 @@ def summarize_trace(trace: list[dict[str, Any]]) -> dict[str, Any]:
         "nodes": trace,
         "visits": visits,
         "seconds": seconds,
+        # 막힌 자리입니다. 비어 있으면 한 번에 통과했다는 뜻이고, 방문 횟수에서 추론할
+        # 필요가 없습니다(ADR-069).
+        "rejections": [
+            {"node": entry["node"], "stage": entry["rejected"], "attempt": entry["attempt"]}
+            for entry in trace if "rejected" in entry
+        ],
         "attempts": max((entry["attempt"] for entry in trace), default=0),
         "total_seconds": round(sum(entry["seconds"] for entry in trace), 3),
     }
