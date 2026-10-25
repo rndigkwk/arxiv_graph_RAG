@@ -140,3 +140,4 @@
 | [ADR-066](ADR-066-measure-inside-generate.md) | `generate` 안쪽을 잰다 — 괄호로 적어 둔 고백을 분해로 바꾼다 | 채택 |
 | [ADR-067](ADR-067-warm-the-citation-graph-at-boot.md) | 인용망을 부팅 때 배경에서 올린다 — 첫 방문자가 15초를 혼자 내지 않는다 | 채택 |
 | [ADR-068](ADR-068-modules-live-in-src.md) | 모듈은 `src/`에 산다 — 손으로 적은 목록을 지우는 것이 목적이다 | 채택 |
+| [ADR-069](ADR-069-the-condition-check-keeps-its-quarter.md) | 조건 판정은 4분의 1을 계속 받는다 — 2.2%를 바꾸고, 그 2.2%가 유일한 거름망이다 | 기각 |

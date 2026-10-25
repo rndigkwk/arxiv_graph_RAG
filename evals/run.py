@@ -220,8 +220,11 @@ def evaluate_case(
         # 노드별 지연·방문 횟수입니다. "답변이 느리다"를 어느 단계인지로 바꿔 말할 수 있습니다.
         trace = response.get("graph_trace")
         if trace:
+            # `rejections`를 빼면 어느 게이트가 막았는지가 보고서에서 사라집니다. 없으면
+            # 조용히 넘기지 않고 터뜨립니다 - 빠진 키는 0이 아니라 결함입니다.
             row["graph_trace"] = {
-                key: trace[key] for key in ("visits", "seconds", "attempts", "total_seconds")
+                key: trace[key]
+                for key in ("visits", "seconds", "rejections", "attempts", "total_seconds")
             }
         # `generate` 노드 안쪽입니다 - 도구·모델·나머지(ADR-066). 보고서에 남기지 않으면
         # 실행이 끝나는 순간 사라지고, 다시 보려면 **돈을 또 써야** 합니다.

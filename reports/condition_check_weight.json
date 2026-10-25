@@ -1,0 +1,118 @@
+{
+  "cost": {
+    "nodes": {
+      "accept": {
+        "p50_seconds": 0.0,
+        "p90_seconds": 0.0,
+        "share_percent": 0.0,
+        "sum_seconds": 0.0,
+        "visits": 180
+      },
+      "check_conditions": {
+        "p50_seconds": 4.01,
+        "p90_seconds": 5.47,
+        "share_percent": 26.7,
+        "sum_seconds": 737.6,
+        "visits": 184
+      },
+      "check_format": {
+        "p50_seconds": 0.0,
+        "p90_seconds": 0.0,
+        "share_percent": 0.0,
+        "sum_seconds": 0.0,
+        "visits": 184
+      },
+      "collect": {
+        "p50_seconds": 0.0,
+        "p90_seconds": 0.0,
+        "share_percent": 0.0,
+        "sum_seconds": 0.0,
+        "visits": 184
+      },
+      "generate": {
+        "p50_seconds": 10.13,
+        "p90_seconds": 15.48,
+        "share_percent": 73.3,
+        "sum_seconds": 2020.3,
+        "visits": 184
+      },
+      "revise": {
+        "p50_seconds": 0.0,
+        "p90_seconds": 0.0,
+        "share_percent": 0.0,
+        "sum_seconds": 0.0,
+        "visits": 4
+      },
+      "route": {
+        "p50_seconds": 0.0,
+        "p90_seconds": 0.0,
+        "share_percent": 0.0,
+        "sum_seconds": 0.0,
+        "visits": 180
+      }
+    },
+    "total_seconds": 2757.9
+  },
+  "effect": {
+    "abstained": 0,
+    "attribution": {
+      "inferred": 180
+    },
+    "by_gate": {
+      "check_conditions": {
+        "categories": {
+          "coauthor": 4
+        },
+        "rejections": 4
+      },
+      "check_format": {
+        "categories": {},
+        "rejections": 0
+      }
+    },
+    "rejected_percent": 2.2,
+    "rejected_runs": [
+      {
+        "category": "coauthor",
+        "gate": "check_conditions",
+        "id": "coauthor-01",
+        "report": "baseline_routed_run1.json"
+      },
+      {
+        "category": "coauthor",
+        "gate": "check_conditions",
+        "id": "coauthor-04",
+        "report": "baseline_routed_run1.json"
+      },
+      {
+        "category": "coauthor",
+        "gate": "check_conditions",
+        "id": "coauthor-01",
+        "report": "baseline_routed_run3.json"
+      },
+      {
+        "category": "coauthor",
+        "gate": "check_conditions",
+        "id": "coauthor-06",
+        "report": "baseline_routed_run3.json"
+      }
+    ],
+    "runs": 180,
+    "runs_rejected_once": 4
+  },
+  "note": "모델을 부르지 않습니다 - 저장된 리포트만 읽습니다(0원).",
+  "reports": [
+    "reports/baseline_resolve_run1.json",
+    "reports/baseline_resolve_run2.json",
+    "reports/baseline_resolve_run3.json",
+    "reports/baseline_routed_run1.json",
+    "reports/baseline_routed_run2.json",
+    "reports/baseline_routed_run3.json"
+  ],
+  "runs": 180,
+  "verdict": {
+    "condition_p50_seconds": 4.01,
+    "condition_share_percent": 26.7,
+    "outcomes_changed_percent": 2.2
+  }
+}
