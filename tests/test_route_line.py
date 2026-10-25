@@ -86,3 +86,24 @@ def test_the_after_the_fact_caption_is_a_different_line():
 
     assert "Text2Cypher" not in before
     assert "선택 안 됨" not in before
+
+
+def test_a_veto_without_a_cue_is_not_called_a_reason():
+    """배포 앱에서 본 거짓입니다.
+
+    "2303.11366 논문과 관련된 논문을 알려 줘"는 단서 0개에 거부 `similar` 하나였는데,
+    화면이 "좁히지 않은 이유: similar"라고 적었습니다. **좁힐 뻔한 적이 없습니다** -
+    단서가 없으면 거부가 없어도 넓은 경로입니다. 없던 인과를 적고 있었습니다.
+    """
+    route = routing.classify("2303.11366 논문과 관련된 논문을 알려 줘")
+
+    assert not route.cues and route.vetoes
+    assert "좁히지 않은 이유" not in app.route_line(route.as_dict())
+
+
+def test_a_veto_that_actually_overrode_a_cue_is_still_explained():
+    """대조군입니다. 둘 다 숨기면 거부를 설명하는 자리가 사라집니다."""
+    route = routing.classify("Explain the papers citing 2501.00001")
+
+    assert route.cues and route.vetoes
+    assert "좁히지 않은 이유: explain" in app.route_line(route.as_dict())
