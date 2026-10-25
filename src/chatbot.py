@@ -685,6 +685,25 @@ def graph_counts():
     return run_read(GRAPH_COUNTS)[0]
 
 
+TOP_CATEGORIES = """
+MATCH (p:ArxivPaper)
+WHERE p.primary_category IS NOT NULL
+RETURN p.primary_category AS code, count(*) AS papers
+ORDER BY papers DESC, code ASC
+LIMIT $limit
+"""
+
+
+def top_categories(limit=10):
+    """논문 수 상위 분류를 `{code, papers}` 목록으로 돌려줍니다.
+
+    **인용망을 읽지 않습니다.** `category_members`는 메모리의 인용망 배열을 쓰는데, 그
+    배열을 만드는 데 15초가 듭니다 - 목록을 뽑으려고 그걸 부르면 GDS 엔진을 고른 사람도
+    로컬 적재를 기다리게 됩니다. 세는 일은 데이터베이스가 더 잘합니다.
+    """
+    return run_read(TOP_CATEGORIES, {"limit": int(limit)})
+
+
 # ── 인용망 PageRank ────────────────────────────────────────────────────────
 # 기본 엔진입니다. 인용망이 노드 3.8만·관계 6.9만으로 작아 여기서 직접 계산합니다.
 # 인용망을 읽는 데 20초쯤 걸리고, 그 뒤 PageRank 계산 자체는 0.1초 안에 끝납니다.
