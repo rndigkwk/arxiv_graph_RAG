@@ -76,6 +76,27 @@ docker compose --env-file .local\neo4j.env -f compose.local.yml start
 
 중지해도 영구 볼륨 데이터는 남습니다. 이 안내에는 데이터 볼륨을 삭제하는 명령을 포함하지 않습니다.
 
+## 두 배 측정
+
+그래프를 두 배로 키웠을 때의 크기·지연은 **별도 컨테이너**에서 잽니다. 1배 기준선과 이미지·heap·
+page cache·CPU가 같고(`tests/test_measure_double_graph.py`가 대조합니다), 포트(27687)와 볼륨이
+다릅니다. 위의 1배 로컬 DB에는 쓰지 않습니다. 결과는 [ADR-071](docs/adr/ADR-071-double-the-graph-move-only-the-database.md)에 있습니다.
+
+```powershell
+# 1배 컨테이너가 돌고 있으면 CPU를 나눠 쓰므로 잠시 멈춥니다(볼륨은 남습니다).
+docker compose --env-file .local\neo4j.env -f compose.local.yml stop
+docker compose --env-file .local\neo4j.env -f compose.double.yml up -d
+
+# 같은 컨테이너에서 1배를 재고, 거울 사본을 얹어 2배를 잽니다. Aura와 OpenAI를 부르지 않습니다.
+.\.venv\Scripts\python.exe -u scripts\measure_double_graph.py --runs 8
+
+docker compose --env-file .local\neo4j.env -f compose.double.yml stop
+docker compose --env-file .local\neo4j.env -f compose.local.yml start
+```
+
+스크립트는 **빈 DB에서만** 시작합니다. 다시 재려면 측정용 볼륨(`arxiv-graphrag-double-data`)을
+직접 비워야 합니다 — 이 안내와 스크립트는 지우는 명령을 담지 않습니다.
+
 ## 확장 판단
 
 현재 크기의 적재/질의/재시작이 통과하고 메모리 여유가 확인되면 추가 데이터를 별도 스냅샷으로 실험합니다.

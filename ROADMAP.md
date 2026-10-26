@@ -545,7 +545,7 @@ torch·로컬 임베딩 모델·Chroma가 없는 것이 차이입니다. 즉 **�
 
 | | Aura Free (현재) | Aura Pro 1GB | 자체 호스팅 VPS |
 |---|---|---|---|
-| 월 비용 | **$0** | ~$66 | **~$5~7** |
+| 월 비용 | **$0** | ~$66 | **한 자릿수~$31** (아래 정정) |
 | 메모리 | 1GB | 1GB (**증가 없음**) | 4GB |
 | 노드·관계 한도 | 20만 / 40만 | 없음 | 없음 |
 | 일시정지 | 3일 (keep-alive로 해결) | 없음 | 없음 |
@@ -576,6 +576,17 @@ Leiden은 **별도 Aura Graph Analytics 세션**을 띄워야 합니다. 자체 
 **자체 호스팅의 진짜 비용은 돈이 아닙니다.** Streamlit Cloud에서 접속해야 하므로 공개 TLS
 엔드포인트가 필요하고, 인증서·방화벽·인증을 직접 관리해야 합니다. 관리형 백업도 사라집니다.
 Aura Free가 공짜로 주던 부분입니다.
+
+> **2026-10-26 — 두 배를 쟀습니다([ADR-071](docs/adr/ADR-071-double-the-graph-move-only-the-database.md)).**
+> heap 1G · page cache 1G를 고정한 채 거울 사본으로 2배를 적재했더니 그래프 저장소가 <!--n:reports/double_graph.json#stages.2x.data_mib.graph_store-->640.6<!--/n-->MiB로
+> page cache 안에 들어갔고, DB 컨테이너가 쓴 메모리는 <!--n:reports/double_graph.json#stages.2x.memory_during_load.max_gib-->2.14<!--/n-->GiB였습니다. **위 표의 "4GB"는 2배에서도
+> 맞습니다.** 먼저 닿는 것은 메모리가 아니라 `CITATION_EDGES`의 30초 타임아웃입니다 — Aura만큼
+> 먼 DB라면 2배의 p95가 약 <!--n:reports/double_graph.json#growth.aura_projection.citation_edges.aura_p95_projected-->19.9<!--/n-->초(여유 1.5배)로 추정됩니다.
+>
+> **비용 칸은 정정합니다.** "~$5~7"은 10-12의 추정이었습니다. 2026-10에 다시 보니 저가 공급자의
+> 4GB 요금이 올랐거나 판매 중단 표시가 있다는 보고가 있고, Seoul의 GCE e2-medium은 약 $31입니다.
+> 출처마다 수치가 어긋나므로 결제 전에 공급자 페이지를 봐야 합니다. 어느 쪽이든 Aura Pro($66)보다
+> 싸고, 메모리 4배와 GDS를 준다는 결론은 그대로입니다.
 
 ### 8-3. OpenAI API — 지배적 비용 항목
 
@@ -711,8 +722,8 @@ CI가 앱 의존성 전체를 설치하지 않아도 됩니다.
 |---|---:|---|
 | **현재 — Streamlit Cloud + Aura Free** | **$0** | **지금은 이것이 맞습니다.** 사람이 눌러야 깨어나는 것만 약점 |
 | Cloud Run(`min=0`) + Aura Free | ~$0 | 무인 깨우기 해결. FastAPI 분리와 묶을 때만 의미(8-5절) |
-| Streamlit Cloud + 자체 호스팅 Neo4j | **~$5~7** | 한도·일시정지 제거 + **GDS 내장**. 용량이 필요해지면 이쪽 |
-| Cloud Run(`min=0`) + 자체 호스팅 Neo4j | ~$5~7 | 위 둘을 합친 구성 |
+| Streamlit Cloud + 자체 호스팅 Neo4j | **한 자릿수~$31** | 한도·일시정지 제거 + **GDS 내장**. 용량이 필요해지면 이쪽(ADR-071에서 2배를 재고 채택) |
+| Cloud Run(`min=0`) + 자체 호스팅 Neo4j | 한 자릿수~$33 | 위 둘을 합친 구성. **2배 때 기각**(ADR-071) — 앱 이사가 필요 없고, 식을 때마다 예열을 다시 냅니다 |
 | Streamlit Cloud 또는 Cloud Run + **Aura Pro 1GB** | **~$66** | **권하지 않음.** 메모리 증가 0, GDS 여전히 없음 |
 | Cloud Run(상시) + Aura Pro 2GB | ~$200 | 포트폴리오에는 과함 |
 | + 주간 회귀 평가 CI | +$3~5 | 어느 구성에나 추가 가능 |
@@ -721,7 +732,8 @@ CI가 앱 의존성 전체를 설치하지 않아도 됩니다.
 
 1. **지금 바꿀 것은 없습니다.** 현재 구성이 $0이고, 일시정지는 keep-alive로 해결됐으며, 메모리는
    259MB로 한도의 절반도 안 됩니다.
-2. **용량이 필요해지면 자체 호스팅**입니다. Aura Pro의 1/10 가격에 메모리 4배와 GDS 내장을 줍니다.
+2. **용량이 필요해지면 자체 호스팅**입니다. Aura Pro보다 싸게 메모리 4배와 GDS 내장을 줍니다. 2배에서도
+   4GB 한 대로 충분하다는 것을 2026-10-26에 쟀습니다(ADR-071).
    Aura Professional은 월 $66에 **지금 가진 것과 똑같은 1GB**를 주므로 어느 경우에도 선택지가
    아닙니다.
 3. **Cloud Run은 FastAPI 분리(Day 77)와 함께일 때만** 옮길 값이 있습니다. 단독으로 옮기면 dograg
