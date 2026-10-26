@@ -5,8 +5,9 @@ COPY --from=ghcr.io/astral-sh/uv:0.11.29 /uv /usr/local/bin/uv
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv UV_LINK_MODE=copy PATH=/opt/venv/bin:$PATH
 WORKDIR /build
 COPY pyproject.toml uv.lock .python-version ./
-# dev 그룹(평가 전용)은 넣지 않습니다 - Streamlit Cloud와 같은 설치입니다(pyproject의 주석).
-RUN uv sync --locked --no-dev --no-install-project
+# dev 그룹(평가 전용)은 넣지 않습니다 - Streamlit Cloud와 같은 설치에 FastAPI 층(`api` extra,
+# ADR-081)만 더합니다. 앱과 API가 이 이미지 하나를 같이 씁니다.
+RUN uv sync --locked --no-dev --no-install-project --extra api
 WORKDIR /app
 EXPOSE 8501
 # 파일 감시는 끕니다. 배포는 `git pull` 뒤 재시작이고, 감시는 VM CPU를 계속 씁니다.

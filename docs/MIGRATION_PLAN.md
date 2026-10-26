@@ -60,10 +60,14 @@ DB가 먼저입니다.
 - 수집은 VM의 cron에서 돕니다. GitHub Actions에서 돌리면 DB를 열어야 합니다.
 - 먼저 확인할 것: 10-26 시험 실행의 "새 논문 103편/주"가 cs.AI 실제 주간 신규보다 작아 보입니다(창·분류 필터).
 
-## 3. FastAPI 층
+## 3. FastAPI 층 — 코드 (2026-10-27)
 
 - `chatbot.ask`(스트리밍), 부분 그래프, 순위, 품질 데이터를 API로 엽니다. 같은 VM, 같은 코드.
 - 이 단계에서 Streamlit은 그대로 둡니다. 둘이 같은 모듈을 씁니다.
+- `src/api.py`, compose의 `api` 서비스, Caddy의 `/api/*`([ADR-081](adr/ADR-081-fastapi-beside-streamlit-on-the-vm.md)).
+  질문은 SSE, 질문·번역에만 IP별·전체 상한.
+- 남은 것: 배포 뒤 VM 메모리를 다시 잽니다(두 번째 파이썬 프로세스). SSE가 Caddy를 지나 흘러오는지
+  VM 주소에서 봅니다.
 
 ## 4. Next.js (Vercel)
 

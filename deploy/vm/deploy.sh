@@ -20,11 +20,11 @@ C="docker compose --env-file .env -f deploy/vm/compose.yml"
 changed() { ! git diff --quiet "$old" "$new" -- "$@"; }
 # 이미지는 의존성만 굽습니다. 의존성이 바뀌었을 때만 다시 굽습니다.
 if changed pyproject.toml uv.lock .python-version .dockerignore deploy/vm/Dockerfile; then
-  $C build -q app
+  $C build -q app api
 fi
 $C up -d
 # 코드는 마운트돼 있고 파일 감시를 껐으므로, 새 코드는 재시작해야 읽힙니다.
-$C restart app
+$C restart app api
 if changed deploy/vm/Caddyfile; then
   $C restart caddy
 fi

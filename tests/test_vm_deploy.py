@@ -29,7 +29,7 @@ def test_overlapping_timer_runs_step_aside():
 
 
 def test_every_deploy_restarts_the_app():
-    assert re.search(r"^\$C restart app$", DEPLOY, re.MULTILINE)
+    assert re.search(r"^\$C restart app api$", DEPLOY, re.MULTILINE)
     assert "--server.fileWatcherType=none" in Path("deploy/vm/Dockerfile").read_text(
         encoding="utf-8")
 
