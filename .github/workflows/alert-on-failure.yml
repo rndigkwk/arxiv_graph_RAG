@@ -1,0 +1,51 @@
+name: Alert on failure
+# When a scheduled, pushed or manual run of a watched workflow fails on main, open an issue labelled
+# "alert" (GitHub emails the owner), or comment on the open one for the same workflow. Without it a
+# failure is only visible in the Actions tab. Taken from dograg's workflow of the same name.
+#
+# Pull request runs are left out: a red check on the PR already says so.
+#
+# What it cannot see: GitHub *disabling* a scheduled workflow after 60 days without activity is not
+# a failure, so no run completes and nothing fires. ADR-016's switch condition 1 still needs the
+# Actions tab for that.
+on:
+  workflow_run:
+    workflows:
+      - Keep Aura awake
+      - Check deployed app
+      - Regression evaluation
+      - Weekly ingest
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  alert:
+    if: >
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event != 'pull_request'
+    runs-on: ubuntu-latest
+    # Only this job may write, and only issues.
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the alert issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          EVENT: ${{ github.event.workflow_run.event }}
+        run: |
+          gh label create alert --color B60205 --description "A watched workflow failed on main" 2>/dev/null || true
+          title="Failed: $WORKFLOW"
+          body="$WORKFLOW failed ($EVENT, commit ${SHA::7}). Run: $RUN_URL"
+          number="$(gh issue list --label alert --state open --search "in:title \"$title\"" \
+            --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")"
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --label alert --body "$body"
+          fi

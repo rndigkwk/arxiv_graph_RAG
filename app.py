@@ -8,7 +8,7 @@ from urllib.parse import quote
 import streamlit as st
 
 from pipeline import logs
-from src import abstain, citations, quality_board, routing, warmup
+from src import abstain, citations, quality_board, release, routing, warmup
 from src.paper_library import add_paper, compare_selection
 
 
@@ -1291,7 +1291,13 @@ def main():
     citation_warmup(chatbot)
 
     sidebar()
-    st.caption(f"적재된 논문 {chatbot.paper_count:,}편 / 모델 {chatbot.llm_model}")
+    # 배포 표시는 배포 점검이 읽습니다(scripts/check_deployed_app.py). 커밋을 두 번 읽어
+    # 화면과 검색 모듈이 같은 코드인지 봅니다 - 다르면 재부팅이 필요하다는 뜻입니다.
+    loaded = getattr(chatbot, "LOADED_COMMIT", release.OLDER)
+    deployed, stale = release.stamp(release.commit(), loaded)
+    st.caption(f"적재된 논문 {chatbot.paper_count:,}편 / 모델 {chatbot.llm_model} / {deployed}")
+    if stale:
+        st.warning(stale)
 
     home_tab, chat_tab, rank_tab, gate_tab = st.tabs(
         ["홈", "챗봇", "PageRank 순위", "품질 게이트"]
