@@ -1,0 +1,52 @@
+{
+  "source": "reports/inside_generate_2026-10-26.json",
+  "cases": 30,
+  "failed": 0,
+  "model": "gpt-6-luna",
+  "generate": {
+    "traced": 30,
+    "adds_up": 29,
+    "seconds": 409.1,
+    "max_seconds": 37.0,
+    "model_share": 0.796,
+    "tools_share": 0.202,
+    "other_share": 0.002,
+    "tools_share_warm": 0.138
+  },
+  "cold_first_related_call": {
+    "case": "author-02",
+    "seconds": 26.092
+  },
+  "tools": {
+    "translate_to_english": {
+      "calls": 10,
+      "seconds": 19.7,
+      "p50": 1.97,
+      "max": 2.8
+    },
+    "rank_related_papers": {
+      "calls": 25,
+      "seconds": 17.6,
+      "p50": 0.68,
+      "max": 0.97
+    },
+    "resolve_paper": {
+      "calls": 18,
+      "seconds": 9.8,
+      "p50": 0.55,
+      "max": 0.66
+    },
+    "search_graph": {
+      "calls": 33,
+      "seconds": 9.4,
+      "p50": 0.27,
+      "max": 0.4
+    }
+  },
+  "sdk_retries": {
+    "recorded_cases": 30,
+    "total": 0,
+    "by_endpoint": {}
+  },
+  "total_seconds_max": 40.4
+}
