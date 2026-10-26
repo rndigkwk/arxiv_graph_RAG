@@ -118,6 +118,39 @@ def test_two_overlapping_tool_calls_do_not_swap_their_times():
     assert seconds["starts_second"] < 0.3, seconds
 
 
+def test_tools_that_ran_at_the_same_time_count_their_overlap_once():
+    """2026-10-26 `citing-02`: 한 턴이 도구 둘을 동시에 불렀고 나머지가 -0.194초였습니다.
+
+    30문항 중 한 턴에 도구가 둘인 문항은 그것 하나였고, 음수도 그것 하나였습니다.
+    호출마다의 초는 그대로 두고(누가 길었는지), 도구 몫만 벽시계로 셉니다.
+    """
+    inside = tool_timing.InsideGenerate(ticking(0.0, 0.2, 0.6, 1.0))
+
+    inside.on_tool_start({}, "")         # 0.0 rank_related_papers
+    inside.on_tool_start({}, "")         # 0.2 search_graph
+    inside.on_tool_end(ended("search"))  # 0.6
+    inside.on_tool_end(ended("rank"))    # 1.0
+
+    summary = inside.summary(1.0)
+    assert inside.seconds() == {"search": pytest.approx(0.4), "rank": 1.0}
+    assert summary["tools_seconds"] == 1.0
+    assert summary["tools_seconds_summed"] == 1.4
+    # 그냥 더했다면 -0.4가 되어 분해가 틀렸다고 말합니다. 틀린 것은 덧셈이었습니다.
+    assert summary["other_seconds"] == 0.0
+    assert summary["adds_up"] is True
+
+
+@pytest.mark.parametrize(("spans", "covered"), [
+    ([], 0.0),
+    ([(0.0, 1.0), (2.0, 3.0)], 2.0),          # 떨어진 둘은 그대로 더합니다
+    ([(0.0, 1.0), (0.5, 2.0)], 2.0),          # 걸친 둘
+    ([(0.0, 3.0), (1.0, 2.0)], 3.0),          # 하나가 다른 하나 안에
+    ([(1.0, 2.0), (0.0, 1.0)], 2.0),          # 순서와 무관, 맞닿은 끝
+])
+def test_covered_seconds(spans, covered):
+    assert tool_timing.covered_seconds(spans) == pytest.approx(covered)
+
+
 def test_a_failed_tool_keeps_its_time_but_loses_its_name():
     """오류의 끝에는 ToolMessage가 없습니다. 0으로 적으면 나머지가 그만큼 부풉니다."""
     inside = tool_timing.InsideGenerate(ticking(0.0, 1.5))
