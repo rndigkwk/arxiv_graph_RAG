@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-10-26",
+  "what": "Aura -> 로컬 Docker의 VM compose(deploy/vm/compose.yml) 리허설. GCP VM이 아닙니다.",
+  "snapshot": {
+    "counts": {
+      "papers": 38665,
+      "authors": 112962,
+      "authored": 273688,
+      "references": 69438
+    },
+    "export_seconds": 303.4,
+    "bytes": 217237689
+  },
+  "load": {
+    "stage_seconds": {
+      "papers": 169.4,
+      "authors": 8.0,
+      "authored": 19.0,
+      "references": 5.2
+    },
+    "elapsed_seconds": 203.7,
+    "dropped_options": [
+      "arxiv_paper_embedding_index.vector.default_search_expansion_factor=3.0",
+      "arxiv_paper_embedding_index.vector.quantization.type=BINARY"
+    ]
+  },
+  "verify_problems": [],
+  "retrieval": {
+    "cases": 31,
+    "top_k": 10,
+    "identical_lists": 3,
+    "same_top1": 30,
+    "top1_changed": [
+      "topic-code-generation"
+    ],
+    "mean_overlap_at_k": 0.894,
+    "summary": {
+      "hit_at_k": {
+        "before": 1.0,
+        "after": 1.0
+      },
+      "recall_at_k": {
+        "before": 0.6837,
+        "after": 0.6836
+      },
+      "reciprocal_rank": {
+        "before": 1.0,
+        "after": 1.0
+      }
+    },
+    "repeat_identical": {
+      "aura": 31,
+      "vm": 31
+    }
+  },
+  "memory_peak_mib": {
+    "neo4j": 2321.4,
+    "app": 340.4,
+    "caddy": 34.8,
+    "total": 2696.6
+  },
+  "question_seconds": {
+    "author": 27.2,
+    "topic_vector": 27.5,
+    "citing": 40.0
+  }
+}

@@ -32,7 +32,12 @@ DB가 먼저입니다.
 백업 앱이 남습니다. 그래서 **Aura를 깨우는 `keep-alive` 워크플로는 이전 뒤에도 이 저장소에서 끄지
 않습니다**(Aura Free는 쓰지 않으면 일시 중지됩니다).
 
-## 1. GCP VM에 DB와 지금 앱
+## 1. GCP VM에 DB와 지금 앱 — 준비 끝, GCP 가입 대기 (2026-10-26)
+
+**실행 안내는 [GCP_VM.md](GCP_VM.md)입니다.** 같은 compose를 로컬 Docker에서 리허설했습니다
+([ADR-079](adr/ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md)). 아래 "먼저 확인"의 답:
+거울 사본은 **별도 볼륨**(`arxiv-graphrag-double-data`)에 실렸으므로 섞이지 않았습니다. 다만 로컬
+스냅샷(10-14)이 낡아 쓰지 않고, 옮기는 날 Aura에서 다시 내보냅니다.
 
 - VM 한 대(4GB, 서울)에 Neo4j 5.26 Community + GDS Community. Neo4j는 `127.0.0.1`에만 묶고 인터넷에 열지 않습니다.
 - 지금 그래프를 옮겨 싣습니다. 로컬 Docker 볼륨 `arxiv-graphrag-local-data`에 ADR-071 측정의 거울 사본(2배)이

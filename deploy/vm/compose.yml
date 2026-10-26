@@ -1,0 +1,55 @@
+name: arxiv-graphrag-vm
+# GCP VM 한 대에 앱과 DB(ADR-071, docs/GCP_VM.md). 인터넷에는 Caddy의 80·443만 엽니다.
+# Neo4j는 호스트 포트를 열지 않습니다 - 앱은 compose 네트워크로, 사람은 `docker compose exec`로 닿습니다.
+services:
+  neo4j:
+    # compose.local.yml과 같은 이미지·heap·page cache입니다. ADR-071의 1배·2배 측정이 이 설정입니다.
+    image: neo4j@sha256:f1e52d4dc6da122468c4a3c1050a4f5e117f6d3268625237c34d49166f0d6082
+    environment:
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:?.env에 NEO4J_PASSWORD가 없습니다}"
+      NEO4J_server_memory_heap_initial__size: 1G
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 1G
+    volumes:
+      - data:/data
+      - logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+  app:
+    build:
+      context: ../..
+      dockerfile: deploy/vm/Dockerfile
+    # VM에서는 저장소 루트의 .env입니다. 로컬 리허설만 APP_ENV_FILE로 다른 파일을 줍니다.
+    env_file: ${APP_ENV_FILE:-../../.env}
+    environment:
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USERNAME: neo4j
+      NEO4J_DATABASE: neo4j
+    volumes:
+      - ../..:/app
+      - ${SNAPSHOT_DIR:-./snapshot}:/snapshot
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    restart: unless-stopped
+  caddy:
+    image: caddy:2.10.2
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:?.env에 APP_DOMAIN이 없습니다}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - app
+    restart: unless-stopped
+volumes:
+  data:
+  logs:
+  caddy_data:

@@ -31,3 +31,4 @@ reports/eval_not_run.json
 reports/summary.md
 reports/regression_*.json
 reports/junit.xml
+deploy/vm/snapshot/
