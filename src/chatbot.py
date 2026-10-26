@@ -35,7 +35,15 @@ from neo4j_graphrag.types import RetrieverResultItem
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from pipeline import tracing
-from src import agent_graph, pagerank, prompts, release, title_search, tool_timing
+from src import (
+    agent_graph,
+    pagerank,
+    prompts,
+    release,
+    source_check,
+    title_search,
+    tool_timing,
+)
 from src.answer_validation import (
     direct_evidence_ids,
     log_validation_failure,
@@ -75,6 +83,8 @@ def env(*names, default=None):
 # 이 모듈을 **처음 임포트한** 커밋입니다. 화면이 그릴 때 읽는 커밋과 다르면 Streamlit Cloud가
 # 옛 모듈을 붙든 채입니다(`src/release.py`). 임포트 때 한 번만 읽어야 그 차이가 남습니다.
 LOADED_COMMIT = release.commit()
+# 커밋만 비교하면 `src/`를 건드리지 않은 머지에서도 옛 모듈로 보입니다. 내용의 지문을 함께 남깁니다.
+LOADED_SOURCE = source_check.digest()
 
 neo4j_uri = env("NEO4J_URI")
 neo4j_user = env("NEO4J_USER", "NEO4J_USERNAME")
