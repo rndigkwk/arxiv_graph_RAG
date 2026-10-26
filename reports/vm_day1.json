@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-10-26",
+  "what": "GCP VM(e2-medium, asia-northeast3-a, Debian 12, pd-balanced 30GB) 1단계 첫날.",
+  "app_url": "https://8-230-25-138.sslip.io",
+  "snapshot": {
+    "counts": {
+      "papers": 38665,
+      "authors": 112962,
+      "authored": 273688,
+      "references": 69438
+    },
+    "export_seconds": 229.4
+  },
+  "load_wall_seconds": 546.5,
+  "verify_problems": [],
+  "deploy_check": {
+    "first_screen_seconds": 25,
+    "commit": "ac91bf1"
+  },
+  "retrieval": {
+    "cases": 31,
+    "top_k": 10,
+    "identical_lists": 3,
+    "same_top1": 30,
+    "top1_changed": [
+      "topic-code-generation"
+    ],
+    "mean_overlap_at_k": 0.894,
+    "summary": {
+      "hit_at_k": {
+        "before": 1.0,
+        "after": 1.0
+      },
+      "recall_at_k": {
+        "before": 0.6837,
+        "after": 0.6836
+      },
+      "reciprocal_rank": {
+        "before": 1.0,
+        "after": 1.0
+      }
+    }
+  },
+  "memory_peak_mib": {
+    "neo4j": 1609.7,
+    "app": 409.8,
+    "caddy": 59.9
+  },
+  "host_used_peak_mib": 2673,
+  "host_available_after_mib": 1280,
+  "swap_used_mib": {
+    "during_questions_max": 350,
+    "after": 342
+  },
+  "question_seconds": {
+    "author": 30.4,
+    "topic_vector": 42.6,
+    "citing": 42.5
+  }
+}

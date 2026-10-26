@@ -4149,6 +4149,16 @@ ADR-066이 안쪽을 재는 장치를 넣었지만 저장된 90건은 그 전의
 재지 않았습니다. 메모리는 질문 하나의 값입니다. 결정은
 [ADR-079](docs/adr/ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md)에 있습니다.
 
+## 11-55. GCP VM에 올렸습니다 — 검색은 리허설과 같고, 스왑은 싣기가 남긴 것입니다 (2026-10-26)
+
+**잰 것.** e2-medium(서울)에서 싣기·검증 <!--n:reports/vm_day1.json#load_wall_seconds-->546.5<!--/n-->초(리허설의 약 2.7배), 검증 문제 0건.
+31사례 검색은 리허설과 똑같습니다(1위 <!--n:reports/vm_day1.json#retrieval.same_top1-->30<!--/n-->/31, 겹침 <!--n:reports/vm_day1.json#retrieval.mean_overlap_at_k-->0.894<!--/n-->).
+질문 셋 동안 호스트 사용 피크 <!--n:reports/vm_day1.json#host_used_peak_mib-->2673<!--/n-->MiB, 가용 <!--n:reports/vm_day1.json#host_available_after_mib-->1280<!--/n-->MiB.
+스왑 <!--n:reports/vm_day1.json#swap_used_mib.after-->342<!--/n-->MiB는 싣는 동안 밀려난 것이고 질문 동안 늘지 않았습니다.
+
+**말하지 않는 것.** 질문 셋, 한 사람입니다. 답변 지연(30~43초)은 대부분 모델과 조건 검사이고 OpenAI 쪽
+부하에 따라 바뀝니다 - VM의 몫인 도구 시간은 4.2~5.8초였습니다.
+
 ## 13. 재현 방법
 
 ```bash

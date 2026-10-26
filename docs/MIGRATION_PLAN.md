@@ -32,7 +32,10 @@ DB가 먼저입니다.
 백업 앱이 남습니다. 그래서 **Aura를 깨우는 `keep-alive` 워크플로는 이전 뒤에도 이 저장소에서 끄지
 않습니다**(Aura Free는 쓰지 않으면 일시 중지됩니다).
 
-## 1. GCP VM에 DB와 지금 앱 — 준비 끝, GCP 가입 대기 (2026-10-26)
+## 1. GCP VM에 DB와 지금 앱 — 가동 (2026-10-26)
+
+**<https://8-230-25-138.sslip.io>** 에서 돕니다(e2-medium, 서울, 프로젝트 `arxiv-512809`). 첫날 측정은
+[ADR-079](adr/ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md)의 "GCP VM 첫날"입니다.
 
 **실행 안내는 [GCP_VM.md](GCP_VM.md)입니다.** 같은 compose를 로컬 Docker에서 리허설했습니다
 ([ADR-079](adr/ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md)). 아래 "먼저 확인"의 답:

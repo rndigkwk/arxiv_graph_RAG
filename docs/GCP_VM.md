@@ -20,7 +20,8 @@
 winget install Google.CloudSDK
 ```
 
-새 터미널에서 로그인합니다. 브라우저가 열리고, 로그인은 사람이 합니다.
+새 터미널에서 로그인합니다. 브라우저가 열리고, 로그인은 사람이 합니다. **이 PC의 gcloud에는 다른
+프로젝트(dograg)가 잡혀 있었습니다.** 명령마다 `--project=arxiv-512809`를 붙이는 쪽이 안전합니다.
 
 ```powershell
 gcloud auth login
@@ -68,8 +69,12 @@ Aura는 읽기만 합니다(약 5분, 217MB).
 
 ```bash
 uv run python scripts/move_graph.py export --out .local/move
-gcloud compute scp --recurse .local/move arxiv-graphrag:arxiv_graph_RAG/deploy/vm/snapshot --zone=asia-northeast3-a
+gcloud compute ssh arxiv-graphrag --zone=asia-northeast3-a --command "mkdir -p ~/arxiv_graph_RAG/deploy/vm/snapshot"
+gcloud compute scp .local/move/snapshot.json .local/move/papers.jsonl.gz .local/move/authors.jsonl.gz .local/move/authored.jsonl.gz .local/move/references.jsonl.gz arxiv-graphrag:arxiv_graph_RAG/deploy/vm/snapshot/ --zone=asia-northeast3-a
 ```
+
+Windows의 `gcloud compute scp`는 PuTTY의 pscp를 써서 `--recurse`로 디렉터리를 옮기지 못했습니다
+(2026-10-26, `unable to open`). 파일을 나열해 옮깁니다.
 
 VM에서 싣고 검증합니다(리허설에서 싣기 약 3분 반).
 
@@ -87,7 +92,8 @@ VM의 Neo4j 볼륨을 사람이 직접 비웁니다.
 ## 6. 그날 잴 것
 
 - **동시 메모리**(ADR-071 결정 4). 질문을 몇 개 보내면서 `docker stats --no-stream`과 `free -m`을 봅니다.
-  리허설 피크는 셋을 합쳐 2.7GiB였습니다. 스왑을 쓰기 시작하면 8GB(e2-standard-2)로 올립니다.
+  리허설 피크는 셋을 합쳐 2.7GiB였습니다. **질문을 받는 동안** 스왑이 늘면(`vmstat`의 `si`가 0이 아니면)
+  8GB(e2-standard-2)로 올립니다. 싣기·이미지 빌드가 밀어낸 스왑(첫날 342MiB)은 세지 않습니다.
 - **검색이 Aura와 같은지.** 같은 사례를 양쪽에서 돌려 비교합니다(리허설: 순위 지표 같음, 겹침 0.894).
 
 ```bash
