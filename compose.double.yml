@@ -1,0 +1,32 @@
+name: arxiv-graphrag-double
+# 그래프를 두 배로 키웠을 때의 크기·지연을 재는 컨테이너입니다(scripts/measure_double_graph.py).
+# compose.local.yml과 **이미지·메모리·CPU가 같아야** 1배 기준선과 비교됩니다 -
+# tests/test_measure_double_graph.py가 두 파일을 대조합니다. 다른 것은 이름·포트·볼륨뿐입니다.
+services:
+  neo4j:
+    image: neo4j@sha256:f1e52d4dc6da122468c4a3c1050a4f5e117f6d3268625237c34d49166f0d6082
+    container_name: arxiv-graphrag-double
+    ports:
+      - "127.0.0.1:27474:7474"
+      - "127.0.0.1:27687:7687"
+    environment:
+      NEO4J_AUTH: "neo4j/${LOCAL_NEO4J_PASSWORD:?Run local_graph_test.py init first}"
+      NEO4J_server_memory_heap_initial__size: 1G
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 1G
+    mem_limit: 4g
+    cpus: 2
+    volumes:
+      - data:/data
+      - logs:/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: "no"
+volumes:
+  data:
+    name: arxiv-graphrag-double-data
+  logs:
+    name: arxiv-graphrag-double-logs

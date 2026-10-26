@@ -142,3 +142,4 @@
 | [ADR-068](ADR-068-modules-live-in-src.md) | 모듈은 `src/`에 산다 — 손으로 적은 목록을 지우는 것이 목적이다 | 채택 |
 | [ADR-069](ADR-069-the-condition-check-keeps-its-quarter.md) | 조건 판정은 4분의 1을 계속 받는다 — 2.2%를 바꾸고, 그 2.2%가 유일한 거름망이다 | 기각 |
 | [ADR-070](ADR-070-the-screen-says-the-category-and-the-route.md) | 화면이 고른 분류와 보낼 경로를 말한다 — 재검토 제안 셋 중 둘을 그대로, 하나를 약하게 | 채택 |
+| [ADR-071](ADR-071-double-the-graph-move-only-the-database.md) | 두 배가 필요해지면 DB만 옮긴다 — 4GB 한 대면 되고, 먼저 닿는 것은 30초다 | 채택 |

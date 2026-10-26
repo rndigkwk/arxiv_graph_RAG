@@ -1,0 +1,217 @@
+{
+  "generated_at": "2026-10-26T01:14:46.644580+00:00",
+  "target": "bolt://127.0.0.1:27687",
+  "container": {
+    "cpus": 2,
+    "mem_limit_gib": 4,
+    "heap_gib": 1,
+    "pagecache_mib": 1024
+  },
+  "snapshot": {
+    "generated_at": "2026-10-14T03:29:06.496003+00:00",
+    "counts": {
+      "papers": 37854,
+      "authors": 111171,
+      "authored": 268928,
+      "references": 69438
+    }
+  },
+  "statement_timeout_seconds": 30,
+  "runs": 8,
+  "mirror": {
+    "prefix": "mirror:",
+    "differs_from_real_growth": [
+      "저자가 전부 새 사람입니다. 실제 수집에서는 저자가 겹치므로 노드·AUTHORED의 상한입니다.",
+      "인용망이 서로 이어지지 않는 두 덩어리입니다. 읽는 행 수는 맞고 PageRank 의미는 다릅니다.",
+      "임베딩이 원본과 똑같습니다. 벡터 인덱스 크기는 맞고 검색 품질은 재지 않습니다."
+    ]
+  },
+  "scope": "로컬 루프백 지연입니다. 클라우드 VM·인터넷 왕복·동시 접속은 들어 있지 않습니다.",
+  "settings": {
+    "server.memory.heap.initial_size": "1.00GiB",
+    "server.memory.heap.max_size": "1.00GiB",
+    "server.memory.off_heap.block_cache_size": "128",
+    "server.memory.off_heap.max_cacheable_block_size": "512.00KiB",
+    "server.memory.off_heap.transaction_max_size": "2.00GiB",
+    "server.memory.pagecache.directio": "false",
+    "server.memory.pagecache.flush.buffer.enabled": "false",
+    "server.memory.pagecache.flush.buffer.size_in_pages": "128",
+    "server.memory.pagecache.scan.prefetchers": "4",
+    "server.memory.pagecache.size": "1.00GiB",
+    "server.memory.query_cache.per_db_cache_num_entries": "1000"
+  },
+  "stages": {
+    "1x": {
+      "load_seconds": {
+        "papers": 148.7,
+        "authors": 5.9,
+        "authored": 17.9,
+        "references": 4.3
+      },
+      "load_total_seconds": 176.9,
+      "memory_during_load": {
+        "samples": 53,
+        "max_gib": 1.791
+      },
+      "checkpointed": "ClientError",
+      "counts": {
+        "papers": 37854,
+        "authors": 111171,
+        "authored": 268928,
+        "references": 69438
+      },
+      "data_mib": {
+        "store": 450.5,
+        "schema_index": 129.9,
+        "transaction_logs": 513.6,
+        "graph_store": 320.6
+      },
+      "fits_pagecache": true,
+      "queries": {
+        "paper_rows": {
+          "runs": 8,
+          "failures": 0,
+          "rows": 37854,
+          "p50": 1.537,
+          "p95": 1.817,
+          "max": 1.817,
+          "mean": 1.569,
+          "timeout": 30,
+          "headroom_ratio": 16.51
+        },
+        "citation_edges": {
+          "runs": 8,
+          "failures": 0,
+          "rows": 69438,
+          "p50": 2.468,
+          "p95": 2.579,
+          "max": 2.579,
+          "mean": 2.482,
+          "timeout": 30,
+          "headroom_ratio": 11.63
+        },
+        "vector_top5": {
+          "runs": 8,
+          "failures": 0,
+          "rows": 5,
+          "p50": 0.048,
+          "p95": 0.153,
+          "max": 0.153,
+          "mean": 0.052,
+          "timeout": 30,
+          "headroom_ratio": 196.08
+        }
+      },
+      "app_path": {
+        "citation_graph_seconds": 5.77,
+        "pagerank_seconds": 0.178,
+        "chatbot_imported_mb": 220.3,
+        "citation_graph_loaded_mb": 261.4,
+        "peak_mb": 261.5,
+        "streamlit_headroom_mb": 428.5
+      },
+      "memory_after_gib": 1.799
+    },
+    "2x": {
+      "load_seconds": {
+        "papers": 121.8,
+        "authors": 5.6,
+        "authored": 15.7,
+        "references": 4.2
+      },
+      "load_total_seconds": 147.4,
+      "memory_during_load": {
+        "samples": 44,
+        "max_gib": 2.14
+      },
+      "checkpointed": "ClientError",
+      "counts": {
+        "papers": 75708,
+        "authors": 222342,
+        "authored": 537856,
+        "references": 138876
+      },
+      "data_mib": {
+        "store": 918.6,
+        "schema_index": 278.0,
+        "transaction_logs": 1025.7,
+        "graph_store": 640.6
+      },
+      "fits_pagecache": true,
+      "queries": {
+        "paper_rows": {
+          "runs": 8,
+          "failures": 0,
+          "rows": 75708,
+          "p50": 3.019,
+          "p95": 3.134,
+          "max": 3.134,
+          "mean": 3.035,
+          "timeout": 30,
+          "headroom_ratio": 9.57
+        },
+        "citation_edges": {
+          "runs": 8,
+          "failures": 0,
+          "rows": 138876,
+          "p50": 4.925,
+          "p95": 5.012,
+          "max": 5.012,
+          "mean": 4.932,
+          "timeout": 30,
+          "headroom_ratio": 5.99
+        },
+        "vector_top5": {
+          "runs": 8,
+          "failures": 0,
+          "rows": 5,
+          "p50": 0.019,
+          "p95": 0.027,
+          "max": 0.027,
+          "mean": 0.021,
+          "timeout": 30,
+          "headroom_ratio": 1111.11
+        }
+      },
+      "app_path": {
+        "citation_graph_seconds": 11.51,
+        "pagerank_seconds": 0.041,
+        "chatbot_imported_mb": 221.0,
+        "citation_graph_loaded_mb": 296.6,
+        "peak_mb": 297.9,
+        "streamlit_headroom_mb": 392.1
+      },
+      "memory_after_gib": 2.142
+    }
+  },
+  "growth": {
+    "data_mib": {
+      "store": 2.04,
+      "graph_store": 2.0,
+      "schema_index": 2.14,
+      "transaction_logs": 2.0
+    },
+    "queries_p95": {
+      "paper_rows": 1.72,
+      "citation_edges": 1.94,
+      "vector_top5": 0.18
+    },
+    "load_total_seconds": 0.83,
+    "citation_graph_seconds": 1.99,
+    "app_peak_mb": 1.14,
+    "aura_projection": {
+      "paper_rows": {
+        "aura_p95_measured": 7.176,
+        "local_growth": 1.72,
+        "aura_p95_projected": 12.34,
+        "headroom_ratio_projected": 2.43
+      },
+      "citation_edges": {
+        "aura_p95_measured": 10.254,
+        "local_growth": 1.94,
+        "aura_p95_projected": 19.89,
+        "headroom_ratio_projected": 1.51
+      }
+    }
+  }
+}

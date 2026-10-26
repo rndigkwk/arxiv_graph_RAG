@@ -4001,6 +4001,55 @@ IDLE일 수 없습니다), **화면이 말했어야 할 것을 추론으로 맞�
 - **p50 4.01초와 11-46절의 4.35초는 범위가 다릅니다**(180회 대 routed 90회). 빼서 쓰면 안 됩니다.
 
 
+## 11-51. 그래프를 두 배로 쟀습니다 — 메모리는 남고, 먼저 닿는 것은 30초입니다 (2026-10-26)
+
+"Aura Free를 넘겨 두 배로 키우면 어디에 올리나"에 추정 두 개가 열 배 차이로 맞섰습니다. 10-14
+실측의 컨테이너 피크 1.745GiB를 두 배 한 "DB 혼자 4GB"와, 원시 데이터 160MB를 두 배 한
+"2GB급". 앞의 것은 heap 1G·page cache 1G로 **고정한 설정**의 크기였고 뒤의 것은 인덱스를
+뺐습니다. 같은 컨테이너에서 1배를 재고 거울 사본을 얹어 2배를 쟀습니다(0원, Aura 미접속).
+
+| | 1배 | 2배 | 증가 |
+|---|---:|---:|---:|
+| 그래프 저장소 | <!--n:reports/double_graph.json#stages.1x.data_mib.graph_store-->320.6<!--/n-->MiB | <!--n:reports/double_graph.json#stages.2x.data_mib.graph_store-->640.6<!--/n-->MiB | <!--n:reports/double_graph.json#growth.data_mib.graph_store-->2.0<!--/n-->배 |
+| 스키마 인덱스 | <!--n:reports/double_graph.json#stages.1x.data_mib.schema_index-->129.9<!--/n-->MiB | <!--n:reports/double_graph.json#stages.2x.data_mib.schema_index-->278.0<!--/n-->MiB | <!--n:reports/double_graph.json#growth.data_mib.schema_index-->2.14<!--/n-->배 |
+| 트랜잭션 로그 | <!--n:reports/double_graph.json#stages.1x.data_mib.transaction_logs-->513.6<!--/n-->MiB | <!--n:reports/double_graph.json#stages.2x.data_mib.transaction_logs-->1025.7<!--/n-->MiB | <!--n:reports/double_graph.json#growth.data_mib.transaction_logs-->2.0<!--/n-->배 |
+| DB 컨테이너 메모리(샘플 최대) | <!--n:reports/double_graph.json#stages.1x.memory_during_load.max_gib-->1.791<!--/n-->GiB | <!--n:reports/double_graph.json#stages.2x.memory_during_load.max_gib-->2.14<!--/n-->GiB | — |
+| `CITATION_EDGES` p95 | <!--n:reports/double_graph.json#stages.1x.queries.citation_edges.p95-->2.579<!--/n-->초 | <!--n:reports/double_graph.json#stages.2x.queries.citation_edges.p95-->5.012<!--/n-->초 | <!--n:reports/double_graph.json#growth.queries_p95.citation_edges-->1.94<!--/n-->배 |
+| `PAPER_ROWS` p95 | <!--n:reports/double_graph.json#stages.1x.queries.paper_rows.p95-->1.817<!--/n-->초 | <!--n:reports/double_graph.json#stages.2x.queries.paper_rows.p95-->3.134<!--/n-->초 | <!--n:reports/double_graph.json#growth.queries_p95.paper_rows-->1.72<!--/n-->배 |
+| 앱 인용망 예열 | <!--n:reports/double_graph.json#stages.1x.app_path.citation_graph_seconds-->5.77<!--/n-->초 | <!--n:reports/double_graph.json#stages.2x.app_path.citation_graph_seconds-->11.51<!--/n-->초 | <!--n:reports/double_graph.json#growth.citation_graph_seconds-->1.99<!--/n-->배 |
+| 앱 Python 피크 | <!--n:reports/double_graph.json#stages.1x.app_path.peak_mb-->261.5<!--/n-->MB | <!--n:reports/double_graph.json#stages.2x.app_path.peak_mb-->297.9<!--/n-->MB | <!--n:reports/double_graph.json#growth.app_peak_mb-->1.14<!--/n-->배 |
+
+**2배의 그래프 저장소가 page cache 1GiB에 들어갑니다.** "DB 혼자 4GB"는 틀렸습니다 — 4GB 한
+대면 DB에 충분합니다. 앱도 Streamlit Cloud 보장치 690MB에
+<!--n:reports/double_graph.json#stages.2x.app_path.streamlit_headroom_mb-->392.1<!--/n-->MB가 남습니다.
+
+**먼저 닿는 것은 30초 타임아웃입니다.** Aura에서 잰 `CITATION_EDGES` p95 10.25초(10-16
+측정, `reports/graph_load_latency.json`)에 같은 배치의 증가율을 곱하면 2배에서 **<!--n:reports/double_graph.json#growth.aura_projection.citation_edges.aura_p95_projected-->19.89<!--/n-->초,
+여유 <!--n:reports/double_graph.json#growth.aura_projection.citation_edges.headroom_ratio_projected-->1.51<!--/n-->배**입니다. 같은 행
+수가 로컬에서는 2.58초였으니 지연의 대부분은 행 수가 아니라 거리입니다. "Aura만큼 먼 DB"를
+가정한 추정입니다.
+
+결정은 [ADR-071](docs/adr/ADR-071-double-the-graph-move-only-the-database.md)에 적었습니다 —
+두 배가 필요해지면 **DB만** 자체 호스팅으로 옮기고 앱은 Streamlit Cloud에 둡니다. Cloud Run +
+GCE 안은 기각했습니다.
+
+### 첫 실행이 조용히 실패했습니다
+
+알림은 exit 0이라 했지만 스크립트는 1배 적재 뒤 `KeyError`로 멈췄습니다 — 래퍼의 종료 코드였습니다.
+원인은 `du -sk`에 중첩 경로(`/data/databases/neo4j`와 그 아래 `schema`)를 한 번에 넘기면 이미 센
+하위 디렉터리를 다시 적지 않는다는 것입니다. 경로마다 따로 부르게 고치고, 측정용 볼륨만 비운 뒤
+처음부터 다시 쟀습니다.
+
+### 재지 못한 것
+
+- **실제 두 배.** 거울 사본은 저자가 전부 새 사람(상한)이고, 인용망이 두 덩어리이며, 임베딩이
+  똑같습니다. 행 수와 크기는 맞고, 검색 품질과 PageRank 의미는 다릅니다.
+- **클라우드 VM과 거리.** 로컬 루프백·전용 2 CPU입니다. e2-medium은 shared-core입니다.
+- **벡터 검색의 증가.** 1배 p95 <!--n:reports/double_graph.json#stages.1x.queries.vector_top5.p95-->0.153<!--/n-->초는 식은 인덱스를
+  만난 첫 실행이라 2배가 더 빨라 보입니다. 순서 효과이지 증가율이 아닙니다.
+- **`db.checkpoint()`**는 이 판에서 거부됐습니다. 저장소 크기가 정확히 두 배로 나와 비교에는
+  지장이 없습니다.
+
 ## 13. 재현 방법
 
 ```bash
@@ -4076,6 +4125,9 @@ uv run python scripts/measure_citation_graph_warmup.py --repeats 3 \
 # 11-50절: 조건 판정이 받는 값과 바꾸는 값. 저장된 기준선만 읽습니다(API 비용 0원)
 uv run python scripts/measure_condition_check.py
 
+# 11-51절: 그래프 두 배의 크기·지연. 빈 측정용 컨테이너가 먼저입니다(LOCAL_DOCKER.md, 0원, 약 10분)
+uv run python scripts/measure_double_graph.py --runs 8
+
 # 11-5절: 로컬 임베딩 모델 비교. 첫 실행은 CPU 인코딩에 모델당 3시간 25분 걸립니다
 uv run --with sentence-transformers python -m models.embedding_tuning.compare_models   --model sentence-transformers/allenai-specter
 ```
@@ -4126,6 +4178,7 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/citation_graph_warmup.json` | 11-49절 — 인용망을 짓는 시간과 캐시된 조회 |
 | `reports/app_memory_warmup.json` | 11-49절 — 예열이 항상 내는 메모리(10-18 보고서를 덮지 않도록 따로 둡니다) |
 | `reports/condition_check_weight.json` | 11-50절 — 조건 판정의 비중·p50과 게이트가 막은 실행 |
+| `reports/double_graph.json` | 11-51절 — 그래프 두 배의 저장소·메모리·지연과 30초 추정 |
 | `reports/variant_study_{graph,base}.json` | 11-1절 — 변형 비교 |
 | `reports/index_cost.json` | 11-2절 — 색인 비용과 커버리지 |
 | `reports/embedding_tuning.json` | 11-3절 — 어댑터와 격자 탐색 |
