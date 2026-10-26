@@ -1,0 +1,6 @@
+# deploy/vm/Dockerfile은 의존성 목록(pyproject.toml·uv.lock·.python-version)만 복사합니다.
+# 나머지를 빌드 문맥에 보내지 않습니다 - .env와 .local/(스냅샷·비밀번호)이 이미지에 들어가지 않게.
+*
+!pyproject.toml
+!uv.lock
+!.python-version

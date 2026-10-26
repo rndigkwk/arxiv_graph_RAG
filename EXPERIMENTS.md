@@ -4127,6 +4127,28 @@ ADR-066이 안쪽을 재는 장치를 넣었지만 저장된 90건은 그 전의
 같은 유료 평가로 재야 합니다. 저자·최다 피인용 문항은 `search_graph`가 찾은 논문을 넘기므로 세지
 않았습니다. 상관은 원인을 말하지 않습니다.
 
+## 11-54. VM 한 대를 로컬에서 리허설했습니다 — 스키마의 절반이 빠질 뻔했고, 벡터 목록은 열에 하나꼴로 바뀝니다 (2026-10-26)
+
+**왜.** 이전 계획 1단계(GCP VM에 DB와 앱)를 가입 전에 같은 compose(`deploy/vm/compose.yml`)로
+로컬 Docker에서 돌려 봤습니다. 가입하는 날부터 크레딧의 90일이 셉니다.
+
+**잡은 것.** 옛 적재 스크립트는 전문 검색 인덱스 둘을 만들지 않았습니다 - 앱은 떠도 제목 해석이
+`CONTAINS`로 떨어집니다. `scripts/move_graph.py`가 Aura의 `SHOW INDEXES`를 읽어 같은 이름으로
+만들고 `verify`가 대조합니다(음성 대조: 인덱스 하나를 지우면 실패). Aura의 `BINARY` 양자화는
+5.26 Community가 거절하므로 버리고, 버린 것을 보고서에 적습니다.
+
+**잰 것.** 내보내기 <!--n:reports/vm_rehearsal.json#snapshot.export_seconds-->303.4<!--/n-->초,
+싣기 <!--n:reports/vm_rehearsal.json#load.elapsed_seconds-->203.7<!--/n-->초. 31사례 검색은 순위 지표가
+같고(recall@k <!--n:reports/vm_rehearsal.json#retrieval.summary.recall_at_k.after-->0.6836<!--/n-->),
+1위는 <!--n:reports/vm_rehearsal.json#retrieval.same_top1-->30<!--/n-->건이 같고, 열 개 겹침은
+<!--n:reports/vm_rehearsal.json#retrieval.mean_overlap_at_k-->0.894<!--/n-->입니다. 같은 쪽을 두 번
+돌리면 31/31 같으므로 잡음이 아니라 인덱스 차이입니다. 질문 하나 동안 세 컨테이너의 피크 합은
+<!--n:reports/vm_rehearsal.json#memory_peak_mib.total-->2696.6<!--/n-->MiB입니다.
+
+**말하지 않는 것.** GCP VM의 수치가 아닙니다. 겹침 0.894가 답변 품질에 무엇을 하는지는 유료 평가로
+재지 않았습니다. 메모리는 질문 하나의 값입니다. 결정은
+[ADR-079](docs/adr/ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md)에 있습니다.
+
 ## 13. 재현 방법
 
 ```bash

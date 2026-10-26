@@ -1,0 +1,5 @@
+# 인터넷에 여는 것은 이 하나입니다. Let's Encrypt 인증서를 Caddy가 받고 갱신합니다.
+{$APP_DOMAIN} {
+	encode gzip
+	reverse_proxy app:8501
+}
