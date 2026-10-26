@@ -505,6 +505,9 @@ uv run python -m pipeline.capacity
 # 증분 수집 시험 실행 — --load 없이는 Aura에 쓰지 않습니다
 uv run python -m pipeline.ingest --days 7
 
+# 성공한 창을 다시 받게 워터마크만 되감습니다. 지우지는 못합니다 (ADR-074)
+uv run python -m pipeline.ingest --rewind-to 2026-10-20 --reason "보강이 빈 창을 다시 받습니다"
+
 # 공동인용 링크 예측 기준선 사다리
 uv run --extra ml python -m models.link_prediction.train
 

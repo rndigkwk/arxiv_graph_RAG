@@ -890,6 +890,7 @@ A가 768차원 임베딩을 텍스트 피처로 쓰므로, 임베딩 없는 논�
 | 실험 추적 (MLflow, 없으면 파일) | `pipeline/tracking.py` | ✅ 3종 실행 기록 |
 | OAI-PMH 증분 수집 | `pipeline/oai.py` | ✅ 315편 실제 수집 |
 | 용량 검사·부분 실패 격리·멱등 적재 | `pipeline/ingest.py` | ✅ 시험 실행 통과 |
+| 워터마크 되감기(`--rewind-to`) | `pipeline/ingest.py` | ✅ 시험만, 실제로 되감은 적 없음 ([ADR-074](docs/adr/ADR-074-rewind-the-ingest-watermark.md)) |
 | 주간 스케줄 | [`ingest.yml`](.github/workflows/ingest.yml) | ✅ 시험 실행만, 적재는 수동 |
 
 시험 실행 결과: 2일 창에서 cs.AI 315편 수집, 인용 보강 실패 0, 적재 후 예상 관계

@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import re
+from collections import Counter
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from statistics import fmean
 from time import perf_counter
@@ -21,6 +25,49 @@ from evals.telemetry import (
 )
 
 MAX_CONTEXT_ROWS = 50
+
+# openai SDK가 HTTP 요청을 다시 보낼 때 남기는 INFO 로그입니다(`_sleep_for_retry`). 재시도는
+# SDK 안에서 끝나 콜백에도 응답에도 남지 않으므로, 몇 번 일어났는지 알 길이 이것뿐입니다.
+# ADR-073이 재시도를 2번에서 1번으로 줄이면서 "살아난 호출이 몇 번이었는지 모른다"고 적었습니다.
+SDK_LOGGER = "openai._base_client"
+SDK_RETRY_MESSAGE = "Retrying request to %s in %f seconds"
+
+
+class _SdkRetryCounter(logging.Handler):
+    """재시도 로그를 끝점(`responses`·`embeddings`…)별로 셉니다. 메시지 본문은 남기지 않습니다."""
+
+    def __init__(self) -> None:
+        super().__init__(logging.INFO)
+        self.counts: Counter[str] = Counter()
+
+    def emit(self, record: logging.LogRecord) -> None:
+        if record.msg == SDK_RETRY_MESSAGE and record.args:
+            self.counts[str(record.args[0]).rstrip("/").rsplit("/", 1)[-1]] += 1
+
+
+@contextmanager
+def sdk_retries() -> Iterator[Counter[str]]:
+    """이 블록 안에서 일어난 SDK 재시도를 셉니다. 로거 수준은 끝나면 되돌립니다."""
+    logger = logging.getLogger(SDK_LOGGER)
+    counter, previous = _SdkRetryCounter(), logger.level
+    logger.addHandler(counter)
+    if not logger.isEnabledFor(logging.INFO):
+        logger.setLevel(logging.INFO)
+    try:
+        yield counter.counts
+    finally:
+        logger.removeHandler(counter)
+        logger.setLevel(previous)
+
+
+def tool_seconds(response: dict[str, Any]) -> list[dict[str, Any]]:
+    """도구 호출마다 이름과 초만 남깁니다(ADR-066). 인자는 남기지 않습니다.
+
+    합계(`generate_trace.tools_seconds`)만으로는 번역·Cypher·벡터 중 무엇이 긴지 말할 수
+    없습니다. ADR-073이 "번역 지연은 잰 적이 없다"고 적은 값이 여기서 나옵니다.
+    """
+    return [{"name": call.get("name", ""), "seconds": call["seconds"]}
+            for call in response.get("tool_calls", []) or [] if "seconds" in call]
 
 
 # arxiv_id 모양. 골드 Cypher의 매개변수에서 **기준 논문**만 골라내기 위한 것입니다.
@@ -373,7 +420,8 @@ def compare_case(
 
     start = perf_counter()
     try:
-        graph_response, graph_messages = chatbot.ask(case["question"], [])
+        with sdk_retries() as retries:
+            graph_response, graph_messages = chatbot.ask(case["question"], [])
     except ValueError as exc:
         # 검증을 통과하지 못한 답변은 이 앱에서 "답하지 못함"입니다. 한 건의 실패가 나머지
         # 케이스의 측정을 막으면 안 되므로, 0점으로 기록하고 사유를 남기고 계속 갑니다.
@@ -416,6 +464,8 @@ def compare_case(
             "chat_output_tokens": graph_output,
             "embedding_tokens_estimate": graph_embedding_tokens,
             "estimated_api_cost_usd": graph_cost,
+            "sdk_retries": dict(retries),
+            "tool_seconds": tool_seconds(graph_response),
         }
     )
     return {
@@ -567,7 +617,8 @@ def one_case(
     # 기준선까지 돌리지 않고는 비용을 비교할 수 없습니다 - 라우팅 측정이 정확히 그
     # 경우였습니다(ADR-024).
     start = perf_counter()
-    response, messages = chatbot.ask(case["question"], [])
+    with sdk_retries() as retries:
+        response, messages = chatbot.ask(case["question"], [])
     row = evaluate_case(case, response, mode=mode, top_k=top_k)
     agent_input, agent_output = _token_totals(messages)
     agent_cached = cached_input_tokens(messages)
@@ -587,6 +638,9 @@ def one_case(
         "tool_names": [
             call.get("name", "") for call in response.get("tool_calls", []) or []
         ],
+        # 빈 사전은 "재시도 0번"입니다. 키가 없는 옛 보고서와 구별됩니다.
+        "sdk_retries": dict(retries),
+        "tool_seconds": tool_seconds(response),
     })
     return row
 

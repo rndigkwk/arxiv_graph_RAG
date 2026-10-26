@@ -1,0 +1,3243 @@
+{
+  "schema_version": 2,
+  "generated_at": "2026-10-26T05:43:56.947411+00:00",
+  "mode": "agent",
+  "top_k": 5,
+  "dataset": "cases_graph.json",
+  "metadata": {
+    "timestamp_utc": "2026-10-26T05:43:56.947411+00:00",
+    "dataset_file": "cases_graph.json",
+    "dataset_sha256": "27f1fea3bb5961e9b52767b1399d9da1324fbff2bf51ffc91444f37f99670aeb",
+    "mode": "agent",
+    "top_k": 5,
+    "case_ids": [
+      "author-01",
+      "author-02",
+      "author-03",
+      "author-04",
+      "author-05",
+      "author-06",
+      "citing-01",
+      "citing-02",
+      "citing-03",
+      "citing-04",
+      "citing-05",
+      "citing-06",
+      "reference-01",
+      "reference-02",
+      "reference-03",
+      "reference-04",
+      "reference-05",
+      "reference-06",
+      "coauthor-01",
+      "coauthor-02",
+      "coauthor-03",
+      "coauthor-04",
+      "coauthor-05",
+      "coauthor-06",
+      "topcited-01",
+      "topcited-02",
+      "topcited-03",
+      "topcited-04",
+      "topcited-05",
+      "topcited-06"
+    ],
+    "model": "gpt-6-luna",
+    "embedding_model": "text-embedding-3-large",
+    "python_version": "3.12.13",
+    "platform": {
+      "system": "Windows",
+      "release": "11",
+      "machine": "AMD64"
+    },
+    "packages": {
+      "openai": "3.3.0",
+      "langchain": "1.3.16",
+      "neo4j-graphrag": "1.18.0",
+      "tiktoken": "0.14.0"
+    },
+    "git_sha": "10bc8b60c555504f4b833c82621a168775e06b58",
+    "git_dirty": true,
+    "prompt_versions": {
+      "CYPHER_RULES": "0fc2226dcb49",
+      "AGENT_SYSTEM": "72066324526a",
+      "JUDGE_CONTENT": "c09bb82b3769",
+      "TRANSLATE_TO_ENGLISH": "1af68d2a119f",
+      "TRANSLATE_TO_KOREAN": "130e2c8cb43c"
+    }
+  },
+  "pricing": null,
+  "results": [
+    {
+      "id": "author-01",
+      "category": "author",
+      "retrieved_ids": [
+        "2502.13130",
+        "2508.07917"
+      ],
+      "ordered_by": [
+        "answer_value"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [],
+      "evidence_ids": [
+        "2502.13130",
+        "2508.07917"
+      ],
+      "answer": "The collection lists Yuquan Deng as an author on these papers:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2502.13130 | Magma: A Foundation Model for Multimodal AI Agents | cs.CV |\n| 2508.07917 | MolmoAct: Action Reasoning Models that can Reason in Space | cs.RO |",
+      "contexts": [
+        "Cypher: MATCH (a:ArxivAuthorName {name: \"Yuquan Deng\"})-[:AUTHORED]->(p:ArxivPaper) RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category ORDER BY answer_value LIMIT 25\nanswer_value=Magma: A Foundation Model for Multimodal AI Agents | evidence_ids=['2502.13130'] | arxiv_id=2502.13130 | primary_category=cs.CV\nanswer_value=MolmoAct: Action Reasoning Models that can Reason in Space | evidence_ids=['2508.07917'] | arxiv_id=2508.07917 | primary_category=cs.RO"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "author_named"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.01,
+          "generate": 10.156,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.252,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 13.418
+      },
+      "generate_trace": {
+        "generate_seconds": 10.156,
+        "tools_seconds": 0.241,
+        "tool_calls": 1,
+        "model_seconds": 9.865,
+        "model_turns": 2,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.05,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "elapsed_seconds": 13.48773049999727,
+      "chat_input_tokens": 5689,
+      "chat_input_tokens_cached": 2655,
+      "chat_input_tokens_fresh": 3034,
+      "chat_output_tokens": 317,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "search_graph"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "search_graph",
+          "seconds": 0.241
+        }
+      ]
+    },
+    {
+      "id": "author-02",
+      "category": "author",
+      "retrieved_ids": [
+        "2206.15378",
+        "1908.09453",
+        "1903.05614"
+      ],
+      "ordered_by": [
+        "p.published DESC"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "1711.00832",
+        "2206.05825",
+        "1707.06347",
+        "1902.04043",
+        "1606.06271"
+      ],
+      "evidence_ids": [
+        "2206.15378",
+        "1908.09453",
+        "1903.05614"
+      ],
+      "answer": "Three papers in the collection list Finbarr Timbers as an author:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2206.15378 | Mastering the Game of Stratego with Model-Free Multiagent Reinforcement Learning | cs.AI |\n| 1908.09453 | OpenSpiel: A Framework for Reinforcement Learning in Games | cs.LG |\n| 1903.05614 | Computing Approximate Equilibria in Sequential Adversarial Games by Exploitability Descent | cs.AI |",
+      "contexts": [
+        "Cypher: MATCH (a:ArxivAuthorName {name: \"Finbarr Timbers\"})-[:AUTHORED]->(p:ArxivPaper) RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25\nanswer_value=Mastering the Game of Stratego with Model-Free Multiagent Reinforcement Learning | evidence_ids=['2206.15378'] | arxiv_id=2206.15378 | primary_category=cs.AI\nanswer_value=OpenSpiel: A Framework for Reinforcement Learning in Games | evidence_ids=['1908.09453'] | arxiv_id=1908.09453 | primary_category=cs.LG\nanswer_value=Computing Approximate Equilibria in Sequential Adversarial Games by Exploitability Descent | evidence_ids=['1903.05614'] | arxiv_id=1903.05614 | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "author_named"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 36.998,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.424,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 40.422
+      },
+      "generate_trace": {
+        "generate_seconds": 36.998,
+        "tools_seconds": 28.315,
+        "tool_calls": 3,
+        "model_seconds": 8.653,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.03,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 40.45150309999008,
+      "chat_input_tokens": 12371,
+      "chat_input_tokens_cached": 11050,
+      "chat_input_tokens_fresh": 1321,
+      "chat_output_tokens": 350,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 1.986
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.237
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 26.092
+        }
+      ]
+    },
+    {
+      "id": "author-03",
+      "category": "author",
+      "retrieved_ids": [
+        "2407.00215",
+        "2607.18966",
+        "2509.15541"
+      ],
+      "ordered_by": [
+        "answer_value"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2401.05566",
+        "2503.11926",
+        "2212.08073",
+        "2406.07358",
+        "2305.04388"
+      ],
+      "evidence_ids": [
+        "2407.00215",
+        "2607.18966",
+        "2509.15541"
+      ],
+      "answer": "Three papers in the collection list Evgenia Nitishinskaya as an author:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2407.00215 | LLM Critics Help Catch LLM Bugs | cs.SE |\n| 2607.18966 | Measuring Reward-Seeking via Contrastive Belief Updates | cs.AI |\n| 2509.15541 | Stress Testing Deliberative Alignment for Anti-Scheming Training | cs.AI |",
+      "contexts": [
+        "Cypher: MATCH (a:ArxivAuthorName {name: \"Evgenia Nitishinskaya\"})-[:AUTHORED]->(p:ArxivPaper) RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category ORDER BY answer_value LIMIT 25\nanswer_value=LLM Critics Help Catch LLM Bugs | evidence_ids=['2407.00215'] | arxiv_id=2407.00215 | primary_category=cs.SE\nanswer_value=Measuring Reward-Seeking via Contrastive Belief Updates | evidence_ids=['2607.18966'] | arxiv_id=2607.18966 | primary_category=cs.AI\nanswer_value=Stress Testing Deliberative Alignment for Anti-Scheming Training | evidence_ids=['2509.15541'] | arxiv_id=2509.15541 | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "author_named"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 10.055,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 2.993,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 13.048
+      },
+      "generate_trace": {
+        "generate_seconds": 10.055,
+        "tools_seconds": 2.491,
+        "tool_calls": 3,
+        "model_seconds": 7.523,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.041,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 13.088698300009128,
+      "chat_input_tokens": 12363,
+      "chat_input_tokens_cached": 11053,
+      "chat_input_tokens_fresh": 1310,
+      "chat_output_tokens": 316,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 1.611
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.313
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.567
+        }
+      ]
+    },
+    {
+      "id": "author-04",
+      "category": "author",
+      "retrieved_ids": [
+        "2511.01287",
+        "2307.12469",
+        "2106.01157"
+      ],
+      "ordered_by": [
+        "answer_value"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2112.02682",
+        "2003.02320",
+        "2012.05876",
+        "2205.03447",
+        "2003.13084"
+      ],
+      "evidence_ids": [
+        "2511.01287",
+        "2307.12469",
+        "2106.01157"
+      ],
+      "answer": "The collection lists these papers with an author named Limin Sun:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2511.01287 | “Give a Positive Review Only”: An Early Investigation Into In-Paper Prompt Injection Attacks and Defenses for AI Reviewers | cs.CL |\n| 2307.12469 | How Effective Are They? Exploring Large Language Model Based Fuzz Driver Generation | cs.CR |\n| 2106.01157 | Social Engineering in Cybersecurity: A Domain Ontology and Knowledge Graph Application Examples | cs.CR |",
+      "contexts": [
+        "Cypher: MATCH (a:ArxivAuthorName {name: \"Limin Sun\"})-[:AUTHORED]->(p:ArxivPaper) RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category ORDER BY answer_value LIMIT 25\nanswer_value=\"Give a Positive Review Only\": An Early Investigation Into In-Paper Prompt Injection Attacks and Defenses for AI Reviewers | evidence_ids=['2511.01287'] | arxiv_id=2511.01287 | primary_category=cs.CL\nanswer_value=How Effective Are They? Exploring Large Language Model Based Fuzz Driver Generation | evidence_ids=['2307.12469'] | arxiv_id=2307.12469 | primary_category=cs.CR\nanswer_value=Social Engineering in Cybersecurity: A Domain Ontology and Knowledge Graph Application Examples | evidence_ids=['2106.01157'] | arxiv_id=2106.01157 | primary_category=cs.CR"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "author_named"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 11.204,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.155,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 14.359
+      },
+      "generate_trace": {
+        "generate_seconds": 11.204,
+        "tools_seconds": 2.693,
+        "tool_calls": 3,
+        "model_seconds": 8.459,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.052,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 14.39636040001642,
+      "chat_input_tokens": 12366,
+      "chat_input_tokens_cached": 11029,
+      "chat_input_tokens_fresh": 1337,
+      "chat_output_tokens": 371,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 1.778
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.309
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.606
+        }
+      ]
+    },
+    {
+      "id": "author-05",
+      "category": "author",
+      "retrieved_ids": [
+        "2506.21490",
+        "2311.10090"
+      ],
+      "ordered_by": [
+        "p.title"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2003.02979",
+        "1910.05789",
+        "1902.00506",
+        "2103.04000",
+        "2201.12436"
+      ],
+      "evidence_ids": [
+        "2506.21490",
+        "2311.10090"
+      ],
+      "answer": "The collection lists two papers with an author named Matteo Gallici:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2506.21490 | Ad-Hoc Human-AI Coordination Challenge | cs.AI |\n| 2311.10090 | JaxMARL: Multi-Agent RL Environments and Algorithms in JAX | cs.LG |",
+      "contexts": [
+        "Cypher: MATCH (a:ArxivAuthorName {name: \"Matteo Gallici\"})-[:AUTHORED]->(p:ArxivPaper) RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category ORDER BY p.title LIMIT 25\nanswer_value=Ad-Hoc Human-AI Coordination Challenge | evidence_ids=['2506.21490'] | arxiv_id=2506.21490 | primary_category=cs.AI\nanswer_value=JaxMARL: Multi-Agent RL Environments and Algorithms in JAX | evidence_ids=['2311.10090'] | arxiv_id=2311.10090 | primary_category=cs.LG"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "author_named"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 9.737,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 2.482,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 12.219
+      },
+      "generate_trace": {
+        "generate_seconds": 9.737,
+        "tools_seconds": 2.204,
+        "tool_calls": 3,
+        "model_seconds": 7.503,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.03,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 12.249297200003639,
+      "chat_input_tokens": 12190,
+      "chat_input_tokens_cached": 10978,
+      "chat_input_tokens_fresh": 1212,
+      "chat_output_tokens": 277,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 1.179
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.299
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.726
+        }
+      ]
+    },
+    {
+      "id": "author-06",
+      "category": "author",
+      "retrieved_ids": [
+        "2512.13168",
+        "2510.17950"
+      ],
+      "ordered_by": [
+        "p.published DESC"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [],
+      "evidence_ids": [
+        "2512.13168",
+        "2510.17950"
+      ],
+      "answer": "Two papers in the collection list Adina Yakefu as an author:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2512.13168 | Finch: Benchmarking Finance & Accounting across Spreadsheet-Centric Enterprise Workflows | cs.AI |\n| 2510.17950 | RoboChallenge: Large-scale Real-robot Evaluation of Embodied Policies | cs.RO |",
+      "contexts": [
+        "Cypher: MATCH (a:ArxivAuthorName {name: \"Adina Yakefu\"})-[:AUTHORED]->(p:ArxivPaper) RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25\nanswer_value=2512.13168 | evidence_ids=['2512.13168'] | title=Finch: Benchmarking Finance & Accounting across Spreadsheet-Centric Enterprise Workflows | primary_category=cs.AI\nanswer_value=2510.17950 | evidence_ids=['2510.17950'] | title=RoboChallenge: Large-scale Real-robot Evaluation of Embodied Policies | primary_category=cs.RO"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "author_named"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 6.292,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 2.586,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 8.878
+      },
+      "generate_trace": {
+        "generate_seconds": 6.292,
+        "tools_seconds": 0.402,
+        "tool_calls": 1,
+        "model_seconds": 5.868,
+        "model_turns": 2,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.022,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "elapsed_seconds": 8.922642900026403,
+      "chat_input_tokens": 5657,
+      "chat_input_tokens_cached": 5215,
+      "chat_input_tokens_fresh": 442,
+      "chat_output_tokens": 263,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "search_graph"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "search_graph",
+          "seconds": 0.402
+        }
+      ]
+    },
+    {
+      "id": "citing-01",
+      "category": "citing",
+      "retrieved_ids": [
+        "2607.03478",
+        "2608.10209",
+        "2507.08249",
+        "2606.16914",
+        "2606.22495"
+      ],
+      "ordered_by": [
+        "title"
+      ],
+      "anchor_ids": [
+        "2209.00626"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2203.02155",
+        "1906.01820",
+        "1606.06565",
+        "2302.04761",
+        "2210.03629"
+      ],
+      "evidence_ids": [
+        "2607.03478",
+        "2608.10209",
+        "2507.08249",
+        "2606.16914",
+        "2606.22495"
+      ],
+      "answer": "The collection contains five papers that cite “The Alignment Problem from a Deep Learning Perspective”:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2607.03478 | Demonstrating Generalization Failures via Mixtures of Conditional Policies | cs.AI |\n| 2608.10209 | Evaluation-Conditioned Training: Teaching Models to Generalize to Stronger Oversight Regimes | cs.AI |\n| 2507.08249 | Giving AI Agents Access to Cryptocurrency and Smart Contracts Creates New Vectors of AI Harm | cs.AI |\n| 2606.16914 | Greed Is Learned: Visible Incentives as Reward-Hacking Triggers | cs.AI |\n| 2606.22495 | Grounded Scaling: Why Agentic AI Needs Deterministic Environments | cs.AI |",
+      "contexts": [
+        "Title lookup: The Alignment Problem from a Deep Learning Perspective -> 2209.00626 (The Alignment Problem from a Deep Learning Perspective)",
+        "Cypher: MATCH (citing:ArxivPaper)-[:REFERENCES]->(cited:ArxivPaper {arxiv_id: \"2209.00626\"}) RETURN citing.arxiv_id AS answer_value, [citing.arxiv_id] AS evidence_ids, citing.title AS title, citing.primary_category AS primary_category ORDER BY title LIMIT 25\nanswer_value=2607.03478 | evidence_ids=['2607.03478'] | title=Demonstrating Generalization Failures via Mixtures of Conditional Policies | primary_category=cs.AI\nanswer_value=2608.10209 | evidence_ids=['2608.10209'] | title=Evaluation-Conditioned Training: Teaching Models to Generalize to Stronger Oversight Regimes | primary_category=cs.AI\nanswer_value=2507.08249 | evidence_ids=['2507.08249'] | title=Giving AI Agents Access to Cryptocurrency and Smart Contracts Creates New Vectors of AI Harm | primary_category=cs.AI\nanswer_value=2606.16914 | evidence_ids=['2606.16914'] | title=Greed Is Learned: Visible Incentives as Reward-Hacking Triggers | primary_category=cs.AI\nanswer_value=2606.22495 | evidence_ids=['2606.22495'] | title=Grounded Scaling: Why Agentic AI Needs Deterministic Environments | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 9.642,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.469,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 15.111
+      },
+      "generate_trace": {
+        "generate_seconds": 9.642,
+        "tools_seconds": 1.479,
+        "tool_calls": 3,
+        "model_seconds": 8.124,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.039,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 15.143491800001357,
+      "chat_input_tokens": 12736,
+      "chat_input_tokens_cached": 11279,
+      "chat_input_tokens_fresh": 1457,
+      "chat_output_tokens": 436,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.47
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.269
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.74
+        }
+      ]
+    },
+    {
+      "id": "citing-02",
+      "category": "citing",
+      "retrieved_ids": [
+        "2507.05624",
+        "2608.20019"
+      ],
+      "ordered_by": [
+        "answer_value"
+      ],
+      "anchor_ids": [
+        "2204.13707"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "1812.07809",
+        "1810.04805",
+        "2002.05709",
+        "1706.03762",
+        "1805.10205"
+      ],
+      "evidence_ids": [
+        "2507.05624",
+        "2608.20019"
+      ],
+      "answer": "Two papers in the collection cite **“Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities”**:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2507.05624 | ADMC: Attention-based Diffusion Model for Missing Modalities Feature Completion | cs.AI |\n| 2608.20019 | Contrastive Mixed Prompt Learning for Incomplete Multimodal Sentiment Analysis with Unseen Modality Combination | cs.AI |",
+      "contexts": [
+        "Title lookup: Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities -> 2204.13707 (Tag-assisted Multimodal Sentiment Analysis under Uncertain Missing Modalities)",
+        "Cypher: MATCH (p:ArxivPaper)-[:REFERENCES]->(target:ArxivPaper {arxiv_id: \"2204.13707\"}) RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category ORDER BY answer_value LIMIT 25\nanswer_value=ADMC: Attention-based Diffusion Model for Missing Modalities Feature Completion | evidence_ids=['2507.05624'] | arxiv_id=2507.05624 | primary_category=cs.AI\nanswer_value=Contrastive Mixed Prompt Learning for Incomplete Multimodal Sentiment Analysis with Unseen Modality Combination | evidence_ids=['2608.20019'] | arxiv_id=2608.20019 | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 11.602,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.402,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 16.004
+      },
+      "generate_trace": {
+        "generate_seconds": 11.602,
+        "tools_seconds": 1.757,
+        "tool_calls": 3,
+        "model_seconds": 10.039,
+        "model_turns": 3,
+        "unattributed_seconds": 0.0,
+        "other_seconds": -0.194,
+        "adds_up": false,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 16.034451300045475,
+      "chat_input_tokens": 9514,
+      "chat_input_tokens_cached": 8075,
+      "chat_input_tokens_fresh": 1439,
+      "chat_output_tokens": 473,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.561
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.229
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.967
+        }
+      ]
+    },
+    {
+      "id": "citing-03",
+      "category": "citing",
+      "retrieved_ids": [
+        "2608.08634",
+        "2603.04191"
+      ],
+      "ordered_by": [
+        "answer_value"
+      ],
+      "anchor_ids": [
+        "2407.01437"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2304.11406",
+        "2502.09597",
+        "2502.20616",
+        "2005.11401",
+        "2504.19413"
+      ],
+      "evidence_ids": [
+        "2608.08634",
+        "2603.04191"
+      ],
+      "answer": "Two papers in the collection cite “Needle in the Haystack for Memory Based Large Language Models”:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.08634 | Can Open-Weight Models Compete on Financial Text Comprehension? | cs.AI |\n| 2603.04191 | Towards Natural Personalization: Evaluating Long-Horizon Preference Following in Personalized User-LLM Interactions | cs.AI |",
+      "contexts": [
+        "Title lookup: Needle in the Haystack for Memory Based Large Language Models -> 2407.01437 (Needle in the Haystack for Memory Based Large Language Models)",
+        "Cypher: MATCH (citing:ArxivPaper)-[:REFERENCES]->(cited:ArxivPaper) WHERE cited.arxiv_id = \"2407.01437\" RETURN citing.title AS answer_value, [citing.arxiv_id] AS evidence_ids, citing.primary_category AS primary_category ORDER BY answer_value LIMIT 25\nanswer_value=Can Open-Weight Models Compete on Financial Text Comprehension? | evidence_ids=['2608.08634'] | primary_category=cs.AI\nanswer_value=Towards Natural Personalization: Evaluating Long-Horizon Preference Following in Personalized User-LLM Interactions | evidence_ids=['2603.04191'] | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 13.357,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.044,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 18.401
+      },
+      "generate_trace": {
+        "generate_seconds": 13.357,
+        "tools_seconds": 3.481,
+        "tool_calls": 4,
+        "model_seconds": 9.841,
+        "model_turns": 5,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.035,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 4
+      },
+      "elapsed_seconds": 18.42952410003636,
+      "chat_input_tokens": 15474,
+      "chat_input_tokens_cached": 14105,
+      "chat_input_tokens_fresh": 1369,
+      "chat_output_tokens": 330,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 2.06
+        },
+        {
+          "name": "resolve_paper",
+          "seconds": 0.542
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.239
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.639
+        }
+      ]
+    },
+    {
+      "id": "citing-04",
+      "category": "citing",
+      "retrieved_ids": [
+        "2608.20318",
+        "2606.25996"
+      ],
+      "ordered_by": [
+        "title"
+      ],
+      "anchor_ids": [
+        "2410.06215"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2505.03335",
+        "2303.11366",
+        "2110.14168",
+        "2308.10144",
+        "2508.05004"
+      ],
+      "evidence_ids": [
+        "2608.20318",
+        "2606.25996"
+      ],
+      "answer": "The collection contains two papers that cite *DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback*:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2608.20318 | AI4AI-Bench: Benchmarking LLM Agents in Algorithmic Design for Recursive Self-Improvement | cs.AI |\n| 2606.25996 | Autodata: An agentic data scientist to create high quality synthetic data | cs.AI |",
+      "contexts": [
+        "Title lookup: DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback -> 2410.06215 (DataEnvGym: Data Generation Agents in Teacher Environments with Student Feedback)",
+        "Cypher: MATCH (citing:ArxivPaper)-[:REFERENCES]->(cited:ArxivPaper {arxiv_id: \"2410.06215\"}) RETURN citing.title AS answer_value, [citing.arxiv_id] AS evidence_ids, citing.title AS title, citing.primary_category AS primary_category ORDER BY title LIMIT 25\nanswer_value=AI4AI-Bench: Benchmarking LLM Agents in Algorithmic Design for Recursive Self-Improvement | evidence_ids=['2608.20318'] | title=AI4AI-Bench: Benchmarking LLM Agents in Algorithmic Design for Recursive Self-Improvement | primary_category=cs.AI\nanswer_value=Autodata: An agentic data scientist to create high quality synthetic data | evidence_ids=['2606.25996'] | title=Autodata: An agentic data scientist to create high quality synthetic data | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 10.134,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.33,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 15.464
+      },
+      "generate_trace": {
+        "generate_seconds": 10.134,
+        "tools_seconds": 1.704,
+        "tool_calls": 3,
+        "model_seconds": 8.399,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.031,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 15.496402400021907,
+      "chat_input_tokens": 12539,
+      "chat_input_tokens_cached": 11201,
+      "chat_input_tokens_fresh": 1338,
+      "chat_output_tokens": 299,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.517
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.242
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.944
+        }
+      ]
+    },
+    {
+      "id": "citing-05",
+      "category": "citing",
+      "retrieved_ids": [
+        "2606.24722",
+        "2607.20379"
+      ],
+      "ordered_by": [
+        "title"
+      ],
+      "anchor_ids": [
+        "1409.5185"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "1602.05629",
+        "1812.06127",
+        "1812.11446",
+        "1712.01887",
+        "1905.00414"
+      ],
+      "evidence_ids": [
+        "2606.24722",
+        "2607.20379"
+      ],
+      "answer": "The collection contains two papers that cite *Deeply-Supervised Nets*:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.24722 | Decentralised AI Training and Inference with BlockTrain | cs.AI |\n| 2607.20379 | Train the Model, Not the Reader: Decodability Supervision for Verifiable Activation Explanations | cs.AI |",
+      "contexts": [
+        "Title lookup: Deeply-Supervised Nets -> 1409.5185 (Deeply-Supervised Nets)",
+        "Cypher: MATCH (citing:ArxivPaper)-[:REFERENCES]->(target:ArxivPaper {arxiv_id: \"1409.5185\"}) RETURN citing.arxiv_id AS answer_value, [citing.arxiv_id] AS evidence_ids, citing.title AS title, citing.primary_category AS primary_category ORDER BY title LIMIT 25\nanswer_value=2606.24722 | evidence_ids=['2606.24722'] | title=Decentralised AI Training and Inference with BlockTrain | primary_category=cs.AI\nanswer_value=2607.20379 | evidence_ids=['2607.20379'] | title=Train the Model, Not the Reader: Decodability Supervision for Verifiable Activation Explanations | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 12.929,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.031,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 16.96
+      },
+      "generate_trace": {
+        "generate_seconds": 12.929,
+        "tools_seconds": 1.563,
+        "tool_calls": 3,
+        "model_seconds": 11.33,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.036,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 17.009695999964606,
+      "chat_input_tokens": 12685,
+      "chat_input_tokens_cached": 11285,
+      "chat_input_tokens_fresh": 1400,
+      "chat_output_tokens": 469,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.549
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.227
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.786
+        }
+      ]
+    },
+    {
+      "id": "citing-06",
+      "category": "citing",
+      "retrieved_ids": [
+        "2607.25045",
+        "2607.25076"
+      ],
+      "ordered_by": [
+        "title"
+      ],
+      "anchor_ids": [
+        "2604.08401"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2602.13473",
+        "2606.25400",
+        "2604.08401",
+        "2408.06292",
+        "2410.05080"
+      ],
+      "evidence_ids": [
+        "2607.25045",
+        "2607.25076"
+      ],
+      "answer": "The collection contains two papers that cite **“Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing”**:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2607.25045 | CogEEGAgent: Toward Autonomous Cognitive EEG Analysis with Grounded Execution and Selection-Aware Verification | cs.AI |\n| 2607.25076 | Towards an Agent Operating System - Lessons from Classical and Cloud OS | cs.AI |",
+      "contexts": [
+        "Title lookup: Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing -> 2604.08401 (Verify Before You Commit: Towards Faithful Reasoning in LLM Agents via Self-Auditing)",
+        "Cypher: MATCH (citing:ArxivPaper)-[:REFERENCES]->(target:ArxivPaper {arxiv_id: \"2604.08401\"}) RETURN citing.arxiv_id AS answer_value, [citing.arxiv_id] AS evidence_ids, citing.title AS title, citing.primary_category AS primary_category ORDER BY title LIMIT 25\nanswer_value=2607.25045 | evidence_ids=['2607.25045'] | title=CogEEGAgent: Toward Autonomous Cognitive EEG Analysis with Grounded Execution and Selection-Aware Verification | primary_category=cs.AI\nanswer_value=2607.25076 | evidence_ids=['2607.25076'] | title=Towards an Agent Operating System - Lessons from Classical and Cloud OS | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 13.873,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.924,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 17.797
+      },
+      "generate_trace": {
+        "generate_seconds": 13.873,
+        "tools_seconds": 1.574,
+        "tool_calls": 3,
+        "model_seconds": 12.241,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.058,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 17.838526199979242,
+      "chat_input_tokens": 12713,
+      "chat_input_tokens_cached": 11276,
+      "chat_input_tokens_fresh": 1437,
+      "chat_output_tokens": 445,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.582
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.329
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.664
+        }
+      ]
+    },
+    {
+      "id": "reference-01",
+      "category": "reference",
+      "retrieved_ids": [
+        "2412.19663",
+        "2105.09492",
+        "2603.04337"
+      ],
+      "ordered_by": [
+        "c.title"
+      ],
+      "anchor_ids": [
+        "2607.05915"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2505.19713",
+        "2207.04632",
+        "2505.06507",
+        "2505.04481",
+        "2606.13368"
+      ],
+      "evidence_ids": [
+        "2412.19663",
+        "2105.09492",
+        "2603.04337"
+      ],
+      "answer": "The cited papers with primary category cs.CV are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2412.19663 | CAD-GPT: Synthesising CAD Construction Sequence with Spatial Reasoning-Enhanced Multimodal LLMs | cs.CV |\n| 2105.09492 | DeepCAD: A Deep Generative Network for Computer-Aided Design Models | cs.CV |\n| 2603.04337 | Pointer-CAD: Unifying B-Rep and Command Sequences via Pointer-based Edges & Faces Selection | cs.CV |",
+      "contexts": [
+        "Title lookup: PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation -> 2607.05915 (PCBWorld: A Benchmark Environment for Engine-Grounded PCB Design Automation)",
+        "Cypher: MATCH (p:ArxivPaper {arxiv_id: \"2607.05915\"})-[:REFERENCES]->(c:ArxivPaper) WHERE c.primary_category = \"cs.CV\" RETURN c.arxiv_id AS answer_value, [c.arxiv_id] AS evidence_ids, c.title AS title, c.primary_category AS primary_category ORDER BY c.title LIMIT 25\nanswer_value=2412.19663 | evidence_ids=['2412.19663'] | title=CAD-GPT: Synthesising CAD Construction Sequence with Spatial Reasoning-Enhanced Multimodal LLMs | primary_category=cs.CV\nanswer_value=2105.09492 | evidence_ids=['2105.09492'] | title=DeepCAD: A Deep Generative Network for Computer-Aided Design Models | primary_category=cs.CV\nanswer_value=2603.04337 | evidence_ids=['2603.04337'] | title=Pointer-CAD: Unifying B-Rep and Command Sequences via Pointer-based Edges & Faces Selection | primary_category=cs.CV"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 11.515,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.904,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 16.419
+      },
+      "generate_trace": {
+        "generate_seconds": 11.515,
+        "tools_seconds": 1.448,
+        "tool_calls": 3,
+        "model_seconds": 10.031,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.036,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 16.452189499977976,
+      "chat_input_tokens": 12689,
+      "chat_input_tokens_cached": 11265,
+      "chat_input_tokens_fresh": 1424,
+      "chat_output_tokens": 344,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.552
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.23
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.667
+        }
+      ]
+    },
+    {
+      "id": "reference-02",
+      "category": "reference",
+      "retrieved_ids": [
+        "2606.21565",
+        "2508.01780",
+        "2409.17270"
+      ],
+      "ordered_by": [
+        "c.title"
+      ],
+      "anchor_ids": [
+        "2607.04096"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2210.03629",
+        "2508.20453",
+        "2307.16789",
+        "2310.06770",
+        "2307.13854"
+      ],
+      "evidence_ids": [
+        "2606.21565",
+        "2508.01780",
+        "2409.17270"
+      ],
+      "answer": "The cited papers with primary category cs.AI are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2606.21565 | Composing Verifiable Conceptual Models via Building Blocks: Towards Design-Time Verification of Agentic AI Workflows | cs.AI |\n| 2508.01780 | LiveMCPBench: Can Agents Navigate an Ocean of MCP Tools? | cs.AI |\n| 2409.17270 | Proof of Thought : Neurosymbolic Program Synthesis allows Robust and Interpretable Reasoning | cs.AI |",
+      "contexts": [
+        "Title lookup: Forethought: Verifiable Reasoning from Neurosymbolic Primitive Programming -> 2607.04096 (Forethought: Verifiable Reasoning from Neurosymbolic Primitive Programming)",
+        "Cypher: MATCH (p:ArxivPaper {arxiv_id: \"2607.04096\"})-[:REFERENCES]->(c:ArxivPaper) WHERE c.primary_category = \"cs.AI\" RETURN c.title AS answer_value, [c.arxiv_id] AS evidence_ids, c.primary_category AS primary_category ORDER BY c.title LIMIT 25\nanswer_value=Composing Verifiable Conceptual Models via Building Blocks: Towards Design-Time Verification of Agentic AI Workflows | evidence_ids=['2606.21565'] | primary_category=cs.AI\nanswer_value=LiveMCPBench: Can Agents Navigate an Ocean of MCP Tools? | evidence_ids=['2508.01780'] | primary_category=cs.AI\nanswer_value=Proof of Thought : Neurosymbolic Program Synthesis allows Robust and Interpretable Reasoning | evidence_ids=['2409.17270'] | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 11.316,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.736,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 16.052
+      },
+      "generate_trace": {
+        "generate_seconds": 11.316,
+        "tools_seconds": 1.436,
+        "tool_calls": 3,
+        "model_seconds": 9.842,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.038,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 16.08055300003616,
+      "chat_input_tokens": 12589,
+      "chat_input_tokens_cached": 11216,
+      "chat_input_tokens_fresh": 1373,
+      "chat_output_tokens": 374,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.528
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.245
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.663
+        }
+      ]
+    },
+    {
+      "id": "reference-03",
+      "category": "reference",
+      "retrieved_ids": [
+        "2509.15202",
+        "2404.01318",
+        "2406.05946",
+        "2404.13208"
+      ],
+      "ordered_by": [
+        "answer_value"
+      ],
+      "anchor_ids": [
+        "2608.11705"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2402.04249",
+        "2307.15043",
+        "2406.11717",
+        "2203.02155",
+        "2009.03300"
+      ],
+      "evidence_ids": [
+        "2509.15202",
+        "2404.01318",
+        "2406.05946",
+        "2404.13208"
+      ],
+      "answer": "The cited papers with primary category **cs.CR** are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2509.15202 | Beyond Surface Alignment: Rebuilding LLMs Safety Mechanism via Probabilistically Ablating Refusal Direction | cs.CR |\n| 2404.01318 | JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models | cs.CR |\n| 2406.05946 | Safety Alignment Should Be Made More Than Just a Few Tokens Deep | cs.CR |\n| 2404.13208 | The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions | cs.CR |",
+      "contexts": [
+        "Title lookup: Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning -> 2608.11705 (Making Your LLMs More Objective: Stabilizing LLM Safety Behavior Across Traits with Trait-Invariant Safety Tuning)",
+        "Cypher: MATCH (seed:ArxivPaper {arxiv_id: \"2608.11705\"})-[:REFERENCES]->(p:ArxivPaper) WHERE p.primary_category = \"cs.CR\" RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids ORDER BY answer_value LIMIT 25\nanswer_value=Beyond Surface Alignment: Rebuilding LLMs Safety Mechanism via Probabilistically Ablating Refusal Direction | evidence_ids=['2509.15202']\nanswer_value=JailbreakBench: An Open Robustness Benchmark for Jailbreaking Large Language Models | evidence_ids=['2404.01318']\nanswer_value=Safety Alignment Should Be Made More Than Just a Few Tokens Deep | evidence_ids=['2406.05946']\nanswer_value=The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions | evidence_ids=['2404.13208']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 12.338,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.446,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 16.784
+      },
+      "generate_trace": {
+        "generate_seconds": 12.338,
+        "tools_seconds": 1.576,
+        "tool_calls": 3,
+        "model_seconds": 10.727,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.035,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 16.8143041000003,
+      "chat_input_tokens": 12816,
+      "chat_input_tokens_cached": 11336,
+      "chat_input_tokens_fresh": 1480,
+      "chat_output_tokens": 485,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.661
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.229
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.685
+        }
+      ]
+    },
+    {
+      "id": "reference-04",
+      "category": "reference",
+      "retrieved_ids": [
+        "2110.00061",
+        "2403.07718"
+      ],
+      "ordered_by": [
+        "answer_value"
+      ],
+      "anchor_ids": [
+        "2608.18050"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2307.13854",
+        "2404.07972",
+        "2406.12045",
+        "2310.06770",
+        "2306.06070"
+      ],
+      "evidence_ids": [
+        "2110.00061",
+        "2403.07718"
+      ],
+      "answer": "The cited papers with primary category cs.LG are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2110.00061 | PubTables-1M: Towards comprehensive table extraction from unstructured documents | cs.LG |\n| 2403.07718 | WorkArena: How Capable Are Web Agents at Solving Common Knowledge Work Tasks? | cs.LG |",
+      "contexts": [
+        "Title lookup: StagedWorkspace: A Versioned Workspace for Knowledge-Work Agents -> 2608.18050 (StagedWorkspace: A Versioned Workspace for Knowledge-Work Agents)",
+        "Cypher: MATCH (src:ArxivPaper {arxiv_id: \"2608.18050\"})-[:REFERENCES]->(p:ArxivPaper) WHERE p.primary_category = \"cs.LG\" RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids ORDER BY answer_value LIMIT 25\nanswer_value=PubTables-1M: Towards comprehensive table extraction from unstructured documents | evidence_ids=['2110.00061']\nanswer_value=WorkArena: How Capable Are Web Agents at Solving Common Knowledge Work Tasks? | evidence_ids=['2403.07718']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 18.103,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.26,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 22.363
+      },
+      "generate_trace": {
+        "generate_seconds": 18.103,
+        "tools_seconds": 4.02,
+        "tool_calls": 4,
+        "model_seconds": 14.045,
+        "model_turns": 5,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.038,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 4
+      },
+      "elapsed_seconds": 22.391303499985952,
+      "chat_input_tokens": 15582,
+      "chat_input_tokens_cached": 14185,
+      "chat_input_tokens_fresh": 1397,
+      "chat_output_tokens": 325,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 2.579
+        },
+        {
+          "name": "resolve_paper",
+          "seconds": 0.545
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.246
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.65
+        }
+      ]
+    },
+    {
+      "id": "reference-05",
+      "category": "reference",
+      "retrieved_ids": [
+        "2312.00752",
+        "1707.06347"
+      ],
+      "ordered_by": [
+        "title"
+      ],
+      "anchor_ids": [
+        "2411.06429"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2402.03300",
+        "2203.02155",
+        "2210.03629",
+        "2305.18290",
+        "2503.14476"
+      ],
+      "evidence_ids": [
+        "2312.00752",
+        "1707.06347"
+      ],
+      "answer": "The cited papers with primary category cs.LG are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2312.00752 | Mamba: Linear-Time Sequence Modeling with Selective State Spaces | cs.LG |\n| 1707.06347 | Proximal Policy Optimization Algorithms | cs.LG |",
+      "contexts": [
+        "Title lookup: Reinforcement learning for Quantum Tiq-Taq-Toe -> 2411.06429 (Reinforcement learning for Quantum Tiq-Taq-Toe)",
+        "Cypher: MATCH (p:ArxivPaper {arxiv_id: \"2411.06429\"})-[:REFERENCES]->(c:ArxivPaper) WHERE c.primary_category = \"cs.LG\" RETURN c.arxiv_id AS answer_value, [c.arxiv_id] AS evidence_ids, c.title AS title, c.primary_category AS primary_category ORDER BY title LIMIT 25\nanswer_value=2312.00752 | evidence_ids=['2312.00752'] | title=Mamba: Linear-Time Sequence Modeling with Selective State Spaces | primary_category=cs.LG\nanswer_value=1707.06347 | evidence_ids=['1707.06347'] | title=Proximal Policy Optimization Algorithms | primary_category=cs.LG"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 12.899,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.158,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 17.057
+      },
+      "generate_trace": {
+        "generate_seconds": 12.899,
+        "tools_seconds": 3.72,
+        "tool_calls": 4,
+        "model_seconds": 9.146,
+        "model_turns": 5,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.033,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 4
+      },
+      "elapsed_seconds": 17.080799799994566,
+      "chat_input_tokens": 15636,
+      "chat_input_tokens_cached": 14197,
+      "chat_input_tokens_fresh": 1439,
+      "chat_output_tokens": 322,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 2.228
+        },
+        {
+          "name": "resolve_paper",
+          "seconds": 0.573
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.249
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.67
+        }
+      ]
+    },
+    {
+      "id": "reference-06",
+      "category": "reference",
+      "retrieved_ids": [
+        "2510.04374",
+        "2411.15114"
+      ],
+      "ordered_by": [
+        "c.title"
+      ],
+      "anchor_ids": [
+        "2602.07267"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2310.06770",
+        "2410.07095",
+        "2601.11868",
+        "2210.03629",
+        "2307.13854"
+      ],
+      "evidence_ids": [
+        "2510.04374",
+        "2411.15114"
+      ],
+      "answer": "The cited papers with primary category **cs.LG** are:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2510.04374 | GDPval: Evaluating AI Model Performance on Real-World Economically Valuable Tasks | cs.LG |\n| 2411.15114 | RE-Bench: Evaluating frontier AI R&D capabilities of language model agents against human experts | cs.LG |",
+      "contexts": [
+        "Title lookup: BRIDGE: Predicting Human Task Completion Time From Model Performance -> 2602.07267 (BRIDGE: Predicting Human Task Completion Time From Model Performance)",
+        "Cypher: MATCH (p:ArxivPaper {arxiv_id: \"2602.07267\"})-[:REFERENCES]->(c:ArxivPaper) WHERE c.primary_category = \"cs.LG\" RETURN c.arxiv_id AS answer_value, [c.arxiv_id] AS evidence_ids, c.title AS title, c.primary_category AS primary_category ORDER BY c.title LIMIT 25\nanswer_value=2510.04374 | evidence_ids=['2510.04374'] | title=GDPval: Evaluating AI Model Performance on Real-World Economically Valuable Tasks | primary_category=cs.LG\nanswer_value=2411.15114 | evidence_ids=['2411.15114'] | title=RE-Bench: Evaluating frontier AI R&D capabilities of language model agents against human experts | primary_category=cs.LG"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 9.99,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.836,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 13.826
+      },
+      "generate_trace": {
+        "generate_seconds": 9.99,
+        "tools_seconds": 1.512,
+        "tool_calls": 3,
+        "model_seconds": 8.451,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.027,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 13.857696800027043,
+      "chat_input_tokens": 12525,
+      "chat_input_tokens_cached": 11196,
+      "chat_input_tokens_fresh": 1329,
+      "chat_output_tokens": 296,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.613
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.219
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.68
+        }
+      ]
+    },
+    {
+      "id": "coauthor-01",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2303.14382",
+        "2510.01656",
+        "2403.05530",
+        "2510.11345"
+      ],
+      "ordered_by": [
+        "answer_value",
+        "answer_value"
+      ],
+      "anchor_ids": [
+        "2404.04940"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "0711.0189",
+        "1007.1684",
+        "1301.2603",
+        "1901.10204",
+        "2008.10065"
+      ],
+      "evidence_ids": [
+        "2303.14382",
+        "2510.01656",
+        "2403.05530",
+        "2510.11345"
+      ],
+      "answer": "The collection contains these other papers that share the author Han Lu:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 2303.14382 | Active Finetuning: Exploiting Annotation Budget in the Pretraining-Finetuning Paradigm | cs.CV | Han Lu |\n| 2510.01656 | Asymmetric Proximal Policy Optimization: mini-critics boost LLM reasoning | cs.LG | Han Lu |\n| 2403.05530 | Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context | cs.CL | Han Lu |\n| 2510.11345 | Part II: ROLL Flash -- Accelerating RLVR and Agentic Training with Asynchrony | cs.LG | Han Lu |",
+      "contexts": [
+        "Title lookup: Fuzzy K-Means Clustering without Cluster Centroids -> 2404.04940 (Fuzzy K-Means Clustering without Cluster Centroids)",
+        "Cypher: MATCH (seed:ArxivPaper {arxiv_id: \"2404.04940\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> seed.arxiv_id WITH p, collect(DISTINCT a.name) AS shared_authors RETURN p.title AS answer_value, shared_authors, p.arxiv_id AS arxiv_id, [p.arxiv_id] AS evidence_ids ORDER BY answer_value LIMIT 25\nanswer_value=Active Finetuning: Exploiting Annotation Budget in the Pretraining-Finetuning Paradigm | shared_authors=['Han Lu'] | arxiv_id=2303.14382 | evidence_ids=['2303.14382']\nanswer_value=Asymmetric Proximal Policy Optimization: mini-critics boost LLM reasoning | shared_authors=['Han Lu'] | arxiv_id=2510.01656 | evidence_ids=['2510.01656']\nanswer_value=Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context | shared_authors=['Han Lu'] | arxiv_id=2403.05530 | evidence_ids=['2403.05530']\nanswer_value=Part II: ROLL Flash -- Accelerating RLVR and Agentic Training with Asynchrony | shared_authors=['Han Lu'] | arxiv_id=2510.11345 | evidence_ids=['2510.11345']",
+        "Cypher: MATCH (seed:ArxivPaper {arxiv_id: \"2404.04940\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> seed.arxiv_id WITH p, collect(DISTINCT a.name) AS shared_authors RETURN p.arxiv_id AS arxiv_id, p.title AS answer_value, p.primary_category AS primary_category, shared_authors, [p.arxiv_id] AS evidence_ids ORDER BY answer_value LIMIT 25\narxiv_id=2303.14382 | answer_value=Active Finetuning: Exploiting Annotation Budget in the Pretraining-Finetuning Paradigm | primary_category=cs.CV | shared_authors=['Han Lu'] | evidence_ids=['2303.14382']\narxiv_id=2510.01656 | answer_value=Asymmetric Proximal Policy Optimization: mini-critics boost LLM reasoning | primary_category=cs.LG | shared_authors=['Han Lu'] | evidence_ids=['2510.01656']\narxiv_id=2403.05530 | answer_value=Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context | primary_category=cs.CL | shared_authors=['Han Lu'] | evidence_ids=['2403.05530']\narxiv_id=2510.11345 | answer_value=Part II: ROLL Flash -- Accelerating RLVR and Agentic Training with Asynchrony | primary_category=cs.LG | shared_authors=['Han Lu'] | evidence_ids=['2510.11345']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 20.335,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.259,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 24.594
+      },
+      "generate_trace": {
+        "generate_seconds": 20.335,
+        "tools_seconds": 3.414,
+        "tool_calls": 5,
+        "model_seconds": 16.881,
+        "model_turns": 6,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.04,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 5
+      },
+      "elapsed_seconds": 24.616449299966916,
+      "chat_input_tokens": 20992,
+      "chat_input_tokens_cached": 18695,
+      "chat_input_tokens_fresh": 2297,
+      "chat_output_tokens": 774,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "translate_to_english",
+        "search_graph",
+        "rank_related_papers",
+        "search_graph"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.558
+        },
+        {
+          "name": "translate_to_english",
+          "seconds": 1.515
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.292
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.761
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.287
+        }
+      ]
+    },
+    {
+      "id": "coauthor-02",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2504.08324",
+        "1809.05224",
+        "2104.03220"
+      ],
+      "ordered_by": [
+        "title"
+      ],
+      "anchor_ids": [
+        "2402.04674"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "1510.04740",
+        "1711.07137",
+        "2004.10337",
+        "2402.04674",
+        "1705.07874"
+      ],
+      "evidence_ids": [
+        "2504.08324",
+        "1809.05224",
+        "2104.03220"
+      ],
+      "answer": "Three other papers in the collection share an author with the cited paper:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 2504.08324 | An Introduction to Double/Debiased Machine Learning | econ.EM | Victor Chernozhukov |\n| 1809.05224 | Automatic Debiased Machine Learning of Causal and Structural Effects | math.ST | Victor Chernozhukov |\n| 2104.03220 | DoubleML -- An Object-Oriented Implementation of Double Machine Learning in Python | stat.ML | Philipp Bach; Victor Chernozhukov; Martin Spindler |",
+      "contexts": [
+        "Title lookup: Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study -> 2402.04674 (Hyperparameter Tuning for Causal Inference with Double Machine Learning: A Simulation Study)",
+        "Cypher: MATCH (target:ArxivPaper {arxiv_id: \"2402.04674\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> target.arxiv_id WITH p, collect(DISTINCT a.name) AS shared_authors RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, shared_authors ORDER BY title LIMIT 25\nanswer_value=2504.08324 | evidence_ids=['2504.08324'] | title=An Introduction to Double/Debiased Machine Learning | primary_category=econ.EM | shared_authors=['Victor Chernozhukov']\nanswer_value=1809.05224 | evidence_ids=['1809.05224'] | title=Automatic Debiased Machine Learning of Causal and Structural Effects | primary_category=math.ST | shared_authors=['Victor Chernozhukov']\nanswer_value=2104.03220 | evidence_ids=['2104.03220'] | title=DoubleML -- An Object-Oriented Implementation of Double Machine Learning in Python | primary_category=stat.ML | shared_authors=['Philipp Bach', 'Victor Chernozhukov', 'Martin Spindler']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 20.985,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.952,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 25.937
+      },
+      "generate_trace": {
+        "generate_seconds": 20.985,
+        "tools_seconds": 3.483,
+        "tool_calls": 4,
+        "model_seconds": 17.464,
+        "model_turns": 5,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.038,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 4
+      },
+      "elapsed_seconds": 25.96806819998892,
+      "chat_input_tokens": 16048,
+      "chat_input_tokens_cached": 14426,
+      "chat_input_tokens_fresh": 1622,
+      "chat_output_tokens": 474,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 1.961
+        },
+        {
+          "name": "resolve_paper",
+          "seconds": 0.565
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.272
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.686
+        }
+      ]
+    },
+    {
+      "id": "coauthor-03",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2510.15144",
+        "2507.11479",
+        "2504.13641",
+        "2506.06958"
+      ],
+      "ordered_by": [
+        "answer_value"
+      ],
+      "anchor_ids": [
+        "2606.08098"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2305.20050",
+        "2110.14168",
+        "2203.11171",
+        "2305.14325",
+        "2408.03314"
+      ],
+      "evidence_ids": [
+        "2510.15144",
+        "2507.11479",
+        "2504.13641",
+        "2506.06958"
+      ],
+      "answer": "The collection shows four unique other papers that share at least one author with the specified paper:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2510.15144 | HugAgent: A Human Simulation Benchmark for Individual-Level Reasoning | cs.AI |\n| 2507.11479 | Perspective-Aware AI in Extended Reality | cs.AI |\n| 2504.13641 | Propagational Proxy Voting | cs.SI |\n| 2506.06958 | Simulating Society Requires Simulating Thought | cs.CY |",
+      "contexts": [
+        "Title lookup: When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference -> 2606.08098 (When Does Delegation Beat Majority? A Delegation-Based Aggregator for Multi-Sample LLM Inference)",
+        "Cypher: MATCH (seed:ArxivPaper {arxiv_id: \"2606.08098\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> seed.arxiv_id RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.primary_category AS primary_category ORDER BY answer_value LIMIT 25\nanswer_value=HugAgent: A Human Simulation Benchmark for Individual-Level Reasoning | evidence_ids=['2510.15144'] | primary_category=cs.AI\nanswer_value=Perspective-Aware AI in Extended Reality | evidence_ids=['2507.11479'] | primary_category=cs.AI\nanswer_value=Propagational Proxy Voting | evidence_ids=['2504.13641'] | primary_category=cs.SI\nanswer_value=Propagational Proxy Voting | evidence_ids=['2504.13641'] | primary_category=cs.SI\nanswer_value=Simulating Society Requires Simulating Thought | evidence_ids=['2506.06958'] | primary_category=cs.CY"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 17.375,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.353,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 20.728
+      },
+      "generate_trace": {
+        "generate_seconds": 17.375,
+        "tools_seconds": 4.3,
+        "tool_calls": 4,
+        "model_seconds": 13.039,
+        "model_turns": 5,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.036,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 4
+      },
+      "elapsed_seconds": 20.75101900001755,
+      "chat_input_tokens": 16069,
+      "chat_input_tokens_cached": 14437,
+      "chat_input_tokens_fresh": 1632,
+      "chat_output_tokens": 507,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "translate_to_english",
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "translate_to_english",
+          "seconds": 2.803
+        },
+        {
+          "name": "resolve_paper",
+          "seconds": 0.555
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.257
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.686
+        }
+      ]
+    },
+    {
+      "id": "coauthor-04",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2305.14133",
+        "2506.17124"
+      ],
+      "ordered_by": [
+        "title",
+        "p.title"
+      ],
+      "anchor_ids": [
+        "2607.16421"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "1707.06347",
+        "1612.01474",
+        "1705.08439",
+        "1702.06054",
+        "1705.02670"
+      ],
+      "evidence_ids": [
+        "2305.14133",
+        "2506.17124"
+      ],
+      "answer": "The collection contains two other papers that share the author Josiah P. Hanna with *When to Plan: Learning to Select Between Reactive Control and Deliberative Planning*.\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 2305.14133 | Conditional Mutual Information for Disentangled Representations in Reinforcement Learning | cs.LG | Josiah P. Hanna |\n| 2506.17124 | When Can Model-Free Reinforcement Learning be Enough for Thinking? | cs.AI | Josiah P. Hanna |",
+      "contexts": [
+        "Title lookup: When to Plan: Learning to Select Between Reactive Control and Deliberative Planning -> 2607.16421 (When to Plan: Learning to Select Between Reactive Control and Deliberative Planning)",
+        "Cypher: MATCH (seed:ArxivPaper {arxiv_id: \"2607.16421\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> seed.arxiv_id WITH p, collect(DISTINCT a.name) AS shared_authors RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, shared_authors AS shared_authors ORDER BY title LIMIT 25\nanswer_value=2305.14133 | evidence_ids=['2305.14133'] | title=Conditional Mutual Information for Disentangled Representations in Reinforcement Learning | shared_authors=['Josiah P. Hanna']\nanswer_value=2506.17124 | evidence_ids=['2506.17124'] | title=When Can Model-Free Reinforcement Learning be Enough for Thinking? | shared_authors=['Josiah P. Hanna']",
+        "Cypher: MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2305.14133\", \"2506.17124\"] RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.title LIMIT 25\nanswer_value=2305.14133 | evidence_ids=['2305.14133'] | title=Conditional Mutual Information for Disentangled Representations in Reinforcement Learning | primary_category=cs.LG\nanswer_value=2506.17124 | evidence_ids=['2506.17124'] | title=When Can Model-Free Reinforcement Learning be Enough for Thinking? | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 15.872,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.018,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 20.89
+      },
+      "generate_trace": {
+        "generate_seconds": 15.872,
+        "tools_seconds": 1.733,
+        "tool_calls": 4,
+        "model_seconds": 14.1,
+        "model_turns": 5,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.039,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 4
+      },
+      "elapsed_seconds": 20.926712000044063,
+      "chat_input_tokens": 16923,
+      "chat_input_tokens_cached": 15186,
+      "chat_input_tokens_fresh": 1737,
+      "chat_output_tokens": 530,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers",
+        "search_graph"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.47
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.287
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.75
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.227
+        }
+      ]
+    },
+    {
+      "id": "coauthor-05",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "1802.07127",
+        "2311.17582"
+      ],
+      "ordered_by": [
+        "p.title",
+        "p.title"
+      ],
+      "anchor_ids": [
+        "1402.0565"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "1401.1247",
+        "1207.1359",
+        "1606.06888",
+        "1903.05511",
+        "0810.4214"
+      ],
+      "evidence_ids": [
+        "1802.07127",
+        "2311.17582"
+      ],
+      "answer": "The collection contains two other papers that share an author with *Lifted Variable Elimination: Decoupling the Operators from the Constraint Language*:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 1802.07127 | Actions Speak Louder Than Goals: Valuing Player Actions in Soccer | stat.AP | Jesse Davis |\n| 2311.17582 | LoCoMotif: Discovering time-warped motifs in time series | cs.LG | Hendrik Blockeel |",
+      "contexts": [
+        "Title lookup: Lifted Variable Elimination: Decoupling the Operators from the Constraint Language -> 1402.0565 (Lifted Variable Elimination: Decoupling the Operators from the Constraint Language)",
+        "Cypher: MATCH (seed:ArxivPaper {arxiv_id: \"1402.0565\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> seed.arxiv_id WITH DISTINCT p, a MATCH (a)-[:AUTHORED]->(seed) RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category ORDER BY p.title LIMIT 25\nanswer_value=Actions Speak Louder Than Goals: Valuing Player Actions in Soccer | evidence_ids=['1802.07127'] | arxiv_id=1802.07127 | primary_category=stat.AP\nanswer_value=Actions Speak Louder Than Goals: Valuing Player Actions in Soccer | evidence_ids=['1802.07127'] | arxiv_id=1802.07127 | primary_category=stat.AP\nanswer_value=LoCoMotif: Discovering time-warped motifs in time series | evidence_ids=['2311.17582'] | arxiv_id=2311.17582 | primary_category=cs.LG\nanswer_value=LoCoMotif: Discovering time-warped motifs in time series | evidence_ids=['2311.17582'] | arxiv_id=2311.17582 | primary_category=cs.LG",
+        "Cypher: MATCH (seed:ArxivPaper {arxiv_id: \"1402.0565\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> seed.arxiv_id WITH p, collect(DISTINCT a.name) AS shared_authors RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, shared_authors AS shared_authors ORDER BY p.title LIMIT 25\nanswer_value=Actions Speak Louder Than Goals: Valuing Player Actions in Soccer | evidence_ids=['1802.07127'] | arxiv_id=1802.07127 | primary_category=stat.AP | shared_authors=['Jesse Davis']\nanswer_value=LoCoMotif: Discovering time-warped motifs in time series | evidence_ids=['2311.17582'] | arxiv_id=2311.17582 | primary_category=cs.LG | shared_authors=['Hendrik Blockeel']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 17.612,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.387,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 21.999
+      },
+      "generate_trace": {
+        "generate_seconds": 17.612,
+        "tools_seconds": 1.843,
+        "tool_calls": 4,
+        "model_seconds": 15.732,
+        "model_turns": 5,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.037,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 4
+      },
+      "elapsed_seconds": 22.030206600029487,
+      "chat_input_tokens": 17440,
+      "chat_input_tokens_cached": 15423,
+      "chat_input_tokens_fresh": 2017,
+      "chat_output_tokens": 648,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers",
+        "search_graph"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.55
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.303
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.634
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.356
+        }
+      ]
+    },
+    {
+      "id": "coauthor-06",
+      "category": "coauthor",
+      "retrieved_ids": [
+        "2110.06197",
+        "2606.18206",
+        "2512.10858"
+      ],
+      "ordered_by": [
+        "title"
+      ],
+      "anchor_ids": [
+        "1805.09112"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "1006.5169",
+        "2412.01023",
+        "1806.03417",
+        "2201.03187",
+        "2306.14291"
+      ],
+      "evidence_ids": [
+        "2110.06197",
+        "2606.18206",
+        "2512.10858"
+      ],
+      "answer": "The collection contains three other papers that share an author with *Hyperbolic Neural Networks*:\n\n| arXiv ID | Title | Primary category | Shared author |\n|---|---|---|---|\n| 2110.06197 | Crystal Diffusion Variational Autoencoder for Periodic Material Generation | cs.LG | Octavian-Eugen Ganea |\n| 2606.18206 | Fixed-Point Reasoners: Stable and Adaptive Deep Looped Transformers | cs.AI | Thomas Hofmann |\n| 2512.10858 | Scaling Behavior of Discrete Diffusion Language Models | cs.LG | Thomas Hofmann |",
+      "contexts": [
+        "Title lookup: Hyperbolic Neural Networks -> 1805.09112 (Hyperbolic Neural Networks)",
+        "Cypher: MATCH (seed:ArxivPaper {arxiv_id: \"1805.09112\"})<-[:AUTHORED]-(a:ArxivAuthorName)-[:AUTHORED]->(p:ArxivPaper) WHERE p.arxiv_id <> seed.arxiv_id WITH p, collect(DISTINCT a.name) AS shared_authors RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, shared_authors ORDER BY title LIMIT 25\nanswer_value=2110.06197 | evidence_ids=['2110.06197'] | title=Crystal Diffusion Variational Autoencoder for Periodic Material Generation | primary_category=cs.LG | shared_authors=['Octavian-Eugen Ganea']\nanswer_value=2606.18206 | evidence_ids=['2606.18206'] | title=Fixed-Point Reasoners: Stable and Adaptive Deep Looped Transformers | primary_category=cs.AI | shared_authors=['Thomas Hofmann']\nanswer_value=2512.10858 | evidence_ids=['2512.10858'] | title=Scaling Behavior of Discrete Diffusion Language Models | primary_category=cs.LG | shared_authors=['Thomas Hofmann']"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "share_author"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 10.611,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.747,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 14.358
+      },
+      "generate_trace": {
+        "generate_seconds": 10.611,
+        "tools_seconds": 1.412,
+        "tool_calls": 3,
+        "model_seconds": 9.168,
+        "model_turns": 4,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.031,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 3
+      },
+      "elapsed_seconds": 14.391739499988034,
+      "chat_input_tokens": 12703,
+      "chat_input_tokens_cached": 11256,
+      "chat_input_tokens_fresh": 1447,
+      "chat_output_tokens": 360,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "resolve_paper",
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.437
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.358
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.618
+        }
+      ]
+    },
+    {
+      "id": "topcited-01",
+      "category": "topcited",
+      "retrieved_ids": [
+        "2210.03629",
+        "2402.03300",
+        "2302.04761"
+      ],
+      "ordered_by": [
+        "citation_count DESC"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2303.11366",
+        "2310.06770",
+        "2307.16789",
+        "2307.13854",
+        "2201.11903"
+      ],
+      "evidence_ids": [
+        "2210.03629",
+        "2402.03300",
+        "2302.04761"
+      ],
+      "answer": "The three most-cited papers with primary category cs.CL in this collection are:\n\n| arXiv ID | Title | Primary category | Citations |\n|---|---|---|---:|\n| 2210.03629 | ReAct: Synergizing Reasoning and Acting in Language Models | cs.CL | 480 |\n| 2402.03300 | DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models | cs.CL | 239 |\n| 2302.04761 | Toolformer: Language Models Can Teach Themselves to Use Tools | cs.CL | 228 |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE p.primary_category = \"cs.CL\" WITH p, COUNT { (p)<-[:REFERENCES]-() } AS citation_count RETURN toString(citation_count) AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY citation_count DESC LIMIT 3\nanswer_value=480 | evidence_ids=['2210.03629'] | title=ReAct: Synergizing Reasoning and Acting in Language Models | primary_category=cs.CL\nanswer_value=239 | evidence_ids=['2402.03300'] | title=DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models | primary_category=cs.CL\nanswer_value=228 | evidence_ids=['2302.04761'] | title=Toolformer: Language Models Can Teach Themselves to Use Tools | primary_category=cs.CL"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category",
+          "counting"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 12.167,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.396,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 16.563
+      },
+      "generate_trace": {
+        "generate_seconds": 12.167,
+        "tools_seconds": 1.007,
+        "tool_calls": 2,
+        "model_seconds": 11.136,
+        "model_turns": 3,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.024,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 2
+      },
+      "elapsed_seconds": 16.60329640004784,
+      "chat_input_tokens": 9417,
+      "chat_input_tokens_cached": 8211,
+      "chat_input_tokens_fresh": 1206,
+      "chat_output_tokens": 306,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "search_graph",
+          "seconds": 0.331
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.676
+        }
+      ]
+    },
+    {
+      "id": "topcited-02",
+      "category": "topcited",
+      "retrieved_ids": [
+        "2110.14168",
+        "1707.06347",
+        "2305.20050"
+      ],
+      "ordered_by": [
+        "citation_count DESC"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [],
+      "evidence_ids": [
+        "2110.14168",
+        "1707.06347",
+        "2305.20050"
+      ],
+      "answer": "The three most-cited papers in primary category cs.LG in this collection are:\n\n| arXiv ID | Title | Primary category | Citations |\n|---|---|---|---:|\n| 2110.14168 | Training Verifiers to Solve Math Word Problems | cs.LG | 171 |\n| 1707.06347 | Proximal Policy Optimization Algorithms | cs.LG | 149 |\n| 2305.20050 | Let's Verify Step by Step | cs.LG | 147 |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE p.primary_category = \"cs.LG\" WITH p, COUNT { (p)<-[:REFERENCES]-() } AS citation_count RETURN toString(citation_count) AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY citation_count DESC LIMIT 3\nanswer_value=171 | evidence_ids=['2110.14168'] | title=Training Verifiers to Solve Math Word Problems | primary_category=cs.LG\nanswer_value=149 | evidence_ids=['1707.06347'] | title=Proximal Policy Optimization Algorithms | primary_category=cs.LG\nanswer_value=147 | evidence_ids=['2305.20050'] | title=Let's Verify Step by Step | primary_category=cs.LG"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category",
+          "counting"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 9.088,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.853,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 13.941
+      },
+      "generate_trace": {
+        "generate_seconds": 9.088,
+        "tools_seconds": 0.322,
+        "tool_calls": 1,
+        "model_seconds": 8.749,
+        "model_turns": 2,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.017,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "elapsed_seconds": 13.972694299998693,
+      "chat_input_tokens": 5643,
+      "chat_input_tokens_cached": 5222,
+      "chat_input_tokens_fresh": 421,
+      "chat_output_tokens": 317,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "search_graph"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "search_graph",
+          "seconds": 0.322
+        }
+      ]
+    },
+    {
+      "id": "topcited-03",
+      "category": "topcited",
+      "retrieved_ids": [
+        "2303.11366",
+        "2407.21783",
+        "2307.13854"
+      ],
+      "ordered_by": [
+        "citing_count DESC"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2210.03629",
+        "2302.04761",
+        "2310.06770",
+        "2303.17651",
+        "2201.11903"
+      ],
+      "evidence_ids": [
+        "2303.11366",
+        "2407.21783",
+        "2307.13854"
+      ],
+      "answer": "The three most-cited papers with primary category cs.AI in this collection are:\n\n| arXiv ID | Title | Primary category | Citing papers in this collection |\n|---|---|---|---:|\n| 2303.11366 | Reflexion: Language Agents with Verbal Reinforcement Learning | cs.AI | 246 |\n| 2407.21783 | The Llama 3 Herd of Models | cs.AI | 168 |\n| 2307.13854 | WebArena: A Realistic Web Environment for Building Autonomous Agents | cs.AI | 151 |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE p.primary_category = \"cs.AI\" WITH p, COUNT { (p)<-[:REFERENCES]-() } AS citing_count RETURN toString(citing_count) AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_category ORDER BY citing_count DESC LIMIT 3\nanswer_value=246 | evidence_ids=['2303.11366'] | arxiv_id=2303.11366 | title=Reflexion: Language Agents with Verbal Reinforcement Learning | primary_category=cs.AI\nanswer_value=168 | evidence_ids=['2407.21783'] | arxiv_id=2407.21783 | title=The Llama 3 Herd of Models | primary_category=cs.AI\nanswer_value=151 | evidence_ids=['2307.13854'] | arxiv_id=2307.13854 | title=WebArena: A Realistic Web Environment for Building Autonomous Agents | primary_category=cs.AI"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category",
+          "counting"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 13.657,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 4.599,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 18.256
+      },
+      "generate_trace": {
+        "generate_seconds": 13.657,
+        "tools_seconds": 1.069,
+        "tool_calls": 2,
+        "model_seconds": 12.566,
+        "model_turns": 3,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.022,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 2
+      },
+      "elapsed_seconds": 18.29176940000616,
+      "chat_input_tokens": 9502,
+      "chat_input_tokens_cached": 8262,
+      "chat_input_tokens_fresh": 1240,
+      "chat_output_tokens": 313,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "search_graph",
+          "seconds": 0.389
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.68
+        }
+      ]
+    },
+    {
+      "id": "topcited-04",
+      "category": "topcited",
+      "retrieved_ids": [
+        "2103.00020",
+        "2511.21631",
+        "2502.13923"
+      ],
+      "ordered_by": [
+        "citation_count DESC"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2304.08485",
+        "2402.03300",
+        "2507.06261",
+        "2201.11903",
+        "2410.21276"
+      ],
+      "evidence_ids": [
+        "2103.00020",
+        "2511.21631",
+        "2502.13923"
+      ],
+      "answer": "The three most-cited papers with primary category **cs.CV** in this collection are:\n\n| arXiv ID | Title | Primary category | Citations from papers in this collection |\n|---|---|---|---:|\n| 2103.00020 | Learning Transferable Visual Models From Natural Language Supervision | cs.CV | 88 |\n| 2511.21631 | Qwen3-VL Technical Report | cs.CV | 52 |\n| 2502.13923 | Qwen2.5-VL Technical Report | cs.CV | 44 |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE p.primary_category = \"cs.CV\" WITH p, COUNT { (p)<-[:REFERENCES]-() } AS citation_count RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, citation_count AS citation_count ORDER BY citation_count DESC LIMIT 3\nanswer_value=Learning Transferable Visual Models From Natural Language Supervision | evidence_ids=['2103.00020'] | arxiv_id=2103.00020 | primary_category=cs.CV | citation_count=88\nanswer_value=Qwen3-VL Technical Report | evidence_ids=['2511.21631'] | arxiv_id=2511.21631 | primary_category=cs.CV | citation_count=52\nanswer_value=Qwen2.5-VL Technical Report | evidence_ids=['2502.13923'] | arxiv_id=2502.13923 | primary_category=cs.CV | citation_count=44"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category",
+          "counting"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 15.699,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.136,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 20.835
+      },
+      "generate_trace": {
+        "generate_seconds": 15.699,
+        "tools_seconds": 1.084,
+        "tool_calls": 2,
+        "model_seconds": 14.58,
+        "model_turns": 3,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.035,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 2
+      },
+      "elapsed_seconds": 20.879017700033728,
+      "chat_input_tokens": 9556,
+      "chat_input_tokens_cached": 8263,
+      "chat_input_tokens_fresh": 1293,
+      "chat_output_tokens": 367,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "search_graph",
+          "seconds": 0.25
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.834
+        }
+      ]
+    },
+    {
+      "id": "topcited-05",
+      "category": "topcited",
+      "retrieved_ids": [
+        "2307.15818",
+        "2406.09246",
+        "2204.01691"
+      ],
+      "ordered_by": [
+        "citation_count DESC"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [
+        "2410.24164",
+        "2210.03629",
+        "2303.03378",
+        "2306.03310",
+        "2405.12213"
+      ],
+      "evidence_ids": [
+        "2307.15818",
+        "2406.09246",
+        "2204.01691"
+      ],
+      "answer": "The three most-cited papers whose primary category is cs.RO are:\n\n| arXiv ID | Title | Primary category | Citations |\n|---|---|---|---:|\n| 2307.15818 | RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control | cs.RO | 38 |\n| 2406.09246 | OpenVLA: An Open-Source Vision-Language-Action Model | cs.RO | 35 |\n| 2204.01691 | Do As I Can, Not As I Say: Grounding Language in Robotic Affordances | cs.RO | 27 |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE p.primary_category = \"cs.RO\" WITH p, COUNT { (p)<-[:REFERENCES]-() } AS citation_count RETURN toString(citation_count) AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_category ORDER BY citation_count DESC LIMIT 3\nanswer_value=38 | evidence_ids=['2307.15818'] | arxiv_id=2307.15818 | title=RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control | primary_category=cs.RO\nanswer_value=35 | evidence_ids=['2406.09246'] | arxiv_id=2406.09246 | title=OpenVLA: An Open-Source Vision-Language-Action Model | primary_category=cs.RO\nanswer_value=27 | evidence_ids=['2204.01691'] | arxiv_id=2204.01691 | title=Do As I Can, Not As I Say: Grounding Language in Robotic Affordances | primary_category=cs.RO"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category",
+          "counting"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 13.723,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 5.029,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 18.752
+      },
+      "generate_trace": {
+        "generate_seconds": 13.723,
+        "tools_seconds": 0.992,
+        "tool_calls": 2,
+        "model_seconds": 12.708,
+        "model_turns": 3,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.023,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 2
+      },
+      "elapsed_seconds": 18.78487989999121,
+      "chat_input_tokens": 9541,
+      "chat_input_tokens_cached": 8273,
+      "chat_input_tokens_fresh": 1268,
+      "chat_output_tokens": 342,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "search_graph",
+        "rank_related_papers"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "search_graph",
+          "seconds": 0.35
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.642
+        }
+      ]
+    },
+    {
+      "id": "topcited-06",
+      "category": "topcited",
+      "retrieved_ids": [
+        "2405.15793",
+        "2403.07974",
+        "2601.11868"
+      ],
+      "ordered_by": [
+        "citation_count DESC"
+      ],
+      "hit_at_k": 1.0,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "retrieval_precision": 1.0,
+      "retrieval_recall": 1.0,
+      "answer_correct": null,
+      "answer_evidence_precision": 1.0,
+      "answer_evidence_recall": 1.0,
+      "related_retrieval_precision": null,
+      "related_retrieval_recall": null,
+      "related_ids": [],
+      "evidence_ids": [
+        "2405.15793",
+        "2403.07974",
+        "2601.11868"
+      ],
+      "answer": "The three most frequently cited papers in primary category cs.SE are:\n\n| arXiv ID | Title | Primary category | Citations |\n|---|---|---|---:|\n| 2405.15793 | SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering | cs.SE | 95 |\n| 2403.07974 | LiveCodeBench: Holistic and Contamination Free Evaluation of Large Language Models for Code | cs.SE | 57 |\n| 2601.11868 | Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces | cs.SE | 55 |",
+      "contexts": [
+        "Cypher: MATCH (p:ArxivPaper) WHERE p.primary_category = \"cs.SE\" WITH p, COUNT { (p)<-[:REFERENCES]-() } AS citation_count RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, citation_count AS citation_count ORDER BY citation_count DESC LIMIT 3\nanswer_value=2405.15793 | evidence_ids=['2405.15793'] | title=SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering | primary_category=cs.SE | citation_count=95\nanswer_value=2403.07974 | evidence_ids=['2403.07974'] | title=LiveCodeBench: Holistic and Contamination Free Evaluation of Large Language Models for Code | primary_category=cs.SE | citation_count=57\nanswer_value=2601.11868 | evidence_ids=['2601.11868'] | title=Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces | primary_category=cs.SE | citation_count=55"
+      ],
+      "route": {
+        "name": "graph",
+        "cues": [
+          "citation",
+          "category",
+          "counting"
+        ],
+        "vetoes": []
+      },
+      "graph_trace": {
+        "visits": {
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "route": 0.0,
+          "generate": 9.828,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 3.531,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 13.359
+      },
+      "generate_trace": {
+        "generate_seconds": 9.828,
+        "tools_seconds": 0.332,
+        "tool_calls": 1,
+        "model_seconds": 9.481,
+        "model_turns": 2,
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.015,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "elapsed_seconds": 13.392703299992718,
+      "chat_input_tokens": 5770,
+      "chat_input_tokens_cached": 5221,
+      "chat_input_tokens_fresh": 549,
+      "chat_output_tokens": 410,
+      "estimated_api_cost_usd": null,
+      "tool_names": [
+        "search_graph"
+      ],
+      "sdk_retries": {},
+      "tool_seconds": [
+        {
+          "name": "search_graph",
+          "seconds": 0.332
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "case_count": 30,
+    "hit_at_k": 1.0,
+    "recall_at_k": 1.0,
+    "reciprocal_rank": 1.0,
+    "retrieval_precision": 1.0,
+    "retrieval_recall": 1.0,
+    "answer_evidence_precision": 1.0,
+    "answer_evidence_recall": 1.0
+  }
+}

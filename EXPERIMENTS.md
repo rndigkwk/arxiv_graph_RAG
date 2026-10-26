@@ -3907,6 +3907,9 @@ Streamlit Community Cloud는 앱을 재웁니다. 포트폴리오를 보러 온 
 작동했습니다. 그래서 10-18 보고서를 되돌리고 이번 실행은
 `reports/app_memory_warmup.json`으로 따로 남겼습니다. 같은 배치에서 잰 것끼리만 뺍니다.
 
+**2026-10-26에 측정기를 고쳤습니다.** `--output`이 이미 있으면 재기 전에 거부하고, 덮으려면
+`--overwrite`를 줘야 합니다(`tests/test_measure_app_memory_output.py`).
+
 ### 재서 확인했습니다 — 첫 질문이 절반이 됐습니다 (2026-10-25)
 
 머지하고 앱을 재부팅한 뒤, **재부팅 직후 첫 질문으로** 같은 질문을 던졌습니다.
@@ -4051,6 +4054,53 @@ Cloud에"라고 적었다가 같은 날 뒤집었습니다: 같은 요금에 DB�
 - **`db.checkpoint()`**는 이 판에서 거부됐습니다. 저장소 크기가 정확히 두 배로 나와 비교에는
   지장이 없습니다.
 
+## 11-52. `generate` 안쪽을 처음으로 쟀습니다 — 다섯 중 넷이 모델이고, 재시도는 없었습니다 (2026-10-26)
+
+ADR-066이 안쪽을 재는 장치를 넣었지만 저장된 90건은 그 전의 실행이라 `0/90건`이었습니다.
+30문항을 새로 돌렸습니다(`--mode agent`, 유료, 모델 gpt-6-luna,
+실패 <!--n:reports/inside_generate.json#failed-->0<!--/n-->건). 같은 실행에서 ADR-073이 "모른다"고 적은 둘 — SDK 재시도
+횟수와 번역 지연 — 도 함께 남겼습니다(`evals/run.py`의 `sdk_retries`·`tool_seconds`).
+요약은 `scripts/measure_inside_generate.py`가 `reports/inside_generate.json`으로 냅니다.
+
+| `generate` 안쪽 | 몫 |
+|---|---:|
+| 모델 턴 | <!--n:reports/inside_generate.json#generate.model_share-->0.796<!--/n--> |
+| 도구 | <!--n:reports/inside_generate.json#generate.tools_share-->0.202<!--/n--> |
+| 도구(첫 관련 논문 호출 제외) | <!--n:reports/inside_generate.json#generate.tools_share_warm-->0.138<!--/n--> |
+| 그 외(뺀 값) | <!--n:reports/inside_generate.json#generate.other_share-->0.002<!--/n--> |
+
+분해가 맞은 것은 <!--n:reports/inside_generate.json#generate.traced-->30<!--/n-->건 중
+<!--n:reports/inside_generate.json#generate.adds_up-->29<!--/n-->건입니다. 한 건(`citing-02`)은 나머지가 -0.194초로 허용폭
+0.05초를 넘어 화면이라면 수를 적지 않았을 경우입니다.
+
+**도구 몫의 4분의 1은 앱에서는 일어나지 않는 일입니다.** 첫 `rank_related_papers` 한 번이
+<!--n:reports/inside_generate.json#cold_first_related_call.seconds-->26.092<!--/n-->초였습니다. 하네스 프로세스에는 부팅
+예열(ADR-067)이 없어서 첫 질문이 인용망을 올렸습니다. 그 한 번을 빼고 도구별로 보면:
+
+| 도구 | 호출 | 합계 | p50 | 최대 |
+|---|---:|---:|---:|---:|
+| 한국어→영어 번역 | <!--n:reports/inside_generate.json#tools.translate_to_english.calls-->10<!--/n--> | <!--n:reports/inside_generate.json#tools.translate_to_english.seconds-->19.7<!--/n-->초 | <!--n:reports/inside_generate.json#tools.translate_to_english.p50-->1.97<!--/n-->초 | <!--n:reports/inside_generate.json#tools.translate_to_english.max-->2.8<!--/n-->초 |
+| 관련 논문 | <!--n:reports/inside_generate.json#tools.rank_related_papers.calls-->25<!--/n--> | <!--n:reports/inside_generate.json#tools.rank_related_papers.seconds-->17.6<!--/n-->초 | <!--n:reports/inside_generate.json#tools.rank_related_papers.p50-->0.68<!--/n-->초 | <!--n:reports/inside_generate.json#tools.rank_related_papers.max-->0.97<!--/n-->초 |
+| 제목 해석 | <!--n:reports/inside_generate.json#tools.resolve_paper.calls-->18<!--/n--> | <!--n:reports/inside_generate.json#tools.resolve_paper.seconds-->9.8<!--/n-->초 | <!--n:reports/inside_generate.json#tools.resolve_paper.p50-->0.55<!--/n-->초 | <!--n:reports/inside_generate.json#tools.resolve_paper.max-->0.66<!--/n-->초 |
+| Text2Cypher | <!--n:reports/inside_generate.json#tools.search_graph.calls-->33<!--/n--> | <!--n:reports/inside_generate.json#tools.search_graph.seconds-->9.4<!--/n-->초 | <!--n:reports/inside_generate.json#tools.search_graph.p50-->0.27<!--/n-->초 | <!--n:reports/inside_generate.json#tools.search_graph.max-->0.4<!--/n-->초 |
+
+벡터 검색(`search_papers`)은 한 번도 불리지 않았습니다. 이 30문항은 그래프 질문이라 라우팅이
+그래프 경로로 보냈습니다(ADR-024) — 벡터의 몫은 이 실행으로는 말할 수 없습니다.
+
+**SDK 재시도는 <!--n:reports/inside_generate.json#sdk_retries.total-->0<!--/n-->번이었습니다**(기록한 질문
+<!--n:reports/inside_generate.json#sdk_retries.recorded_cases-->30<!--/n-->건). ADR-073이 재시도를 2번에서 1번으로 줄이며
+"살아난 호출이 몇 번인지 모른다"고 적은 값입니다 — 이 실행에서는 살릴 호출이 없었습니다.
+**번역의 최대는 <!--n:reports/inside_generate.json#tools.translate_to_english.max-->2.8<!--/n-->초**로 60초 제한의
+20분의 1 아래입니다. `generate` 한 번의 최대는 <!--n:reports/inside_generate.json#generate.max_seconds-->37.0<!--/n-->초로
+저장된 180회의 최대 36.3초와 같은 자리입니다.
+
+**그래서 느린 답변을 줄이려면 모델 턴입니다.** 도구를 모두 공짜로 만들어도 `generate`는 약
+14% 줄 뿐입니다. 모델 턴 하나의 안쪽(대기와 토큰 생성)은 여전히 재지 못합니다.
+
+**말하지 않는 것.** 30건 한 번입니다 — 몫이 실행마다 얼마나 흔들리는지는 모릅니다. 비용은
+보고서에 0으로 적혔습니다. 가격 환경 변수(`EVAL_CHAT_*_USD_PER_1M`)를 주지 않아서이고, 쓴
+토큰은 입력 367,738·출력 11,840입니다.
+
 ## 13. 재현 방법
 
 ```bash
@@ -4180,6 +4230,8 @@ uv run --with sentence-transformers python -m models.embedding_tuning.compare_mo
 | `reports/app_memory_warmup.json` | 11-49절 — 예열이 항상 내는 메모리(10-18 보고서를 덮지 않도록 따로 둡니다) |
 | `reports/condition_check_weight.json` | 11-50절 — 조건 판정의 비중·p50과 게이트가 막은 실행 |
 | `reports/double_graph.json` | 11-51절 — 그래프 두 배의 저장소·메모리·지연과 30초 추정 |
+| `reports/inside_generate_2026-10-26.json` | 11-52절 — `generate` 안쪽을 잰 30문항 실행(유료) |
+| `reports/inside_generate.json` | 11-52절 — 위 실행의 요약: 모델·도구 몫, 도구별, SDK 재시도 |
 | `reports/variant_study_{graph,base}.json` | 11-1절 — 변형 비교 |
 | `reports/index_cost.json` | 11-2절 — 색인 비용과 커버리지 |
 | `reports/embedding_tuning.json` | 11-3절 — 어댑터와 격자 탐색 |

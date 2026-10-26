@@ -80,10 +80,19 @@ def main() -> int:
     parser.add_argument("--import", dest="modules", nargs="*", default=[],
                         help="앱이 실제로 가져올 모듈. 임포트 전후를 따로 적습니다.")
     parser.add_argument("--label", default="")
-    parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--output", type=Path, default=OUTPUT,
+                        help="이미 있으면 --overwrite 없이는 쓰지 않습니다.")
+    parser.add_argument("--overwrite", action="store_true",
+                        help="--output이 이미 있어도 덮어씁니다.")
     parser.add_argument("--skip-app", action="store_true",
                         help="chatbot을 가져오지 않고 패키지 비용만 봅니다(네트워크 없이).")
     args = parser.parse_args()
+    # **재기 전에 거부합니다.** 2026-10-25에 기본값이 10-18 보고서를 조용히 덮었고, 그 보고서에
+    # 묶인 "Langfuse +5.2MB"가 다른 실행끼리 뺀 수가 됐습니다(EXPERIMENTS 11-49절). 다 잰 뒤에
+    # 거부하면 측정 시간을 버리므로 앞에서 막습니다.
+    if args.output.exists() and not args.overwrite:
+        parser.error(f"{args.output}이 이미 있습니다. 다른 실행의 보고서를 덮지 않도록 "
+                     "--output으로 새 이름을 주거나, 덮으려면 --overwrite를 주세요.")
 
     stages: dict[str, float] = {"interpreter": resident_mb()}
 

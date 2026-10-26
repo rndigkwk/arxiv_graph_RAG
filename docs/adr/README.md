@@ -145,3 +145,6 @@
 | [ADR-071](ADR-071-double-the-graph-move-only-the-database.md) | 두 배가 필요해지면 앱과 DB를 VM 한 대에 올린다 — 4GB면 되고, 30초는 거리에서 온다 (결정 1을 같은 날 뒤집음) | 채택 |
 | [ADR-072](ADR-072-check-the-deployed-app-in-a-browser.md) | 배포 앱을 브라우저로 확인하고, 실패하면 이슈를 연다 — HTTP 방문은 깨우지도, 옛 코드를 알아보지도 못한다 | 채택 |
 | [ADR-073](ADR-073-say-what-the-model-failure-means.md) | 모델이 실패하면 무엇을 할지 말한다 — 제한 시간은 저장된 180회에서 정한다 | 채택 |
+| [ADR-074](ADR-074-rewind-the-ingest-watermark.md) | 수집 워터마크를 되감는 명령을 둔다 — 되돌리기가 아니라 다시 받기다 | 채택 |
+| [ADR-075](ADR-075-cache-the-drawn-subgraph.md) | 그린 부분 그래프를 캐시한다 — 다시 그릴 때마다 답변 수만큼 조회하고 있었다 | 채택 |
+| [ADR-076](ADR-076-the-latest-answer-is-a-workbench.md) | 최신 답변은 세 칸 작업대로, 지난 답변은 접는다 — 접은 패널도 안쪽은 실행된다 | 채택 |

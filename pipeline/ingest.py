@@ -3,6 +3,7 @@
     uv run python -m pipeline.ingest
     uv run python -m pipeline.ingest --days 7
     uv run python -m pipeline.ingest --days 7 --load
+    uv run python -m pipeline.ingest --rewind-to 2026-10-20 --reason "보강이 빈 창을 다시 받습니다"
 
 기본값이 `--dry-run`입니다. `--load`를 명시하지 않으면 Aura에 아무것도 쓰지 않습니다. 이 그래프는
 관계 한도의 84.6%를 이미 쓰고 있어서, 무심코 적재하면 되돌리기 어렵습니다.
@@ -28,6 +29,13 @@
 
 **멱등 적재.** 모두 `MERGE`입니다. 같은 배치를 두 번 적재해도 노드·관계 수가 변하지 않아야
 합니다. `--verify-idempotent`가 그것을 실제로 확인합니다.
+
+## 되감기 (ADR-074)
+
+`--rewind-to`는 워터마크만 뒤로 옮기고 끝납니다. 다음 평상시 실행이 그 날짜부터 다시 받습니다.
+**되돌리기가 아닙니다** — 적재가 모두 `MERGE`라 빠진 간선을 채우고 속성을 덮을 뿐, 잘못 들어간
+논문·간선을 지우지 못합니다. 상태 파일을 손으로 고치지 않는 이유는 `runs`에 사유가 남지 않기
+때문입니다.
 """
 
 from __future__ import annotations
@@ -343,6 +351,76 @@ def write_dead_letters(failures: list[dict[str, str]], path: Path = DEAD_LETTER_
     return len(failures)
 
 
+class RewindRefused(ValueError):
+    """되감기를 거부한 이유입니다. 상태는 바뀌지 않습니다."""
+
+
+REWIND_CANNOT_DELETE = (
+    "되감기는 지우지 못합니다. 다음 실행이 같은 창을 다시 받아 빠진 간선을 채우고 속성을 "
+    "덮을 뿐, 잘못 들어간 논문·간선은 그대로 남습니다."
+)
+
+
+def rewind(state: dict[str, Any], to: str, reason: str, *, now: datetime | None = None
+           ) -> dict[str, Any]:
+    """다음 실행이 `to`부터 받도록 워터마크를 옮기고, 그 기록을 돌려줍니다.
+
+    워터마크는 "본 가장 늦은 날짜"이고 다음 창은 그 다음날부터이므로, 새 워터마크는 `to`의
+    전날입니다. 앞으로 감기는 데이터를 조용히 건너뛰므로 거부합니다. **워터마크가 비어
+    있어도 거부합니다** — 빈 워터마크에 과거 날짜를 넣으면 되감기가 아니라 시작점을 새로
+    정하는 일이 되고, 그러면 `--days`가 정하던 창이 말없이 바뀝니다.
+    """
+    reason = reason.strip()
+    if not reason:
+        raise RewindRefused("사유가 필요합니다. 몇 달 뒤 runs를 볼 때 남는 것은 사유뿐입니다.")
+    try:
+        target = date.fromisoformat(to)
+    except ValueError as exc:
+        raise RewindRefused(f"날짜를 읽을 수 없습니다: {to!r} (YYYY-MM-DD)") from exc
+    before = str(state.get("last_datestamp") or "")
+    if not before:
+        raise RewindRefused("되감을 것이 없습니다. 워터마크가 비어 있어 다음 실행은 --days로 "
+                            "정한 창을 받습니다.")
+    try:
+        current = date.fromisoformat(before)
+    except ValueError as exc:
+        raise RewindRefused(f"지금 워터마크를 읽을 수 없습니다: {before!r}. 손으로 고친 값인지 "
+                            "먼저 확인하세요.") from exc
+    if target > current:
+        raise RewindRefused(
+            f"앞으로 감을 수 없습니다. 지금 워터마크는 {before}이고 다음 실행은 "
+            f"{(current + timedelta(days=1)).isoformat()}부터 받습니다. {to}부터 받으면 그 사이를 "
+            "건너뜁니다."
+        )
+    after = (target - timedelta(days=1)).isoformat()
+    state["last_datestamp"] = after
+    entry = {
+        "at": (now or datetime.now(UTC)).isoformat(),
+        "stopped_at": "rewound",
+        "watermark_before": before,
+        "watermark_after": after,
+        "next_window_from": target.isoformat(),
+        "reason": reason,
+        "loaded": False,
+        "watermark_advanced": False,
+    }
+    state.setdefault("runs", []).append(entry)
+    state["runs"] = state["runs"][-50:]
+    return entry
+
+
+def mark_rewind_in_dead_letters(entry: dict[str, Any], path: Path = DEAD_LETTER_PATH) -> None:
+    """dead letter는 덧붙이기만 합니다. 되감은 뒤의 같은 실패가 앞의 것과 섞이지 않도록 경계
+    줄을 하나 넣습니다 - 중복 제거를 만드는 것보다 쌉니다."""
+    if not path.exists():
+        return
+    with path.open("a", encoding="utf-8") as handle:
+        marker = {"rewound": True, **{key: entry[key] for key in
+                  ("watermark_before", "watermark_after", "reason")},
+                  "recorded_at": entry["at"]}
+        handle.write(json.dumps(marker, ensure_ascii=False) + "\n")
+
+
 # 적재한 논문이 **그래프에서** 임베딩을 갖고 있는지 되읽습니다. 레코드를 본 가드로는
 # 적재기가 그 값을 버렸는지 알 수 없습니다(2026-10-24에 그렇게 버렸습니다).
 LOADED_EMBEDDING_CYPHER = """
@@ -434,7 +512,15 @@ def main() -> int:
         help="임베딩 추정 비용의 천장(달러). 넘으면 호출하지 않습니다.",
     )
     parser.add_argument("--output", type=Path, default=REPORT_PATH)
+    parser.add_argument(
+        "--rewind-to", metavar="YYYY-MM-DD",
+        help=("다음 실행이 이 날짜부터 다시 받도록 워터마크만 옮기고 끝납니다. 수집·적재는 "
+              "하지 않고, 지우지도 못합니다(ADR-074)."),
+    )
+    parser.add_argument("--reason", help="--rewind-to의 사유입니다. 필수입니다.")
     args = parser.parse_args()
+    if args.rewind_to is not None or args.reason is not None:
+        return _rewind_only(parser, args)
     # **임베딩만 하고 적재하지 않으면 돈을 쓰고 버립니다.** 벡터는 메모리 레코드에만
     # 붙고 이 모듈은 그래프에 따로 쓰지 않습니다.
     if args.embed and not args.load:
@@ -605,6 +691,29 @@ def main() -> int:
             report["idempotent"] = dict(repeated) == dict(after)
             report["counts"]["after_repeat"] = dict(repeated)
     _finish(report, args.output, state, harvested.last_datestamp, advance=True)
+    return 0
+
+
+def _rewind_only(parser: argparse.ArgumentParser, args: argparse.Namespace) -> int:
+    """되감고 끝납니다. 되감기와 적재를 한 명령에 묶지 않아 사고 반경이 작습니다."""
+    if args.rewind_to is None:
+        parser.error("--reason은 --rewind-to와 함께만 씁니다.")
+    if args.reason is None:
+        parser.error("--rewind-to에는 --reason이 필요합니다.")
+    if args.load or args.embed or args.verify_idempotent or args.allow_missing_embeddings:
+        parser.error("--rewind-to는 되감고 끝납니다. 적재는 확인한 뒤 평상시 명령으로 하세요.")
+    state = read_state()
+    print(f"지금 워터마크: {state.get('last_datestamp') or '(비어 있음)'}")
+    try:
+        entry = rewind(state, args.rewind_to, args.reason)
+    except RewindRefused as exc:
+        print(f"되감지 않았습니다: {exc}")
+        return 1
+    write_state(state)
+    mark_rewind_in_dead_letters(entry)
+    print(f"되감았습니다: {entry['watermark_before']} → {entry['watermark_after']} "
+          f"(다음 실행은 {entry['next_window_from']}부터 받습니다)")
+    print(REWIND_CANNOT_DELETE)
     return 0
 
 

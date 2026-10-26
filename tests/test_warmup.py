@@ -189,7 +189,7 @@ def test_the_evidence_panel_shows_the_warmup_state():
     pytest.importorskip("streamlit")
     source = Path("app.py").read_text(encoding="utf-8")
 
-    panel = source.index('st.expander("검색 과정과 근거 확인")')
+    panel = source.index('st.expander("단계별 소요 시간")')
     tables = source.index('st.write("노드별 소요 시간")')
 
     assert panel < source.index("warmup.warmup_state_line(") < tables
