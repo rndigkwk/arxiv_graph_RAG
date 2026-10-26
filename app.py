@@ -50,6 +50,22 @@ def graph_counts():
     return load_chatbot().graph_counts()
 
 
+# 세 칸 작업대의 너비 비율입니다 — 왼쪽 경로, 가운데 답변, 오른쪽 근거(ADR-076). 화면이 좁으면
+# Streamlit이 칸을 세로로 쌓습니다.
+WORKBENCH = (1, 2.2, 1.4)
+
+# 화면은 다시 그릴 때마다 대화 기록의 답변을 **전부** 다시 그리고, 답변마다 그래프를 읽습니다.
+# 한 번에 Aura 질의 두 개, 측정 중앙값 0.40초라 답변이 다섯 개면 버튼 하나에 2초가 듭니다
+# (ADR-075). 그래프는 주간 수집 때만 바뀌므로 6시간을 둡니다. 실패는 캐시하지 않습니다.
+SUBGRAPH_TTL_SECONDS = 6 * 3600
+
+
+@st.cache_data(show_spinner=False, ttl=SUBGRAPH_TTL_SECONDS, max_entries=256)
+def subgraph_of(ids):
+    """같은 논문 묶음의 저자·인용 관계는 한 번만 읽습니다. `ids`는 튜플이어야 해시됩니다."""
+    return load_chatbot().fetch_subgraph(list(ids))
+
+
 @st.cache_data(show_spinner=False)
 def quality_report():
     """품질 리포트 노트북이 저장한 JSON입니다. 없으면 None."""
@@ -191,8 +207,11 @@ def make_graph(subgraph, mechanism=None):
 
     if not statements:
         return ""
-    # 저자까지 가로로 늘어져 글자가 작아지지 않도록 위에서 아래로 배치합니다.
-    return "digraph {\nrankdir=TB;\nnode [fontsize=10];\nedge [fontsize=9];\n" + \
+    # 저자까지 가로로 늘어져 글자가 작아지지 않도록 위에서 아래로 배치합니다. 서로 이어지지
+    # 않은 논문은 **3열 격자로 쌓습니다**(`packmode`). 안 그러면 한 줄에 전부 늘어서고, 작업대의
+    # 가운데 칸에 맞춰 줄어들어 글자를 읽을 수 없었습니다(ADR-076).
+    return "digraph {\nrankdir=TB;\npack=true;\npackmode=\"array_3\";\n" \
+        "node [fontsize=10];\nedge [fontsize=9];\n" + \
         "\n".join(sorted(statements)) + "\n}"
 
 
@@ -419,30 +438,33 @@ def route_line(route):
 
 
 def show_response(chatbot, response, index):
-    """실제 검색 방식, 답변, 검색 그래프, 상세 근거를 함께 보여줍니다."""
-    st.caption(" | ".join(route_marks(response)))
+    """답변 하나를 세 칸 작업대로 그립니다 — 왼쪽 경로, 가운데 답변, 오른쪽 근거(ADR-076).
+
+    전에는 한 칸에 답변·그래프·접힌 패널이 세로로 쌓여, 답을 읽은 뒤 근거를 보려면 스크롤이
+    길었습니다. 근거(인용 ID·Cypher)를 오른쪽에 펼쳐 둡니다.
+
+    **가운데를 먼저 그립니다.** 오른쪽이 가운데에서 읽은 부분 그래프를 씁니다. 칸은 자리가
+    먼저 잡혀 있으므로 그리는 순서가 화면 순서를 바꾸지 않습니다.
+    """
+    route_col, answer_col, evidence_col = st.columns(WORKBENCH, gap="medium")
+    with answer_col:
+        subgraph = show_answer_column(chatbot, response, index)
+    with route_col:
+        show_route_column(chatbot, response)
+    with evidence_col:
+        show_evidence_column(response, subgraph)
+
+
+def show_route_column(chatbot, response):
+    """왼쪽 칸 — 어느 도구를 썼고 어디에 시간이 들었는지."""
+    st.markdown("##### 이 답변의 경로")
+    for mark in route_marks(response):
+        st.caption(mark)
     if line := latency_line(response):
         st.caption(line)
     for item in response["translations"]:
         st.caption(f'검색어 번역: {item["source_text"]} → {item["english"]}')
-    show_answer(response, index)
-
-    try:
-        subgraph = chatbot.fetch_subgraph(graph_ids(response))
-    except Exception as exc:
-        subgraph = {"papers": [], "references": []}
-        st.caption(f"그래프 조회 에러: {type(exc).__name__}. "
-                   "답변과 근거는 그대로 확인할 수 있습니다.")
-    mechanism = mechanism_of(response)
-    graph = make_graph(subgraph, mechanism)
-    if graph:
-        st.write("검색된 그래프")
-        st.graphviz_chart(graph, width="stretch")
-        st.caption(graph_legend(subgraph, chatbot.MAX_GRAPH_NODES, mechanism))
-    else:
-        st.caption("이번 검색에서 시각화할 논문이 없습니다.")
-
-    with st.expander("검색 과정과 근거 확인"):
+    with st.expander("단계별 소요 시간"):
         # 이 답변을 낼 때 예열이 어느 상태였는지. **네 상태를 모두 적습니다** -
         # 위의 상태 줄은 끝나면 조용해야 하지만, 여기서 조용하면 "끝남"과
         # "시작 안 함"이 같아 보입니다. 실제로 한 번 그래서 갈라내지 못했습니다(ADR-067).
@@ -475,9 +497,27 @@ def show_response(chatbot, response, index):
                 "`답변 생성`에만 들어 있습니다. 초가 빈칸이면 그 호출은 **재지 못한 것**이고 "
                 "공짜라는 뜻이 아닙니다."
             )
-        st.write("답변의 인용 arXiv ID:", response["evidence_ids"])
-        # 선택 여부와 순서는 실제 호출 기록에서 읽습니다.
-        st.write("도구 요청 순서")
+
+
+def show_evidence_column(response, subgraph):
+    """오른쪽 칸 — 답변이 무엇에 기대는지. **Cypher를 접지 않습니다**(ADR-076).
+
+    이 프로젝트의 주장이 "Cypher 한 줄이 모델을 이겼다"인데, 그 Cypher가 접힌 패널 안쪽에
+    있었습니다.
+    """
+    st.markdown("##### 근거")
+    # 목록 위젯으로 적으면 25편이 25줄이 되어 칸을 다 차지합니다. 한 문단으로 적습니다.
+    st.write(f'답변의 인용 arXiv ID {len(response["evidence_ids"])}편')
+    st.caption(", ".join(response["evidence_ids"]) or "없음")
+    if response["cypher"]:
+        st.write("실행한 Cypher")
+        st.code(response["cypher"], language="cypher", wrap_lines=True)
+        st.dataframe(response["rows"], hide_index=True)
+    for message in response.get("errors", []):
+        # 실패한 Cypher는 에이전트가 고쳐서 다시 호출합니다. 시도 흔적을 남깁니다.
+        st.write("Cypher 오류(에이전트가 다시 작성함):", message)
+    # 선택 여부와 순서는 실제 호출 기록에서 읽습니다.
+    with st.expander("도구 요청 순서"):
         for number, call in enumerate(response["tool_calls"], 1):
             spent = f' — {call["seconds"]:.2f}초' if "seconds" in call else ""
             st.write(f'{number}. {TOOL_LABEL.get(call["name"], call["name"])}{spent}')
@@ -490,13 +530,35 @@ def show_response(chatbot, response, index):
             if "output" in call:
                 st.write("도구 응답:", call["status"])
                 st.write(call["output"])
-        if response["cypher"]:
-            st.write("실행한 Cypher")
-            st.code(response["cypher"], language="cypher")
-            st.dataframe(response["rows"], hide_index=True)
-        for message in response.get("errors", []):
-            # 실패한 Cypher는 에이전트가 고쳐서 다시 호출합니다. 시도 흔적을 남깁니다.
-            st.write("Cypher 오류(에이전트가 다시 작성함):", message)
+
+    if subgraph["papers"]:
+        with st.expander("그래프에 그린 논문"):
+            st.dataframe([{
+                "arXiv ID": paper["arxiv_id"], "제목": paper["title"],
+                "대표 분류": paper["primary_category"], "게재일": paper["published"][:10],
+                "저자 수": paper["author_count"], "피인용": paper["cited_by"],
+                "인용": paper["references_out"], "출처": paper["source"],
+            } for paper in subgraph["papers"]], hide_index=True)
+
+
+def show_answer_column(chatbot, response, index):
+    """가운데 칸 — 답변, 그래프, 관련 논문과 비교. 그린 부분 그래프를 돌려줍니다."""
+    show_answer(response, index)
+
+    try:
+        subgraph = subgraph_of(tuple(graph_ids(response)))
+    except Exception as exc:
+        subgraph = {"papers": [], "references": []}
+        st.caption(f"그래프 조회 에러: {type(exc).__name__}. "
+                   "답변과 근거는 그대로 확인할 수 있습니다.")
+    mechanism = mechanism_of(response)
+    graph = make_graph(subgraph, mechanism)
+    if graph:
+        st.write("검색된 그래프")
+        st.graphviz_chart(graph, width="stretch")
+        st.caption(graph_legend(subgraph, chatbot.MAX_GRAPH_NODES, mechanism))
+    else:
+        st.caption("이번 검색에서 시각화할 논문이 없습니다.")
 
     if response.get("related"):
         with st.expander("관련 논문 — 공동인용 · PageRank · 임베딩"):
@@ -616,16 +678,23 @@ def show_response(chatbot, response, index):
                 st.write(hit["abstract"])
                 st.link_button("arXiv PDF", hit["pdf_url"])
 
-    if subgraph["papers"]:
-        with st.expander("그래프에 그린 논문"):
-            st.dataframe([{
-                "arXiv ID": paper["arxiv_id"], "제목": paper["title"],
-                "대표 분류": paper["primary_category"], "게재일": paper["published"][:10],
-                "저자 수": paper["author_count"], "피인용": paper["cited_by"],
-                "인용": paper["references_out"], "출처": paper["source"],
-            } for paper in subgraph["papers"]], hide_index=True)
-
     show_paper_comparison(chatbot, response, index)
+    return subgraph
+
+
+def show_past_response(question, response, index):
+    """지난 답변은 접어서 **답만** 보여 줍니다(ADR-076).
+
+    화면은 다시 그릴 때마다 대화 기록을 전부 다시 그립니다. 지난 답변까지 세 칸으로 그리면
+    답변마다 그래프 조회·인용 경로 조회가 반복되고, 스크롤도 답변 수만큼 길어집니다.
+    Streamlit의 접힌 패널은 **안쪽도 실행합니다** - 그래서 접는 것만으로는 부족하고 안쪽을
+    가볍게 둡니다. 근거가 필요하면 작업대로 다시 펼칩니다.
+    """
+    with st.expander(f"지난 답변 — {question[:80]}"):
+        show_answer(response, index)
+        if st.button("작업대에 펼치기", key=f"focus:{index}"):
+            st.session_state.focus = index
+            st.rerun()
 
 
 def _save_paper(paper):
@@ -1208,7 +1277,7 @@ def show_pagerank(chatbot):
 
     top_ids = [paper["arxiv_id"] for paper in result["papers"]]
     try:
-        subgraph = chatbot.fetch_subgraph(top_ids)
+        subgraph = subgraph_of(tuple(top_ids))
     except Exception as exc:
         st.caption(f"그래프 조회 에러: {type(exc).__name__}. 표는 그대로 확인할 수 있습니다.")
         return
@@ -1354,10 +1423,15 @@ def answer_question(chatbot, question):
             return
     # 성공적으로 처리한 질문만 저장하므로 중단된 질문은 다음 대화에 섞이지 않습니다.
     st.session_state.history = history
+    st.session_state.focus = None
     st.session_state.messages.extend([
         {"role": "user", "content": question},
         {"role": "assistant", "response": response},
     ])
+    # 다시 그려야 앞 답변이 접힙니다. 안 그러면 이 실행에서는 앞 답변과 새 답변이 둘 다 세 칸으로
+    # 남습니다 - 배포 전 로컬 화면에서 그렇게 보였습니다(ADR-076). 새 답변은 기록에서 다시
+    # 그려지고, 그래프 조회는 캐시가 받습니다.
+    st.rerun()
 
 
 def clear_chat():
@@ -1366,11 +1440,29 @@ def clear_chat():
     st.session_state.history = []
     st.session_state.korean = {}
     st.session_state.pending = None
+    st.session_state.focus = None
     st.session_state.paper_comparisons = {}
     st.session_state.paper_comparison_errors = {}
     for key in list(st.session_state.keys()):
         if isinstance(key, str) and key.startswith("paper-comparison-selection:"):
             del st.session_state[key]
+
+
+def workbench_index(messages, focus):
+    """세 칸으로 펼칠 답변의 위치. 고른 것이 없거나 없어진 위치면 **가장 최근 답변**입니다."""
+    answers = [index for index, message in enumerate(messages)
+               if message["role"] == "assistant"]
+    if focus in answers:
+        return focus
+    return answers[-1] if answers else None
+
+
+def question_before(messages, index):
+    """답변 바로 앞의 질문입니다. 접은 답변의 제목으로 씁니다."""
+    for message in reversed(messages[:index]):
+        if message["role"] == "user":
+            return message["content"]
+    return ""
 
 
 def chat(chatbot):
@@ -1393,13 +1485,18 @@ def chat(chatbot):
     messages_area = st.container()
     input_area = st.container()
 
+    messages = st.session_state.messages
+    focus = workbench_index(messages, st.session_state.get("focus"))
     with messages_area:
-        for index, message in enumerate(st.session_state.messages):
+        for index, message in enumerate(messages):
             with st.chat_message(message["role"]):
                 if message["role"] == "user":
                     st.write(message["content"])
-                else:
+                elif index == focus:
                     show_response(chatbot, message["response"], index)
+                else:
+                    show_past_response(question_before(messages, index),
+                                       message["response"], index)
 
     # 답변을 만드는 동안에도 입력창이 보이도록 먼저 그립니다. 자리는 위에서 이미 잡혔습니다.
     with input_area:
