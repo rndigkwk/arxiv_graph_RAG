@@ -25,7 +25,9 @@ import re
 import sys
 import time
 
-APP_URL = "https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/"
+# 2026-10-26부터 GCP VM입니다(ADR-080). VM은 잠들지 않으므로 깨우기 버튼은 Streamlit Cloud 주소를
+# 인자로 넘길 때(백업 앱 등)만 쓰입니다.
+APP_URL = "https://8-230-25-138.sslip.io/"
 WAKE_BUTTON = "Yes, get this app back up!"
 READY_TEXT = "적재된 논문"  # app.main의 캡션. DB 연결 뒤에만 그려집니다
 DB_FAILED_TEXT = "실시간 그래프 연결을 준비하지 못했습니다"  # app.main의 준비 실패 안내
@@ -34,7 +36,7 @@ ERROR_TEXTS = ("This app has encountered an error", "Traceback (most recent call
 STAMP = re.compile(r"배포 ([0-9a-f]{7}|확인 불가)")
 STALE = re.compile(r"검색 모듈 ([0-9a-f]{7}|이전 코드)")
 READY_TIMEOUT_S = 420  # 잠든 앱이 깨어나고, 인용망 예열과 별개로 첫 화면이 뜨기까지
-COMMIT_WAIT_S = 600  # main에 올라간 직후라면 재배포가 아직 진행 중일 수 있습니다
+COMMIT_WAIT_S = 600  # VM 타이머(2분) + 의존성이 바뀌었을 때의 이미지 빌드를 기다립니다
 SETTLE_S = 15
 
 

@@ -6,7 +6,7 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 [![Neo4j](https://img.shields.io/badge/Neo4j-Aura-008CC1?logo=neo4j&logoColor=white)](https://neo4j.com/cloud/aura/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 
-🌐 **Live demo:** [arXiv GraphRAG Streamlit 앱](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)
+🌐 **Live demo:** [arXiv GraphRAG 앱 (GCP VM)](https://8-230-25-138.sslip.io/) · [Streamlit Cloud 판](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)
 
 ## 처음 보시는 분께 — 2분 경로
 

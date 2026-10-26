@@ -1,4 +1,8 @@
 name: Check deployed app
+# Since 2026-10-26 the app runs on a GCP VM that pulls main every two minutes
+# (deploy/vm/deploy.sh, ADR-080). Nothing here touches the VM: this job only waits, up to ten
+# minutes, for the pushed commit to appear on the page.
+#
 # Opens the deployed Streamlit app in a headless browser (scripts/visit_deployed_app.py): clicks
 # "Yes, get this app back up!" when it sleeps, waits for the first screen (which needs Aura), and
 # compares the deploy stamp with this commit. It fails when the search module is older than the

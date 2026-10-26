@@ -29,4 +29,25 @@ if [ ! -f /swapfile ]; then
 fi
 
 [ -d "$HOME/arxiv_graph_RAG" ] || git clone https://github.com/rndigkwk/arxiv_graph_RAG.git "$HOME/arxiv_graph_RAG"
+
+# main을 따라가는 타이머(ADR-080). 처음 올린 뒤 2분 간격으로 deploy.sh를 부릅니다.
+sudo tee /etc/systemd/system/arxiv-deploy.service >/dev/null <<UNIT
+[Unit]
+Description=arxiv GraphRAG: main을 따라 배포
+[Service]
+Type=oneshot
+User=$USER
+ExecStart=/bin/bash $HOME/arxiv_graph_RAG/deploy/vm/deploy.sh
+UNIT
+sudo tee /etc/systemd/system/arxiv-deploy.timer >/dev/null <<UNIT
+[Unit]
+Description=arxiv GraphRAG: 2분마다 main 확인
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+[Install]
+WantedBy=timers.target
+UNIT
+sudo systemctl daemon-reload
+sudo systemctl enable --now arxiv-deploy.timer
 echo "끝났습니다. docker 그룹이 적용되도록 SSH를 다시 연결하세요."

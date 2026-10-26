@@ -102,14 +102,18 @@ uv run python scripts/move_graph.py diff --before .local/move/retrieval_aura.jso
 
 ## 배포와 재시작
 
-코드는 VM의 clone을 마운트합니다. 배포는 pull과 재시작입니다. `uv.lock`이 바뀌었으면 `--build`를 붙입니다.
+**자동입니다**([ADR-080](adr/ADR-080-the-vm-pulls-main.md)). VM의 타이머가 2분마다 main을 보고,
+바뀌었으면 fast-forward한 뒤 앱을 재시작합니다(의존성이 바뀌었으면 이미지도 다시 굽습니다).
+배포 점검 워크플로가 새 커밋이 화면에 뜨는지 봅니다.
 
 ```bash
-cd ~/arxiv_graph_RAG && git pull --ff-only
-docker compose --env-file .env -f deploy/vm/compose.yml up -d --build app
+journalctl -u arxiv-deploy --since today
+sudo systemctl stop arxiv-deploy.timer
+sudo systemctl start arxiv-deploy.timer
 ```
 
-VM이 재부팅되어도 세 컨테이너는 `restart: unless-stopped`로 다시 뜹니다.
+첫 줄은 배포 기록, 둘째·셋째 줄은 자동 배포를 멈추고 다시 켭니다. VM이 재부팅되어도 세 컨테이너는
+`restart: unless-stopped`로 다시 뜨고 타이머도 다시 켜집니다.
 
 ## 1단계에서 아직 아닌 것
 
