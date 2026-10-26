@@ -8,6 +8,7 @@
 - 앱 질의를 옮겨 적으면 앱이 바뀌어도 측정은 옛 질의를 잽니다.
 """
 
+import ast
 import json
 from pathlib import Path
 
@@ -16,6 +17,7 @@ import yaml
 
 from scripts import local_graph_test as base
 from scripts.measure_double_graph import (
+    APP_QUERIES,
     MIRROR,
     URI,
     app_queries,
@@ -96,12 +98,22 @@ def test_the_double_container_matches_the_baseline_container():
 
 
 def test_the_measured_queries_are_the_app_queries():
-    """옮겨 적지 않고 읽습니다. 앱 질의가 바뀌면 측정도 같이 바뀌어야 합니다."""
-    from src import chatbot
+    """옮겨 적지 않고 읽습니다. 앱이 다른 상수를 읽기 시작하면 측정은 옛 질의를 잽니다.
 
+    `chatbot`을 임포트하지 않습니다 - CI에는 `.env`가 없습니다. 대신 `citation_graph()`가
+    실제로 읽는 이름이 측정이 읽는 이름과 같은지를 AST로 봅니다.
+    """
+    tree = ast.parse(Path("src/chatbot.py").read_text(encoding="utf-8"))
+    body = next(node for node in tree.body
+                if isinstance(node, ast.FunctionDef) and node.name == "citation_graph")
+    read = {arg.id for node in ast.walk(body)
+            if isinstance(node, ast.Call) and getattr(node.func, "id", "") == "read_with_retry"
+            for arg in node.args if isinstance(arg, ast.Name)}
+
+    assert read == set(APP_QUERIES)
     found = app_queries()
-    assert found["PAPER_ROWS"] == chatbot.PAPER_ROWS
-    assert found["CITATION_EDGES"] == chatbot.CITATION_EDGES
+    assert "ArxivPaper" in found["PAPER_ROWS"]
+    assert ":REFERENCES" in found["CITATION_EDGES"]
 
 
 def test_a_query_that_stops_being_a_literal_is_reported(tmp_path):
