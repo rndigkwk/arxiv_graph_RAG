@@ -4159,6 +4159,32 @@ ADR-066이 안쪽을 재는 장치를 넣었지만 저장된 90건은 그 전의
 **말하지 않는 것.** 질문 셋, 한 사람입니다. 답변 지연(30~43초)은 대부분 모델과 조건 검사이고 OpenAI 쪽
 부하에 따라 바뀝니다 - VM의 몫인 도구 시간은 4.2~5.8초였습니다.
 
+## 11-56. 새 논문의 참고문헌을 S2에서 받아 봤습니다 — 한 주에 그래프 밖 논문 3천여 편, 두 번 이상 인용된 것은 115편입니다 (2026-10-27)
+
+**왜.** 이전 계획 2단계(수집 확장)의 크기를 정해야 합니다. 지금의 "인용 보강"은 그래프 자신을 조회해서
+새 논문에 참고문헌이 붙지 않습니다. 10-24에 적재한 OAI 논문(주간 수집 한 번의 크기)으로 잽니다.
+
+**먼저 풀린 의문.** 10-26 시험 실행의 "새 논문 103편/주"는 수집이 작은 것이 아니었습니다. 10-24 적재가
+같은 창을 이미 덮었고(10-19~23, 평일 약 187편), CI는 상태 파일을 남기지 않아 매번 7일을 되돌아봅니다.
+실제 주간 신규는 cs.AI 1차 분류로 약 1,000편입니다.
+
+**잰 것**(`scripts/measure_reference_growth.py`, 읽기만, S2 요청 <!--n:reports/reference_growth.json#requests-->2<!--/n-->번, 0원).
+대상 <!--n:reports/reference_growth.json#targets-->934<!--/n-->편 중 참고문헌이 있는 것 <!--n:reports/reference_growth.json#found_with_references-->437<!--/n-->편, S2에 있지만 아직
+0개인 것 <!--n:reports/reference_growth.json#found_empty-->458<!--/n-->편(늦게 붙습니다 - 다시 물어야 합니다), S2에 없는 것 <!--n:reports/reference_growth.json#not_found-->39<!--/n-->편.
+arXiv 참고문헌은 편당 중앙값 <!--n:reports/reference_growth.json#arxiv_references_per_paper_p50-->23<!--/n-->개입니다.
+
+- 그래프 **안** 논문으로 가는 간선 <!--n:reports/reference_growth.json#edges.to_papers_in_graph-->7856<!--/n-->개 - 노드 없이 늘릴 수 있습니다.
+- 그래프 **밖** 논문 <!--n:reports/reference_growth.json#distinct_cited_outside-->3297<!--/n-->편. 그중 새 논문 두 편 이상이 인용한 것은
+  <!--n:reports/reference_growth.json#outside_by_citing_count/>=2-->115<!--/n-->편뿐입니다.
+- 밖의 논문을 다 들이면 저자 간선이 약 <!--n:reports/reference_growth.json#estimated_authored_for_outside-->23338<!--/n-->개 늘어납니다
+  (그래프의 편당 저자 <!--n:reports/reference_growth.json#authors_per_paper_in_graph-->7.08<!--/n-->명으로 추정 - 잰 값이 아닙니다).
+
+**말하지 않는 것.** 한 주 표본입니다. 아직 0개인 458편이 채워지면 밖의 논문은 더 늘어납니다. 들일
+범위는 정하지 않았습니다.
+
+**첫 측정에서 묶음 하나(434편)가 통째로 실패했습니다.** 바로 다시 보내니 16초에 끝났습니다. 상태
+코드가 아닌 끊김도 다시 시도하게 고쳤습니다(`pipeline/s2.py`).
+
 ## 13. 재현 방법
 
 ```bash

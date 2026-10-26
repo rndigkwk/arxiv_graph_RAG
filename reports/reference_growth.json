@@ -1,0 +1,25 @@
+{
+  "targets": 934,
+  "requests": 2,
+  "found_with_references": 437,
+  "found_empty": 458,
+  "not_found": 39,
+  "failed": 0,
+  "arxiv_references_per_paper_p50": 23,
+  "non_arxiv_references_dropped": 8725,
+  "edges": {
+    "to_papers_in_graph": 7856,
+    "to_papers_outside": 3417
+  },
+  "distinct_cited": 7774,
+  "distinct_cited_in_graph": 4477,
+  "distinct_cited_outside": 3297,
+  "outside_by_citing_count": {
+    ">=1": 3297,
+    ">=2": 115,
+    ">=3": 3,
+    ">=5": 1
+  },
+  "estimated_authored_for_outside": 23338,
+  "authors_per_paper_in_graph": 7.08
+}
