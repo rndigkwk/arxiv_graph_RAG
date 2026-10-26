@@ -35,7 +35,7 @@ from neo4j_graphrag.types import RetrieverResultItem
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from pipeline import tracing
-from src import agent_graph, pagerank, prompts, title_search, tool_timing
+from src import agent_graph, pagerank, prompts, release, title_search, tool_timing
 from src.answer_validation import (
     direct_evidence_ids,
     log_validation_failure,
@@ -71,6 +71,10 @@ def env(*names, default=None):
             return value
     return default
 
+
+# 이 모듈을 **처음 임포트한** 커밋입니다. 화면이 그릴 때 읽는 커밋과 다르면 Streamlit Cloud가
+# 옛 모듈을 붙든 채입니다(`src/release.py`). 임포트 때 한 번만 읽어야 그 차이가 남습니다.
+LOADED_COMMIT = release.commit()
 
 neo4j_uri = env("NEO4J_URI")
 neo4j_user = env("NEO4J_USER", "NEO4J_USERNAME")
@@ -1216,13 +1220,18 @@ def fetch_subgraph(arxiv_ids):
 
 # ── 준비 ──────────────────────────────────────────────────────────────────
 # Streamlit의 캐시 함수가 이 모듈을 처음 불러올 때 한 번만 준비합니다.
+# 제한 시간과 재시도는 저장된 180회에서 정합니다(ADR-073). 전에는 120초에 라이브러리 기본
+# 재시도 2번이라, 제공자가 멈추면 한 호출이 최악 6분을 기다렸습니다. 조건 판정 한 호출의
+# 최대가 9.6초, `generate` 노드 한 번 전체(모델 호출 여럿과 도구 포함)의 최대가 36.3초이므로
+# 60초는 측정된 어느 호출도 끊지 않고 최악을 2분으로 줄입니다.
 llm = ChatOpenAI(
     model=llm_model, api_key=openai_api_key,
-    use_responses_api=True, streaming=True, timeout=120,
+    use_responses_api=True, streaming=True, timeout=60, max_retries=1,
 )
 # 번역 도구와 번역 버튼이 함께 쓰는 짧은 호출용 모델입니다. 구조화 출력을 쓰지 않습니다.
-translator = ChatOpenAI(model=llm_model, api_key=openai_api_key, timeout=60)
-embedder = OpenAIEmbeddings(model=EMBEDDING_MODEL, timeout=60, max_retries=2)
+# 번역 지연은 잰 적이 없어서 제한 시간은 그대로 두고 재시도만 맞춥니다.
+translator = ChatOpenAI(model=llm_model, api_key=openai_api_key, timeout=60, max_retries=1)
+embedder = OpenAIEmbeddings(model=EMBEDDING_MODEL, timeout=60, max_retries=1)
 # 적재 노트북과 같이 질문 벡터도 768차원으로 고정합니다.
 embedder.embed_query = partial(embedder.embed_query, dimensions=EMBEDDING_DIMENSIONS)
 

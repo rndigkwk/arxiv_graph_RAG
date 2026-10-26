@@ -8,7 +8,7 @@ from urllib.parse import quote
 import streamlit as st
 
 from pipeline import logs
-from src import abstain, citations, quality_board, routing, warmup
+from src import abstain, citations, model_outage, quality_board, release, routing, warmup
 from src.paper_library import add_paper, compare_selection
 
 
@@ -237,7 +237,8 @@ def show_answer(response, index):
             try:
                 body = translate(response["answer"])
             except Exception as exc:
-                st.warning(f"번역 에러: {type(exc).__name__}. 영어 답변을 그대로 보여 줍니다.")
+                st.warning(model_outage.message(exc)
+                           or f"번역 에러: {type(exc).__name__}. 영어 답변을 그대로 보여 줍니다.")
                 body = response["answer"]
         st.markdown(answer_text(response, body))
     else:
@@ -725,11 +726,15 @@ def show_saved_papers(chatbot):
                 st.session_state.saved_paper_comparison_error = None
             except Exception as exc:
                 st.session_state.saved_paper_comparison = None
-                st.session_state.saved_paper_comparison_error = type(exc).__name__
+                # 모델 한도·무응답이면 "선택을 확인하라"는 안내가 틀립니다. 이유를 그대로 둡니다.
+                st.session_state.saved_paper_comparison_error = (
+                    model_outage.message(exc) or type(exc).__name__)
         if selection_error and selected:
             st.caption(selection_error)
-        if st.session_state.get("saved_paper_comparison_error"):
-            st.error("논문 비교를 완료하지 못했습니다. 선택을 확인하고 다시 시도해 주세요.")
+        failure = st.session_state.get("saved_paper_comparison_error")
+        if failure:
+            st.error(failure if failure in model_outage.MESSAGES.values()
+                     else "논문 비교를 완료하지 못했습니다. 선택을 확인하고 다시 시도해 주세요.")
         result = st.session_state.get("saved_paper_comparison")
         if result and {p["arxiv_id"] for p in result.get("papers", [])} == set(selected):
             _show_comparison_result(result, saved)
@@ -802,8 +807,9 @@ def show_paper_comparison(chatbot, response, index):
         except Exception as exc:
             errors[index] = {
                 "selected_ids": list(selected_ids),
-                "message": (f"논문 비교를 완료하지 못했습니다 ({type(exc).__name__}). "
-                            "선택을 확인하고 다시 시도해 주세요."),
+                "message": model_outage.message(exc) or (
+                    f"논문 비교를 완료하지 못했습니다 ({type(exc).__name__}). "
+                    "선택을 확인하고 다시 시도해 주세요."),
             }
 
     error = errors.get(index)
@@ -1291,7 +1297,13 @@ def main():
     citation_warmup(chatbot)
 
     sidebar()
-    st.caption(f"적재된 논문 {chatbot.paper_count:,}편 / 모델 {chatbot.llm_model}")
+    # 배포 표시는 배포 점검이 읽습니다(scripts/visit_deployed_app.py). 커밋을 두 번 읽어
+    # 화면과 검색 모듈이 같은 코드인지 봅니다 - 다르면 재부팅이 필요하다는 뜻입니다.
+    loaded = getattr(chatbot, "LOADED_COMMIT", release.OLDER)
+    deployed, stale = release.stamp(release.commit(), loaded)
+    st.caption(f"적재된 논문 {chatbot.paper_count:,}편 / 모델 {chatbot.llm_model} / {deployed}")
+    if stale:
+        st.warning(stale)
 
     home_tab, chat_tab, rank_tab, gate_tab = st.tabs(
         ["홈", "챗봇", "PageRank 순위", "품질 게이트"]
@@ -1336,7 +1348,9 @@ def answer_question(chatbot, question):
             return
         except Exception as exc:
             answer_area.empty()
-            st.error(f"검색 에러: {type(exc).__name__}. 연결 상태를 확인하고 다시 질문하세요.")
+            # 모델이 실패한 것을 "검색 에러 - 연결을 확인하라"로 적으면 할 일이 틀립니다(ADR-073).
+            st.error(model_outage.message(exc)
+                     or f"검색 에러: {type(exc).__name__}. 연결 상태를 확인하고 다시 질문하세요.")
             return
     # 성공적으로 처리한 질문만 저장하므로 중단된 질문은 다음 대화에 섞이지 않습니다.
     st.session_state.history = history
