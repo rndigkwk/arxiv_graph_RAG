@@ -152,3 +152,4 @@
 | [ADR-078](ADR-078-show-each-family-with-its-n.md) | 품질 게이트 탭에 분야별 표를 두되, 수 옆에 n을 둔다 — 지금은 천장에 붙어 있다 | 채택 |
 | [ADR-079](ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md) | VM은 저장소를 마운트하고 HTTPS 하나만 연다 — 스키마는 Aura에서 읽어 옮기고, 벡터 양자화만 같게 못 한다 | 채택 |
 | [ADR-080](ADR-080-the-vm-pulls-main.md) | VM이 main을 당겨 온다 — GitHub에는 VM에 닿는 자격을 두지 않는다 | 채택 |
+| [ADR-081](ADR-081-fastapi-beside-streamlit-on-the-vm.md) | FastAPI 층은 같은 VM에서 Streamlit 옆에 둔다 — 돈이 드는 길에만 문턱을 둔다 | 채택 |

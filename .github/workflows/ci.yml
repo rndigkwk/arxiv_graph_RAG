@@ -16,8 +16,9 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv lock --check
-      - run: uv sync --locked --group dev
-      - run: uv run --locked python -c "import networkx, plotly, streamlit"
+      # `api` extra는 VM 이미지만 설치하지만, tests/test_api.py가 돌도록 CI에도 넣습니다.
+      - run: uv sync --locked --group dev --extra api
+      - run: uv run --locked python -c "import fastapi, networkx, plotly, streamlit"
       - run: uv run --locked ruff check src app.py evals tests scripts pipeline models
       - run: uv run --locked python -m pytest -q
       # 검사기도 손으로 적지 않고 글로브로 넘깁니다. 두 줄짜리 목록에 세 번째

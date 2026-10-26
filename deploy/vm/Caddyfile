@@ -1,5 +1,15 @@
 # 인터넷에 여는 것은 이 하나입니다. Let's Encrypt 인증서를 Caddy가 받고 갱신합니다.
 {$APP_DOMAIN} {
-	encode gzip
-	reverse_proxy app:8501
+	# FastAPI 층(ADR-081). 질문은 SSE로 흐르므로 모아 두지 않고(flush_interval -1) 압축하지
+	# 않습니다. X-Forwarded-For는 Caddy가 새로 씁니다(trusted_proxies가 없으면 들어온 값을 믿지
+	# 않습니다) - API의 IP별 상한이 이것을 읽습니다.
+	handle /api/* {
+		reverse_proxy api:8000 {
+			flush_interval -1
+		}
+	}
+	handle {
+		encode gzip
+		reverse_proxy app:8501
+	}
 }
