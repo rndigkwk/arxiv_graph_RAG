@@ -189,3 +189,15 @@ def test_vm_env_carries_no_aura_or_gds_secrets():
     names = [line.split("=", 1)[0] for line in render("sk-x", "a.sslip.io", "p").splitlines()
              if line]
     assert names == ["OPENAI_API_KEY", "NEO4J_PASSWORD", "APP_DOMAIN", "LANGFUSE_TRACING"]
+
+
+def test_vm_env_is_written_with_lf_even_on_windows(tmp_path, monkeypatch):
+    # 2026-10-26 VM에 처음 올린 .env가 CRLF였습니다. compose가 비밀번호 끝의 CR까지 읽습니다.
+    from scripts import make_vm_env
+
+    (tmp_path / ".env").write_text("OPENAI_API_KEY=sk-x\n", encoding="utf-8")
+    monkeypatch.setattr(make_vm_env, "ROOT", tmp_path)
+    monkeypatch.setattr(make_vm_env, "OUTPUT", tmp_path / ".local" / "vm.env")
+    monkeypatch.setattr("sys.argv", ["make_vm_env.py", "--domain", "a.sslip.io"])
+    assert make_vm_env.main() == 0
+    assert b"\r" not in (tmp_path / ".local" / "vm.env").read_bytes()

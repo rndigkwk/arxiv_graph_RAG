@@ -49,7 +49,9 @@ def main() -> int:
     if not key:
         parser.error(".env에 OPENAI_API_KEY가 없습니다")
     OUTPUT.parent.mkdir(exist_ok=True)
-    OUTPUT.write_text(render(key, args.domain, secrets.token_hex(20)), encoding="utf-8")
+    # Windows에서 그냥 쓰면 CRLF가 되고, VM의 compose가 비밀번호 끝에 CR을 붙여 읽습니다.
+    OUTPUT.write_text(render(key, args.domain, secrets.token_hex(20)), encoding="utf-8",
+                      newline="\n")
     print(f"{OUTPUT}를 만들었습니다(값은 찍지 않습니다).")
     return 0
 

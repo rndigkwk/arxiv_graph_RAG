@@ -62,13 +62,27 @@ compose로 리허설했고, 세 가지가 계획과 달랐습니다.
   남는다는 ADR-071의 추정과 맞지만, 질문 하나·16표본입니다.
 - 저자·주제(벡터)·인용 질문 셋이 예외 없이 답했습니다.
 
+## GCP VM 첫날 (2026-10-26)
+
+`reports/vm_day1.json`입니다. e2-medium(4GB), 서울, 주소 `https://8-230-25-138.sslip.io`.
+
+- 싣기와 검증이 <!--n:reports/vm_day1.json#load_wall_seconds-->546.5<!--/n-->초(리허설의 약 2.7배 - 디스크와 CPU가 느립니다), 검증 문제 0건.
+  Let's Encrypt 인증서는 Caddy가 첫 시도에 받았습니다.
+- 배포 점검이 첫 화면 <!--n:reports/vm_day1.json#deploy_check.first_screen_seconds-->25<!--/n-->초, 화면·모듈 커밋 일치로 통과했습니다.
+- **검색은 리허설과 똑같습니다.** 1위 <!--n:reports/vm_day1.json#retrieval.same_top1-->30<!--/n-->/31, 겹침 <!--n:reports/vm_day1.json#retrieval.mean_overlap_at_k-->0.894<!--/n-->,
+  recall@k <!--n:reports/vm_day1.json#retrieval.summary.recall_at_k.after-->0.6836<!--/n-->.
+- **메모리.** 질문 셋 동안 Neo4j <!--n:reports/vm_day1.json#memory_peak_mib.neo4j-->1609.7<!--/n-->MiB, 앱 <!--n:reports/vm_day1.json#memory_peak_mib.app-->409.8<!--/n-->MiB,
+  호스트 사용 <!--n:reports/vm_day1.json#host_used_peak_mib-->2673<!--/n-->MiB, 그 뒤 가용 <!--n:reports/vm_day1.json#host_available_after_mib-->1280<!--/n-->MiB.
+  스왑 <!--n:reports/vm_day1.json#swap_used_mib.after-->342<!--/n-->MiB는 **싣는 동안 밀려난 것**입니다 - 질문 동안 늘지 않았고 그 뒤
+  swap-in/out이 0입니다. 그래서 4GB를 유지합니다.
+
 ## 민감도
 
 - **목록 겹침 0.894가 품질에 무엇을 하는지는 모릅니다.** 31사례의 순위 지표는 같았지만 정답 표지가
   있는 논문만 봅니다. 답변 품질(유료 평가)로 재지 않았습니다. 지표가 떨어지는 사례가 나오면 먼저 볼
   것은 양자화입니다 — `vector.quantization.enabled: false`로 다시 만들고 다시 잽니다.
 - **메모리는 질문 하나의 값입니다.** 동시 사용자가 늘면 앱이 먼저 커집니다. setup.sh가 스왑 2GB를
-  만들어 OOM 대신 느려지게 했고, 스왑을 쓰기 시작하면 8GB로 올립니다(ADR-071 결정 4는 VM에서 다시 잽니다).
+  만들어 OOM 대신 느려지게 했고, **질문을 받는 동안** 스왑 사용이 늘면(swap-in이 0이 아니게 되면) 8GB로 올립니다. 싣기·빌드가 밀어낸 스왑은 세지 않습니다(ADR-071 결정 4는 VM에서 다시 잽니다).
 - **sslip.io는 남의 DNS입니다.** 멈추면 주소가 죽습니다. 그때는 도메인을 사서 `APP_DOMAIN`만 바꿉니다.
 - **주간 수집은 아직 Aura에 씁니다.** 1단계의 VM은 옮긴 날의 사본입니다. 2단계에서 수집을 VM으로
   옮길 때 한 번 더 내보내 싣습니다.
