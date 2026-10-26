@@ -8,7 +8,16 @@ from urllib.parse import quote
 import streamlit as st
 
 from pipeline import logs
-from src import abstain, citations, model_outage, quality_board, release, routing, warmup
+from src import (
+    abstain,
+    citations,
+    model_outage,
+    quality_board,
+    release,
+    routing,
+    source_check,
+    warmup,
+)
 from src.paper_library import add_paper, compare_selection
 
 
@@ -1370,6 +1379,10 @@ def main():
     # 화면과 검색 모듈이 같은 코드인지 봅니다 - 다르면 재부팅이 필요하다는 뜻입니다.
     loaded = getattr(chatbot, "LOADED_COMMIT", release.OLDER)
     deployed, stale = release.stamp(release.commit(), loaded)
+    # 커밋이 달라도 `src/`의 내용이 같으면 옛 코드가 아닙니다. Streamlit Cloud는 `src/`를
+    # 건드리지 않은 머지에서도 모듈을 다시 임포트하지 않습니다(ADR-072 고침, 이슈 #56).
+    if stale and source_check.same_code(getattr(chatbot, "LOADED_SOURCE", None)):
+        stale = None
     st.caption(f"적재된 논문 {chatbot.paper_count:,}편 / 모델 {chatbot.llm_model} / {deployed}")
     if stale:
         st.warning(stale)
