@@ -1297,7 +1297,7 @@ def main():
     citation_warmup(chatbot)
 
     sidebar()
-    # 배포 표시는 배포 점검이 읽습니다(scripts/check_deployed_app.py). 커밋을 두 번 읽어
+    # 배포 표시는 배포 점검이 읽습니다(scripts/visit_deployed_app.py). 커밋을 두 번 읽어
     # 화면과 검색 모듈이 같은 코드인지 봅니다 - 다르면 재부팅이 필요하다는 뜻입니다.
     loaded = getattr(chatbot, "LOADED_COMMIT", release.OLDER)
     deployed, stale = release.stamp(release.commit(), loaded)

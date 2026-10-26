@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from scripts.check_deployed_app import error_in, parse_stamp, verdict
+from scripts.visit_deployed_app import error_in, parse_stamp, verdict
 from src import release
 
 WORKFLOWS = Path(".github/workflows")
@@ -164,6 +164,6 @@ def test_the_check_is_given_the_commit_and_the_pinned_browser():
     steps = " ".join(step.get("run", "") for step in doc["jobs"]["check"]["steps"])
     assert "--expect-commit" in steps and "github.sha" in steps
     pinned = set(re.findall(r"playwright==([\d.]+)", steps))
-    script = Path("scripts/check_deployed_app.py").read_text(encoding="utf-8")
+    script = Path("scripts/visit_deployed_app.py").read_text(encoding="utf-8")
     assert pinned == set(re.findall(r"playwright==([\d.]+)", script))
     assert "push" in triggers(doc), "머지 직후 옛 모듈을 잡으려면 push에서도 돌아야 합니다"

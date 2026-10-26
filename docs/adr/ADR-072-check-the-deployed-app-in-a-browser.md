@@ -41,7 +41,8 @@ dograg의 사고는 `ImportError`로 화면에 드러났기 때문에 그 차이
 
 ## 결정 2 — 헤드리스 브라우저로 깨우고 대조합니다
 
-`scripts/check_deployed_app.py`(Playwright 1.64.1 고정)가 앱을 열고:
+`scripts/visit_deployed_app.py`(Playwright 1.64.1 고정)가 앱을 열고(이름이
+`check_`가 아닌 것은 CI가 `scripts/check_*.py`를 문서 검사기로 모두 돌리기 때문입니다):
 
 - "Yes, get this app back up!"이 보이면 누릅니다.
 - "적재된 논문" 캡션이 뜰 때까지 기다립니다. 그 줄은 Aura 연결 뒤에만 그려지므로 DB도 함께

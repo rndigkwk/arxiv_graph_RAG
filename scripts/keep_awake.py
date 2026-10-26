@@ -122,7 +122,7 @@ def visit(url: str) -> None:
 
     잠들기를 늦추는 효과는 있지만, **이미 잠든 앱을 깨우지는 못합니다.** 깨우기는 화면의
     버튼을 눌러야 하고 그건 헤드리스 브라우저가 필요합니다 - 그 일은
-    `scripts/check_deployed_app.py`가 합니다(ADR-072). 앱에는 연결 실패 시 보여 줄
+    `scripts/visit_deployed_app.py`가 합니다(ADR-072). 앱에는 연결 실패 시 보여 줄
     대체 화면이 있고 README에 깨우는 방법이 적혀 있으므로, 여기서는 실패해도 넘어갑니다.
     """
     try:

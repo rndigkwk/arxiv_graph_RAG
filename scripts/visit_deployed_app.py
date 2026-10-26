@@ -1,6 +1,6 @@
 """배포 앱을 헤드리스 브라우저로 열어, 깨어 있고 **새 코드를 돌리는지** 확인합니다.
 
-    uvx --with playwright==1.64.1 python scripts/check_deployed_app.py --expect-commit <sha>
+    uvx --with playwright==1.64.1 python scripts/visit_deployed_app.py --expect-commit <sha>
     # 처음 한 번: uvx --with playwright==1.64.1 playwright install chromium
 
 `keep_awake.py`의 HTTP 방문으로는 두 가지를 못 합니다. 둘 다 이 저장소에서 실제로 일어났습니다.

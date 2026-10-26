@@ -1,4 +1,4 @@
-"""배포된 코드가 어느 커밋인지 읽습니다. 화면과 배포 점검(`scripts/check_deployed_app.py`)이 씁니다.
+"""배포된 코드가 어느 커밋인지 읽습니다. 화면과 배포 점검(`scripts/visit_deployed_app.py`)이 씁니다.
 
 Streamlit Cloud가 **옛 모듈을 돌린 일이 두 번** 있었습니다. `app.py`는 새로 실행됐는데 이미
 임포트된 `chatbot`이 그대로 남았고, 재부팅해야 고쳐졌습니다. 그런데 화면에 배포 여부를 확인할
@@ -45,7 +45,7 @@ def commit(root: Path = ROOT) -> str | None:
 def stamp(app_commit: str | None, module_commit: str | None) -> tuple[str, str | None]:
     """화면에 붙일 배포 표시와, 둘이 어긋났을 때의 경고.
 
-    표시의 모양은 배포 점검이 읽으므로 바꾸면 `check_deployed_app.parse_stamp`도 바꿔야
+    표시의 모양은 배포 점검이 읽으므로 바꾸면 `visit_deployed_app.parse_stamp`도 바꿔야
     합니다 - `tests/test_deployed_app.py`가 둘을 맞물려 시험합니다.
     """
     caption = f"배포 {app_commit or '확인 불가'}"

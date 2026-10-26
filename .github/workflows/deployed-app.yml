@@ -1,5 +1,5 @@
 name: Check deployed app
-# Opens the deployed Streamlit app in a headless browser (scripts/check_deployed_app.py): clicks
+# Opens the deployed Streamlit app in a headless browser (scripts/visit_deployed_app.py): clicks
 # "Yes, get this app back up!" when it sleeps, waits for the first screen (which needs Aura), and
 # compares the deploy stamp with this commit. It fails when the search module is older than the
 # page - Streamlit Cloud kept an old `chatbot` module until a reboot twice (ADR-072).
@@ -37,4 +37,4 @@ jobs:
       - name: Check the deployed app
         run: >
           uvx --with playwright==1.64.1
-          python scripts/check_deployed_app.py --expect-commit "${{ github.sha }}"
+          python scripts/visit_deployed_app.py --expect-commit "${{ github.sha }}"
