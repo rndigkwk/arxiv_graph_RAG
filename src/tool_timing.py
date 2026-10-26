@@ -18,7 +18,10 @@
 2. **오류로 끝난 도구.** 끝에 `ToolMessage`가 없어 어느 호출인지 모릅니다. 버리지 않고
    `unattributed_seconds`로 따로 적습니다 - 쓴 시간을 0으로 적으면 나머지가 그만큼
    부풀어 "설명되지 않은 시간"으로 보입니다.
-3. **나머지(`other_seconds`)는 잰 값이 아니라 뺀 값입니다.** `generate` 전체에서 위를
+3. **한 모델 턴이 도구를 여럿 부르는 경우.** LangGraph는 그것들을 동시에 돌립니다. 호출마다의
+   초를 그냥 더하면 겹친 구간을 두 번 셉니다(2026-10-26 `citing-02`: 나머지가 -0.194초).
+   도구 몫은 **구간의 합집합**이고, 호출마다의 초는 그대로 남깁니다.
+4. **나머지(`other_seconds`)는 잰 값이 아니라 뺀 값입니다.** `generate` 전체에서 위를
    덜어낸 것이고, 스트리밍 루프·부분 JSON 파싱·직렬화가 거기 들어갑니다. 음수가 나오면
    분해가 틀린 것이므로 `adds_up`이 false가 되고, 화면은 수를 적지 않습니다.
 
@@ -52,6 +55,7 @@ class InsideGenerate(BaseCallbackHandler):
         self._frames = threading.local()
         self._lock = threading.Lock()
         self._calls: dict[str, float] = {}
+        self._spans: list[tuple[float, float]] = []
         self._model_seconds = 0.0
         self._model_turns = 0
         self._unattributed = 0.0
@@ -93,6 +97,7 @@ class InsideGenerate(BaseCallbackHandler):
         with self._lock:
             if isinstance(call_id, str) and call_id:
                 self._calls[call_id] = self._calls.get(call_id, 0.0) + frame["seconds"]
+                self._spans.append((frame["start"], frame["start"] + frame["seconds"]))
             else:
                 self._unattributed += frame["seconds"]
 
@@ -140,14 +145,17 @@ class InsideGenerate(BaseCallbackHandler):
         시도 전부의 합이고, 여기 모인 호출도 시도 전부이므로 같은 범위를 비교합니다.
         """
         with self._lock:
-            tools = round(sum(self._calls.values()), 3)
+            summed = round(sum(self._calls.values()), 3)
+            tools = round(covered_seconds(self._spans), 3)
             model = round(self._model_seconds, 3)
             unattributed = round(self._unattributed, 3)
             turns, strays, calls = self._model_turns, self._stray_ends, len(self._calls)
         other = round(generate_seconds - tools - model - unattributed, 3)
         return {
             "generate_seconds": round(generate_seconds, 3),
+            # 겹친 구간을 한 번만 센 벽시계 시간입니다. 호출마다의 합은 아래에 따로 둡니다.
             "tools_seconds": tools,
+            "tools_seconds_summed": summed,
             "tool_calls": calls,
             "model_seconds": model,
             "model_turns": turns,
@@ -157,6 +165,19 @@ class InsideGenerate(BaseCallbackHandler):
             "adds_up": other >= -OVERLAP_TOLERANCE,
             "stray_ends": strays,
         }
+
+
+def covered_seconds(spans: list[tuple[float, float]]) -> float:
+    """구간들이 덮는 길이. 동시에 돈 도구 둘은 겹친 만큼 한 번만 셉니다."""
+    total, reach = 0.0, None
+    for start, end in sorted(spans):
+        if reach is None or start > reach:
+            total += end - start
+            reach = end
+        elif end > reach:
+            total += end - reach
+            reach = end
+    return total
 
 
 def attach(calls: list[dict[str, Any]], seconds: dict[str, float]) -> int:

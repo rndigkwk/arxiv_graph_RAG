@@ -9,6 +9,12 @@ ADR-066이 안쪽을 재는 장치를 넣었지만 저장된 실행은 전부 �
 **첫 관련 논문 호출은 따로 셉니다.** 하네스 프로세스에는 앱의 부팅 예열(ADR-067)이 없어서
 처음 `rank_related_papers`를 부르는 질문이 인용망을 올리는 값을 혼자 냅니다. 그 한 번을
 섞으면 앱에서는 일어나지 않는 일이 도구 몫을 부풀립니다. 빼지 않고 이름을 붙여 둡니다.
+하네스가 예열을 한 보고서(`metadata.citation_graph_warmup_seconds`가 있음)에는 차가운 호출이
+없으므로 따로 세지 않습니다.
+
+**한 턴에 도구가 둘 이상인 문항은 이름을 붙입니다.** 그 문항의 도구 몫은 이 보고서가 만들어질
+때 겹친 구간을 두 번 셌습니다(`citing-02`, 나머지 -0.194초). 계측은 고쳤지만 저장된 값은
+구간이 없어 다시 셀 수 없습니다. 도구 수가 `모델 턴 - 1`보다 많으면 어느 턴이 둘을 불렀습니다.
 """
 
 from __future__ import annotations
@@ -25,6 +31,16 @@ OUTPUT = Path("reports/inside_generate.json")
 COLD_TOOL = "rank_related_papers"
 
 
+def parallel_tool_cases(rows: list[dict[str, Any]]) -> list[str]:
+    """한 모델 턴이 도구를 둘 이상 부른 문항. 마지막 턴은 답을 쓰므로 도구를 부르지 않습니다.
+
+    새 계측(`tools_seconds_summed`가 있음)은 겹침을 이미 한 번만 셉니다 - 그래도 이름은 남깁니다.
+    """
+    return [row["id"] for row in rows
+            if (trace := row.get("generate_trace"))
+            and trace.get("tool_calls", 0) > max(trace.get("model_turns", 0) - 1, 0)]
+
+
 def summarize(report: dict[str, Any]) -> dict[str, Any]:
     rows = report["results"]
     traces = [row["generate_trace"] for row in rows if row.get("generate_trace")]
@@ -32,9 +48,10 @@ def summarize(report: dict[str, Any]) -> dict[str, Any]:
 
     seconds: dict[str, list[float]] = defaultdict(list)
     cold: dict[str, Any] | None = None
+    warmed = report["metadata"].get("citation_graph_warmup_seconds") is not None
     for row in rows:
         for call in row.get("tool_seconds", []):
-            if call["name"] == COLD_TOOL and cold is None:
+            if call["name"] == COLD_TOOL and cold is None and not warmed:
                 cold = {"case": row["id"], "seconds": call["seconds"]}
                 continue
             seconds[call["name"]].append(call["seconds"])
@@ -62,7 +79,9 @@ def summarize(report: dict[str, Any]) -> dict[str, Any]:
                 (sum(t["tools_seconds"] for t in traces) - (cold or {}).get("seconds", 0.0))
                 / total, 3),
         },
+        "harness_warmup_seconds": report["metadata"].get("citation_graph_warmup_seconds"),
         "cold_first_related_call": cold,
+        "parallel_tool_cases": parallel_tool_cases(rows),
         "tools": {
             name: {
                 "calls": len(values),

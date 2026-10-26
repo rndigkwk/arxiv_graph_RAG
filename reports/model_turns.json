@@ -1,0 +1,76 @@
+{
+  "source": "reports/inside_generate_2026-10-26.json",
+  "cases": 30,
+  "turns": {
+    "distribution": {
+      "2": 4,
+      "3": 5,
+      "4": 13,
+      "5": 7,
+      "6": 1
+    },
+    "mean": 3.87,
+    "seconds_per_turn_p50": 2.81,
+    "seconds_per_turn_max": 4.93
+  },
+  "model_seconds_correlation": {
+    "turns": 0.47,
+    "input_tokens": 0.54,
+    "output_tokens": 0.68
+  },
+  "input_tokens_cached_share": 0.885,
+  "by_family": {
+    "author": {
+      "cases": 6,
+      "turns_mean": 3.33,
+      "model_seconds_mean": 8.0
+    },
+    "citing": {
+      "cases": 6,
+      "turns_mean": 4.0,
+      "model_seconds_mean": 10.0
+    },
+    "coauthor": {
+      "cases": 6,
+      "turns_mean": 5.0,
+      "model_seconds_mean": 14.4
+    },
+    "reference": {
+      "cases": 6,
+      "turns_mean": 4.33,
+      "model_seconds_mean": 10.4
+    },
+    "topcited": {
+      "cases": 6,
+      "turns_mean": 2.67,
+      "model_seconds_mean": 11.5
+    }
+  },
+  "separate_pair": {
+    "tools": [
+      "search_graph",
+      "rank_related_papers"
+    ],
+    "cases": 17,
+    "ids": [
+      "citing-01",
+      "citing-03",
+      "citing-04",
+      "citing-05",
+      "citing-06",
+      "reference-01",
+      "reference-02",
+      "reference-03",
+      "reference-04",
+      "reference-05",
+      "reference-06",
+      "coauthor-01",
+      "coauthor-02",
+      "coauthor-03",
+      "coauthor-04",
+      "coauthor-05",
+      "coauthor-06"
+    ],
+    "estimated_seconds_per_case": 2.81
+  }
+}

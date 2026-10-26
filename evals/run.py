@@ -70,6 +70,20 @@ def tool_seconds(response: dict[str, Any]) -> list[dict[str, Any]]:
             for call in response.get("tool_calls", []) or [] if "seconds" in call]
 
 
+def warm_citation_graph(chatbot: Any, mode: str) -> float | None:
+    """앱의 부팅 예열(ADR-067)을 하네스에서도 합니다. 걸린 초를 돌려줍니다.
+
+    2026-10-26 실행에서 첫 `rank_related_papers` 호출이 26.1초였고 나머지는 p50 0.68초였습니다.
+    앱은 그 값을 부팅 때 배경에서 치르므로 사용자는 겪지 않습니다. 하네스만 그 값을 한 문항에
+    몰아 주면 평가가 재는 지연이 앱보다 큽니다. 검색만 재는 모드는 그 도구를 부르지 않습니다.
+    """
+    if mode == "retrieval":
+        return None
+    started = perf_counter()
+    chatbot.citation_graph()
+    return round(perf_counter() - started, 3)
+
+
 # arxiv_id 모양. 골드 Cypher의 매개변수에서 **기준 논문**만 골라내기 위한 것입니다.
 ARXIV_ID = re.compile(r"^\d{4}\.\d{4,5}$")
 
@@ -687,6 +701,7 @@ def main() -> None:
     from src import chatbot
 
     rates = pricing_from_env(os.environ)
+    warmup_seconds = warm_citation_graph(chatbot, args.mode)
 
     # 앞 실행이 남긴 표식이 이번 실패를 설명하면 안 됩니다.
     budget.clear()
@@ -723,6 +738,8 @@ def main() -> None:
         model=getattr(chatbot, "llm_model", os.environ.get("OPENAI_MODEL", "")),
         embedding_model=getattr(chatbot, "EMBEDDING_MODEL", "text-embedding-3-large"),
     )
+    # 이 값이 없는 보고서는 이 변경 전의 것이고, 첫 관련 논문 호출이 차갑습니다.
+    metadata["citation_graph_warmup_seconds"] = warmup_seconds
     report = {
         "schema_version": 2,
         "generated_at": metadata["timestamp_utc"],

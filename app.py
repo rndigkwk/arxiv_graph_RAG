@@ -11,6 +11,7 @@ from pipeline import logs
 from src import (
     abstain,
     citations,
+    family_board,
     model_outage,
     quality_board,
     release,
@@ -920,6 +921,40 @@ def show_paper_comparison(chatbot, response, index):
     )
 
 
+def show_family_board(baseline):
+    """분야별 표. 수 옆에 `n`을 둡니다 - 분야마다 6문항, 3회 실행입니다(`family_board`)."""
+    stable = baseline.get("ragas_stable_families") or []
+    rows = family_board.load_rows(stable)
+    if not rows:
+        return
+    st.markdown("##### 분야별 — 분야마다 6문항 × 3회")
+    if family_board.at_ceiling(rows):
+        st.caption(
+            "**검색·근거 지표는 다섯 분야 모두 1.0이고 실패는 0건입니다.** 이 30문항으로는 "
+            "그 지표에서 분야를 가르지 못합니다. 분야끼리 다른 것은 RAGAS뿐이고, 그중 "
+            "`context_precision`은 '게이트' 열이 '예'인 분야만 봅니다 - 기준선의 "
+            "`ragas_stable_families`가 정하고, 나머지 분야는 품질과 무관하게 움직였습니다(ADR-017)."
+        )
+
+    def judged(row, name):
+        low, high = row[f"{name}_range"] or (None, None)
+        if row[name] is None:
+            return "—"
+        return f"{row[name]:.3f}" if low == high else f"{row[name]:.3f} ({low:.2f}~{high:.2f})"
+
+    st.dataframe([{
+        "분야": row["family"],
+        "n": f'{row["cases"]}×{row["runs"]}',
+        "hit@5": row["hit_at_k"],
+        "근거 재현율": row["answer_evidence_recall"],
+        "실패율": row["failure_rate"],
+        "faithfulness": judged(row, "faithfulness"),
+        "answer_relevancy": judged(row, "answer_relevancy"),
+        "context_precision": judged(row, "context_precision"),
+        "게이트": "예" if row["gated_context_precision"] else "아니오",
+    } for row in rows], hide_index=True)
+
+
 def show_quality_board():
     """게이트·하한·기각 기록을 한 화면에. 여기서 숫자를 만들지 않습니다.
 
@@ -1007,6 +1042,8 @@ def show_quality_board():
             "지금 코드": row["code"],
             "같은가": {True: "예", False: "아니오"}.get(row["same"], "—"),
         } for row in quality_board.prompt_rows(baseline)], hide_index=True)
+
+    show_family_board(baseline)
 
     st.markdown("##### 평가 하네스 밖에서 지키는 선")
     for row in quality_board.slot_rows(baseline):

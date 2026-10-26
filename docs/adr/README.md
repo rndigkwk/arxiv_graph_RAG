@@ -148,3 +148,5 @@
 | [ADR-074](ADR-074-rewind-the-ingest-watermark.md) | 수집 워터마크를 되감는 명령을 둔다 — 되돌리기가 아니라 다시 받기다 | 채택 |
 | [ADR-075](ADR-075-cache-the-drawn-subgraph.md) | 그린 부분 그래프를 캐시한다 — 다시 그릴 때마다 답변 수만큼 조회하고 있었다 | 채택 |
 | [ADR-076](ADR-076-the-latest-answer-is-a-workbench.md) | 최신 답변은 세 칸 작업대로, 지난 답변은 접는다 — 접은 패널도 안쪽은 실행된다 | 채택 |
+| [ADR-077](ADR-077-the-harness-warms-up-like-the-app.md) | 평가 하네스도 앱처럼 인용망을 데운다 — 동시에 돈 도구는 한 번만 센다 | 채택 |
+| [ADR-078](ADR-078-show-each-family-with-its-n.md) | 품질 게이트 탭에 분야별 표를 두되, 수 옆에 n을 둔다 — 지금은 천장에 붙어 있다 | 채택 |

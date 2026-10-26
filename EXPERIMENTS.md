@@ -4071,11 +4071,12 @@ ADR-066이 안쪽을 재는 장치를 넣었지만 저장된 90건은 그 전의
 
 분해가 맞은 것은 <!--n:reports/inside_generate.json#generate.traced-->30<!--/n-->건 중
 <!--n:reports/inside_generate.json#generate.adds_up-->29<!--/n-->건입니다. 한 건(`citing-02`)은 나머지가 -0.194초로 허용폭
-0.05초를 넘어 화면이라면 수를 적지 않았을 경우입니다.
+0.05초를 넘어 화면이라면 수를 적지 않았을 경우입니다. 원인은 한 턴이 도구 둘을 동시에 불렀는데
+계측이 호출마다의 초를 더한 것이었고, ADR-077이 겹친 구간을 한 번만 세도록 고쳤습니다.
 
 **도구 몫의 4분의 1은 앱에서는 일어나지 않는 일입니다.** 첫 `rank_related_papers` 한 번이
 <!--n:reports/inside_generate.json#cold_first_related_call.seconds-->26.092<!--/n-->초였습니다. 하네스 프로세스에는 부팅
-예열(ADR-067)이 없어서 첫 질문이 인용망을 올렸습니다. 그 한 번을 빼고 도구별로 보면:
+예열(ADR-067)이 없어서 첫 질문이 인용망을 올렸습니다(ADR-077 뒤로는 하네스도 먼저 데웁니다). 그 한 번을 빼고 도구별로 보면:
 
 | 도구 | 호출 | 합계 | p50 | 최대 |
 |---|---:|---:|---:|---:|
@@ -4100,6 +4101,31 @@ ADR-066이 안쪽을 재는 장치를 넣었지만 저장된 90건은 그 전의
 **말하지 않는 것.** 30건 한 번입니다 — 몫이 실행마다 얼마나 흔들리는지는 모릅니다. 비용은
 보고서에 0으로 적혔습니다. 가격 환경 변수(`EVAL_CHAT_*_USD_PER_1M`)를 주지 않아서이고, 쓴
 토큰은 입력 367,738·출력 11,840입니다.
+
+## 11-53. 모델 시간은 턴 수에서 옵니다 — 기준 논문을 확정한 뒤 두 도구를 따로 부른 문항이 17건입니다 (2026-10-26)
+
+11-52가 `generate`의 4분의 3 이상이 모델이라고 했습니다. 모델 턴 하나의 안쪽은 공급자가 알려 주지
+않으므로 **턴의 수**를 봤습니다. 같은 보고서(`reports/inside_generate_2026-10-26.json`)만 읽습니다(0원).
+`scripts/measure_model_turns.py`가 `reports/model_turns.json`으로 냅니다.
+
+- 문항당 모델 턴은 평균 <!--n:reports/model_turns.json#turns.mean-->3.87<!--/n-->회이고, 턴 하나에 중앙값 <!--n:reports/model_turns.json#turns.seconds_per_turn_p50-->2.81<!--/n-->초
+  (최대 <!--n:reports/model_turns.json#turns.seconds_per_turn_max-->4.93<!--/n-->초)입니다.
+- 모델 초와의 상관(30건): 턴 수 <!--n:reports/model_turns.json#model_seconds_correlation.turns-->0.47<!--/n-->, 입력 토큰
+  <!--n:reports/model_turns.json#model_seconds_correlation.input_tokens-->0.54<!--/n-->, 출력 토큰 <!--n:reports/model_turns.json#model_seconds_correlation.output_tokens-->0.68<!--/n-->.
+  입력의 <!--n:reports/model_turns.json#input_tokens_cached_share-->0.885<!--/n-->는 캐시에서 왔습니다.
+- 분야별 평균 턴: 공저자 <!--n:reports/model_turns.json#by_family.coauthor.turns_mean-->5.0<!--/n-->회, 최다 피인용 <!--n:reports/model_turns.json#by_family.topcited.turns_mean-->2.67<!--/n-->회.
+
+**도구를 부를 때마다 한 턴입니다.** 30문항 중 한 턴이 도구 둘을 부른 것은 `citing-02` 하나였습니다
+(그래서 도구 시간이 겹쳤습니다 - ADR-077). `resolve_paper`로 기준 논문을 확정한 뒤에는
+`search_graph`와 `rank_related_papers`가 서로의 결과를 쓰지 않는데, 둘을 따로 부른 문항이
+<!--n:reports/model_turns.json#separate_pair.cases-->17<!--/n-->건입니다. 한 턴으로 합치면 문항당 약 <!--n:reports/model_turns.json#separate_pair.estimated_seconds_per_case-->2.81<!--/n-->초를 아낄 수
+있다는 것이 **추정**입니다 - 턴당 중앙값을 곱한 것이고, 합친 턴의 입력이 그만큼 커집니다.
+지금 `rank_related_papers`의 설명이 "search_graph나 search_papers로 먼저 확인한 arxiv_id만
+넣으라"고 적어 순서를 시킵니다.
+
+**말하지 않는 것.** 바꾸지 않았습니다. 설명을 고치면 모델이 고르는 도구가 바뀌므로 품질과 시간을
+같은 유료 평가로 재야 합니다. 저자·최다 피인용 문항은 `search_graph`가 찾은 논문을 넘기므로 세지
+않았습니다. 상관은 원인을 말하지 않습니다.
 
 ## 13. 재현 방법
 

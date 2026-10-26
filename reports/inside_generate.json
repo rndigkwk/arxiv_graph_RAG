@@ -13,10 +13,14 @@
     "other_share": 0.002,
     "tools_share_warm": 0.138
   },
+  "harness_warmup_seconds": null,
   "cold_first_related_call": {
     "case": "author-02",
     "seconds": 26.092
   },
+  "parallel_tool_cases": [
+    "citing-02"
+  ],
   "tools": {
     "translate_to_english": {
       "calls": 10,
