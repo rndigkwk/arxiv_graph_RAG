@@ -1,7 +1,9 @@
-# ADR-071: 두 배가 필요해지면 DB만 옮긴다 — 4GB 한 대면 되고, 먼저 닿는 것은 30초다
+# ADR-071: 두 배가 필요해지면 앱과 DB를 VM 한 대에 올린다 — 4GB면 되고, 30초는 거리에서 온다
 
 - **상태:** 채택 (두 배가 필요해질 때 적용합니다. 지금은 Aura Free를 유지합니다)
 - **날짜:** 2026-10-26
+- **이 ADR은 결정 1을 같은 날 뒤집었습니다.** 처음 제목은 "DB만 옮긴다"였습니다. 아래
+  "뒤집힌 결정 1" 참고. 파일 이름은 링크를 지키려고 그대로 둡니다.
 
 ## 맥락
 
@@ -67,13 +69,15 @@ p95가 **<!--n:reports/double_graph.json#growth.aura_projection.citation_edges.a
 
 ## 결정
 
-**1. 두 배가 필요해지면 DB만 자체 호스팅으로 옮기고 앱은 Streamlit Cloud에 둡니다.**
+**1. ~~두 배가 필요해지면 DB만 자체 호스팅으로 옮기고 앱은 Streamlit Cloud에 둡니다.~~**
+**뒤집혔습니다** — 아래 "뒤집힌 결정 1".
 [ROADMAP 8-6절](../../ROADMAP.md#8-6-합계)의 "Streamlit Cloud + 자체 호스팅 Neo4j" 행입니다.
 heap 1G · page cache 1G로 시작하고 메모리 4GB 한 대면 됩니다. 앱과 DB는 독립적인 선택이고,
 필요한 것은 DB 용량뿐입니다.
 
 **2. Cloud Run 앱 + GCE VM(fable 안)은 기각합니다.** VM 크기(e2-medium 4GB)는 결과적으로
-맞았지만 이유가 틀렸고, 앱 이사는 필요가 없습니다. 이사하면 잃는 것이 있습니다 —
+맞았지만 이유가 틀렸습니다. 뒤집힌 결정 1 뒤에도 기각은 그대로입니다 — 앱을 VM 옆이 아니라
+Cloud Run에 두면 아래의 손실만 남습니다. 이사하면 잃는 것이 있습니다 —
 `min=0`이면 컨테이너가 식을 때마다 인용망 예열을 다시 내는데
 ([ADR-067](ADR-067-warm-the-citation-graph-at-boot.md)), 그 값이 2배에서 로컬로도
 <!--n:reports/double_graph.json#stages.2x.app_path.citation_graph_seconds-->11.51<!--/n-->초입니다. 그리고 ADR-016의 전환 조건은
@@ -82,9 +86,45 @@ heap 1G · page cache 1G로 시작하고 메모리 4GB 한 대면 됩니다. 앱
 **3. Aura Professional은 계속 기각입니다.** 1GB에 월 ~$66을 내도 메모리가 늘지 않고(지금이 이미
 1GB), PageRank·Leiden에 쓰는 GDS가 여전히 없습니다. 자체 호스팅은 GDS Community가 내장입니다.
 
-**4. 두 배를 적재하기 전에 DB와 앱 사이의 거리를 잽니다.** 30초는 `chatbot.run_read`가 모든
+**4. 두 배를 적재하기 전에 DB와 앱 사이의 거리를 잽니다.** (뒤집힌 결정 1을 따르면 거리가
+0이므로, 새 VM에서 같은 질의가 로컬 측정과 비슷한지만 확인합니다.) 30초는 `chatbot.run_read`가 모든
 질의에 거는 타임아웃입니다. 새 호스트에서 `CITATION_EDGES`의 p95를 먼저 재고, 1.5배보다 여유가
 작으면 적재보다 그 질의(한 번에 전부 읽기)를 먼저 고칩니다.
+
+## 뒤집힌 결정 1 (2026-10-26) — 앱도 같은 VM에 올립니다
+
+결정 1은 "앱과 DB는 독립적인 선택"이라는 [ROADMAP 8-6절](../../ROADMAP.md#8-6-합계)의 원칙을
+따랐습니다. 그 원칙은 **DB가 공짜(Aura Free)이고 앱만 고를 때** 맞았습니다. 두 배에서는 DB가
+4GB VM을 요구하고, 그 순간 둘은 독립이 아닙니다 — **이미 내는 VM에 앱이 들어가느냐**가 질문이
+됩니다. 측정이 답했습니다.
+
+| | 결정 1 (Streamlit Cloud + DB VM) | **뒤집은 뒤 (VM 한 대)** |
+|---|---|---|
+| 월 요금 | VM 약 $31 + 디스크 + 고정 IP ≈ **$37** | **같습니다(≈ $37)** — 앱은 남는 메모리에 들어갑니다 |
+| 메모리 | DB <!--n:reports/double_graph.json#stages.2x.memory_during_load.max_gib-->2.14<!--/n-->GiB / 4GB | DB <!--n:reports/double_graph.json#stages.2x.memory_during_load.max_gib-->2.14<!--/n-->GiB + 앱 <!--n:reports/double_graph.json#stages.2x.app_path.peak_mb-->297.9<!--/n-->MB + OS ≈ 3GB / 4GB |
+| `CITATION_EDGES` p95, 2배 | Aura만큼 멀면 약 <!--n:reports/double_graph.json#growth.aura_projection.citation_edges.aura_p95_projected-->19.89<!--/n-->초(추정), 여유 <!--n:reports/double_graph.json#growth.aura_projection.citation_edges.headroom_ratio_projected-->1.51<!--/n-->배 | 루프백 **<!--n:reports/double_graph.json#stages.2x.queries.citation_edges.p95-->5.012<!--/n-->초(실측)**, 여유 <!--n:reports/double_graph.json#stages.2x.queries.citation_edges.headroom_ratio-->5.99<!--/n-->배 |
+| 인터넷에 여는 것 | **Neo4j Bolt** — TLS·인증서·방화벽·인증을 직접 | 앱 하나. Neo4j는 `127.0.0.1`에만 묶습니다 |
+| 잠들기 | Streamlit의 `Zzzz`가 남습니다 | 없습니다(항상 켜짐) |
+| 잃는 것 | — | Streamlit Cloud의 git push 자동 배포, 재부팅 버튼 |
+
+**같은 값에 위험이 둘 줄어듭니다.** 결정 1의 가장 큰 비용은 돈이 아니라 ROADMAP 8-2-1절이 적은
+"공개 TLS 엔드포인트"였고, 그것은 Streamlit Cloud가 DB에 접속해야 해서 생긴 것이었습니다. 앱이
+옆에 있으면 DB를 열 이유가 없습니다. 30초 위험도 거리에서 왔으므로 함께 사라집니다.
+
+**fable이 적은 3안 중 2안(VM 한 대)입니다.** fable은 "DB 혼자 4GB"를 근거로 이 안을 기각했고,
+그 근거가 틀렸다는 것을 이 ADR이 쟀습니다. 결론은 fable과 다르지만 2안의 구성 자체는 그쪽 목록에
+있었습니다.
+
+**[ADR-016](ADR-016-stay-on-streamlit.md)과 부딪히지 않습니다.** ADR-016은 **지금** Streamlit
+Cloud를 떠날 이유가 없다는 결정이고, 그 전환 조건(keep-alive 비활성화, FastAPI 분리)은 여전히
+충족되지 않았습니다. 이 뒤집힘은 **두 배가 필요해질 때** 새로 생기는 이유입니다 — DB를 위해 서버가
+이미 하나 생기므로 "서버를 늘리지 않는다"가 성립하지 않습니다. dograg의 복제(Cloud Run 이사)도
+아닙니다.
+
+**아직 재지 않은 것.** 앱과 DB를 **한 기계에서 동시에** 띄워 재지 않았습니다. 위 3GB는 따로 잰
+두 값의 합이고, 실제 앱은 예측 패널의 sklearn까지 올려 피크가 조금 더 큽니다(ADR-016의
+333.2MB). 여유가 1GB 안팎이므로 VM을 만든 날 함께 띄워 재고, 모자라면 e2-standard-2(8GB,
+약 $63)로 올립니다. 요금은 제3자 집계이고 Google 페이지로 확인하지 않았습니다.
 
 ## 민감도
 
