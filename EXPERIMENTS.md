@@ -4030,8 +4030,9 @@ IDLE일 수 없습니다), **화면이 말했어야 할 것을 추론으로 맞�
 가정한 추정입니다.
 
 결정은 [ADR-071](docs/adr/ADR-071-double-the-graph-move-only-the-database.md)에 적었습니다 —
-두 배가 필요해지면 **DB만** 자체 호스팅으로 옮기고 앱은 Streamlit Cloud에 둡니다. Cloud Run +
-GCE 안은 기각했습니다.
+두 배가 필요해지면 **앱과 DB를 VM 한 대에** 올립니다. 처음에는 "DB만 옮기고 앱은 Streamlit
+Cloud에"라고 적었다가 같은 날 뒤집었습니다: 같은 요금에 DB를 인터넷에 열지 않고, 30초 위험이
+거리에서 오므로 함께 사라집니다. Cloud Run + GCE 안은 기각했습니다.
 
 ### 첫 실행이 조용히 실패했습니다
 
