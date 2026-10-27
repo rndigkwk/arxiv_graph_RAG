@@ -16,7 +16,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from scripts.visit_deployed_app import error_in, parse_stamp, verdict
+from scripts.visit_deployed_app import error_in, parse_stamp, still_deploying, verdict
 from src import release
 
 WORKFLOWS = Path(".github/workflows")
@@ -67,6 +67,17 @@ def test_an_old_search_module_fails_even_when_the_page_is_new():
     caption, warning = release.stamp("6fd3cde", "1a2b3c4")
     problem = verdict(SHA, parse_stamp(caption + "\n" + warning))
     assert problem and "재부팅" in problem
+
+
+def test_a_merged_but_not_restarted_vm_is_waited_for():
+    """VM은 화면 커밋이 먼저 바뀌고 모듈은 재시작 뒤에 바뀝니다(2026-10-27 #64)."""
+    caption, warning = release.stamp(SHA[:7], "1a2b3c4")
+    assert still_deploying(SHA, parse_stamp(caption + "\n" + warning))
+    caption, _ = release.stamp("1a2b3c4", "1a2b3c4")
+    assert still_deploying(SHA, parse_stamp(caption))  # 아직 merge 전
+    caption, _ = release.stamp(SHA[:7], SHA[:7])
+    assert not still_deploying(SHA, parse_stamp(caption))
+    assert not still_deploying(None, parse_stamp(caption))  # 기대 커밋 없이는 기다릴 것이 없습니다
 
 
 def test_a_module_without_the_attribute_counts_as_old():

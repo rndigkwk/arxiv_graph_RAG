@@ -62,14 +62,14 @@ DB가 먼저입니다.
 - **들일 범위**: 한 주에 그래프 밖 인용 논문이 3,297편, 두 번 이상 인용된 것은 115편입니다(EXPERIMENTS 11-56). 범위를 정해야 합니다.
 - Aura 주간 수집 워크플로는 2026-10-27에 껐습니다(`gh workflow disable`). 백업 앱은 그 시점 그래프로 고정됩니다.
 
-## 3. FastAPI 층 — 코드 (2026-10-27)
+## 3. FastAPI 층 — 가동 (2026-10-27)
 
 - `chatbot.ask`(스트리밍), 부분 그래프, 순위, 품질 데이터를 API로 엽니다. 같은 VM, 같은 코드.
 - 이 단계에서 Streamlit은 그대로 둡니다. 둘이 같은 모듈을 씁니다.
 - `src/api.py`, compose의 `api` 서비스, Caddy의 `/api/*`([ADR-081](adr/ADR-081-fastapi-beside-streamlit-on-the-vm.md)).
   질문은 SSE, 질문·번역에만 IP별·전체 상한.
-- 남은 것: 배포 뒤 VM 메모리를 다시 잽니다(두 번째 파이썬 프로세스). SSE가 Caddy를 지나 흘러오는지
-  VM 주소에서 봅니다.
+- 배포 뒤 잰 것(ADR-081 "배포 첫날"): 두 프로세스가 다 올라온 뒤 available 1,160 MiB. SSE는 첫
+  `partial`이 0.05초에 옵니다.
 
 ## 4. Next.js (Vercel)
 

@@ -60,10 +60,23 @@ def verdict(expected: str | None, stamp: dict[str, str | None]) -> str | None:
         return "배포 커밋을 읽지 못했습니다(.git 없음) - 새 코드인지 확인할 수 없습니다"
     if stamp["module"] != stamp["app"]:
         return (f"검색 모듈이 옛 코드입니다(화면 {stamp['app']}, 모듈 {stamp['module']}). "
-                "Streamlit Cloud에서 재부팅하세요")
+                "VM이면 `journalctl -u arxiv-deploy`, Streamlit Cloud면 재부팅하세요")
     if expected and not expected.startswith(stamp["app"]):
         return f"배포가 기대한 커밋이 아닙니다(화면 {stamp['app']}, 기대 {expected[:7]})"
     return None
+
+
+def still_deploying(expected: str | None, stamp: dict[str, str | None]) -> bool:
+    """화면이나 모듈이 아직 기대한 커밋이 아니면 배포가 오는 중일 수 있습니다.
+
+    VM은 저장소를 마운트하므로(ADR-079) `git merge` 순간 화면의 커밋이 먼저 바뀌고, 모듈은
+    재시작(이미지를 다시 구우면 몇 분 뒤)에야 바뀝니다. 2026-10-27 #64 배포에서 그 사이를 옛
+    모듈로 읽고 실패했습니다 - 화면 커밋만 기다리던 때입니다. 끝내 안 바뀌면 COMMIT_WAIT_S 뒤
+    `verdict`가 실패로 셉니다.
+    """
+    if not expected or not stamp["app"]:
+        return False
+    return not all(c and expected.startswith(c) for c in (stamp["app"], stamp["module"]))
 
 
 def error_in(texts: list[str], error_boxes: int = 0) -> str | None:
@@ -139,11 +152,10 @@ def check(url: str, expected: str | None) -> int:
                 raise SystemExit(f"실패: {problem}")
             stamp = parse_stamp("\n".join(texts))
             problem = verdict(expected, stamp)
-            redeploying = problem and stamp["app"] and stamp["module"] == stamp["app"] \
-                and expected and not expected.startswith(stamp["app"])
+            redeploying = problem and still_deploying(expected, stamp)
             if not redeploying or time.perf_counter() - started > COMMIT_WAIT_S:
                 break
-            # 커밋만 다르면 재배포가 아직 오는 중일 수 있습니다. 다시 불러 봅니다.
+            # 화면이나 모듈이 아직 옛 커밋이면 재배포가 오는 중일 수 있습니다. 다시 불러 봅니다.
             page.wait_for_timeout(30_000)
             page.reload(wait_until="domcontentloaded")
             wait_ready(page, time.perf_counter())
