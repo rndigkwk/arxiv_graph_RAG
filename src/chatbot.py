@@ -39,6 +39,7 @@ from src import (
     agent_graph,
     early_judge,
     pagerank,
+    pre_translate,
     prompts,
     related_by_app,
     release,
@@ -287,7 +288,7 @@ def search_papers(query: str, top_k: int = 5) -> dict:
     """영어 질의문과 의미가 가까운 논문을 제목+초록 임베딩으로 찾습니다.
 
     "어떤 논문이 있나", "무엇을 다루는 연구인가"처럼 주제·내용으로 찾을 때 사용합니다.
-    query는 반드시 영어여야 합니다. 한국어 질문은 translate_to_english로 먼저 번역하세요.
+    query는 반드시 영어여야 합니다. 한국어 질문에는 앱이 붙인 영어 번역이 따라옵니다.
     저자·인용 수·분류별 집계처럼 저장된 관계를 세는 질문은 search_graph를 쓰세요.
     top_k는 1~10이며 기본값은 5입니다.
     """
@@ -667,6 +668,19 @@ def ask(question, history, on_answer=None):
         early.offer(ids, early_judge.graph_queries(calls))
         early_related.offer(related_by_app.seeds(calls, ids), ())
 
+    def translate_first(asked):
+        """영어가 아닌 글자가 있을 때만 에이전트 전에 번역합니다(ADR-087)."""
+        if not pre_translate.needs_translation(asked):
+            return None
+        started = time.perf_counter()
+        try:
+            output = translate_to_english.invoke({"text": asked})
+        except Exception as exc:  # noqa: BLE001 - 번역이 없어도 답은 시도합니다.
+            output = exc
+        record = pre_translate.call_record(asked, output, time.perf_counter() - started)
+        return {"record": record,
+                "hint": pre_translate.hint(output) if record["status"] == "success" else None}
+
     def check_conditions(user_question, response):
         queries = early_judge.graph_queries(response["tool_calls"])
         ahead = early.take(response["evidence_ids"], queries)
@@ -692,6 +706,7 @@ def ask(question, history, on_answer=None):
         log_failure=lambda attempt, stage, exc: log_validation_failure(
             validation_request_id, attempt, stage, exc
         ),
+        translate=translate_first,
     )
     state = agent_graph.build_graph(deps).invoke({
         "question": question,
@@ -1349,7 +1364,8 @@ try:
     agent = create_agent(
         model=llm,
         # `rank_related_papers`는 없습니다. 앱이 답 뒤에 부릅니다(ADR-086, `related_by_app`).
-        tools=[translate_to_english, resolve_paper, search_graph, search_papers],
+        # `translate_to_english`도 없습니다. 그래프가 에이전트 전에 부릅니다(ADR-087).
+        tools=[resolve_paper, search_graph, search_papers],
         system_prompt=agent_system,
         # structured_response는 answer와 evidence_ids가 있는 GroundedAnswer 객체입니다.
         response_format=ProviderStrategy(GroundedAnswer, strict=True),

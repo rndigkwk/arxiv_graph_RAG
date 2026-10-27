@@ -12,6 +12,9 @@ Day 50~53 교안의 구조입니다. 바꾸는 것은 **흐름의 모양**이고
 4. **경로 선택이 노드가 됩니다.** `route`가 질문을 보고 저장된 관계만 묻는 질문을 가려냅니다
    ([`routing.py`](routing.py), ADR-024). 그 전까지 경로 선택은 시스템 프롬프트의 문장으로만
    있었고, 모델이 지키는지 세지 않았습니다.
+5. **번역이 노드가 됩니다.** `translate`가 영어가 아닌 글자가 있는 질문만 에이전트 전에 번역합니다
+   ([`pre_translate.py`](pre_translate.py), ADR-087). 모델이 도구로 번역을 고르던 때는 영어
+   질문에서도 불러 턴 하나를 썼습니다. 노드로 두면 그 시간이 `generate` 밖에 따로 잡힙니다.
 
 **행동은 바꾸지 않았습니다.** `abstain`은 지금도 `AnswerValidationError`를 올립니다. 평가
 하네스가 그 예외를 "답하지 못함"으로 세고 게이트의 `answer_failure_rate` 기준선이 그 정의로
@@ -52,6 +55,7 @@ class AnswerState(TypedDict, total=False):
     history: list[Any]
     messages: list[Any]
     route: dict[str, Any]
+    translation: dict[str, Any]
     attempt: int
     result: dict[str, Any]
     response: dict[str, Any]
@@ -70,6 +74,9 @@ class Dependencies:
     check_format: Callable[[dict[str, Any]], None]
     check_conditions: Callable[[str, dict[str, Any]], Any]
     log_failure: Callable[[int, str, Exception], None]
+    # `{"record": 도구 호출 기록, "hint": 이번 턴에 붙일 메시지}` 또는 None(번역하지 않음).
+    # 없으면 노드도 없습니다 - 번역을 쓰지 않는 테스트의 추적이 그대로입니다.
+    translate: Callable[[str], dict[str, Any] | None] | None = None
 
 
 def _timed(name: str, state: AnswerState, work: Callable[[], dict[str, Any]]) -> dict[str, Any]:
@@ -94,6 +101,20 @@ def _timed(name: str, state: AnswerState, work: Callable[[], dict[str, Any]]) ->
 
 def build_graph(deps: Dependencies):
     """Compile the generate → validate → revise → accept/abstain graph."""
+
+    def translate(state: AnswerState) -> dict[str, Any]:
+        def work() -> dict[str, Any]:
+            done = deps.translate(state["question"])
+            if not done:
+                return {}
+            update: dict[str, Any] = {"translation": done}
+            if done.get("hint"):
+                # 경로 힌트처럼 이번 턴의 메시지로 붙입니다. 질문 원문은 그대로 둡니다 -
+                # 조건 판정과 기록은 사용자가 쓴 질문을 봅니다.
+                update["messages"] = [*state["messages"], ("user", done["hint"])]
+            return update
+
+        return _timed("translate", state, work)
 
     def route(state: AnswerState) -> dict[str, Any]:
         def work() -> dict[str, Any]:
@@ -127,6 +148,13 @@ def build_graph(deps: Dependencies):
             # 경로를 응답에 실어 둡니다. 지시를 지켰는지는 보고서에서 세어야 알 수 있고,
             # 세려면 판정이 답변과 같은 줄에 남아 있어야 합니다(ADR-024).
             response["route"] = state.get("route", {})
+            # 앱이 한 번역을 도구 호출 기록 맨 앞에 둡니다. 실제로 가장 먼저 일어난 일입니다.
+            if record := (state.get("translation") or {}).get("record"):
+                response["tool_calls"] = [record, *response["tool_calls"]]
+                if record["status"] == "success":
+                    response["translations"] = [
+                        record["output"], *response.get("translations", [])
+                    ]
             return {"response": response}
 
         return _timed("collect", state, work)
@@ -188,6 +216,8 @@ def build_graph(deps: Dependencies):
         return "revise" if state.get("attempt", 0) + 1 < MAX_ATTEMPTS else "abstain"
 
     graph = StateGraph(AnswerState)
+    if deps.translate is not None:
+        graph.add_node("translate", translate)
     for name, node in (
         ("route", route),
         ("generate", generate),
@@ -200,7 +230,11 @@ def build_graph(deps: Dependencies):
     ):
         graph.add_node(name, node)
 
-    graph.add_edge(START, "route")
+    if deps.translate is not None:
+        graph.add_edge(START, "translate")
+        graph.add_edge("translate", "route")
+    else:
+        graph.add_edge(START, "route")
     graph.add_edge("route", "generate")
     graph.add_edge("generate", "collect")
     graph.add_edge("collect", "check_format")

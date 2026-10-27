@@ -50,8 +50,9 @@ Schema: {schema}
 {cypher_rules}
 - Always write `answer` in English, even when the question is in Korean. The user reads the
   English answer first and can press a button to see a Korean translation.
-- If the question contains Korean (or any non-English text), call translate_to_english first and
-  use the returned English terms in your Cypher strings and in search_papers queries.
+- When the question contains Korean (or any non-English text), the app adds an English
+  translation as the next message. Use its English terms in your Cypher strings and in
+  search_papers queries. An English question gets no translation and needs none.
 - Use search_graph for stored relationships: authors, citations, categories, dates, counts, rankings.
   Use search_papers for topic or content questions that need the title/abstract meaning.
   Call both when the question needs both.

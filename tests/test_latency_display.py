@@ -19,7 +19,7 @@ from pathlib import Path
 import app
 
 LATENCY = Path("reports/answer_latency.json")
-AGENT_NODES = ("route", "generate", "collect", "check_format",
+AGENT_NODES = ("translate", "route", "generate", "collect", "check_format",
                "check_conditions", "revise", "accept", "abstain")
 
 
@@ -216,8 +216,10 @@ def test_every_tool_the_agent_can_call_has_a_label():
     listed = source[source.index("tools=[") + len("tools=["):]
     names = [name.strip() for name in listed[:listed.index("]")].split(",")]
 
-    # 넷입니다. 관련 논문은 앱이 부릅니다(ADR-086) - 그 표찰은 앱이 붙인 기록이 씁니다.
-    assert len(names) >= 4, names
+    # 셋입니다. 관련 논문(ADR-086)과 번역(ADR-087)은 앱이 부릅니다.
+    # 그 표찰은 앱이 붙인 기록이 씁니다.
+    assert len(names) >= 3, names
     assert "rank_related_papers" in app.TOOL_LABEL
+    assert "translate_to_english" in app.TOOL_LABEL
     for name in names:
         assert name in app.TOOL_LABEL, name
