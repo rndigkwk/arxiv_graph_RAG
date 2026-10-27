@@ -990,6 +990,18 @@ FORECAST_VECTORS = """
 MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids AND p.embedding IS NOT NULL
 RETURN p.arxiv_id AS arxiv_id, p.embedding AS embedding
 """
+# 후보의 임베딩 대신 시드와의 내적만 받습니다. 인용이 많은 시드는 후보가 4천 편 가까이 되고,
+# 768차원 벡터를 다 받는 데 VM에서 13.9초였습니다(내적만 받으면 1.5초, 값 차이 1e-7 아래).
+# `vector.similarity.cosine`은 쓰지 않습니다 - 저장된 벡터의 노름이 1에서 조금 벗어나
+# 학습 피처(내적)와 4e-4까지 다릅니다.
+FORECAST_SIMILARITY = """
+MATCH (s:ArxivPaper {arxiv_id: $seed})
+WITH s.embedding AS seed
+MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids AND p.embedding IS NOT NULL
+RETURN p.arxiv_id AS arxiv_id,
+       reduce(total = 0.0, i IN range(0, size(seed) - 1) | total + seed[i] * p.embedding[i])
+       AS similarity
+"""
 FORECAST_NEIGHBOURS = """
 CALL db.index.vector.queryNodes($index, $limit, $vector) YIELD node, score
 RETURN node.arxiv_id AS arxiv_id
@@ -1039,9 +1051,9 @@ def forecast_cocitation(arxiv_id, top_k=5, pool=None):
     if not candidates:
         return {"seed_id": arxiv_id, "papers": [], "reason": "후보가 없습니다."}
 
-    vectors = {
-        row["arxiv_id"]: np.asarray(row["embedding"], dtype=np.float32)
-        for row in run_read(FORECAST_VECTORS, {"ids": [arxiv_id, *candidates]})
+    similarity = {
+        row["arxiv_id"]: float(row["similarity"])
+        for row in run_read(FORECAST_SIMILARITY, {"seed": arxiv_id, "ids": candidates})
     }
     # 피인용 수는 앱이 이미 들고 있는 간선에서 셉니다. Cypher를 한 번 덜 부릅니다.
     counts = np.bincount(graph["cols"], minlength=graph["size"])
@@ -1049,7 +1061,7 @@ def forecast_cocitation(arxiv_id, top_k=5, pool=None):
                 for paper in (arxiv_id, *candidates) if paper in graph["index"]}
 
     ranked = forecast_module.rank(
-        arxiv_id, candidates, graph=graph, vectors=vectors,
+        arxiv_id, candidates, graph=graph, similarity=similarity,
         indegree=indegree, model=model, top_k=top_k,
     )
     details = {row["arxiv_id"]: row for row in with_details(
