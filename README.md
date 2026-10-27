@@ -6,7 +6,7 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 [![Neo4j](https://img.shields.io/badge/Neo4j-Aura-008CC1?logo=neo4j&logoColor=white)](https://neo4j.com/cloud/aura/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 
-🌐 **Live demo:** [arXiv GraphRAG 앱 (GCP VM)](https://8-230-25-138.sslip.io/) · [Streamlit Cloud 판](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)
+🌐 **Live demo:** [arXiv GraphRAG](https://arxiv-graphrag.vercel.app/) (Next.js, API는 GCP VM) · [Streamlit 백업 판](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/) (2026-10-27 그래프로 고정)
 
 ## 처음 보시는 분께 — 2분 경로
 
@@ -14,7 +14,7 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 |---|---|
 | **지금 무엇을 쓰고 무엇을 왜 안 쓰는가** | [`docs/MODELS.md`](docs/MODELS.md) — 배포된 모델, 등록만 한 모델, 재서 기각한 아홉 |
 | **결정과 그 근거 수치** | [결정 기록](docs/adr/README.md) — 채택·기각·보류, 뒤집힌 것은 지우지 않고 표시 |
-| **측정이 기록으로 남는 모양** | 배포된 앱의 **`품질 게이트` 탭** — 게이트 일곱 규칙, 지표별 하한·여유·변동폭, 기각한 모델 |
+| **측정이 기록으로 남는 모양** | 배포된 앱의 **[품질 화면](https://arxiv-graphrag.vercel.app/quality)** — 게이트 일곱 규칙, 지표별 하한·여유·변동폭, 기각한 모델 |
 | **어떻게 알았는가** | [`EXPERIMENTS.md`](EXPERIMENTS.md) — 질문 / 방법 / 결과 / 결론 |
 
 ## 이 저장소가 주장하는 것

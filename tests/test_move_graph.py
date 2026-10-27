@@ -148,7 +148,7 @@ def test_vm_neo4j_matches_the_measured_setup():
 def test_vm_opens_only_caddy_to_the_internet():
     services = compose("deploy/vm/compose.yml")["services"]
     assert "ports" not in services["neo4j"]
-    assert "ports" not in services["app"]
+    assert "ports" not in services["api"]
     assert services["caddy"]["ports"] == ["80:80", "443:443"]
 
 

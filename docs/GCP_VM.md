@@ -4,6 +4,9 @@
 인터넷에는 Caddy의 HTTPS 하나만 엽니다. 설계와 리허설 결과는
 [ADR-079](adr/ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md)에 있습니다.
 
+> **2026-10-27부터 VM에는 Streamlit이 없습니다**([ADR-083](adr/ADR-083-take-streamlit-off-the-vm.md)). 화면은 Vercel의 Next.js이고,
+> VM은 Neo4j·API·Caddy만 돌립니다. 아래 "앱"은 그 전의 설명입니다.
+
 **사람이 할 일은 1·2번뿐입니다.** 계정 가입·결제 수단·로그인은 대신할 수 없습니다. 2번이 끝나면
 이 PC의 `gcloud`로 나머지를 진행합니다.
 

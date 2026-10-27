@@ -20,11 +20,12 @@ C="docker compose --env-file .env -f deploy/vm/compose.yml"
 changed() { ! git diff --quiet "$old" "$new" -- "$@"; }
 # 이미지는 의존성만 굽습니다. 의존성이 바뀌었을 때만 다시 굽습니다.
 if changed pyproject.toml uv.lock .python-version .dockerignore deploy/vm/Dockerfile; then
-  $C build -q app api
+  $C build -q api
 fi
-$C up -d
-# 코드는 마운트돼 있고 파일 감시를 껐으므로, 새 코드는 재시작해야 읽힙니다.
-$C restart app api
+# 내린 서비스(2026-10-27의 app)는 --remove-orphans가 지웁니다. 남기면 메모리를 계속 씁니다.
+$C up -d --remove-orphans
+# 코드는 마운트돼 있고 파일 감시를 켜지 않았으므로, 새 코드는 재시작해야 읽힙니다.
+$C restart api
 if changed deploy/vm/Caddyfile; then
   $C restart caddy
 fi

@@ -1,7 +1,13 @@
-"""배포 앱을 헤드리스 브라우저로 열어, 깨어 있고 **새 코드를 돌리는지** 확인합니다.
+"""배포가 깨어 있고 **새 코드를 돌리는지** 확인합니다.
 
-    uvx --with playwright==1.64.1 python scripts/visit_deployed_app.py --expect-commit <sha>
-    # 처음 한 번: uvx --with playwright==1.64.1 playwright install chromium
+    python scripts/visit_deployed_app.py --expect-commit <sha>      # VM의 API와 Vercel 화면
+    uvx --with playwright==1.64.1 python scripts/visit_deployed_app.py --streamlit [URL]
+    # Streamlit 판(백업 앱). 처음 한 번: uvx --with playwright==1.64.1 playwright install chromium
+
+**2026-10-27부터 VM에는 Streamlit이 없습니다**(ADR-083). 화면은 Vercel의 Next.js이고, VM은
+API와 DB만 돌립니다. 그래서 기본 점검은 브라우저 없이 `/api/health`의 두 커밋(디스크·검색
+모듈)을 읽습니다 - 아래 교훈 2가 그대로 적용됩니다. 그래프가 살아 있는지는 `/api/stats`로,
+화면이 떠 있는지는 Vercel 주소의 응답으로 봅니다. 아래 설명은 `--streamlit` 점검의 것입니다.
 
 `keep_awake.py`의 HTTP 방문으로는 두 가지를 못 합니다. 둘 다 이 저장소에서 실제로 일어났습니다.
 
@@ -25,9 +31,12 @@ import re
 import sys
 import time
 
-# 2026-10-26부터 GCP VM입니다(ADR-080). VM은 잠들지 않으므로 깨우기 버튼은 Streamlit Cloud 주소를
-# 인자로 넘길 때(백업 앱 등)만 쓰입니다.
-APP_URL = "https://8-230-25-138.sslip.io/"
+# VM은 API와 DB만 돌립니다(ADR-083). Streamlit 판은 Streamlit Cloud의 백업 앱 하나만 남았습니다.
+API_URL = "https://8-230-25-138.sslip.io"
+WEB_URL = "https://arxiv-graphrag.vercel.app/"
+WEB_READY_TEXT = "arXiv GraphRAG"
+APP_URL = "https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/"
+OLDER = "이전 코드"  # src.release.OLDER와 같은 뜻. 스크립트가 src를 임포트하지 않습니다
 WAKE_BUTTON = "Yes, get this app back up!"
 READY_TEXT = "적재된 논문"  # app.main의 캡션. DB 연결 뒤에만 그려집니다
 DB_FAILED_TEXT = "실시간 그래프 연결을 준비하지 못했습니다"  # app.main의 준비 실패 안내
@@ -77,6 +86,51 @@ def still_deploying(expected: str | None, stamp: dict[str, str | None]) -> bool:
     if not expected or not stamp["app"]:
         return False
     return not all(c and expected.startswith(c) for c in (stamp["app"], stamp["module"]))
+
+
+def api_stamp(health: dict) -> dict[str, str | None]:
+    """`/api/health`를 화면 배포 표시와 같은 모양으로. 모듈 커밋이 없으면 옛 모듈입니다."""
+    commit = health.get("commit")
+    return {"found": "commit" in health, "app": commit,
+            "module": health.get("module_commit") or (OLDER if commit else None)}
+
+
+def read_json(url: str) -> dict:
+    import json
+    from urllib.request import Request, urlopen
+
+    with urlopen(Request(url, headers={"User-Agent": "deploy-check"}), timeout=60) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def check_api(base: str, web: str, expected: str | None) -> int:
+    """VM의 API가 기대한 커밋을 돌리고 그래프를 읽는지, Vercel 화면이 뜨는지 봅니다(0원)."""
+    from urllib.request import Request, urlopen
+
+    started = time.perf_counter()
+    while True:
+        try:
+            stamp = api_stamp(read_json(base + "/api/health"))
+            problem = verdict(expected, stamp)
+        except OSError as exc:  # 재시작 중이면 잠깐 502입니다
+            stamp, problem = {"found": False, "app": None, "module": None}, f"API 응답 없음({exc})"
+        waiting = problem and (stamp["app"] is None or still_deploying(expected, stamp))
+        if not waiting or time.perf_counter() - started > COMMIT_WAIT_S:
+            break
+        time.sleep(30)
+    if problem:
+        raise SystemExit(f"실패: {problem}")
+    papers = read_json(base + "/api/stats")["counts"]["papers"]
+    if not papers:
+        raise SystemExit("실패: API가 그래프에서 논문을 하나도 읽지 못했습니다")
+    with urlopen(Request(web, headers={"User-Agent": "deploy-check"}), timeout=60) as response:
+        page = response.read().decode("utf-8", "replace")
+    if WEB_READY_TEXT not in page:
+        raise SystemExit(f"실패: 화면({web})에 {WEB_READY_TEXT!r}가 없습니다")
+    waited = time.perf_counter() - started
+    summary(f"- API {stamp['app']} · 모듈 {stamp['module']} · 논문 {papers:,}편 · 화면 응답 · "
+            f"{waited:.0f}초" + (f" · 기대 {expected[:7]}" if expected else ""))
+    return 0
 
 
 def error_in(texts: list[str], error_boxes: int = 0) -> str | None:
@@ -169,11 +223,14 @@ def check(url: str, expected: str | None) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="배포 앱이 깨어 있고 새 코드를 돌리는지 봅니다.")
-    parser.add_argument("url", nargs="?", default=APP_URL)
+    parser = argparse.ArgumentParser(description="배포가 깨어 있고 새 코드를 돌리는지 봅니다.")
+    parser.add_argument("--streamlit", nargs="?", const=APP_URL, metavar="URL",
+                        help="API 대신 Streamlit 판을 브라우저로 엽니다(기본은 백업 앱)")
     parser.add_argument("--expect-commit", help="배포돼 있어야 할 커밋(워크플로가 넘깁니다)")
     args = parser.parse_args()
-    return check(args.url, args.expect_commit)
+    if args.streamlit:
+        return check(args.streamlit, args.expect_commit)
+    return check_api(API_URL, WEB_URL, args.expect_commit)
 
 
 if __name__ == "__main__":

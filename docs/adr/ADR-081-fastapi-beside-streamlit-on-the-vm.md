@@ -1,6 +1,6 @@
 # ADR-081: FastAPI 층은 같은 VM에서 Streamlit 옆에 둔다 — 돈이 드는 길에만 문턱을 둔다
 
-- **상태:** 채택
+- **상태:** 채택 — 2026-10-27 Streamlit을 내린 뒤로 "옆에"는 끝났습니다([ADR-083](ADR-083-take-streamlit-off-the-vm.md)). API 층의 결정은 그대로입니다
 - **날짜:** 2026-10-27
 
 ## 맥락
