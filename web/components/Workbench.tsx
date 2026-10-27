@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { type Abstain, type Answer, type Route, type Subgraph, ask, getRoute, getSubgraph, translate } from "@/lib/api";
 import { citedEvidence, graphIds, historyFor, routeLine, seconds, usedPath } from "@/lib/answer";
@@ -22,10 +23,11 @@ type Turn = {
 
 const EXAMPLE = "Which papers cite ReAct: Synergizing Reasoning and Acting in Language Models?";
 
-export function Workbench() {
+// `initial`은 논문 페이지에서 넘어온 질문입니다. 칸만 채우고 보내지는 않습니다(보내면 돈이 듭니다).
+export function Workbench({ initial = "" }: { initial?: string }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [current, setCurrent] = useState<number | null>(null);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(initial);
   const [route, setRoute] = useState<Route | null>(null);
   const [traceOpen, setTraceOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
@@ -242,7 +244,7 @@ function TurnView({
                 {a.evidence_ids.map((id) => (
                   <tr key={id}>
                     <td className="mono" style={{ fontSize: 13, whiteSpace: "nowrap" }}>
-                      <a href={`https://arxiv.org/abs/${id}`}>{id}</a>
+                      <Link href={`/papers/${id}`}>{id}</Link>
                     </td>
                     <td>{titles.get(id)?.title ?? "…"}</td>
                     <td className="mono" style={{ fontSize: 12 }}>
@@ -274,7 +276,7 @@ function TurnView({
             <ol style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6 }}>
               {a.related.map((r) => (
                 <li key={r.arxiv_id}>
-                  <a href={`https://arxiv.org/abs/${r.arxiv_id}`}>{r.title ?? titles.get(r.arxiv_id)?.title ?? r.arxiv_id}</a>{" "}
+                  <Link href={`/papers/${r.arxiv_id}`}>{r.title ?? titles.get(r.arxiv_id)?.title ?? r.arxiv_id}</Link>{" "}
                   <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>
                     {r.arxiv_id}
                   </span>

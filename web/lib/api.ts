@@ -30,6 +30,33 @@ export type SubgraphPaper = {
 export type Subgraph = { papers: SubgraphPaper[]; references: { citing: string; cited: string }[] };
 export type Turn = { question: string; answer: string };
 
+export type RelatedPaper = {
+  arxiv_id: string;
+  title: string;
+  primary_category: string;
+  cited_by: number;
+  shared_citers: number | null;
+  ranked_by: "cocitation" | "pagerank" | "embedding";
+};
+export type Paper = {
+  arxiv_id: string;
+  title: string;
+  abstract: string | null;
+  primary_category: string;
+  categories: string[];
+  pdf_url: string | null;
+  published: string | null;
+  authors: string[];
+  cited_by: number;
+  references: number;
+  bibtex: string;
+  related: RelatedPaper[];
+};
+export type CitingPaper = { arxiv_id: string; title: string; primary_category: string; published: string | null; cited_by: number };
+export type CitingOrder = "recent" | "cited";
+export type SearchHit = { arxiv_id: string; title: string; primary_category: string };
+export type SearchResult = { query: string; arxiv_id?: string | null; method?: string; ambiguous?: boolean; candidates: SearchHit[]; note?: string };
+
 export type AskEvent =
   | { kind: "partial"; answer: string }
   | { kind: "final"; answer: Answer }
@@ -66,6 +93,23 @@ export const getRoute = (q: string, signal?: AbortSignal) =>
   json<Route>(`/api/route?q=${encodeURIComponent(q)}`, { signal });
 export const getSubgraph = (ids: string[]) => json<Subgraph>("/api/subgraph", post({ arxiv_ids: ids }));
 export const translate = (text: string) => json<{ text: string }>("/api/translate", post({ text }));
+
+// 논문 페이지는 서버에서 그립니다. 그래프는 주간 수집 때만 바뀌므로 한 시간 캐시합니다.
+// 이 길들은 모델을 부르지 않아 상한이 없고, 그래서 Vercel을 거쳐도 됩니다(ADR-082는 질문·번역 얘기).
+export async function getPaper(id: string): Promise<Paper | null> {
+  try {
+    return await json<Paper>(`/api/papers/${encodeURIComponent(id)}`, { next: { revalidate: 3600 } });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
+}
+export const getCiting = (id: string, order: CitingOrder, skip: number, limit = 20) =>
+  json<{ order: CitingOrder; papers: CitingPaper[] }>(
+    `/api/papers/${encodeURIComponent(id)}/citing?order=${order}&skip=${skip}&limit=${limit}`,
+  );
+export const search = (q: string, signal?: AbortSignal) =>
+  json<SearchResult>(`/api/search?q=${encodeURIComponent(q)}`, { signal });
 
 export async function* ask(question: string, history: Turn[], signal?: AbortSignal): AsyncGenerator<AskEvent> {
   const response = await fetch(API_BASE + "/api/ask", { ...post({ question, history }), signal });
