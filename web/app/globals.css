@@ -1,0 +1,110 @@
+/* 시안(claude.ai/artifact/38K4WuVFbroXpW8xwB5i5w)의 색과 간격입니다. */
+:root {
+  --ground: #f6f7f4;
+  --surface: #ffffff;
+  --ink: #1b211e;
+  --ink-2: #3d4842;
+  --muted: #4e5a53;
+  --line: #d9dfda;
+  --line-soft: #e6eae7;
+  --field: #b9c3bc;
+  --accent: #1f5f8b;
+  --accent-ink: #123e5c;
+  --accent-soft: #e4edf4;
+  --warm: #9a4f0f;
+  --warm-soft: #fbf1e6;
+  --warm-ink: #5c3208;
+  --code: #f0f3f0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans), "Malgun Gothic", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-ink); text-decoration: underline; }
+button, input { font: inherit; }
+button { cursor: pointer; }
+.mono { font-family: var(--font-mono), ui-monospace, Consolas, monospace; }
+.lbl { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: var(--muted); margin: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.btn {
+  min-height: 40px; padding: 0 14px; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+.btn:disabled { opacity: 0.6; cursor: default; }
+.btn-primary { border: 0; background: var(--accent); color: #fff; font-weight: 600; }
+.tag { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+.note { margin: 0; padding: 12px 16px; border-radius: 8px; background: var(--warm-soft); color: var(--warm-ink); font-size: 13px; }
+
+table { border-collapse: collapse; width: 100%; }
+th { font-size: 12px; font-weight: 500; color: var(--muted); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+td { font-size: 14px; padding: 10px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+
+.site-header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px;
+  padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-size: 16px; font-weight: 600; }
+.brand:hover { text-decoration: none; color: var(--ink); }
+.nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav a { padding: 8px 14px; border-radius: 6px; color: var(--ink-2); }
+.nav a[aria-current="page"] { background: var(--accent); color: #fff; font-weight: 500; }
+.stats { margin-left: auto; display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+
+.page { max-width: 1440px; margin: 0 auto; padding: 20px 24px 40px; }
+
+/* 질문 작업대: 대화 | 답 | 경로·근거. 좁아지면 차례로 쌓입니다. */
+.bench { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+.bench-side { flex: 1 1 220px; max-width: 280px; display: flex; flex-direction: column; gap: 16px; }
+.bench-main { flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.answer-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.answer { flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 14px; padding: 20px; }
+.answer h1 { margin: 0; font-size: 18px; font-weight: 600; line-height: 1.4; }
+.meta { margin: 0; font-size: 12px; color: var(--muted); }
+.trace { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.trace .card { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.ask-form { display: flex; flex-direction: column; gap: 8px; padding: 14px; }
+.ask-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.ask-row input {
+  flex: 1 1 360px; min-width: 0; height: 44px; padding: 0 14px;
+  border-radius: 8px; border: 1px solid var(--field); color: var(--ink); background: var(--surface);
+}
+.ask-row .btn { height: 44px; padding: 0 20px; }
+.route { margin: 0; font-size: 12px; color: var(--muted); }
+.route .mono { color: var(--warm); }
+.turn-link {
+  display: block; width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px;
+  border: 0; background: transparent; color: var(--ink); font-size: 13px;
+}
+.turn-link[aria-current="true"] { background: var(--accent-soft); }
+.turn-link .mono { display: block; font-size: 11px; color: var(--muted); }
+pre.cypher { margin: 0; padding: 12px; background: var(--code); border-radius: 6px; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+.answer-text { max-width: 76ch; overflow-x: auto; }
+.answer-text > :first-child { margin-top: 0; }
+.answer-text > :last-child { margin-bottom: 0; }
+.answer-text p, .answer-text ul, .answer-text ol { margin: 0 0 10px; }
+.section { display: flex; flex-direction: column; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+.section h2 { margin: 0; font-size: 14px; font-weight: 600; }
+.facts { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.trace-toggle { display: none; }
+.empty { padding: 24px; color: var(--muted); }
+
+/* 휴대폰(시안의 휴대폰 화면): 대화 목록은 아래로, 경로·근거는 "근거 보기"로 엽니다. */
+@media (max-width: 720px) {
+  .site-header { padding: 10px 16px; }
+  .stats { display: none; }
+  .page { padding: 12px 16px 32px; }
+  .bench-side { max-width: none; order: 2; }
+  .answer { padding: 14px; }
+  .trace-toggle { display: inline-flex; align-items: center; }
+  .trace[data-open="false"] { display: none; }
+  .btn { min-height: 44px; }
+}

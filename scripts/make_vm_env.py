@@ -9,6 +9,8 @@
   닿을 일이 없고, 있으면 `move_graph.py load`의 가드만 남습니다.
 - `LANGFUSE_TRACING="0"`. 무료 한도 때문에 꺼 둡니다(0단계와 같은 선). 켜려면 키 둘과 함께 직접
   바꿉니다(`pipeline/tracing.py`).
+- 브라우저가 API를 부를 수 있는 주소(CORS, ADR-081). Vercel 운영 주소와 로컬 개발, 그리고 브랜치마다
+  달라지는 미리보기 주소를 정규식으로. 비밀이 아닙니다.
 - GDS 세션 키(`CLIENT_*`)는 넣지 않습니다. Aura 전용이고, 기본 엔진(직접 계산)은 없어도 됩니다.
 
 이미 있으면 덮어쓰지 않습니다. 비밀번호가 바뀌면 VM의 Neo4j 볼륨과 맞지 않게 됩니다.
@@ -25,6 +27,8 @@ from dotenv import dotenv_values
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / ".local" / "vm.env"
+WEB_ORIGINS = "https://arxiv-graphrag.vercel.app,http://localhost:3000"
+WEB_PREVIEW_ORIGINS = r"https://arxiv-graphrag-[a-z0-9-]+-rndigkwks-projects\.vercel\.app"
 
 
 def render(openai_key: str, domain: str, password: str) -> str:
@@ -33,6 +37,8 @@ def render(openai_key: str, domain: str, password: str) -> str:
         f"NEO4J_PASSWORD={password}",
         f"APP_DOMAIN={domain}",
         'LANGFUSE_TRACING="0"',
+        f"API_ALLOWED_ORIGINS={WEB_ORIGINS}",
+        f"API_ALLOWED_ORIGIN_REGEX={WEB_PREVIEW_ORIGINS}",
         "",
     ])
 

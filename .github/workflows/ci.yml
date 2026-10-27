@@ -33,3 +33,21 @@ jobs:
       # 목록이 `forecast.py`·`quality_board.py`·`paper_library.py`를 놓치고 있었고,
       # `chatbot.py`와 `app.py`는 아예 검사 밖이었습니다 - 이제 둘 다 들어옵니다.
       - run: uv run --locked python -m compileall -q app.py src evals scripts pipeline models
+  # Next.js 화면(이전 계획 4단계, ADR-082). Vercel이 따로 빌드하지만, 깨진 화면이 main에 들어가기
+  # 전에 여기서 막습니다.
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
