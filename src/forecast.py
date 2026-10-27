@@ -139,16 +139,45 @@ def cocitation_neighbours(graph: dict[str, Any], arxiv_id: str) -> set[str]:
     return {ids[index] for index in partners if index != position}
 
 
+def cocitation_neighbours_of(graph: dict[str, Any], papers: list[str]) -> dict[str, set[str]]:
+    """`cocitation_neighbours`를 여러 논문에 한 번에 셉니다. 정의는 같습니다.
+
+    하나씩 세면 논문마다 간선 전체를 훑습니다. 인용이 많은 시드는 공동인용 후보가 수천 편이라
+    패널 한 번에 17초가 걸렸습니다. 희소 행렬 곱 한 번(인용자 → 함께 인용한 논문)으로 바꿉니다.
+    """
+    from scipy import sparse
+
+    index, ids = graph["index"], graph["ids"]
+    size = len(ids)
+    known = [paper for paper in dict.fromkeys(papers) if paper in index]
+    result: dict[str, set[str]] = {paper: set() for paper in papers}
+    if not known:
+        return result
+    cites = sparse.csr_matrix(
+        (np.ones(len(graph["rows"]), dtype=np.int32), (graph["rows"], graph["cols"])),
+        shape=(size, size),
+    )
+    positions = np.array([index[paper] for paper in known])
+    together = (cites.T.tocsr()[positions] @ cites).tocsr()
+    for row, paper in enumerate(known):
+        partners = together.indices[together.indptr[row]:together.indptr[row + 1]]
+        result[paper] = {ids[i] for i in partners if i != positions[row]}
+    return result
+
+
 def _features(
     seed: str,
     candidates: list[str],
     *,
     graph: dict[str, Any],
-    vectors: dict[str, np.ndarray],
+    similarity: dict[str, float],
     neighbours: dict[str, set[str]],
     indegree: dict[str, int],
 ) -> np.ndarray:
-    """The 12 columns, in training order."""
+    """The 12 columns, in training order.
+
+    `similarity`는 후보마다 **시드와의 임베딩 내적**입니다. 임베딩이 없는 후보는 빠지고 0이 됩니다.
+    """
     matrix = np.zeros((len(candidates), len(FEATURE_NAMES)), dtype=np.float32)
     index = graph["index"]
     seed_neighbours = neighbours.get(seed, set())
@@ -158,7 +187,6 @@ def _features(
     seed_categories = (
         graph["categories"][seed_position] if seed_position is not None else set()
     )
-    seed_vector = vectors.get(seed)
     for row, paper in enumerate(candidates):
         other = neighbours.get(paper, set())
         shared = seed_neighbours & other
@@ -175,7 +203,6 @@ def _features(
         categories = graph["categories"][position] if position is not None else set()
         category_union = len(seed_categories | categories)
         month = month_of(paper)
-        vector = vectors.get(paper)
         matrix[row] = (
             len(shared),
             adamic,
@@ -185,10 +212,7 @@ def _features(
             math.log1p(degrees[1]),
             math.log1p(citations[0]),
             math.log1p(citations[1]),
-            (
-                float(np.dot(seed_vector, vector))
-                if seed_vector is not None and vector is not None else 0.0
-            ),
+            similarity.get(paper, 0.0),
             float(bool(seed_primary) and seed_primary == primary),
             (
                 len(seed_categories & categories) / category_union
@@ -204,7 +228,7 @@ def rank(
     candidates: list[str],
     *,
     graph: dict[str, Any],
-    vectors: dict[str, np.ndarray],
+    similarity: dict[str, float],
     indegree: dict[str, int],
     model: Any,
     top_k: int = TOP_K,
@@ -213,9 +237,10 @@ def rank(
     pool = [paper for paper in dict.fromkeys(candidates) if paper != seed]
     if not pool:
         return []
-    neighbours = {paper: cocitation_neighbours(graph, paper) for paper in (seed, *pool)}
+    neighbours = cocitation_neighbours_of(graph, [seed, *pool])
     matrix = _features(
-        seed, pool, graph=graph, vectors=vectors, neighbours=neighbours, indegree=indegree
+        seed, pool, graph=graph, similarity=similarity, neighbours=neighbours,
+        indegree=indegree,
     )
     scores = model.score(matrix)
     order = np.argsort(-scores)[:top_k]

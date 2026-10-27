@@ -51,6 +51,48 @@ def test_cocitation_neighbours_are_papers_cited_alongside_this_one():
     assert forecast.cocitation_neighbours(graph, "없는-id") == set()
 
 
+def test_counting_many_papers_at_once_gives_the_same_neighbours():
+    """한 번에 세는 쪽(서빙의 빠른 길)이 하나씩 세는 정의와 같아야 합니다."""
+    rng = np.random.default_rng(0)
+    ids = [f"p{i}" for i in range(300)]
+    edges = rng.integers(0, len(ids), size=(2000, 2))
+    graph = {
+        "ids": ids,
+        "index": {name: position for position, name in enumerate(ids)},
+        # 같은 간선이 두 번 들어와도 이웃은 같습니다.
+        "rows": np.concatenate([edges[:, 0], edges[:5, 0]]).astype(np.int32),
+        "cols": np.concatenate([edges[:, 1], edges[:5, 1]]).astype(np.int32),
+    }
+    papers = [*ids, "없는-id"]
+
+    together = forecast.cocitation_neighbours_of(graph, papers)
+
+    assert together == {paper: forecast.cocitation_neighbours(graph, paper) for paper in papers}
+    # 음성 대조: 인용자 하나를 빼면 달라집니다 - 비교가 빈 집합끼리만 맞는 것이 아닙니다.
+    kept = graph["rows"] != graph["rows"][10]
+    fewer = {**graph, "rows": graph["rows"][kept], "cols": graph["cols"][kept]}
+    assert forecast.cocitation_neighbours_of(fewer, papers) != together
+    assert sum(map(len, together.values())) > 1000
+
+
+def test_the_panel_asks_for_one_number_per_candidate_not_its_embedding():
+    """후보 4천 편의 768차원 벡터를 받는 데 VM에서 13.9초였습니다. 내적만 받습니다.
+
+    `chatbot`은 임포트만으로 DB에 붙으므로 소스 모양으로 봅니다.
+    """
+    from pathlib import Path
+
+    source = Path("src/chatbot.py").read_text(encoding="utf-8")
+    start, end = source.index("def forecast_cocitation"), source.index("def explain_citation_paths")
+    body = source[start:end]
+    assert "run_read(FORECAST_SIMILARITY" in body
+    # 시드 한 편의 벡터(최근접 검색용)만 받습니다.
+    assert body.count("run_read(FORECAST_VECTORS") == 1
+    query = source[source.index("FORECAST_SIMILARITY = "):source.index("FORECAST_NEIGHBOURS = ")]
+    # 학습 피처는 내적입니다. 코사인은 노름 차이만큼(4e-4) 다릅니다.
+    assert "vector.similarity.cosine" not in query.split('"""')[1]
+
+
 def test_month_gap_reads_the_arxiv_id_and_tolerates_old_style():
     assert forecast.month_of("2501.00001") == 2025 * 12
     assert forecast.month_of("2512.00001") == 2025 * 12 + 11
@@ -110,12 +152,12 @@ def test_ranking_drops_the_seed_and_explains_each_score():
         "primary": ["cs.AI", "cs.AI", "cs.LG"],
         "categories": [{"cs.AI"}, {"cs.AI"}, {"cs.LG"}],
     }
-    vectors = {name: np.ones(4, dtype=np.float32) / 2 for name in ids}
+    similarity = {name: 1.0 for name in ids}
 
     ranked = forecast.rank(
         "2501.00001",
         ["2501.00001", "2502.00002", "2503.00003"],  # 시드가 섞여 들어와도
-        graph=graph, vectors=vectors, indegree={}, model=model, top_k=5,
+        graph=graph, similarity=similarity, indegree={}, model=model, top_k=5,
     )
 
     # 순서는 점수가 정하므로 고정하지 않습니다. 고정할 것은 시드가 빠지는 것과,
