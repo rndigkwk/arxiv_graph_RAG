@@ -84,8 +84,8 @@ VM에서 싣고 검증합니다(리허설에서 싣기 약 3분 반).
 ```bash
 cd ~/arxiv_graph_RAG
 docker compose --env-file .env -f deploy/vm/compose.yml up -d --wait neo4j
-docker compose --env-file .env -f deploy/vm/compose.yml run --rm app python scripts/move_graph.py load --dir /snapshot
-docker compose --env-file .env -f deploy/vm/compose.yml run --rm app python scripts/move_graph.py verify --dir /snapshot
+docker compose --env-file .env -f deploy/vm/compose.yml run --rm api python scripts/move_graph.py load --dir /snapshot
+docker compose --env-file .env -f deploy/vm/compose.yml run --rm api python scripts/move_graph.py verify --dir /snapshot
 docker compose --env-file .env -f deploy/vm/compose.yml up -d
 ```
 

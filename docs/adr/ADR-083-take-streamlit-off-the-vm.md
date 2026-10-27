@@ -27,7 +27,7 @@ VM(4GB)에는 Streamlit과 FastAPI가 나란히 돌았습니다([ADR-081](ADR-08
 - **Streamlit 코드(`app.py`)는 남깁니다.** Streamlit Cloud의 백업 앱(0단계, Aura Free)이 그것을 돌립니다.
   그 앱은 `visit_deployed_app.py --streamlit`으로 손으로 점검합니다.
 - **Dockerfile은 이번에 바꾸지 않습니다.** 이미지의 기본 명령은 아직 Streamlit이고, compose의 `api`가
-  uvicorn으로 덮어씁니다. 이유는 아래 "머지 순간"입니다.
+  uvicorn으로 덮어씁니다. 이유는 아래 "머지 순간"입니다. (다음 PR에서 바꿨습니다 - 민감도 끝 줄.)
 
 ## 머지 순간 — 옛 deploy.sh가 돈다
 
@@ -54,7 +54,7 @@ VM(4GB)에는 Streamlit과 FastAPI가 나란히 돌았습니다([ADR-081](ADR-08
 - **`/api/health`의 모듈 커밋은 API가 모듈을 불러온 뒤에만 있습니다.** 예열이 그것을 시작할 때
   부르므로 재시작 몇 초 뒤면 채워집니다. 비어 있으면 점검은 옛 모듈로 보고 기다립니다(10분).
 - **Dockerfile의 기본 명령을 uvicorn으로 바꾸는 것은 다음 배포 뒤에 합니다.** 그때는 새 deploy.sh가 돌아
-  `build -q api`만 부릅니다.
+  `build -q api`만 부릅니다. → 2026-10-27 바꿨습니다. compose의 `command` 덮어쓰기도 뺐습니다.
 
 ## 참고
 
