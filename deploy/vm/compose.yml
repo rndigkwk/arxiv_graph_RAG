@@ -36,10 +36,7 @@ services:
     depends_on:
       neo4j:
         condition: service_healthy
-    # 호스트 포트는 없습니다 - Caddy가 /api/*를 넘깁니다. 워커 하나: 상한(Limiter)이 프로세스
-    # 메모리에 있고, 인용망도 프로세스마다 한 벌씩 올라갑니다. 이미지의 기본 명령은 아직
-    # Streamlit입니다 - Dockerfile을 바꾸면 머지 순간 도는 옛 deploy.sh가 `build app`에서 멈춥니다.
-    command: ["uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    # 호스트 포트는 없습니다 - Caddy가 /api/*를 넘깁니다. 명령은 Dockerfile의 CMD(uvicorn)입니다.
     restart: unless-stopped
   caddy:
     image: caddy:2.10.2

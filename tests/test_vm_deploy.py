@@ -31,8 +31,11 @@ def test_overlapping_timer_runs_step_aside():
 
 def test_every_deploy_restarts_the_api():
     assert re.search(r"^\$C restart api$", DEPLOY, re.MULTILINE)
-    assert "--server.fileWatcherType=none" in Path("deploy/vm/Dockerfile").read_text(
-        encoding="utf-8")
+    # 이미지의 기본 명령이 API입니다(ADR-083). 파일 감시(--reload)는 켜지 않습니다.
+    dockerfile = Path("deploy/vm/Dockerfile").read_text(encoding="utf-8")
+    command = dockerfile.split("CMD")[-1]
+    assert command.lstrip().startswith('["uvicorn", "src.api:app"')
+    assert "--reload" not in command and "streamlit" not in command
 
 
 def test_image_is_rebuilt_only_when_its_inputs_change():
