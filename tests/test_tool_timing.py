@@ -46,6 +46,38 @@ def test_a_tool_gets_the_time_of_its_own_call():
     assert inside.seconds() == {"call_a": 2.5}
 
 
+class Usage:
+    """`on_llm_end`가 받는 응답의 모양. 사용량은 메시지의 `usage_metadata`에 옵니다."""
+
+    def __init__(self, tokens):
+        message = type("Message", (), {"usage_metadata": {"output_tokens": tokens}})()
+        self.generations = [[type("Generation", (), {"message": message})()]]
+
+
+def test_each_model_turn_keeps_its_own_seconds_and_tokens():
+    """합계만 있으면 어느 턴이 긴지 말할 수 없습니다(ADR-087, 한국어 턴당 6초)."""
+    inside = tool_timing.InsideGenerate(ticking(0.0, 1.0, 1.5, 5.5))
+
+    inside.on_chat_model_start({}, [])
+    inside.on_llm_end(Usage(40))
+    inside.on_chat_model_start({}, [])
+    inside.on_llm_end(None)  # 사용량이 없으면 None - 0으로 적지 않습니다
+
+    summary = inside.summary(5.5)
+    assert summary["turns"] == [{"seconds": 1.0, "output_tokens": 40},
+                                {"seconds": 4.0, "output_tokens": None}]
+    assert summary["model_seconds"] == sum(turn["seconds"] for turn in summary["turns"])
+
+
+def test_a_model_call_inside_a_tool_is_not_a_turn():
+    inside = tool_timing.InsideGenerate(ticking(0.0, 0.1, 1.9, 2.0))
+    inside.on_tool_start({}, "")
+    inside.on_chat_model_start({}, [])
+    inside.on_llm_end(Usage(10))
+    inside.on_tool_end(ended("call_a"))
+    assert inside.summary(2.0)["turns"] == []
+
+
 def test_a_model_call_inside_a_tool_is_not_counted_twice():
     """**이 테스트가 이 파일의 이유입니다.** 번역 도구가 안에서 모델을 부릅니다."""
     inside = tool_timing.InsideGenerate(ticking(0.0, 0.1, 1.9, 2.0))

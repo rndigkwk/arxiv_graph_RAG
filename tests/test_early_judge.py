@@ -113,6 +113,35 @@ def test_overlap_saves_the_shorter_of_the_two():
     assert time.perf_counter() - begin < 0.45
 
 
+def test_the_judgement_reports_how_much_of_it_was_hidden_behind_the_answer():
+    """기다린 시간만으로는 "판정이 느렸나, 겹친 시간이 짧았나"를 가를 수 없었습니다(ADR-087)."""
+    judge = early_judge.EarlyJudge(lambda ids, queries: time.sleep(0.3) or ("p", "v"))
+    judge.offer(["a"], [])
+    time.sleep(0.1)  # 답 글을 쓰는 시간
+    ahead = judge.take(["a"], [])
+    check_started = time.perf_counter()
+    ahead.exception()
+    timing = early_judge.timing(ahead, check_started, time.perf_counter() - check_started)
+
+    assert timing["early"] is True
+    assert 0.28 <= timing["judge_seconds"] < 0.45
+    assert 0.08 <= timing["ahead_seconds"] < 0.2
+    # 겹친 몫과 기다린 몫을 더하면 판정 시간입니다.
+    assert abs(timing["ahead_seconds"] + timing["waited_seconds"] - timing["judge_seconds"]) < 0.03
+
+
+def test_a_judgement_that_finished_before_the_check_waits_for_nothing():
+    judge = early_judge.EarlyJudge(lambda ids, queries: ("p", "v"))
+    judge.offer(["a"], [])
+    ahead = judge.take(["a"], [])
+    ahead.result()
+    time.sleep(0.05)
+    timing = early_judge.timing(ahead, time.perf_counter(), 0.0)
+    # 다 숨었습니다 - 겹친 몫이 판정 시간 전부입니다(검사 노드가 늦게 온 시간까지 세지 않습니다).
+    assert timing["ahead_seconds"] == timing["judge_seconds"]
+    assert timing["waited_seconds"] == 0.0
+
+
 def test_a_failed_judgement_is_raised_where_the_check_would_raise_it():
     with pytest.raises(ValueError, match="불완전"):
         early_judge.unpack_verdict(ValueError("인용 논문의 내용 판정 결과가 불완전합니다."))
@@ -137,3 +166,8 @@ def test_the_app_offers_and_takes_the_early_judgement():
     # 앞당긴 쪽과 최종 응답이 같은 함수로 도구 기록을 읽어야 열쇠가 맞습니다.
     assert "calls = tool_calls_of(result[\"messages\"])" in SOURCE
     assert "on_evidence(ids, tool_calls_of(result.get(\"messages\", [])))" in SOURCE
+
+
+def test_the_app_records_the_judgement_timing_on_the_answer():
+    assert "response[\"condition_timing\"] = early_judge.timing(" in SOURCE
+    assert "response[\"condition_timing\"] = {\"early\": False}" in SOURCE

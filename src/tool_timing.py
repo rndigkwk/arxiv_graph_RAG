@@ -26,7 +26,8 @@
    분해가 틀린 것이므로 `adds_up`이 false가 되고, 화면은 수를 적지 않습니다.
 
 **여전히 재지 못하는 것**은 모델 턴 **하나의 안쪽**입니다 - 대기와 토큰 생성의 몫은
-공급자가 알려 주지 않습니다.
+공급자가 알려 주지 않습니다. 대신 **턴마다의 초와 출력 토큰**을 적습니다(`turns`). 한국어
+질문은 턴당 약 6초로 영어의 두 배였는데(ADR-087), 합계만으로는 어느 턴이 긴지 말할 수 없었습니다.
 """
 
 from __future__ import annotations
@@ -58,6 +59,7 @@ class InsideGenerate(BaseCallbackHandler):
         self._spans: list[tuple[float, float]] = []
         self._model_seconds = 0.0
         self._model_turns = 0
+        self._turns: list[dict[str, Any]] = []
         self._unattributed = 0.0
         self._stray_ends = 0
 
@@ -117,20 +119,18 @@ class InsideGenerate(BaseCallbackHandler):
         self._push(MODEL)
 
     def on_llm_end(self, response, **kwargs) -> None:
-        frame = self._pop(MODEL)
-        if frame is None or not frame["counted"]:
-            return
-        with self._lock:
-            self._model_seconds += frame["seconds"]
-            self._model_turns += 1
+        self._end_turn(self._pop(MODEL), output_tokens(response))
 
     def on_llm_error(self, error, **kwargs) -> None:
-        frame = self._pop(MODEL)
+        self._end_turn(self._pop(MODEL), None)
+
+    def _end_turn(self, frame: dict[str, Any] | None, tokens: int | None) -> None:
         if frame is None or not frame["counted"]:
             return
         with self._lock:
             self._model_seconds += frame["seconds"]
             self._model_turns += 1
+            self._turns.append({"seconds": round(frame["seconds"], 3), "output_tokens": tokens})
 
     # ── 읽기 ─────────────────────────────────────────────────────────────
     def seconds(self) -> dict[str, float]:
@@ -150,6 +150,7 @@ class InsideGenerate(BaseCallbackHandler):
             model = round(self._model_seconds, 3)
             unattributed = round(self._unattributed, 3)
             turns, strays, calls = self._model_turns, self._stray_ends, len(self._calls)
+            each = [dict(turn) for turn in self._turns]
         other = round(generate_seconds - tools - model - unattributed, 3)
         return {
             "generate_seconds": round(generate_seconds, 3),
@@ -159,12 +160,25 @@ class InsideGenerate(BaseCallbackHandler):
             "tool_calls": calls,
             "model_seconds": model,
             "model_turns": turns,
+            # 끝난 순서입니다. 토큰은 공급자가 사용량을 줄 때만 있고, 없으면 None입니다.
+            "turns": each,
             "unattributed_seconds": unattributed,
             # 잰 값이 아니라 뺀 값입니다. 스트리밍·부분 JSON 파싱·직렬화가 여기 있습니다.
             "other_seconds": other,
             "adds_up": other >= -OVERLAP_TOLERANCE,
             "stray_ends": strays,
         }
+
+
+def output_tokens(response: Any) -> int | None:
+    """모델 응답의 출력 토큰. 모양이 다르거나 사용량이 없으면 None - 0으로 적지 않습니다."""
+    try:
+        message = response.generations[0][0].message
+    except (AttributeError, IndexError, TypeError):
+        return None
+    usage = getattr(message, "usage_metadata", None) or {}
+    value = usage.get("output_tokens")
+    return value if isinstance(value, int) else None
 
 
 def covered_seconds(spans: list[tuple[float, float]]) -> float:

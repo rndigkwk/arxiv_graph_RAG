@@ -39,3 +39,19 @@ def test_cases_are_picked_per_family_in_file_order():
     cases = [{"id": f"{c}-{i}", "category": c} for c in ("author", "citing") for i in range(5)]
     picked = [c["id"] for c in m.pick_cases(cases, 2)]
     assert picked == ["author-0", "author-1", "citing-0", "citing-1"]
+
+
+def test_the_judgement_and_the_last_turn_are_summarised_when_the_server_records_them():
+    rows = [row("a-1", 8.0), row("a-2", 12.0), row("a-3", 9.0)]
+    for each, (judge, ahead) in zip(rows, [(4.0, 2.0), (3.0, 3.0), (5.0, 1.0)]):
+        each["condition_timing"] = {"early": True, "judge_seconds": judge,
+                                    "ahead_seconds": ahead, "waited_seconds": judge - ahead}
+        each["generate_trace"]["turns"] = [{"seconds": 1.5, "output_tokens": 30},
+                                           {"seconds": 3.5, "output_tokens": 200}]
+    rows.append(row("a-4", 10.0))  # 옛 서버 - 기록이 없으면 세지 않습니다
+
+    summary = m.summarize(rows, {})
+    assert summary["judge"] == {"early": 3, "timed": 3, "judge_seconds_p50": 4.0,
+                                "ahead_seconds_p50": 2.0, "waited_seconds_p50": 2.0}
+    assert summary["last_turn"] == {"traced": 3, "last_seconds_p50": 3.5,
+                                    "earlier_seconds_p50": 1.5, "last_output_tokens_p50": 200}

@@ -20,6 +20,7 @@ VM에서 잰 답변 p50 13.6초 중 `check_conditions`가 4.6초였습니다(ADR
 from __future__ import annotations
 
 import threading
+import time
 from collections.abc import Callable, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
 from typing import Any
@@ -73,8 +74,19 @@ class EarlyJudge:
             if key == self._key:
                 return False
             self._key = key
-            self._future = self._pool.submit(self._work, list(ids), list(queries))
+            times: dict[str, float] = {}
+            self._future = self._pool.submit(self._timed, times, list(ids), list(queries))
+            # 판정이 언제 시작해 언제 끝났는지 결과와 함께 넘깁니다. 기다린 시간만으로는
+            # "판정이 느렸나, 겹친 시간이 짧았나"를 가를 수 없었습니다(ADR-087).
+            self._future.times = times  # type: ignore[attr-defined]
             return True
+
+    def _timed(self, times: dict[str, float], ids: list[str], queries: list[str]):
+        times["started"] = time.perf_counter()
+        try:
+            return self._work(ids, queries)
+        finally:
+            times["finished"] = time.perf_counter()
 
     def take(self, ids: Sequence[str], queries: Sequence[str]) -> Future | None:
         """입력이 같을 때만 앞당긴 결과를 넘깁니다. 한 번 넘기면 비웁니다(다음 시도는 새로 판정)."""
@@ -83,6 +95,25 @@ class EarlyJudge:
                 return None
             future, self._key, self._future = self._future, None, None
             return future
+
+
+def timing(future: Future, check_started: float, waited: float) -> dict[str, Any]:
+    """앞당긴 판정 하나의 시간. `check_started`는 검사 노드가 결과를 기다리기 시작한 시각입니다.
+
+    - `judge_seconds`: 판정(논문 조회 포함) 자체가 걸린 시간
+    - `ahead_seconds`: 검사 노드가 오기 전에 이미 돈 시간 - 답 글과 겹친 몫
+    - `waited_seconds`: 검사 노드가 결과를 기다린 시간 - 겹치지 못한 몫
+    """
+    times = getattr(future, "times", {})
+    started, finished = times.get("started"), times.get("finished")
+    if started is None or finished is None:
+        return {"early": True, "waited_seconds": round(waited, 3)}
+    return {
+        "early": True,
+        "judge_seconds": round(finished - started, 3),
+        "ahead_seconds": round(max(0.0, min(finished, check_started) - started), 3),
+        "waited_seconds": round(waited, 3),
+    }
 
 
 def unpack_verdict(verdict: Any) -> Any:
