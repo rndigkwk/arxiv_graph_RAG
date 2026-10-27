@@ -349,6 +349,12 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
             "rules": [{"name": n, "blocks": w} for n, w in quality_board.RULES],
             "gates": quality_board.gate_rows(baseline),
             "families": family_board.load_rows(stable),
+            "rationale": baseline.get("floor_rationale") or {},
+            "slots": quality_board.slot_rows(baseline),
+            "rejected": [
+                {"model": m, "slot": slot, "result": result, "record": record}
+                for m, slot, result, record in quality_board.REJECTED
+            ],
         }
 
     return app
