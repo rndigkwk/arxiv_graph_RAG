@@ -27,6 +27,14 @@ export function citedEvidence(answer: Answer): { found: number; total: number } 
   return { found, total: answer.evidence_ids.length };
 }
 
+/** 예측 패널의 시드. 관련 논문을 고른 시드의 첫 편입니다(Streamlit 패널과 같은 규칙, ADR-038). */
+export function forecastSeed(answer: Answer): string | null {
+  const calls = answer.tool_calls.filter((c) => c.name === "rank_related_papers");
+  const output = calls.at(-1)?.output as { seed_ids?: unknown } | undefined;
+  const seeds = Array.isArray(output?.seed_ids) ? output.seed_ids : [];
+  return typeof seeds[0] === "string" ? seeds[0] : null;
+}
+
 /** API에 보낼 앞 문답. 오래된 것부터 버립니다. */
 export function historyFor(turns: { question: string; answer: string }[]) {
   return turns.slice(-MAX_HISTORY);

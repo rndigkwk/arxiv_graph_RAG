@@ -104,6 +104,11 @@ class FakeBot:
         def invoke(args):
             return {"related": [{"arxiv_id": "b"}]}
 
+    def forecast_cocitation(self, arxiv_id):
+        self.forecasts = [*getattr(self, "forecasts", []), arxiv_id]
+        return {"seed_id": arxiv_id, "papers": [{"arxiv_id": "c", "score": 0.9}],
+                "candidates": 2, "model": {"digest": "d"}, "reason": ""}
+
     def global_pagerank(self):
         return np.array([0.7, 0.3, 0.0])
 
@@ -217,6 +222,17 @@ def test_paper_page_carries_counts_and_related():
     assert data["cited_by"] == 5 and data["references"] == 0
     assert data["related"] == [{"arxiv_id": "b"}]
     assert client().get("/api/papers/zzz").status_code == 404
+
+
+def test_the_forecast_panel_is_served_without_the_paid_limit():
+    """예측 패널(ADR-038)은 OpenAI를 부르지 않습니다. 유료 길의 상한을 쓰면 안 됩니다."""
+    bot = FakeBot()
+    shut = client(bot, limiter=api.Limiter(0, 0, 0))
+    data = shut.get("/api/papers/a/forecast").json()
+    assert data["papers"] == [{"arxiv_id": "c", "score": 0.9}] and data["reason"] == ""
+    assert bot.forecasts == ["a"]
+    assert shut.get("/api/papers/zzz/forecast").status_code == 404
+    assert bot.forecasts == ["a"]  # 그래프에 없는 논문은 모델까지 가지 않습니다
 
 
 def test_global_rank_attaches_scores():

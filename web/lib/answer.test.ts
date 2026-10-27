@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Answer } from "./api";
-import { GENERATE_CONTAINS, citedEvidence, generateSplit, graphIds, historyFor, routeLine, stageRows, usedPath } from "./answer";
+import { GENERATE_CONTAINS, citedEvidence, forecastSeed, generateSplit, graphIds, historyFor, routeLine, stageRows, usedPath } from "./answer";
 
 const answer = (over: Partial<Answer> = {}): Answer => ({
   question: "q",
@@ -15,6 +15,14 @@ const answer = (over: Partial<Answer> = {}): Answer => ({
 });
 
 describe("answer helpers", () => {
+  it("seeds the forecast with the first seed of the related-paper ranking", () => {
+    const ranked = (seed_ids: unknown) => ({ id: "app:rank_related_papers", name: "rank_related_papers", args: {}, output: { seed_ids } });
+    expect(forecastSeed(answer({ tool_calls: [ranked(["2303.11366", "2401.1"])] }))).toBe("2303.11366");
+    expect(forecastSeed(answer({ tool_calls: [ranked([])] }))).toBeNull();
+    expect(forecastSeed(answer())).toBeNull(); // 관련 논문을 부르지 않은 답(순수 집계)
+    expect(forecastSeed(answer({ tool_calls: [ranked("nope")] }))).toBeNull();
+  });
+
   it("counts only evidence that the search actually returned", () => {
     expect(citedEvidence(answer())).toEqual({ found: 1, total: 2 });
     expect(citedEvidence(answer({ papers: [{ arxiv_id: "2509.15541" }] }))).toEqual({ found: 2, total: 2 });

@@ -11,10 +11,10 @@
 
 | 모델 | 어디서 | 무엇을 | 조정 방식 |
 |---|---|---|---|
-| **`gpt-6-luna`** (OpenAI chat) | [`chatbot.py`](../src/chatbot.py) — 에이전트, `translate_to_english`, 번역 버튼 | 도구 다섯 개를 가진 에이전트. 구조화 출력 `GroundedAnswer`(answer + evidence_ids) | **가중치 조정 없음.** 조정 대상은 프롬프트이고 MLflow에 버전으로 남깁니다([ADR-018](adr/ADR-018-prompt-versioning.md)) |
+| **`gpt-6-luna`** (OpenAI chat) | [`chatbot.py`](../src/chatbot.py) — 에이전트, `translate_to_english`, 번역 버튼 | 도구를 가진 에이전트(목록은 `chatbot.py`의 `tools=`; 관련 논문은 앱이 답 뒤에 부릅니다, [ADR-086](adr/ADR-086-the-app-ranks-related-papers-not-the-model.md)). 구조화 출력 `GroundedAnswer`(answer + evidence_ids) | **가중치 조정 없음.** 조정 대상은 프롬프트이고 MLflow에 버전으로 남깁니다([ADR-018](adr/ADR-018-prompt-versioning.md)) |
 | **`text-embedding-3-large`** (768차원) | 같은 파일 — `search_papers`의 벡터 검색 | **질문만** 임베딩합니다. 논문 벡터는 적재 때 만든 것을 다시 쓰고 새로 만들지 않습니다 | 차원을 적재와 같은 768로 고정. 파인튜닝은 재고 기각했습니다(4절) |
 
-| **`graph-text-gbm`** (저장된 가중치 380KB) | [`forecast.py`](../src/forecast.py) — "앞으로 함께 인용될 논문" 패널 | 후보 50편을 재정렬합니다. **버튼을 눌러야 돕니다** | 학습은 오프라인. 앱은 지문을 맞춰 보고 읽기만 합니다([ADR-038](adr/ADR-038-the-forecast-panel.md)) |
+| **`graph-text-gbm`** (저장된 가중치 380KB) | [`forecast.py`](../src/forecast.py) — "앞으로 함께 인용될 논문" 패널. 웹의 논문 화면과 답변 화면(`/api/papers/{id}/forecast`), Streamlit 백업 판 | 후보 50편을 재정렬합니다. **버튼을 눌러야 돕니다** | 학습은 오프라인. 앱은 지문을 맞춰 보고 읽기만 합니다([ADR-038](adr/ADR-038-the-forecast-panel.md)) |
 
 **답변 경로에는 자체 학습 모델이 없습니다.** 모델이 쓰이는 자리는 **표시 패널 하나**이고,
 에이전트 도구가 아니어서 게이트가 보는 지표에 닿지 않습니다. 그것이 결론이지 누락이
@@ -45,7 +45,9 @@
 ([ADR-031](adr/ADR-031-the-model-that-wins-is-the-forecast.md)).
 
 **2026-10-19에 앱에 들어갔습니다 — 기존 패널을 고치는 것이 아니라 새 패널로**
-([ADR-038](adr/ADR-038-the-forecast-panel.md)). 답하는 질문이 "**앞으로** 함께 인용될
+([ADR-038](adr/ADR-038-the-forecast-panel.md)). 그 패널은 Streamlit에만 있어서, VM에서 Streamlit을
+내렸을 때([ADR-083](adr/ADR-083-take-streamlit-off-the-vm.md)) 메인 화면에서 빠졌습니다. 2026-10-27에 웹의
+논문 화면과 답변 화면에 같은 패널을 다시 붙였습니다. 답하는 질문이 "**앞으로** 함께 인용될
 논문"이고 관련 논문 패널의 "지금 같이 읽히는 논문"과 다른 질문이라, 섞지 않고 따로 둡니다.
 에이전트 도구로 올리지는 않았습니다 — 답변 경로에 들어가면 게이트가 보는 지표가 움직이고,
 그 판단은 기준선을 다시 재야 하는 일입니다.

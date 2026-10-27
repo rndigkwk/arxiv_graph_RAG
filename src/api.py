@@ -313,6 +313,18 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
             {**row, **counts, "bibtex": citations.entry(row), "related": related.get("related", [])}
         )
 
+    @app.get("/api/papers/{arxiv_id}/forecast")
+    def forecast(arxiv_id: str) -> dict[str, Any]:
+        """앞으로 함께 인용될 논문(ADR-038). 화면의 버튼을 눌러야 부릅니다.
+
+        모델은 저장된 가중치(`models/artifacts`)와 그래프만 씁니다 - OpenAI를 부르지 않으므로
+        유료 길의 문턱(`guard`) 밖입니다. 가중치가 없거나 지문이 맞지 않으면 `reason`이 옵니다.
+        """
+        bot = chatbot()
+        if bot.fetch_paper_for_saving(arxiv_id) is None:
+            raise HTTPException(404, "그래프에 없는 논문입니다.")
+        return bot.to_jsonable(bot.forecast_cocitation(arxiv_id))
+
     @app.get("/api/papers/{arxiv_id}/citing")
     def citing(
         arxiv_id: str, order: str = "recent", skip: int = 0, limit: int = 20
