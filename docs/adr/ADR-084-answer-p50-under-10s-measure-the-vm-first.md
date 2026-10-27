@@ -2,6 +2,10 @@
 
 - **상태:** 채택
 - **날짜:** 2026-10-27
+- **후속:** 2026-10-28 — 목표를 맞췄습니다. VM 서버 p50 13.6초 → **7.70초**, p90 16.8초 → 10.87초(같은 15문항).
+  조건 검사 겹치기([ADR-085](ADR-085-overlap-the-condition-check-with-the-answer.md)), 관련 논문·번역·제목 해석을 모델 턴 밖으로
+  ([ADR-086](ADR-086-the-app-ranks-related-papers-not-the-model.md)·[087](ADR-087-translate-before-the-agent.md)·[088](ADR-088-resolve-the-named-paper-before-the-agent.md)).
+  남은 가장 큰 대기는 판정 자체(p50 3.74초 중 2.36초를 기다림)입니다.
 
 ## 맥락
 
