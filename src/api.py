@@ -28,6 +28,7 @@ from collections.abc import Callable
 from contextlib import asynccontextmanager
 from typing import Any
 
+import numpy as np
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -50,6 +51,25 @@ RETURN c.arxiv_id AS arxiv_id, c.title AS title, c.primary_category AS primary_c
        toString(c.published) AS published, cited_by
 ORDER BY {order} SKIP $skip LIMIT $limit
 """
+RANK_BY = ("cited", "pagerank", "personalized")
+MAX_RANK_DEPTH = 500
+
+
+def ranked_ids(graph, score, mask, exclude, skip: int, limit: int) -> tuple[list[str], int]:
+    """점수 순으로 skip부터 limit편. 점수가 0인 논문과 mask 밖, exclude는 세지 않습니다."""
+    usable = np.asarray(score, dtype=float).copy()
+    if mask is not None:
+        usable = np.where(mask, usable, 0.0)
+    for arxiv_id in exclude:
+        if arxiv_id in graph["index"]:
+            usable[graph["index"][arxiv_id]] = 0.0
+    total = int((usable > 0).sum())
+    skip = max(0, min(skip, MAX_RANK_DEPTH))
+    limit = max(0, min(max(1, limit), 50, MAX_RANK_DEPTH - skip))
+    order = np.argsort(-usable, kind="stable")[skip:skip + limit]
+    return [graph["ids"][i] for i in order if usable[i] > 0], total
+
+
 ARXIV_ID = re.compile(r"^\d{4}\.\d{4,5}(v\d+)?$")
 
 PAPER_COUNTS = """
@@ -321,22 +341,48 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
         return bot.to_jsonable(bot.fetch_subgraph(body.arxiv_ids))
 
     @app.get("/api/rank")
-    def rank(category: str | None = None, limit: int = 20) -> dict[str, Any]:
+    def rank(
+        by: str = "pagerank",
+        category: str | None = None,
+        include_secondary: bool = True,
+        scope: str = "global",
+        seed: str | None = None,
+        skip: int = 0,
+        limit: int = 20,
+    ) -> dict[str, Any]:
+        """탐색 화면의 순위. 그래프 안 피인용 수, PageRank, 한 논문에서 출발한 개인화 PageRank.
+
+        셋 다 메모리의 인용망에서 셉니다(모델 0원). 순위는 점수가 0보다 큰 논문만 셉니다 -
+        인용으로 이어지지 않은 논문에 순서를 매기면 그 순서는 임의입니다.
+        """
+        if by not in RANK_BY or scope not in ("global", "subgraph"):
+            raise HTTPException(422, f"by는 {', '.join(RANK_BY)}, scope는 global·subgraph입니다.")
         bot = chatbot()
-        limit = max(1, min(limit, 50))
-        if category:
-            return bot.to_jsonable(bot.category_pagerank(category, limit=limit))
-        score = bot.global_pagerank()
         graph = bot.citation_graph()
-        chosen = bot.top_by_score(score, limit=limit)
-        return bot.to_jsonable(
-            {
-                "scope": "global",
-                "papers": bot.with_details(
-                    chosen, lambda arxiv_id: score[graph["index"][arxiv_id]]
-                ),
-            }
-        )
+        exclude: list[str] = []
+        if by == "personalized":
+            if not seed:
+                raise HTTPException(422, "개인화 PageRank에는 출발 논문(seed)이 필요합니다.")
+            score, _ = bot.personalized_pagerank([seed])
+            if score is None:
+                raise HTTPException(404, "인용망에 없는 논문입니다.")
+            exclude = [seed]
+        elif by == "cited":
+            score = np.bincount(graph["cols"], minlength=graph["size"]).astype(float)
+        elif category and scope == "subgraph":
+            score = bot.subgraph_pagerank(category, include_secondary)
+        else:
+            score = bot.global_pagerank()
+        mask = bot.category_members(category, include_secondary) if category else None
+        ids, total = ranked_ids(graph, score, mask, exclude, skip, limit)
+        papers = bot.with_details(ids, lambda arxiv_id: score[graph["index"][arxiv_id]])
+        for paper in papers:
+            paper["rank"] += max(0, skip)
+        return bot.to_jsonable({
+            "by": by, "category": category, "include_secondary": include_secondary,
+            "scope": scope if by == "pagerank" and category else "global", "seed": seed,
+            "total": total, "skip": max(0, skip), "papers": papers,
+        })
 
     @app.get("/api/quality")
     def quality() -> dict[str, Any]:

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
@@ -58,8 +59,25 @@ class FakeBot:
     def top_categories(self, limit):
         return [{"code": "cs.AI", "papers": 3}]
 
+    # 인용: b→a, c→a, c→b. 피인용 수는 a 2, b 1, c 0입니다.
     def citation_graph(self):
-        return {"index": {"a": 0, "b": 1}}
+        return {
+            "index": {"a": 0, "b": 1, "c": 2},
+            "ids": ["a", "b", "c"],
+            "size": 3,
+            "cols": np.array([0, 0, 1]),
+        }
+
+    def category_members(self, code, include_secondary=True):
+        return np.array([False, True, include_secondary])
+
+    def subgraph_pagerank(self, code, include_secondary=True):
+        return np.array([0.0, 0.2, 0.8])
+
+    def personalized_pagerank(self, seed_ids):
+        if seed_ids != ["a"]:
+            return None, []
+        return np.array([0.6, 0.1, 0.3]), [0]
 
     def fetch_paper_for_saving(self, arxiv_id):
         if arxiv_id in ("a", "2401.00001"):
@@ -87,13 +105,15 @@ class FakeBot:
             return {"related": [{"arxiv_id": "b"}]}
 
     def global_pagerank(self):
-        return [0.7, 0.3]
+        return np.array([0.7, 0.3, 0.0])
 
     def top_by_score(self, score, limit):
         return ["a", "b"][:limit]
 
     def with_details(self, ids, score_of):
-        return [{"arxiv_id": i, "score": score_of(i)} for i in ids]
+        return [
+            {"rank": n, "arxiv_id": i, "score": float(score_of(i))} for n, i in enumerate(ids, 1)
+        ]
 
 
 def client(bot=None, limiter=None):
@@ -198,7 +218,39 @@ def test_paper_page_carries_counts_and_related():
 
 def test_global_rank_attaches_scores():
     data = client().get("/api/rank?limit=1").json()
-    assert data == {"scope": "global", "papers": [{"arxiv_id": "a", "score": 0.7}]}
+    assert data["papers"] == [{"rank": 1, "arxiv_id": "a", "score": 0.7}]
+    assert data["total"] == 2  # 점수 0인 c는 순위에 넣지 않습니다
+
+
+def ranked(query):
+    return [p["arxiv_id"] for p in client().get("/api/rank?" + query).json()["papers"]]
+
+
+def test_rank_by_citations_counts_incoming_edges():
+    assert ranked("by=cited") == ["a", "b"]
+    assert ranked("by=cited&category=cs.AI") == ["b"]
+
+
+def test_rank_pages_keep_their_place():
+    data = client().get("/api/rank?skip=1&limit=1").json()
+    assert data["papers"] == [{"rank": 2, "arxiv_id": "b", "score": 0.3}]
+
+
+def test_category_scope_picks_the_score():
+    assert ranked("category=cs.AI&scope=subgraph") == ["c", "b"]
+    assert ranked("category=cs.AI&scope=global") == ["b"]
+    assert ranked("category=cs.AI&scope=subgraph&include_secondary=false") == ["b"]
+
+
+def test_personalized_rank_starts_from_a_seed_and_leaves_it_out():
+    assert ranked("by=personalized&seed=a") == ["c", "b"]
+    assert client().get("/api/rank?by=personalized").status_code == 422
+    assert client().get("/api/rank?by=personalized&seed=zzz").status_code == 404
+
+
+def test_rank_rejects_unknown_orders():
+    assert client().get("/api/rank?by=views").status_code == 422
+    assert client().get("/api/rank?scope=moon").status_code == 422
 
 
 def test_health_reports_commits_without_loading_the_model():
