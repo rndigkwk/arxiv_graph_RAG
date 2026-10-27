@@ -97,6 +97,30 @@ pre.cypher { margin: 0; padding: 12px; background: var(--code); border-radius: 6
 .trace-toggle { display: none; }
 .empty { padding: 24px; color: var(--muted); }
 
+/* 논문·탐색·품질 화면이 같이 쓰는 조각 */
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.panel { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.panel h1 { margin: 0; font-size: 20px; font-weight: 600; line-height: 1.35; }
+.panel h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.sub { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+h2 .sub { display: inline; }
+.plain-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.card.plain-list { padding: 14px 16px; }
+.plain-list.numbered { list-style: decimal; padding-left: 20px; }
+.btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); font-weight: 500; }
+.btn-link { display: inline-flex; align-items: center; }
+.btn-link:hover { text-decoration: none; }
+.btn-primary.btn-link:hover { color: #fff; }
+.authors { margin: 0; color: var(--ink-2); }
+.tiles { margin: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+.tiles > div { flex: 1 1 160px; padding: 12px 14px; border-radius: 8px; background: var(--ground); }
+.tiles dt { font-size: 12px; color: var(--muted); }
+.tiles dd { margin: 2px 0 0; font-size: 22px; font-weight: 500; }
+.tiles .hint { font-size: 12px; color: var(--muted); font-family: inherit; }
+.two-col { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.two-col > * { flex: 1 1 420px; min-width: 0; }
+.bar { height: 8px; border-radius: 4px; background: var(--accent); min-width: 2px; }
+
 /* 휴대폰(시안의 휴대폰 화면): 대화 목록은 아래로, 경로·근거는 "근거 보기"로 엽니다. */
 @media (max-width: 720px) {
   .site-header { padding: 10px 16px; }
