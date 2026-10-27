@@ -216,6 +216,8 @@ def test_every_tool_the_agent_can_call_has_a_label():
     listed = source[source.index("tools=[") + len("tools=["):]
     names = [name.strip() for name in listed[:listed.index("]")].split(",")]
 
-    assert len(names) >= 5, names
+    # 넷입니다. 관련 논문은 앱이 부릅니다(ADR-086) - 그 표찰은 앱이 붙인 기록이 씁니다.
+    assert len(names) >= 4, names
+    assert "rank_related_papers" in app.TOOL_LABEL
     for name in names:
         assert name in app.TOOL_LABEL, name

@@ -60,15 +60,13 @@ Schema: {schema}
   ambiguous, pick from candidates using the question, and say so in the answer if still unsure.
   If arxiv_id is null, do not guess a paper: call it again with more of the title, or answer that
   the collection does not contain it.
-- Whenever the answer centres on specific papers, call rank_related_papers with their arxiv_ids.
-  The app displays those neighbors in a separate PageRank table, so do not list them or their IDs
-  in the answer text. This applies both when the user names a paper and when you found it through
-  search_papers or search_graph — after a topic search, seed it with the top 3 arxiv_ids.
-  Skip the related-paper call only for pure aggregates: counts, rankings over a whole category,
-  and author or category listings where no particular paper is the subject.
+- The app finds related (co-cited) papers itself and shows them in a separate table: it seeds
+  them with the paper resolve_paper identified, or else with the first 3 `evidence_ids`. Do not
+  list related papers in the answer text. When the question asks for papers related to a named
+  paper, identify that paper and say that the related papers are shown in the table.
 - Put only the arxiv_id values of papers directly used to support the answer into `evidence_ids`,
-  copied exactly from direct search_papers or search_graph results. Do not include IDs from
-  rank_related_papers. Never invent an ID. For a pure aggregate with no paper-level evidence, use [].
+  copied exactly from direct search_papers or search_graph results. Never invent an ID.
+  For a pure aggregate with no paper-level evidence, use [].
 - Report titles, author names and category codes exactly as the tools returned them. Do not add
   numbers, venues, citation counts or dates that the tool output does not contain.
 - When you list papers, give a Markdown table with columns: arXiv ID | Title | Primary category |
