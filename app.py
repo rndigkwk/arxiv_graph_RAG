@@ -115,7 +115,7 @@ RELATED_COLUMN = {"점수": st.column_config.NumberColumn("점수", format="%.4f
 
 # StateGraph의 노드 이름(agent_graph.py)을 화면 말로 옮깁니다.
 NODE_LABEL = {
-    "translate": "한국어→영어 번역", "resolve": "제목으로 논문 찾기",
+    "translate": "한국어→영어 번역", "resolve": "제목으로 논문 찾기", "recent": "최근 논문 찾기",
     "route": "경로 판정", "generate": "답변 생성",
     "collect": "결과 수집",
     "check_format": "형식·인용 검사", "check_conditions": "조건 검사",

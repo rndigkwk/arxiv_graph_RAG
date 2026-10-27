@@ -17,6 +17,8 @@ Day 50~53 교안의 구조입니다. 바꾸는 것은 **흐름의 모양**이고
    질문에서도 불러 턴 하나를 썼습니다. 노드로 두면 그 시간이 `generate` 밖에 따로 잡힙니다.
 6. **제목 해석도 노드가 됩니다.** `resolve`가 질문 전체로 지칭한 논문을 찾고, 확실할 때만 그
    arxiv_id를 이번 턴의 메시지로 붙입니다([`pre_resolve.py`](pre_resolve.py), ADR-088).
+7. **"최근" 논문 찾기도 노드가 됩니다.** `recent`가 "최근"을 묻는 질문만 최근 12개월 안에서 먼저
+   찾아 이번 턴의 메시지로 붙입니다([`pre_recent.py`](pre_recent.py), ADR-090).
 
 **행동은 바꾸지 않았습니다.** `abstain`은 지금도 `AnswerValidationError`를 올립니다. 평가
 하네스가 그 예외를 "답하지 못함"으로 세고 게이트의 `answer_failure_rate` 기준선이 그 정의로
@@ -59,6 +61,7 @@ class AnswerState(TypedDict, total=False):
     route: dict[str, Any]
     translation: dict[str, Any]
     resolution: dict[str, Any]
+    recency: dict[str, Any]
     attempt: int
     result: dict[str, Any]
     response: dict[str, Any]
@@ -82,6 +85,9 @@ class Dependencies:
     translate: Callable[[str], dict[str, Any] | None] | None = None
     # 같은 모양입니다. 질문이 지칭한 논문을 앱이 먼저 찾습니다(ADR-088). None이면 노드가 없습니다.
     resolve: Callable[[str], dict[str, Any] | None] | None = None
+    # 같은 모양입니다. "최근" 질문을 앱이 기간 안에서 먼저 찾습니다(ADR-090). 두 번째 인자는 번역된
+    # 영어 질문(없으면 원문)입니다. None이면 노드가 없습니다.
+    recent: Callable[[str, str], dict[str, Any] | None] | None = None
 
 
 def _timed(name: str, state: AnswerState, work: Callable[[], dict[str, Any]]) -> dict[str, Any]:
@@ -132,6 +138,23 @@ def build_graph(deps: Dependencies):
 
         return _timed("resolve", state, work)
 
+    def recent(state: AnswerState) -> dict[str, Any]:
+        def work() -> dict[str, Any]:
+            # 논문 하나를 지칭한 질문이면 건너뜁니다. "최근"이 제목 안의 낱말이거나, 기간 조건이
+            # 그 논문의 관계(인용·공저)에 걸리는 질문이라 주제 검색이 맞지 않습니다.
+            if state.get("resolution"):
+                return {}
+            translation = (state.get("translation") or {}).get("record") or {}
+            output = translation.get("output") if translation.get("status") == "success" else None
+            english = output.get("english") if isinstance(output, dict) else None
+            done = deps.recent(state["question"], english or state["question"])
+            if not done:
+                return {}
+            return {"recency": done,
+                    "messages": [*state["messages"], ("user", done["hint"])]}
+
+        return _timed("recent", state, work)
+
     def route(state: AnswerState) -> dict[str, Any]:
         def work() -> dict[str, Any]:
             decided = routing.classify(state["question"])
@@ -177,6 +200,13 @@ def build_graph(deps: Dependencies):
                 position = 1 if (state.get("translation") or {}).get("record") else 0
                 response["tool_calls"].insert(position, record)
                 response["resolved"] = [record["output"], *response.get("resolved", [])]
+            # 앱의 기간 안 검색은 그다음입니다. 근거는 모델의 `search_graph` 조회가 냅니다.
+            if record := (state.get("recency") or {}).get("record"):
+                position = sum(
+                    1 for key in ("translation", "resolution")
+                    if (state.get(key) or {}).get("record")
+                )
+                response["tool_calls"].insert(position, record)
             return {"response": response}
 
         return _timed("collect", state, work)
@@ -242,6 +272,8 @@ def build_graph(deps: Dependencies):
         graph.add_node("translate", translate)
     if deps.resolve is not None:
         graph.add_node("resolve", resolve)
+    if deps.recent is not None:
+        graph.add_node("recent", recent)
     for name, node in (
         ("route", route),
         ("generate", generate),
@@ -254,9 +286,10 @@ def build_graph(deps: Dependencies):
     ):
         graph.add_node(name, node)
 
-    # 앞 단계는 있는 것만 차례로 잇습니다: [translate] → [resolve] → route.
+    # 앞 단계는 있는 것만 차례로 잇습니다: [translate] → [resolve] → [recent] → route.
     previous = START
-    for name, present in (("translate", deps.translate), ("resolve", deps.resolve)):
+    for name, present in (("translate", deps.translate), ("resolve", deps.resolve),
+                          ("recent", deps.recent)):
         if present is not None:
             graph.add_edge(previous, name)
             previous = name

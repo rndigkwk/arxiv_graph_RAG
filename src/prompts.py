@@ -56,11 +56,6 @@ Schema: {schema}
 - Use search_graph for stored relationships: authors, citations, categories, dates, counts, rankings.
   Use search_papers for topic or content questions that need the title/abstract meaning.
   Call both when the question needs both.
-- Words like "recent", "latest", "new" (최근, 최신) are a publication date condition. Unless the
-  question gives its own period, it means the last 12 months: call search_papers with
-  published_within_months=12 and top_k=5, then one search_graph query on the arxiv_ids it returned with
-  `p.published >= datetime() - duration("P12M")`, and cite only the papers that query returns.
-  Say in the answer that this means published in the last 12 months.
 - When the app has already resolved the paper the question names (a message saying so follows the
   question), use that arxiv_id directly and do not call resolve_paper for it.
   Otherwise, when the question names a paper by its title, call resolve_paper first and use the

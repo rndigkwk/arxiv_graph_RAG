@@ -9,7 +9,6 @@
 """
 import ast
 import atexit
-import datetime as dt
 import json
 import logging
 import os
@@ -40,6 +39,7 @@ from src import (
     agent_graph,
     early_judge,
     pagerank,
+    pre_recent,
     pre_resolve,
     pre_translate,
     prompts,
@@ -282,8 +282,8 @@ def published_date(value):
 def to_item(record):
     """검색한 논문 본문과 인용에 필요한 출처·유사도를 반환합니다.
 
-    발표일을 함께 돌려줍니다(ADR-090). 없으면 "최근" 질문에서 모델이 날짜를 보려고
-    `search_graph`를 거듭 부릅니다.
+    발표일을 함께 돌려줍니다(ADR-090). 도구 설명과 인자는 그대로라 모델이 받는 스키마는
+    바뀌지 않습니다 - 인자 하나와 설명 두 줄이 모든 질문의 턴을 느리게 했습니다.
     """
     node = record["node"]
     return RetrieverResultItem(
@@ -295,36 +295,17 @@ def to_item(record):
     )
 
 
-def published_since(months, now=None):
-    """`months`개월 전 시각입니다. 0 이하면 None(날짜로 거르지 않음)입니다.
-
-    달은 30일로 셉니다. 12개월이면 360일이라 지시문의 Cypher(`duration("P12M")`)보다 며칠
-    짧습니다 - 여기서 찾은 논문은 그 조회를 모두 통과합니다.
-    """
-    months = int(months or 0)
-    if months <= 0:
-        return None
-    now = now or dt.datetime.now(dt.UTC)
-    return now - dt.timedelta(days=30 * min(months, 120))
-
-
 @tool
-def search_papers(query: str, top_k: int = 5, published_within_months: int = 0) -> dict:
+def search_papers(query: str, top_k: int = 5) -> dict:
     """영어 질의문과 의미가 가까운 논문을 제목+초록 임베딩으로 찾습니다.
 
     "어떤 논문이 있나", "무엇을 다루는 연구인가"처럼 주제·내용으로 찾을 때 사용합니다.
     query는 반드시 영어여야 합니다. 한국어 질문에는 앱이 붙인 영어 번역이 따라옵니다.
     저자·인용 수·분류별 집계처럼 저장된 관계를 세는 질문은 search_graph를 쓰세요.
-    결과마다 발표일(published, YYYY-MM-DD)이 있습니다.
     top_k는 1~10이며 기본값은 5입니다.
-    published_within_months를 주면 최근 그 개월 안에 발표된 논문 중에서만 찾습니다.
     """
     top_k = max(1, min(int(top_k), 10))
-    # 날짜는 검색 **안에서** 거릅니다(ADR-090). 가까운 10편을 받은 뒤 거르면 오래된 대표 논문이
-    # 자리를 차지해 0편이 남습니다 - "최근 RLHF 논문"이 그렇게 비었습니다.
-    since = published_since(published_within_months)
-    filters = {"published": {"$gte": since}} if since else None
-    result = vector_retriever.search(query_text=query, top_k=top_k, filters=filters)
+    result = vector_retriever.search(query_text=query, top_k=top_k)
     return {"query": query,
             "papers": [{**item.metadata, "abstract": item.content} for item in result.items]}
 
@@ -729,6 +710,25 @@ def ask(question, history, on_answer=None):
         resolved_first.append(record)
         return {"record": record, "hint": pre_resolve.hint(output)}
 
+    def recent_first(asked, english):
+        """"최근"을 묻는 질문만 최근 12개월 안에서 먼저 찾습니다(ADR-090)."""
+        if not pre_recent.asks_recent(asked):
+            return None
+        started = time.perf_counter()
+        try:
+            result = vector_retriever.search(
+                query_text=english, top_k=pre_recent.TOP_K,
+                filters={"published": {"$gte": pre_recent.since()}},
+            )
+        except Exception:  # noqa: BLE001 - 못 찾으면 모델이 지금처럼 찾습니다.
+            return None
+        output = {"query": english,
+                  "papers": [{**item.metadata, "abstract": item.content} for item in result.items]}
+        if not pre_recent.usable(output):
+            return None
+        record = pre_recent.call_record(english, output, time.perf_counter() - started)
+        return {"record": record, "hint": pre_recent.hint(output)}
+
     def check_conditions(user_question, response):
         queries = early_judge.graph_queries(response["tool_calls"])
         ahead = early.take(response["evidence_ids"], queries)
@@ -762,6 +762,7 @@ def ask(question, history, on_answer=None):
         ),
         translate=translate_first,
         resolve=resolve_first,
+        recent=recent_first,
     )
     state = agent_graph.build_graph(deps).invoke({
         "question": question,
