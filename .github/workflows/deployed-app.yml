@@ -3,16 +3,14 @@ name: Check deployed app
 # (deploy/vm/deploy.sh, ADR-080). Nothing here touches the VM: this job only waits, up to ten
 # minutes, for the pushed commit to appear on the page.
 #
-# Opens the deployed Streamlit app in a headless browser (scripts/visit_deployed_app.py): clicks
-# "Yes, get this app back up!" when it sleeps, waits for the first screen (which needs Aura), and
-# compares the deploy stamp with this commit. It fails when the search module is older than the
-# page - Streamlit Cloud kept an old `chatbot` module until a reboot twice (ADR-072).
+# Since 2026-10-27 the VM runs only the API and the database; the screens are the Next.js app on
+# Vercel (ADR-083). So this check needs no browser: it reads /api/health, whose two commits are
+# the checkout on disk and the module the API process imported, and compares both with this
+# commit (an old module after a merge is what ADR-072 was about). It then reads /api/stats to see
+# the graph answer, and fetches the Vercel page.
 #
-# keep-alive.yml's HTTP visit cannot do either: Streamlit counts browser sessions, so a sleeping
-# app stayed asleep while that job kept succeeding (ADR-016, 2026-10-25).
-#
-# No model calls: it asks nothing, it only renders the page. A failure on main opens an issue
-# through alert-on-failure.yml.
+# No model calls. A failure on main opens an issue through alert-on-failure.yml.
+# The Streamlit Cloud backup app can still be checked by hand with --streamlit (see the script).
 on:
   schedule:
     - cron: "17 */8 * * *"
@@ -34,11 +32,5 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v6
-      - name: Install the browser
-        run: uvx --with playwright==1.64.1 playwright install --with-deps chromium
-      - name: Check the deployed app
-        run: >
-          uvx --with playwright==1.64.1
-          python scripts/visit_deployed_app.py --expect-commit "${{ github.sha }}"
+      - name: Check the deployed API and screens
+        run: python3 scripts/visit_deployed_app.py --expect-commit "${{ github.sha }}"

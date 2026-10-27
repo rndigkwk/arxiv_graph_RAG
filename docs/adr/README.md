@@ -154,3 +154,4 @@
 | [ADR-080](ADR-080-the-vm-pulls-main.md) | VM이 main을 당겨 온다 — GitHub에는 VM에 닿는 자격을 두지 않는다 | 채택 |
 | [ADR-081](ADR-081-fastapi-beside-streamlit-on-the-vm.md) | FastAPI 층은 같은 VM에서 Streamlit 옆에 둔다 — 돈이 드는 길에만 문턱을 둔다 | 채택 |
 | [ADR-082](ADR-082-the-browser-calls-the-vm-api-directly.md) | Next.js 화면은 Vercel에, 브라우저가 VM의 API를 직접 부른다 | 채택 |
+| [ADR-083](ADR-083-take-streamlit-off-the-vm.md) | VM에서 Streamlit을 내린다 — 예전 주소는 Vercel로 보내고, 배포 점검은 API를 읽는다 | 채택 |

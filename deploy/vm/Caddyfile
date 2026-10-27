@@ -8,8 +8,8 @@
 			flush_interval -1
 		}
 	}
+	# 화면은 Vercel로 옮겼습니다(ADR-083). 예전 주소로 온 사람을 같은 경로로 보냅니다.
 	handle {
-		encode gzip
-		reverse_proxy app:8501
+		redir https://arxiv-graphrag.vercel.app{uri} 302
 	}
 }

@@ -10,13 +10,18 @@
 """
 
 import ast
-import re
 from pathlib import Path
 
 import pytest
 import yaml
 
-from scripts.visit_deployed_app import error_in, parse_stamp, still_deploying, verdict
+from scripts.visit_deployed_app import (
+    api_stamp,
+    error_in,
+    parse_stamp,
+    still_deploying,
+    verdict,
+)
 from src import release
 
 WORKFLOWS = Path(".github/workflows")
@@ -170,11 +175,19 @@ def test_only_the_alert_job_can_write_and_only_issues():
     assert "pull_request" in doc["jobs"]["alert"]["if"]
 
 
-def test_the_check_is_given_the_commit_and_the_pinned_browser():
+def test_the_check_is_given_the_commit_and_needs_no_browser():
     doc = names()["Check deployed app"]
     steps = " ".join(step.get("run", "") for step in doc["jobs"]["check"]["steps"])
     assert "--expect-commit" in steps and "github.sha" in steps
-    pinned = set(re.findall(r"playwright==([\d.]+)", steps))
-    script = Path("scripts/visit_deployed_app.py").read_text(encoding="utf-8")
-    assert pinned == set(re.findall(r"playwright==([\d.]+)", script))
+    # VM에는 Streamlit이 없습니다(ADR-083). 브라우저를 깔면 그만큼 느려지고 실패할 곳만 늘어납니다.
+    assert "playwright" not in steps and "--streamlit" not in steps
     assert "push" in triggers(doc), "머지 직후 옛 모듈을 잡으려면 push에서도 돌아야 합니다"
+
+
+def test_api_health_reads_like_the_screen_stamp():
+    assert api_stamp({"commit": "abc1234", "module_commit": "abc1234"}) == {
+        "found": True, "app": "abc1234", "module": "abc1234"}
+    # 모듈이 커밋을 말하지 않으면 옛 모듈입니다 - 화면 표시의 "이전 코드"와 같습니다.
+    stale = api_stamp({"commit": "abc1234", "module_commit": None})
+    assert verdict("abc1234" + "0" * 33, stale).startswith("검색 모듈이 옛 코드입니다")
+    assert still_deploying("abc1234" + "0" * 33, stale)

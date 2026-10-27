@@ -82,15 +82,24 @@ DB가 먼저입니다.
      찾기(`/api/search`, 전문 색인이라 0원), 이 논문을 인용한 논문(`/api/papers/{id}/citing`), BibTeX.
   2. `web/`에 Next.js 뼈대와 질문 작업대(SSE). 휴대폰 화면은 같은 페이지의 좁은 배치입니다.
      Vercel 프로젝트 `arxiv-graphrag`(루트 `web/`)를 이때 만들었습니다([ADR-082](adr/ADR-082-the-browser-calls-the-vm-api-directly.md)).
-  3. 논문 페이지. 4. 탐색. 5. 품질.
+  3. **논문 페이지** `/papers/[id]`와 찾기·저장 목록 `/papers`. 서버에서 그리고 한 시간 캐시합니다(모델을
+     부르지 않는 길이라 Vercel을 거쳐도 상한과 무관합니다). 저장 목록은 브라우저에만 두고 BibTeX로 받습니다.
+     "이 논문에 대해 묻기"와 저자 이름은 질문 칸을 **채우기만** 합니다 - 보내기는 사람이 누릅니다.
+     시안의 "그래프 안에서 1위"는 응답에 순위가 없어 뺐습니다.
+  4. **탐색** `/explore`: 그래프 안 피인용 수, PageRank(분류 안 인용만도), 한 논문에서 출발한 개인화
+     PageRank. `/api/rank`가 `by`·`skip`을 받습니다. 다음 20편, CSV로 받기.
+  5. **품질** `/quality`: 게이트 지표·하한·여유, 규칙, 분야별, 하네스 밖의 선, 기각한 모델. 시안의
+     "관계 한도"와 "주간 수집"은 뺐습니다 - Aura Free의 한도라 VM에는 없고, 수집은 2단계에서 멈춰 있습니다.
   6. Vercel 프로젝트를 만들고 VM의 `API_ALLOWED_ORIGINS`에 그 주소를 넣습니다. 브라우저가 VM을 직접
      부릅니다 - Vercel이 중간에서 넘기면 VM이 보는 IP가 Vercel 것이라 IP별 상한이 한 덩어리가 됩니다.
 - 시안의 "단계별 걸린 시간" 막대는 지금 응답에 없습니다(앱도 재지 않습니다). 2번에서 전체 시간만 보이고,
   단계별은 따로 정합니다.
 
-## 5. VM의 Streamlit 내리기
+## 5. VM의 Streamlit 내리기 — 2026-10-27
 
-- 새 화면이 지금 화면보다 낫다고 확인한 뒤에 내립니다. 백업 앱(0단계)은 남깁니다.
+- 네 화면 PR과 함께 내리기로 정했습니다([ADR-083](adr/ADR-083-take-streamlit-off-the-vm.md)). 백업 앱(0단계)은 남깁니다.
+- VM에는 Neo4j, API, Caddy만 남습니다. 예전 주소는 Vercel로 넘깁니다. 배포 점검은 `/api/health`를 읽습니다.
+- 머지 순간에는 옛 `deploy.sh`가 돌아서 한 번은 VM에서 직접 `up -d --remove-orphans`와 Caddy 재시작을 합니다(ADR-083).
 
 ## 요금
 
