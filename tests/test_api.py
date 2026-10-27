@@ -32,6 +32,7 @@ class FakeBot:
 
     def __init__(self):
         self.asked = []
+        self.reads = []
         self.mode = "ok"
 
     def ask(self, question, history, on_answer=None):
@@ -61,10 +62,24 @@ class FakeBot:
         return {"index": {"a": 0, "b": 1}}
 
     def fetch_paper_for_saving(self, arxiv_id):
-        return {"arxiv_id": arxiv_id, "title": "T"} if arxiv_id == "a" else None
+        if arxiv_id in ("a", "2401.00001"):
+            return {
+                "arxiv_id": arxiv_id,
+                "title": "T",
+                "authors": ["Ada Lovelace"],
+                "published": "2024-01-02",
+                "primary_category": "cs.AI",
+            }
+        return None
 
     def run_read(self, cypher, params):
+        self.reads.append((cypher, params))
         return [{"cited_by": 5, "references": 0}]
+
+    class resolve_paper:  # noqa: N801
+        @staticmethod
+        def invoke(args):
+            return {"query": args["title"], "candidates": [{"arxiv_id": "a"}]}
 
     class rank_related_papers:  # noqa: N801 - LangChain 도구처럼 .invoke를 가집니다
         @staticmethod
@@ -203,3 +218,33 @@ def test_importing_the_module_does_not_load_the_chatbot():
     assert "src.chatbot" not in sys.modules or api.app is not None
     # 모듈 수준의 app은 백엔드를 들고 있지 않습니다 - 첫 요청에서 불러옵니다.
     assert api.create_app(warm=False) is not None
+
+
+def test_paper_page_carries_a_bibtex_entry():
+    data = client().get("/api/papers/a").json()
+    assert data["bibtex"].startswith("@misc{") and "Lovelace" in data["bibtex"]
+
+
+def test_citing_order_is_chosen_from_a_whitelist():
+    bot = FakeBot()
+    c = client(bot)
+    assert c.get("/api/papers/a/citing?order=cited&limit=500").status_code == 200
+    cypher, params = bot.reads[-1]
+    assert "ORDER BY cited_by DESC" in cypher and params["limit"] == 50
+    assert c.get("/api/papers/a/citing?order=x) DETACH DELETE c //").status_code == 422
+
+
+def test_search_takes_an_arxiv_id_or_a_title():
+    c = client()
+    assert c.get("/api/search?q=2401.00001v2").json()["candidates"][0]["arxiv_id"] == "2401.00001"
+    assert c.get("/api/search?q=react").json()["candidates"] == [{"arxiv_id": "a"}]
+    assert c.get("/api/search?q=x").status_code == 422
+
+
+def test_route_is_judged_without_the_backend():
+    data = (
+        client(limiter=api.Limiter(0, 0, 0))
+        .get("/api/route", params={"q": "Which papers cite 2210.03629?"})
+        .json()
+    )
+    assert data["name"] in ("graph", "any") and isinstance(data["cues"], list)

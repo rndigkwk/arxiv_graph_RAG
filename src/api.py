@@ -20,6 +20,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import threading
 import time
 from collections import defaultdict, deque
@@ -32,13 +33,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from src import family_board, quality_board, release, warmup
+from src import citations, family_board, quality_board, release, routing, warmup
 
 logger = logging.getLogger("arxiv_graph_rag.api")
 
 MAX_QUESTION_CHARS = 2000
 MAX_HISTORY_TURNS = 6
 MAX_TRANSLATE_CHARS = 8000
+
+# 정렬은 사용자 입력을 Cypher에 넣지 않고 이 표에서 고릅니다.
+CITING_ORDER = {"recent": "c.published DESC", "cited": "cited_by DESC, c.published DESC"}
+CITING = """
+MATCH (:ArxivPaper {{arxiv_id: $arxiv_id}})<-[:REFERENCES]-(c:ArxivPaper)
+WITH c, COUNT {{ (c)<-[:REFERENCES]-() }} AS cited_by
+RETURN c.arxiv_id AS arxiv_id, c.title AS title, c.primary_category AS primary_category,
+       toString(c.published) AS published, cited_by
+ORDER BY {order} SKIP $skip LIMIT $limit
+"""
+ARXIV_ID = re.compile(r"^\d{4}\.\d{4,5}(v\d+)?$")
 
 PAPER_COUNTS = """
 MATCH (p:ArxivPaper {arxiv_id: $arxiv_id})
@@ -266,7 +278,38 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
             raise HTTPException(404, "그래프에 없는 논문입니다.")
         counts = bot.run_read(PAPER_COUNTS, {"arxiv_id": arxiv_id})[0]
         related = bot.rank_related_papers.invoke({"arxiv_ids": [arxiv_id], "top_k": 5})
-        return bot.to_jsonable({**row, **counts, "related": related.get("related", [])})
+        return bot.to_jsonable(
+            {**row, **counts, "bibtex": citations.entry(row), "related": related.get("related", [])}
+        )
+
+    @app.get("/api/papers/{arxiv_id}/citing")
+    def citing(
+        arxiv_id: str, order: str = "recent", skip: int = 0, limit: int = 20
+    ) -> dict[str, Any]:
+        if order not in CITING_ORDER:
+            raise HTTPException(422, f"order는 {', '.join(CITING_ORDER)} 중 하나입니다.")
+        rows = chatbot().run_read(
+            CITING.format(order=CITING_ORDER[order]),
+            {"arxiv_id": arxiv_id, "skip": max(0, skip), "limit": max(1, min(limit, 50))},
+        )
+        return chatbot().to_jsonable({"order": order, "papers": rows})
+
+    @app.get("/api/search")
+    def search(q: str) -> dict[str, Any]:
+        """제목이나 arXiv ID로 논문을 찾습니다. 전문 색인이라 모델을 부르지 않습니다(0원)."""
+        q = q.strip()
+        bot = chatbot()
+        if ARXIV_ID.match(q):
+            row = bot.fetch_paper_for_saving(q.split("v")[0])
+            return bot.to_jsonable({"query": q, "candidates": [row] if row else []})
+        if len(q) < 2:
+            raise HTTPException(422, "두 글자 이상 적어 주세요.")
+        return bot.to_jsonable(bot.resolve_paper.invoke({"title": q, "top_k": 10}))
+
+    @app.get("/api/route")
+    def route(q: str) -> dict[str, Any]:
+        """보내기 전 경로 판정. `routing.classify`의 규칙만 씁니다(모델도 그래프도 0원)."""
+        return routing.classify(q).as_dict()
 
     @app.post("/api/subgraph")
     def subgraph(body: SubgraphBody) -> dict[str, Any]:
