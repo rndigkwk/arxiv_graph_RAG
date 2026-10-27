@@ -156,3 +156,4 @@
 | [ADR-082](ADR-082-the-browser-calls-the-vm-api-directly.md) | Next.js 화면은 Vercel에, 브라우저가 VM의 API를 직접 부른다 | 채택 |
 | [ADR-083](ADR-083-take-streamlit-off-the-vm.md) | VM에서 Streamlit을 내린다 — 예전 주소는 Vercel로 보내고, 배포 점검은 API를 읽는다 | 채택 |
 | [ADR-084](ADR-084-answer-p50-under-10s-measure-the-vm-first.md) | 답변 p50을 10초 안으로 — 먼저 VM에서 잰다(13.6초, 남은 몫은 조건 검사 겹치기와 턴 하나) | 채택 |
+| [ADR-085](ADR-085-overlap-the-condition-check-with-the-answer.md) | 조건 검사를 답 쓰기와 겹친다 — 판정은 그대로, 시작 시점만 앞당긴다 | 채택 |
