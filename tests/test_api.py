@@ -262,6 +262,9 @@ def test_quality_reads_the_committed_baseline():
     data = client().get("/api/quality").json()
     assert data["summary"]["cases"] > 0
     assert data["rules"] and data["gates"]
+    # 품질 화면이 하한의 이유와 기각한 모델을 그립니다. 숫자를 여기서 만들지 않고 읽기만 합니다.
+    assert set(data["rationale"]) >= {"answer_evidence_recall", "hit_at_k"}
+    assert data["rejected"][0]["record"].startswith("ADR-")
 
 
 def test_importing_the_module_does_not_load_the_chatbot():

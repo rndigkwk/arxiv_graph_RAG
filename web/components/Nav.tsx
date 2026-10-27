@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// 만든 화면만 올립니다. 품질은 다음 PR에서 더합니다(docs/MIGRATION_PLAN.md 4단계).
+// 시안의 네 화면입니다(docs/MIGRATION_PLAN.md 4단계). 휴대폰은 같은 화면의 좁은 배치입니다.
 const PAGES = [
   { href: "/", label: "질문" },
   { href: "/papers", label: "논문" },
   { href: "/explore", label: "탐색" },
+  { href: "/quality", label: "품질" },
 ];
 
 const current = (path: string, href: string) => (href === "/" ? path === "/" : path.startsWith(href));
