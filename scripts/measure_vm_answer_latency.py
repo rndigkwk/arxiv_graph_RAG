@@ -99,6 +99,7 @@ def ask(api: str, question: str) -> dict[str, Any]:
         "first_partial_seconds": round(first - started, 3) if first else None,
         "graph_trace": data.get("graph_trace") if kind == "final" else None,
         "generate_trace": data.get("generate_trace") if kind == "final" else None,
+        "condition_timing": data.get("condition_timing") if kind == "final" else None,
         "tools": [{"name": c.get("name"), "seconds": c.get("seconds")}
                   for c in data.get("tool_calls", [])] if kind == "final" else [],
         "detail": None if kind == "final" else data,
@@ -161,6 +162,8 @@ def summarize(rows: list[dict[str, Any]], local: dict[str, float]) -> dict[str, 
                                  / (sum(t["generate_seconds"] for t in inside) or 1), 3),
         },
         "tools": {name: {"calls": len(v), "p50": percentile(v, 0.5)} for name, v in tools.items()},
+        "judge": judge_summary(done),
+        "last_turn": last_turn_summary(inside),
         "families_p50": {name: percentile(v, 0.5) for name, v in sorted(families.items())},
         # 같은 문항의 로컬(Aura, 2026-10-26) 합계와 나란히. 짝이 없으면 비교하지 않습니다.
         "vs_local": {
@@ -168,6 +171,32 @@ def summarize(rows: list[dict[str, Any]], local: dict[str, float]) -> dict[str, 
             "local_p50": percentile([a for a, _ in paired], 0.5),
             "vm_p50": percentile([b for _, b in paired], 0.5),
         },
+    }
+
+
+def judge_summary(done: list[dict[str, Any]]) -> dict[str, Any]:
+    """판정 자체 시간과, 답 글 뒤에 숨은 몫 / 기다린 몫(ADR-085의 겹치기가 얼마나 먹혔는가)."""
+    timed = [row["condition_timing"] for row in done
+             if (row.get("condition_timing") or {}).get("judge_seconds") is not None]
+    return {
+        "early": sum(1 for row in done if (row.get("condition_timing") or {}).get("early")),
+        "timed": len(timed),
+        **{f"{key}_p50": percentile([t[key] for t in timed], 0.5)
+           for key in ("judge_seconds", "ahead_seconds", "waited_seconds")},
+    }
+
+
+def last_turn_summary(inside: list[dict[str, Any]]) -> dict[str, Any]:
+    """마지막 모델 턴(답 글을 쓰는 턴)과 그 앞 턴들. 턴 기록이 없는 옛 서버면 비웁니다."""
+    turns = [t["turns"] for t in inside if t.get("turns")]
+    tokens = [each[-1]["output_tokens"] for each in turns
+              if each[-1].get("output_tokens") is not None]
+    return {
+        "traced": len(turns),
+        "last_seconds_p50": percentile([each[-1]["seconds"] for each in turns], 0.5),
+        "earlier_seconds_p50": percentile(
+            [turn["seconds"] for each in turns for turn in each[:-1]], 0.5),
+        "last_output_tokens_p50": percentile(tokens, 0.5),
     }
 
 

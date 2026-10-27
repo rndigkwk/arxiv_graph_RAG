@@ -685,10 +685,16 @@ def ask(question, history, on_answer=None):
         queries = early_judge.graph_queries(response["tool_calls"])
         ahead = early.take(response["evidence_ids"], queries)
         if ahead is None or user_question != question:
+            response["condition_timing"] = {"early": False}
             return assess_and_validate(
                 user_question, response, fetch_cited,
                 lambda asked, papers: judge(asked, papers, queries),
             )
+        check_started = time.perf_counter()
+        # 기다리기만 합니다. 조회 예외는 아래 검사 흐름의 그 자리에서 다시 올라옵니다.
+        ahead.exception()
+        response["condition_timing"] = early_judge.timing(
+            ahead, check_started, time.perf_counter() - check_started)
         return assess_and_validate(
             user_question, response,
             lambda ids: ahead.result()[0],
