@@ -3,7 +3,6 @@
 import type { RankBy, RankQuery, RankedPaper } from "./api";
 
 export const PAGE = 20;
-export const ARXIV_ID = /^\d{4}\.\d{4,5}(v\d+)?$/;
 
 export const BY_LABEL: Record<RankBy, string> = {
   cited: "그래프 안 피인용 수",

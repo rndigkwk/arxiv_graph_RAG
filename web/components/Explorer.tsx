@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ApiError, type RankBy, type RankedPaper, type Stats, getRanking, getStats } from "@/lib/api";
 import { BY_LABEL, PAGE, barShare, formatValue, rankQuery, rankingCsv, valueOf } from "@/lib/explore";
-import { ARXIV_ID } from "@/lib/explore";
+import { ARXIV_ID } from "@/lib/paper";
 
 const CATEGORIES = 6;
 const column = { border: 0, margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 6 } as const;

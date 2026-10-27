@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Explorer } from "@/components/Explorer";
-import { ARXIV_ID } from "@/lib/explore";
+import { ARXIV_ID } from "@/lib/paper";
 
 export const metadata: Metadata = { title: "탐색 · arXiv GraphRAG" };
 
