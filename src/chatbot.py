@@ -40,6 +40,7 @@ from src import (
     early_judge,
     pagerank,
     prompts,
+    related_by_app,
     release,
     source_check,
     title_search,
@@ -651,6 +652,21 @@ def ask(question, history, on_answer=None):
     # 답 글을 쓰는 동안 판정을 돌립니다(ADR-085). 입력이 같을 때만 그 결과를 씁니다.
     early = early_judge.EarlyJudge(judge_early)
 
+    def rank_related(seed_ids, _):
+        started = time.perf_counter()
+        try:
+            output = rank_related_papers.invoke({"arxiv_ids": seed_ids})
+        except Exception as exc:  # noqa: BLE001 - 관련 논문 표가 비어도 답은 나갑니다.
+            output = exc
+        return output, time.perf_counter() - started
+
+    # 관련 논문은 모델 도구가 아니라 앱이 부릅니다(ADR-086). 판정과 같은 때 시작합니다.
+    early_related = early_judge.EarlyJudge(rank_related)
+
+    def offer_early(ids, calls):
+        early.offer(ids, early_judge.graph_queries(calls))
+        early_related.offer(related_by_app.seeds(calls, ids), ())
+
     def check_conditions(user_question, response):
         queries = early_judge.graph_queries(response["tool_calls"])
         ahead = early.take(response["evidence_ids"], queries)
@@ -668,7 +684,7 @@ def ask(question, history, on_answer=None):
     deps = agent_graph.Dependencies(
         stream_answer=lambda messages, attempt: stream_agent_answer(
             messages, on_answer, [inside_generate],
-            on_evidence=lambda ids, calls: early.offer(ids, early_judge.graph_queries(calls)),
+            on_evidence=offer_early,
         ),
         collect=collect_response,
         check_format=validate_answer,
@@ -718,6 +734,13 @@ def ask(question, history, on_answer=None):
             attempts=state["trace"][-1]["attempt"],
             cyphers=response.get("cyphers", []),
         ) from state["failure"]
+    # 통과한 답의 근거로 시드를 고릅니다. 앞당긴 것과 시드가 같으면 그 결과를 씁니다.
+    if seed_ids := related_by_app.seeds(response["tool_calls"], response["evidence_ids"]):
+        ahead = early_related.take(seed_ids, ())
+        output, seconds = ahead.result() if ahead else rank_related(seed_ids, ())
+        record = related_by_app.call_record(seed_ids, output, seconds)
+        response["tool_calls"].append(record)
+        response["related"] = record["output"].get("related", [])
     # 공급자가 사용량을 주지 않았거나 판정을 건너뛰었으면 None으로 남깁니다.
     response["validation_usage"] = validation_usage or None
     return response, state["result"]["messages"]
@@ -1325,8 +1348,8 @@ try:
     )[0]
     agent = create_agent(
         model=llm,
-        tools=[translate_to_english, resolve_paper, search_graph, search_papers,
-               rank_related_papers],
+        # `rank_related_papers`는 없습니다. 앱이 답 뒤에 부릅니다(ADR-086, `related_by_app`).
+        tools=[translate_to_english, resolve_paper, search_graph, search_papers],
         system_prompt=agent_system,
         # structured_response는 answer와 evidence_ids가 있는 GroundedAnswer 객체입니다.
         response_format=ProviderStrategy(GroundedAnswer, strict=True),

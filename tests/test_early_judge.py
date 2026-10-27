@@ -131,7 +131,8 @@ def test_the_answer_schema_puts_the_evidence_first():
 
 
 def test_the_app_offers_and_takes_the_early_judgement():
-    assert "on_evidence=lambda ids, calls: early.offer(" in SOURCE
+    assert "on_evidence=offer_early," in SOURCE
+    assert "early.offer(ids, early_judge.graph_queries(calls))" in SOURCE
     assert "early.take(response[\"evidence_ids\"], queries)" in SOURCE
     # 앞당긴 쪽과 최종 응답이 같은 함수로 도구 기록을 읽어야 열쇠가 맞습니다.
     assert "calls = tool_calls_of(result[\"messages\"])" in SOURCE
