@@ -53,7 +53,7 @@ export function EvidenceGraph({ subgraph, evidence }: { subgraph: Subgraph; evid
         {[...pos].map(([id, p]) => {
           const isEvidence = left.includes(id);
           return (
-            <a key={id} href={`https://arxiv.org/abs/${id}`}>
+            <a key={id} href={`/papers/${id}`}>
               <title>{title.get(id) ?? id}</title>
               <rect
                 x={p.x}
