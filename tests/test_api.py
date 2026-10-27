@@ -54,7 +54,7 @@ class FakeBot:
         return "번역: " + text
 
     def graph_counts(self):
-        return {"papers": 3}
+        return {"papers": 3, "authors": 2, "authored": 4, "references": 5}
 
     def top_categories(self, limit):
         return [{"code": "cs.AI", "papers": 3}]
@@ -153,6 +153,9 @@ def test_abstention_is_its_own_event():
     bot.mode = "abstain"
     kind, data = events(client(bot).post("/api/ask", json={"question": "q"}).text)[-1]
     assert kind == "abstain" and data["stage"] == "conditions"
+    # 화면은 사유 코드를 해석하지 않습니다. Streamlit과 같은 문장을 API가 붙여 보냅니다.
+    assert data["explained"]["attempts"] == 2
+    assert data["explained"]["headline"].startswith("근거를 확인하지 못해")
 
 
 def test_unexpected_errors_do_not_leak_their_message():
@@ -265,6 +268,33 @@ def test_quality_reads_the_committed_baseline():
     # 품질 화면이 하한의 이유와 기각한 모델을 그립니다. 숫자를 여기서 만들지 않고 읽기만 합니다.
     assert set(data["rationale"]) >= {"answer_evidence_recall", "hit_at_k"}
     assert data["rejected"][0]["record"].startswith("ADR-")
+
+
+def test_quality_carries_the_tables_only_streamlit_had():
+    data = client().get("/api/quality").json()
+    # 결함을 심어 하한이 걸리는지 본 표, 점수를 낸 프롬프트 지문, 관련 논문 변형 비교.
+    assert all("defect_trips_it" in row for row in data["basis"]) and data["basis"]
+    assert {row["prompt"] for row in data["prompts"]} >= {"AGENT_SYSTEM"}
+    future = data["future"]
+    assert sum(row["deployed"] for row in future["variants"]) == 1
+    assert future["degrees"] and set(future["degree_variants"]) <= set(future["degrees"][0])
+
+
+def test_overview_counts_now_and_reads_the_community_report():
+    data = client().get("/api/overview").json()
+    assert data["counts"]["authored"] == 4
+    rows, links = data["communities"]["rows"], data["communities"]["links"]
+    assert [row["label"] for row in rows] == ["C1", "C2", "C3", "C4", "C5"]
+    # 선은 방향 없이 두 커뮤니티 사이의 인용을 합친 것이고, 자기 안의 인용은 선이 아닙니다.
+    assert all(link["a"] != link["b"] and link["citations"] > 0 for link in links)
+    labels = {row["label"] for row in rows}
+    assert all({link["a"], link["b"]} <= labels for link in links)
+
+
+def test_overview_without_the_report_still_counts(monkeypatch, tmp_path):
+    monkeypatch.setattr(api, "COMMUNITY_REPORT", tmp_path / "missing.json")
+    data = client().get("/api/overview").json()
+    assert data["communities"] is None and data["counts"]["papers"] == 3
 
 
 def test_importing_the_module_does_not_load_the_chatbot():

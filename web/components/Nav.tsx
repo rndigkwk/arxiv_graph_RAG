@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// 시안의 네 화면입니다(docs/MIGRATION_PLAN.md 4단계). 휴대폰은 같은 화면의 좁은 배치입니다.
+// 시안의 네 화면과, Streamlit 홈 탭을 옮긴 그래프 소개입니다(docs/MIGRATION_PLAN.md 4·5단계). 휴대폰은 같은 화면의 좁은 배치입니다.
 const PAGES = [
   { href: "/", label: "질문" },
   { href: "/papers", label: "논문" },
   { href: "/explore", label: "탐색" },
   { href: "/quality", label: "품질" },
+  { href: "/graph", label: "그래프" },
 ];
 
 const current = (path: string, href: string) => (href === "/" ? path === "/" : path.startsWith(href));
