@@ -3,8 +3,9 @@
 arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색·벡터 검색·PageRank를 결합한 GraphRAG 프로젝트입니다.
 
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Neo4j](https://img.shields.io/badge/Neo4j-Aura-008CC1?logo=neo4j&logoColor=white)](https://neo4j.com/cloud/aura/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![Neo4j](https://img.shields.io/badge/Neo4j-5-008CC1?logo=neo4j&logoColor=white)](https://neo4j.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-Vercel-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-GCP_VM-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 
 🌐 **Live demo:** [arXiv GraphRAG](https://arxiv-graphrag.vercel.app/) (Next.js, API는 GCP VM) · [Streamlit 백업 판](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/) (2026-10-27 그래프로 고정)
 
@@ -12,7 +13,7 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 
 | 보고 싶은 것 | 어디로 |
 |---|---|
-| **지금 무엇을 쓰고 무엇을 왜 안 쓰는가** | [`docs/MODELS.md`](docs/MODELS.md) — 배포된 모델, 등록만 한 모델, 재서 기각한 아홉 |
+| **지금 무엇을 쓰고 무엇을 왜 안 쓰는가** | [`docs/MODELS.md`](docs/MODELS.md) — 앱이 쓰는 모델, 재서 기각한 아홉 |
 | **결정과 그 근거 수치** | [결정 기록](docs/adr/README.md) — 채택·기각·보류, 뒤집힌 것은 지우지 않고 표시 |
 | **측정이 기록으로 남는 모양** | 배포된 앱의 **[품질 화면](https://arxiv-graphrag.vercel.app/quality)** — 게이트 일곱 규칙, 지표별 하한·여유·변동폭, 기각한 모델 |
 | **어떻게 알았는가** | [`EXPERIMENTS.md`](EXPERIMENTS.md) — 질문 / 방법 / 결과 / 결론 |
@@ -174,14 +175,14 @@ RAGAS 쪽이었습니다 — 지표마다 `None`을 적고 계속 가므로 게�
 | 장치 | 무엇을 하는가 |
 |---|---|
 | [결정 기록](docs/adr/) | 결정마다 측정값과 그 측정을 만든 스크립트 경로. **뒤집힌 결정을 지우지 않고** 상태를 바꿉니다 |
-| [`docs/MODELS.md`](docs/MODELS.md) | **쓰는 모델과 쓰지 않는 모델.** 배포된 둘, 등록했지만 앱에 없는 하나, 재서 기각한 아홉을 같은 표에 둡니다 |
+| [`docs/MODELS.md`](docs/MODELS.md) | **쓰는 모델과 쓰지 않는 모델.** 앱이 쓰는 것과 재서 기각한 아홉을 같은 표에 둡니다 |
 | [`EXPERIMENTS.md`](EXPERIMENTS.md) | 측정 51건. "어떻게 알았는가"가 서술로 남습니다 |
-| 앱의 **`품질 게이트` 탭** | 게이트 일곱 규칙, 지표별 하한·여유·변동폭, 기각한 모델을 **한 화면에**. 새로 재지 않고 기준선과 커밋된 보고서를 읽어 모양만 바꿉니다 |
+| 앱의 **[품질 화면](https://arxiv-graphrag.vercel.app/quality)** | 게이트 일곱 규칙, 지표별 하한·여유·변동폭, 기각한 모델을 **한 화면에**. 새로 재지 않고 기준선과 커밋된 보고서를 읽어 모양만 바꿉니다 |
 | `scripts/check_doc_numbers.py` | 문서의 숫자를 **출처 보고서에 묶어** CI가 신선도를 검사합니다(묶인 수치 100여 개 — 정확한 수는 검사기 출력에 있습니다) |
 | `scripts/check_doc_links.py` | 문서 간 링크와 앵커를 검사합니다. 대상 문서 수는 검사기 출력에 있습니다 |
 | `evals/ledger.py` | 평가 실행마다 **사례별 지표 한 줄**을 남깁니다. 보고서는 CI에서 버려지는데 그 값이 변동 질문의 유일한 데이터입니다(ADR-055) |
 | `scripts/check_adr_rules.py` | ADR 색인이 **선언한 규칙**을 ADR 파일에서 검사합니다 — 민감도 절과 상태 어휘. 없는 19개는 **명시적인 빚**이고 그 목록은 줄기만 합니다 |
-| 테스트 650여 개 | 게이트 규칙·라우팅·보류·제목 해석·승격 판정·내보내기를 **접속 없이** 검증합니다 |
+| 테스트 1,300여 개 | 게이트 규칙·라우팅·보류·제목 해석·승격 판정·내보내기를 **접속 없이** 검증합니다 |
 
 측정에 쓰는 통계도 손으로 고른 숫자가 아닙니다 — 변형 비교는 **쌍체 부트스트랩**으로 구간을
 내고, 구간이 0을 포함하면 "측정되지 않았다"로 적습니다. 그 규율 때문에 기각된 것이 여럿입니다
@@ -189,9 +190,15 @@ RAGAS 쪽이었습니다 — 지표마다 `None`을 적고 계속 가므로 게�
 
 ## Overview
 
-수집 스냅샷(2026-06-15~2026-09-14)의 arXiv Computer Science AI 논문과 해당 논문이 인용한 1-hop 참고문헌을 Neo4j Aura에 적재했습니다. Streamlit 앱은 질문에 따라 한국어→영어 번역, Text2Cypher 관계 조회, 제목·초록 벡터 검색, 개인화 PageRank를 조합해 답변과 근거를 제공합니다.
+수집 스냅샷(2026-06-15~2026-09-14)의 arXiv Computer Science AI 논문과 해당 논문이 인용한 1-hop 참고문헌을 Neo4j에 적재했습니다. 앱은 질문에 따라 한국어→영어 번역, Text2Cypher 관계 조회, 제목·초록 벡터 검색, 개인화 PageRank를 조합해 답변과 근거를 제공합니다.
 
-> Streamlit 앱의 탭·도구별 상세 기능과 PageRank 계산 방식은 [`APP_README.md`](APP_README.md)를 참고하세요.
+**지금 배포된 모양**(2026-10-27부터, [이전 계획](docs/MIGRATION_PLAN.md)): 화면은 Vercel의 Next.js(`web/`)이고,
+브라우저가 GCP VM의 FastAPI(`src/api.py`)를 부릅니다. VM 한 대에 Neo4j·API·Caddy(HTTPS)가 컨테이너로 돌고
+([`deploy/vm/compose.yml`](deploy/vm/compose.yml), [ADR-079](docs/adr/ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md)),
+Streamlit은 VM에서 내렸습니다([ADR-083](docs/adr/ADR-083-take-streamlit-off-the-vm.md)).
+[Streamlit 백업 판](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)은 Aura Free의 2026-10-27 그래프에 고정돼 있습니다.
+
+> Streamlit 판의 탭·도구별 상세 기능과 PageRank 계산 방식은 [`APP_README.md`](APP_README.md)를 참고하세요.
 
 ### 핵심 기능
 
@@ -206,7 +213,8 @@ RAGAS 쪽이었습니다 — 지표마다 `None`을 적고 계속 가므로 게�
   재정렬합니다(가중치가 없으면 패널만 숨고 앱은 돕니다)
 - PageRank 순위, 커뮤니티, 스키마 메타그래프 시각화
 - 답변에 사용된 arXiv ID·Cypher·도구 호출 순서 확인, 그리고 답하지 못했을 때의 **보류 설명**
-- **`품질 게이트` 탭** — 게이트 규칙과 지표별 하한·여유·변동폭, 기각한 모델 일곱
+- **품질 화면(`/quality`)** — 게이트 규칙과 지표별 하한·여유·변동폭, 기각한 모델
+- 답변 단계별 소요 시간 표시 — 목표는 VM에서 p50 10초입니다([ADR-084](docs/adr/ADR-084-answer-p50-under-10s-measure-the-vm-first.md)부터 087까지)
 
 ## Architecture
 
@@ -214,14 +222,17 @@ RAGAS 쪽이었습니다 — 지표마다 `None`을 적고 계속 가므로 게�
 
 ```text
 arXiv OAI-PMH ──┐
-                 ├─> JSONL 정규화 ──> Neo4j Aura 지식 그래프
+                 ├─> JSONL 정규화 ──> Neo4j 지식 그래프 (GCP VM 컨테이너)
 Semantic Scholar ┘                         │
                                            ├─> 768D 임베딩·벡터 인덱스
                                            ├─> Text2Cypher 관계 질의
-                                           └─> Streamlit GraphRAG 앱
+                                           └─> FastAPI (VM, Caddy HTTPS)
+                                                     │
+                                                     └─> Next.js 화면 (Vercel)
 ```
 
-처리 흐름은 `논문 수집 → 인용·참고문헌 수집 → 메타데이터 결합 → Aura 적재 → 임베딩·검색 → 품질 검증` 순서입니다.
+처리 흐름은 `논문 수집 → 인용·참고문헌 수집 → 메타데이터 결합 → 그래프 적재 → 임베딩·검색 → 품질 검증` 순서입니다.
+위 그림(`data/architecture.svg`)은 Aura·Streamlit 시절의 것입니다. 적재·검색 흐름은 같고 배포 자리만 바뀌었습니다.
 
 ## Quick start
 
@@ -229,23 +240,33 @@ Semantic Scholar ┘                         │
 
 - Python 3.12+
 - `uv`
-- Neo4j Aura 접속 정보
+- Node.js (화면 `web/`, CI는 24)
+- Neo4j 접속 정보 (VM 컨테이너, 로컬 Neo4j, 또는 Aura)
 - OpenAI API 키
 
 ### Run
 
-`.env.example`을 `.env`로 복사한 뒤 Neo4j Aura와 OpenAI 접속 정보를 채웁니다. 앱은 실행 시 Aura와 벡터 인덱스에 연결합니다. 개발 테스트는 DB/API 연결 없이 실행할 수 있습니다. 노트북 의존성은 `uv sync --locked --extra notebooks --extra gds`로 설치합니다. Aura Graph Analytics를 사용하지 않는다면 기본 앱 설치만으로 충분합니다.
+`.env.example`을 `.env`로 복사한 뒤 Neo4j와 OpenAI 접속 정보를 채웁니다. **테스트는 DB/API 연결 없이** 돕니다. 노트북 의존성은 `uv sync --locked --extra notebooks --extra gds`로 설치합니다.
 
 ```bash
 uv sync --locked --group dev
-uv run streamlit run app.py
+uv run --locked python -m pytest
 ```
 
-앱은 `홈`, `챗봇`, `PageRank 순위`, `품질 게이트` 네 탭을 제공합니다. 앱의 상세 설정과 오류 대응은 [`APP_README.md`](APP_README.md)에 정리했습니다.
+API와 화면을 따로 띄웁니다. 화면은 `NEXT_PUBLIC_API_BASE`가 가리키는 API를 부르고, API는 `API_ALLOWED_ORIGINS`에 적힌 출처만 받습니다.
 
-배포된 앱은 [Streamlit 데모 주소](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)에서 바로 확인할 수 있습니다.
+```bash
+uv run --extra api uvicorn src.api:app --port 8000
+```
 
-Streamlit Community Cloud 앱은 한동안 사용하지 않으면 잠들 수 있습니다. `Zzzz` 안내가 보이면 **Yes, get this app back up!**을 누르고 시작될 때까지 기다리세요. 2026-09-27 확인 시 앱이 깨어난 뒤 Aura에 연결되어 홈 화면과 그래프 지표를 표시했습니다.
+```bash
+cd web && npm ci && NEXT_PUBLIC_API_BASE=http://localhost:8000 npm run dev
+```
+
+VM 배포는 [`docs/GCP_VM.md`](docs/GCP_VM.md)에 있습니다. main에 머지되면 VM의 타이머가 2분 안에 받아 다시 띄웁니다.
+
+Streamlit 판(`app.py`)도 그대로 돕니다(`uv run streamlit run app.py`). 상세 설정과 오류 대응은 [`APP_README.md`](APP_README.md)에 있습니다.
+[백업 판](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)은 Streamlit Community Cloud라 한동안 안 쓰면 잠듭니다. `Zzzz` 안내가 보이면 **Yes, get this app back up!**을 누르세요.
 
 ## Data
 
@@ -349,7 +370,10 @@ Leiden 분석에서는 방향성이 있는 `REFERENCES` 관계를 커뮤니티 �
 
 ![커뮤니티 간 인용 메타그래프](reports/aura_community_metagraph.png)
 
-## Streamlit demo
+## Streamlit 판 화면
+
+아래 화면은 Streamlit 판(백업)입니다. 지금 배포된 Next.js 화면은 같은 기능을 `/`(질문), `/explore`(개인화 PageRank),
+`/graph`(스키마·현황), `/papers/{id}`(논문), `/quality`(품질)로 나눠 둡니다.
 
 ### Home — 그래프 현황과 스키마
 
@@ -436,9 +460,12 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 
 ```text
 .
-├── app.py                         # Streamlit 진입점 (네 탭). 루트에 남깁니다 - 배포가 이 경로를 가리킵니다
+├── web/                           # 배포된 화면 (Next.js, Vercel)
+├── deploy/vm/                     # VM의 Neo4j·API·Caddy compose와 배포 스크립트
+├── app.py                         # Streamlit 판 진입점 (백업 판이 이 경로를 가리킵니다)
 ├── src/                           # 앱이 쓰는 모듈 18개
-│   ├── chatbot.py                 # 검색 도구 5개·에이전트·개인화 PageRank
+│   ├── api.py                     # 화면이 부르는 FastAPI (유료 호출 한도 포함)
+│   ├── chatbot.py                 # 검색 도구·에이전트·개인화 PageRank
 │   ├── agent_graph.py             # 답변 흐름 StateGraph (노드별 소요 시간 추적)
 │   ├── routing.py                 # 질문 유형으로 경로를 정하는 규칙
 │   ├── abstain.py                 # 답하지 못한 이유를 사유 코드로 설명
@@ -466,7 +493,7 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 
 ## Limitations and retrospective
 
-- Neo4j Aura Free의 노드·관계 한도 때문에 `Category` 라벨과 `IN_CATEGORY` 관계를 만들지 못하고 분류를 논문 속성으로 저장했습니다.
+- Neo4j Aura Free의 노드·관계 한도 때문에 `Category` 라벨과 `IN_CATEGORY` 관계를 만들지 못하고 분류를 논문 속성으로 저장했습니다. VM으로 옮긴 뒤에는 그 한도가 없지만 스키마는 아직 그대로입니다.
 - 시간 제약으로 AI 외 다른 분야의 논문까지 수집하지 못했습니다.
 - AI 관련 논문이 인용한 1-hop 논문만 수집해 더 깊은 인용망은 포함하지 못했습니다.
 - 컴퓨터 용량 제약으로 PDF를 청킹·임베딩하지 못하고 제목과 abstract만 사용했습니다.
@@ -502,7 +529,7 @@ uv run python -m pipeline.features
 # Aura에 남은 자리와 지울 후보 — 수확과 "깨뜨리는 것"을 함께 셉니다 (DB에 붙지 않습니다)
 uv run python -m pipeline.capacity
 
-# 증분 수집 시험 실행 — --load 없이는 Aura에 쓰지 않습니다
+# 증분 수집 시험 실행 — --load 없이는 그래프에 쓰지 않습니다
 uv run python -m pipeline.ingest --days 7
 
 # 성공한 창을 다시 받게 워터마크만 되감습니다. 지우지는 못합니다 (ADR-074)
