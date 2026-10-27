@@ -30,6 +30,27 @@ export type SubgraphPaper = {
 export type Subgraph = { papers: SubgraphPaper[]; references: { citing: string; cited: string }[] };
 export type Turn = { question: string; answer: string };
 
+export type RankBy = "cited" | "pagerank" | "personalized";
+export type RankQuery = {
+  by: RankBy;
+  category?: string;
+  includeSecondary: boolean;
+  scope: "global" | "subgraph";
+  seed?: string;
+  skip: number;
+};
+export type RankedPaper = {
+  rank: number;
+  score: number;
+  arxiv_id: string;
+  title: string;
+  primary_category: string;
+  published: string | null;
+  cited_by: number;
+};
+export type Ranking = { by: RankBy; category: string | null; scope: string; total: number; skip: number; papers: RankedPaper[] };
+export type Stats = { counts: { papers: number; references: number }; top_categories: { code: string; papers: number }[] };
+
 export type AskEvent =
   | { kind: "partial"; answer: string }
   | { kind: "final"; answer: Answer }
@@ -65,6 +86,8 @@ const post = (body: unknown): RequestInit => ({
 export const getRoute = (q: string, signal?: AbortSignal) =>
   json<Route>(`/api/route?q=${encodeURIComponent(q)}`, { signal });
 export const getSubgraph = (ids: string[]) => json<Subgraph>("/api/subgraph", post({ arxiv_ids: ids }));
+export const getStats = () => json<Stats>("/api/stats");
+export const getRanking = (query: string) => json<Ranking>(`/api/rank?${query}`);
 export const translate = (text: string) => json<{ text: string }>("/api/translate", post({ text }));
 
 export async function* ask(question: string, history: Turn[], signal?: AbortSignal): AsyncGenerator<AskEvent> {
