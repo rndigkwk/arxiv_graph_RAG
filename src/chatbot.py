@@ -9,6 +9,7 @@
 """
 import ast
 import atexit
+import datetime as dt
 import json
 import logging
 import os
@@ -273,28 +274,57 @@ def search_graph(cypher: str) -> dict:
         return {"cypher": cypher, "rows": [], "error": str(exc)}
 
 
+def published_date(value):
+    """발표일을 `YYYY-MM-DD` 문자열로 둡니다. 없는 논문이 있습니다(약 2%)."""
+    return str(value)[:10] if value is not None else None
+
+
 def to_item(record):
-    """검색한 논문 본문과 인용에 필요한 출처·유사도를 반환합니다."""
+    """검색한 논문 본문과 인용에 필요한 출처·유사도를 반환합니다.
+
+    발표일을 함께 돌려줍니다(ADR-090). 없으면 "최근" 질문에서 모델이 날짜를 보려고
+    `search_graph`를 거듭 부릅니다.
+    """
     node = record["node"]
     return RetrieverResultItem(
         content=node["abstract"],
         metadata={"arxiv_id": node["arxiv_id"], "title": node["title"],
                   "primary_category": node["primary_category"], "categories": node["categories"],
+                  "published": published_date(node.get("published")),
                   "pdf_url": node["pdf_url"], "score": record["score"]},
     )
 
 
+def published_since(months, now=None):
+    """`months`개월 전 시각입니다. 0 이하면 None(날짜로 거르지 않음)입니다.
+
+    달은 30일로 셉니다. 12개월이면 360일이라 지시문의 Cypher(`duration("P12M")`)보다 며칠
+    짧습니다 - 여기서 찾은 논문은 그 조회를 모두 통과합니다.
+    """
+    months = int(months or 0)
+    if months <= 0:
+        return None
+    now = now or dt.datetime.now(dt.UTC)
+    return now - dt.timedelta(days=30 * min(months, 120))
+
+
 @tool
-def search_papers(query: str, top_k: int = 5) -> dict:
+def search_papers(query: str, top_k: int = 5, published_within_months: int = 0) -> dict:
     """영어 질의문과 의미가 가까운 논문을 제목+초록 임베딩으로 찾습니다.
 
     "어떤 논문이 있나", "무엇을 다루는 연구인가"처럼 주제·내용으로 찾을 때 사용합니다.
     query는 반드시 영어여야 합니다. 한국어 질문에는 앱이 붙인 영어 번역이 따라옵니다.
     저자·인용 수·분류별 집계처럼 저장된 관계를 세는 질문은 search_graph를 쓰세요.
+    결과마다 발표일(published, YYYY-MM-DD)이 있습니다.
     top_k는 1~10이며 기본값은 5입니다.
+    published_within_months를 주면 최근 그 개월 안에 발표된 논문 중에서만 찾습니다.
     """
     top_k = max(1, min(int(top_k), 10))
-    result = vector_retriever.search(query_text=query, top_k=top_k)
+    # 날짜는 검색 **안에서** 거릅니다(ADR-090). 가까운 10편을 받은 뒤 거르면 오래된 대표 논문이
+    # 자리를 차지해 0편이 남습니다 - "최근 RLHF 논문"이 그렇게 비었습니다.
+    since = published_since(published_within_months)
+    filters = {"published": {"$gte": since}} if since else None
+    result = vector_retriever.search(query_text=query, top_k=top_k, filters=filters)
     return {"query": query,
             "papers": [{**item.metadata, "abstract": item.content} for item in result.items]}
 
@@ -1390,7 +1420,7 @@ try:
     vector_retriever = VectorRetriever(
         driver, VECTOR_INDEX, embedder=embedder,
         return_properties=["arxiv_id", "title", "abstract", "primary_category",
-                           "categories", "pdf_url"],
+                           "categories", "published", "pdf_url"],
         result_formatter=to_item, neo4j_database=neo4j_database,
     )
     paper_count = run_read("RETURN COUNT { (:ArxivPaper) } AS n")[0]["n"]
