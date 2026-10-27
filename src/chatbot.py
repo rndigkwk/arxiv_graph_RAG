@@ -39,6 +39,7 @@ from src import (
     agent_graph,
     early_judge,
     pagerank,
+    pre_resolve,
     pre_translate,
     prompts,
     related_by_app,
@@ -664,9 +665,13 @@ def ask(question, history, on_answer=None):
     # 관련 논문은 모델 도구가 아니라 앱이 부릅니다(ADR-086). 판정과 같은 때 시작합니다.
     early_related = early_judge.EarlyJudge(rank_related)
 
+    # 앱이 먼저 찾은 논문의 기록입니다. 모델의 메시지에는 없으므로, 관련 논문 시드를 앞당겨
+    # 고를 때 함께 넘겨야 최종 응답의 시드(`collect`가 기록을 앞에 둔 뒤)와 같아집니다.
+    resolved_first = []
+
     def offer_early(ids, calls):
         early.offer(ids, early_judge.graph_queries(calls))
-        early_related.offer(related_by_app.seeds(calls, ids), ())
+        early_related.offer(related_by_app.seeds([*resolved_first, *calls], ids), ())
 
     def translate_first(asked):
         """영어가 아닌 글자가 있을 때만 에이전트 전에 번역합니다(ADR-087)."""
@@ -680,6 +685,19 @@ def ask(question, history, on_answer=None):
         record = pre_translate.call_record(asked, output, time.perf_counter() - started)
         return {"record": record,
                 "hint": pre_translate.hint(output) if record["status"] == "success" else None}
+
+    def resolve_first(asked):
+        """질문이 지칭한 논문을 에이전트 전에 찾습니다. 확실할 때만 힌트를 붙입니다(ADR-088)."""
+        started = time.perf_counter()
+        try:
+            output = resolve_paper.invoke({"title": asked})
+        except Exception:  # noqa: BLE001 - 못 찾으면 모델이 지금처럼 찾습니다.
+            return None
+        if not pre_resolve.usable(output):
+            return None
+        record = pre_resolve.call_record(asked, output, time.perf_counter() - started)
+        resolved_first.append(record)
+        return {"record": record, "hint": pre_resolve.hint(output)}
 
     def check_conditions(user_question, response):
         queries = early_judge.graph_queries(response["tool_calls"])
@@ -713,6 +731,7 @@ def ask(question, history, on_answer=None):
             validation_request_id, attempt, stage, exc
         ),
         translate=translate_first,
+        resolve=resolve_first,
     )
     state = agent_graph.build_graph(deps).invoke({
         "question": question,
