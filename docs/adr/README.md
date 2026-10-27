@@ -158,3 +158,4 @@
 | [ADR-084](ADR-084-answer-p50-under-10s-measure-the-vm-first.md) | 답변 p50을 10초 안으로 — 먼저 VM에서 잰다(13.6초, 남은 몫은 조건 검사 겹치기와 턴 하나) | 채택 |
 | [ADR-085](ADR-085-overlap-the-condition-check-with-the-answer.md) | 조건 검사를 답 쓰기와 겹친다 — 판정은 그대로, 시작 시점만 앞당긴다 | 채택 |
 | [ADR-086](ADR-086-the-app-ranks-related-papers-not-the-model.md) | 관련 논문은 앱이 부른다 — 모델이 읽지 않는 결과에 턴을 쓰지 않는다 | 채택 |
+| [ADR-087](ADR-087-translate-before-the-agent.md) | 번역은 에이전트 전에 앱이 한다 — 영어 질문에 번역 턴을 쓰지 않는다 | 채택 |
