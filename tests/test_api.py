@@ -248,3 +248,22 @@ def test_route_is_judged_without_the_backend():
         .json()
     )
     assert data["name"] in ("graph", "any") and isinstance(data["cues"], list)
+
+
+def test_cors_takes_a_list_and_a_preview_pattern(monkeypatch):
+    monkeypatch.setenv("API_ALLOWED_ORIGINS", "http://localhost:3000")
+    monkeypatch.setenv(
+        "API_ALLOWED_ORIGIN_REGEX", r"https://arxiv-graphrag(-[a-z0-9-]+)?\.vercel\.app"
+    )
+    c = client()
+
+    def allowed(origin):
+        headers = {"origin": origin, "access-control-request-method": "POST"}
+        return c.options("/api/ask", headers=headers).headers.get("access-control-allow-origin")
+
+    assert allowed("http://localhost:3000") == "http://localhost:3000"
+    preview = "https://arxiv-graphrag-git-web-ask-screen-rndigkwks-projects.vercel.app"
+    assert allowed(preview) == preview
+    assert allowed("https://evil.example") is None
+    got = c.get("/api/stats", headers={"origin": preview}).headers
+    assert got["access-control-allow-origin"] == preview

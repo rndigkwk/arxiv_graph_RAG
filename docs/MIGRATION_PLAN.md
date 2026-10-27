@@ -81,6 +81,7 @@ DB가 먼저입니다.
   1. **API 채우기.** 시안에 있는데 API에 없던 것: 보내기 전 경로 판정(`/api/route`, 0원), 제목·ID로
      찾기(`/api/search`, 전문 색인이라 0원), 이 논문을 인용한 논문(`/api/papers/{id}/citing`), BibTeX.
   2. `web/`에 Next.js 뼈대와 질문 작업대(SSE). 휴대폰 화면은 같은 페이지의 좁은 배치입니다.
+     Vercel 프로젝트 `arxiv-graphrag`(루트 `web/`)를 이때 만들었습니다([ADR-082](adr/ADR-082-the-browser-calls-the-vm-api-directly.md)).
   3. 논문 페이지. 4. 탐색. 5. 품질.
   6. Vercel 프로젝트를 만들고 VM의 `API_ALLOWED_ORIGINS`에 그 주소를 넣습니다. 브라우저가 VM을 직접
      부릅니다 - Vercel이 중간에서 넘기면 VM이 보는 IP가 Vercel 것이라 IP별 상한이 한 덩어리가 됩니다.

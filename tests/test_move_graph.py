@@ -188,7 +188,19 @@ def test_vm_env_carries_no_aura_or_gds_secrets():
 
     names = [line.split("=", 1)[0] for line in render("sk-x", "a.sslip.io", "p").splitlines()
              if line]
-    assert names == ["OPENAI_API_KEY", "NEO4J_PASSWORD", "APP_DOMAIN", "LANGFUSE_TRACING"]
+    assert names == ["OPENAI_API_KEY", "NEO4J_PASSWORD", "APP_DOMAIN", "LANGFUSE_TRACING",
+                     "API_ALLOWED_ORIGINS", "API_ALLOWED_ORIGIN_REGEX"]
+
+
+def test_vm_env_lets_only_this_projects_previews_call_the_api():
+    import re
+
+    from scripts.make_vm_env import WEB_PREVIEW_ORIGINS
+
+    allowed = re.compile(WEB_PREVIEW_ORIGINS)
+    assert allowed.fullmatch("https://arxiv-graphrag-git-web-ask-screen-rndigkwks-projects.vercel.app")
+    assert not allowed.fullmatch("https://arxiv-graphrag-x-rndigkwks-projects.vercel.app.evil.example")
+    assert not allowed.fullmatch("https://someone-else-rndigkwks-projects.vercel.app")
 
 
 def test_vm_env_is_written_with_lf_even_on_windows(tmp_path, monkeypatch):

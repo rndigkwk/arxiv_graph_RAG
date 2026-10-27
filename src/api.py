@@ -175,10 +175,14 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
 
     app = FastAPI(title="arXiv GraphRAG API", version="1", lifespan=lifespan)
     origins = [o.strip() for o in os.environ.get("API_ALLOWED_ORIGINS", "").split(",") if o.strip()]
-    if origins:
+    # Vercel의 미리보기 주소는 브랜치마다 달라서 목록으로 적을 수 없습니다. 정규식으로 받습니다.
+    origin_regex = os.environ.get("API_ALLOWED_ORIGIN_REGEX") or None
+    if origins or origin_regex:
         app.add_middleware(
             CORSMiddleware,
             allow_origins=origins,
+            allow_origin_regex=origin_regex,
+            expose_headers=["retry-after"],
             allow_methods=["GET", "POST"],
             allow_headers=["content-type"],
         )
