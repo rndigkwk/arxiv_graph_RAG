@@ -29,6 +29,8 @@ import collections
 import json
 import math
 import os
+import statistics
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -50,6 +52,9 @@ ANTHROPIC_MODEL = "claude-haiku-5-5"
 # 이 모델은 **사고가 기본으로 켜지고** 그 토큰이 출력 한도를 먹습니다. 한도가 작으면 구조화
 # 도구 호출이 잘려 "판정이 불완전합니다"로 죽습니다. 넉넉히 둡니다.
 ANTHROPIC_MAX_TOKENS = 8192
+# 판정 호출의 추론 강도 후보입니다. 비우면 앱 그대로입니다. gpt-6-luna는 `minimal`을 받지 않습니다
+# (2026-10-28, 400).
+EFFORTS = ("none", "low", "medium", "high")
 # 쌍체 비교의 유의수준입니다. 몇 건이 갈려야 "다르다"인지는 세어 구합니다(needed_one_way).
 ALPHA = 0.05
 
@@ -135,7 +140,7 @@ def holdout_questions(path: Path, split: str) -> list[dict[str, Any]]:
     return chosen
 
 
-def judge_for(provider: str, model: str) -> tuple[Any, str]:
+def judge_for(provider: str, model: str, effort: str = "") -> tuple[Any, str]:
     """공급자의 심판 호출과 그 모델 이름을 돌려줍니다.
 
     토큰 누적은 양쪽이 `candidate_validation.structured_judge`를 씁니다. 공급자별로 베껴 두면 한쪽만
@@ -143,6 +148,8 @@ def judge_for(provider: str, model: str) -> tuple[Any, str]:
     """
     from src.candidate_validation import QuestionVerdict, structured_judge
 
+    if effort and provider != "openai":
+        raise SystemExit("--reasoning-effort는 openai 심판에만 있습니다.")
     if provider == "openai":
         # 앱의 모델을 쓰므로 여기서만 `chatbot`이 필요합니다. anthropic 쪽은 앱 자격증명
         # 없이도 만들어져야 합니다 - `chatbot`은 `.env`의 Neo4j·OpenAI 값이 없으면
@@ -155,7 +162,22 @@ def judge_for(provider: str, model: str) -> tuple[Any, str]:
                 f"{model}로 재려면 OPENAI_MODEL을 바꿔 돌리세요 - 그러면 기준선과 비교할 수 "
                 "없는 값이 됩니다(ADR-021의 gpt-4o-mini 사고)."
             )
-        return chatbot.judging_model, chatbot.llm_model
+        if not effort:
+            # 앱의 판정은 추론 강도를 정해 둡니다(ADR-089). 이름에 적지 않으면 옛 보고서와
+            # 같은 심판으로 보입니다.
+            return chatbot.judging_model, (
+                f"{chatbot.llm_model} (reasoning={chatbot.JUDGE_REASONING['effort']})"
+            )
+        # 앱의 판정 호출과 **추론 강도 하나만** 다르게 만듭니다. 제한 시간·재시도·스트리밍은
+        # 앱의 `llm`을 그대로 복사합니다 - 따로 만들면 다른 것까지 바뀐 채로 재게 됩니다.
+        structured = chatbot.llm.model_copy(
+            update={"reasoning": {"effort": effort}}
+        ).with_structured_output(QuestionVerdict, strict=True, include_raw=True)
+
+        def make_with_effort(usage: dict[str, int]):
+            return structured_judge(structured, usage)
+
+        return make_with_effort, f"{chatbot.llm_model} (reasoning={effort})"
 
     key = (os.getenv(ANTHROPIC_KEY) or "").strip()
     if not key:
@@ -205,11 +227,11 @@ def judge_for(provider: str, model: str) -> tuple[Any, str]:
 
 
 def run(questions: list[dict[str, Any]], provider: str = "openai",
-        model: str = "") -> tuple[list[dict[str, Any]], str]:
+        model: str = "", effort: str = "") -> tuple[list[dict[str, Any]], str]:
     """Call the judge once per question with real papers attached."""
     from src import candidate_validation, chatbot
 
-    make_judge, judge_model = judge_for(provider, model)
+    make_judge, judge_model = judge_for(provider, model, effort)
 
     def fetch(ids: list[str]) -> list[dict[str, Any]]:
         return chatbot.run_read(
@@ -222,6 +244,7 @@ def run(questions: list[dict[str, Any]], provider: str = "openai",
     for item in questions:
         papers = fetch(item["paper_ids"])
         usage: dict[str, int] = {}
+        started = time.perf_counter()
         try:
             verdict = candidate_validation.judge_content(
                 item["question"], papers, make_judge(usage)
@@ -242,6 +265,7 @@ def run(questions: list[dict[str, Any]], provider: str = "openai",
                 f"{len(rows)}/{len(questions)}번째({item['id']})에서 "
                 f"{type(exc).__name__}: {exc}{hint}"
             ) from None
+        seconds = round(time.perf_counter() - started, 3)
         rows.append({
             **{key: item[key] for key in ("id", "family", "question")},
             "expect_content": item["expect_content"],
@@ -252,6 +276,8 @@ def run(questions: list[dict[str, Any]], provider: str = "openai",
             "content_correct": verdict["requires_content"] == item["expect_content"],
             "graph_correct": verdict["requires_graph"] == item["expect_graph"],
             "tokens": dict(usage),
+            # 답변 지연의 판정 대기가 이 호출입니다(ADR-085). 질문 수가 작아 p50만 봅니다.
+            "seconds": seconds,
         })
     return rows, judge_model
 
@@ -299,6 +325,11 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "input": sum(row["tokens"].get("input_tokens", 0) for row in rows),
             "output": sum(row["tokens"].get("output_tokens", 0) for row in rows),
         },
+        # 옛 행에는 시간이 없습니다. 없는 것을 0으로 채우면 빨라 보입니다.
+        "seconds_p50": (
+            round(statistics.median(row["seconds"] for row in rows), 3)
+            if rows and all("seconds" in row for row in rows) else None
+        ),
     }
 
 
@@ -408,6 +439,8 @@ def main() -> int:
                         help="심판의 공급자입니다. 프롬프트와 스키마는 그대로입니다.")
     parser.add_argument("--model", default="",
                         help=f"비우면 공급자의 기본값입니다(anthropic: {ANTHROPIC_MODEL}).")
+    parser.add_argument("--reasoning-effort", choices=EFFORTS, default="",
+                        help="openai 심판의 추론 강도입니다. 비우면 앱 그대로입니다.")
     parser.add_argument("--compare-to", type=Path, default=None,
                         help="기준선 보고서와 쌍체로 견줍니다(ADR-058의 바를 적용합니다).")
     parser.add_argument("--holdout", type=Path, default=None,
@@ -426,7 +459,7 @@ def main() -> int:
         questions = labelled_questions(args.graph_cases, args.base_cases)
     if args.limit:
         questions = questions[: args.limit]
-    rows, judge_model = run(questions, args.provider, args.model)
+    rows, judge_model = run(questions, args.provider, args.model, args.reasoning_effort)
     report = {
         "generated_at": datetime.now(UTC).isoformat(),
         "label": args.label,

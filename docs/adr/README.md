@@ -160,3 +160,4 @@
 | [ADR-086](ADR-086-the-app-ranks-related-papers-not-the-model.md) | 관련 논문은 앱이 부른다 — 모델이 읽지 않는 결과에 턴을 쓰지 않는다 | 채택 |
 | [ADR-087](ADR-087-translate-before-the-agent.md) | 번역은 에이전트 전에 앱이 한다 — 영어 질문에 번역 턴을 쓰지 않는다 | 채택 |
 | [ADR-088](ADR-088-resolve-the-named-paper-before-the-agent.md) | 질문이 지칭한 논문은 에이전트 전에 앱이 찾는다 — 제목 해석에 모델 턴을 쓰지 않는다 | 채택 |
+| [ADR-089](ADR-089-judge-without-reasoning.md) | 조건 판정은 추론을 끄고 부른다 — 같은 모델, 같은 프롬프트, 추론 강도 하나만 | 보류 |
