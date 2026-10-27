@@ -160,4 +160,4 @@
 | [ADR-086](ADR-086-the-app-ranks-related-papers-not-the-model.md) | 관련 논문은 앱이 부른다 — 모델이 읽지 않는 결과에 턴을 쓰지 않는다 | 채택 |
 | [ADR-087](ADR-087-translate-before-the-agent.md) | 번역은 에이전트 전에 앱이 한다 — 영어 질문에 번역 턴을 쓰지 않는다 | 채택 |
 | [ADR-088](ADR-088-resolve-the-named-paper-before-the-agent.md) | 질문이 지칭한 논문은 에이전트 전에 앱이 찾는다 — 제목 해석에 모델 턴을 쓰지 않는다 | 채택 |
-| [ADR-090](ADR-090-recent-is-a-date-filtered-search.md) | "최근"은 발표일 조건이다 — 날짜는 의미 검색 안에서 거르고, Cypher 한 번으로 확인한다 | 보류 |
+| [ADR-090](ADR-090-recent-is-a-date-filtered-search.md) | "최근" 논문은 앱이 먼저 기간 안에서 찾는다 — 지시문과 도구 스키마는 건드리지 않는다 | 채택 |
