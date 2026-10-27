@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { type Abstain, type Answer, type Route, type Subgraph, ask, getRoute, getSubgraph, translate } from "@/lib/api";
-import { attemptsOf, citedEvidence, graphIds, historyFor, routeLine, seconds, stageRows, usedPath } from "@/lib/answer";
+import { attemptsOf, citedEvidence, forecastSeed, graphIds, historyFor, routeLine, seconds, stageRows, usedPath } from "@/lib/answer";
 import { EvidenceGraph } from "./EvidenceGraph";
+import { ForecastPanel } from "./ForecastPanel";
 import { VectorHits } from "./VectorHits";
 import { Markdown } from "./Markdown";
 
@@ -315,6 +316,7 @@ function TurnView({
                 </li>
               ))}
             </ol>
+            {forecastSeed(a) && <ForecastPanel key={forecastSeed(a)} id={forecastSeed(a)!} />}
           </section>
         )}
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CitingList } from "@/components/CitingList";
+import { ForecastPanel } from "@/components/ForecastPanel";
 import { PaperActions } from "@/components/PaperActions";
 import { PaperSearch } from "@/components/PaperSearch";
 import { getPaper } from "@/lib/api";
@@ -100,6 +101,7 @@ export default async function PaperPage({ params }: Props) {
               ))}
             </ol>
           )}
+          <ForecastPanel id={paper.arxiv_id} />
         </section>
         <CitingList id={paper.arxiv_id} total={paper.cited_by} />
       </div>

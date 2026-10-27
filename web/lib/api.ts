@@ -6,7 +6,7 @@ import { readEvents } from "./sse";
 export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? "https://8-230-25-138.sslip.io").replace(/\/$/, "");
 
 export type Route = { name: "graph" | "any"; cues: string[]; vetoes: string[] };
-export type ToolCall = { id: string; name: string; args: unknown; status?: string };
+export type ToolCall = { id: string; name: string; args: unknown; status?: string; output?: unknown };
 export type Related = { arxiv_id: string; title?: string; score?: number; reason?: string };
 // 넓은 경로의 벡터 검색 결과. 저자와 게재일은 없습니다(저장할 때 논문 API에서 읽습니다).
 export type VectorHit = {
@@ -115,6 +115,21 @@ export type Paper = {
   bibtex: string;
   related: RelatedPaper[];
 };
+// 앞으로 함께 인용될 논문(ADR-038). 자체 학습 GBM이 후보를 재정렬합니다.
+export type ForecastHit = {
+  arxiv_id: string;
+  score: number;
+  title?: string;
+  shared_cocitations: number;
+  embedding_cosine: number;
+};
+export type Forecast = {
+  seed_id: string;
+  papers: ForecastHit[];
+  candidates?: number;
+  model?: { digest?: string; snapshot_version?: string; ranking_mrr?: number };
+  reason: string;
+};
 export type CitingPaper = { arxiv_id: string; title: string; primary_category: string; published: string | null; cited_by: number };
 export type CitingOrder = "recent" | "cited";
 export type SearchHit = { arxiv_id: string; title: string; primary_category: string };
@@ -169,6 +184,8 @@ export async function getPaper(id: string): Promise<Paper | null> {
     throw error;
   }
 }
+// 모델을 부르지만 OpenAI가 아니라 저장된 가중치라 상한 밖입니다. 버튼을 눌러야 부릅니다.
+export const getForecast = (id: string) => json<Forecast>(`/api/papers/${encodeURIComponent(id)}/forecast`);
 export const getCiting = (id: string, order: CitingOrder, skip: number, limit = 20) =>
   json<{ order: CitingOrder; papers: CitingPaper[] }>(
     `/api/papers/${encodeURIComponent(id)}/citing?order=${order}&skip=${skip}&limit=${limit}`,
