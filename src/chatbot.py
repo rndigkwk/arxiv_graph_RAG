@@ -37,6 +37,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from pipeline import tracing
 from src import (
     agent_graph,
+    early_judge,
     pagerank,
     prompts,
     release,
@@ -297,12 +298,14 @@ def search_papers(query: str, top_k: int = 5) -> dict:
 
 # ── 최종 출력 형식 ─────────────────────────────────────────────────────────
 class GroundedAnswer(BaseModel):
-    answer: str = Field(description=(
-        "The final answer, written in English, based only on the retrieved evidence. "
-        "Say that it cannot be confirmed when the search returned nothing."))
+    # **근거가 먼저입니다.** 구조화 출력은 필드를 이 순서로 씁니다. 근거 ID가 답 글보다 먼저 나오면
+    # 답 글을 쓰는 동안 조건 검사를 돌릴 수 있습니다(`early_judge`, ADR-085).
     evidence_ids: list[str] = Field(description=(
         "The arxiv_id values of papers directly used to answer the question. Do not include "
         "papers returned only as PageRank-related suggestions. Empty list when there is none."))
+    answer: str = Field(description=(
+        "The final answer, written in English, based only on the retrieved evidence. "
+        "Say that it cannot be confirmed when the search returned nothing."))
 
 
 UNKNOWN_COMPARISON_TEXT = "초록에서 확인할 수 없음"
@@ -483,15 +486,31 @@ def parse_tool_output(content):
     return content
 
 
-def collect_response(result, question):
-    """이번 질문의 도구 호출 기록과 검색 근거를 구조화 답변에 덧붙입니다."""
-    answer = result["structured_response"]
+def tool_calls_of(messages):
+    """메시지에서 도구 호출 기록을 읽습니다. 결과가 돌아온 호출에는 상태와 출력을 붙입니다.
+
+    `collect_response`와 조건 검사를 앞당기는 쪽(`early_judge`)이 **같은 함수**를 씁니다. 둘이
+    다르게 읽으면 앞당긴 판정의 열쇠(Cypher 목록)가 최종 응답과 어긋나 한 번도 쓰이지 않습니다.
+    """
     calls, outputs = [], {}
-    for message in result["messages"]:
+    for message in messages:
         for call in getattr(message, "tool_calls", None) or []:
             calls.append({"id": call["id"], "name": call["name"], "args": call["args"]})
         if isinstance(message, ToolMessage):
             outputs[message.tool_call_id] = message
+    for call in calls:
+        message = outputs.get(call["id"])
+        if message is None:
+            continue  # 응답이 끊겨 결과가 돌아오지 않은 호출입니다.
+        call["status"] = message.status
+        call["output"] = parse_tool_output(message.content)
+    return calls
+
+
+def collect_response(result, question):
+    """이번 질문의 도구 호출 기록과 검색 근거를 구조화 답변에 덧붙입니다."""
+    answer = result["structured_response"]
+    calls = tool_calls_of(result["messages"])
 
     cypher, rows, papers, translations, errors, related = "", [], {}, [], [], []
     # 제목 해석 결과입니다. **`rows`에 넣지 않습니다** - 질문이 지칭한 논문은 검색 결과가
@@ -501,12 +520,7 @@ def collect_response(result, question):
     # 조회가 여러 번이면 `cypher`는 마지막 것만 남습니다. 실패를 되짚을 때는 전부 필요합니다.
     cyphers = []
     for call in calls:
-        message = outputs.get(call["id"])
-        if message is None:
-            continue  # 응답이 끊겨 결과가 돌아오지 않은 호출입니다.
-        call["status"] = message.status
-        call["output"] = parse_tool_output(message.content)
-        if message.status != "success" or not isinstance(call["output"], dict):
+        if call.get("status") != "success" or not isinstance(call.get("output"), dict):
             continue
         if call["name"] == "search_graph":
             cypher = call["output"].get("cypher", "") or cypher
@@ -534,14 +548,19 @@ def collect_response(result, question):
             "errors": errors, "related": related, "resolved": resolved}
 
 
-def partial_answer(text):
-    """생성 중인 JSON에서 answer 문자열만 읽습니다. 나머지 필드는 화면에 보내지 않습니다."""
+def partial_value(text):
+    """생성 중인 JSON. 아직 읽을 수 없으면 None입니다."""
     try:
-        value = parse_partial_json(text)
+        return parse_partial_json(text)
     except json.JSONDecodeError:
-        return ""
+        return None
+
+
+def answer_of(value):
+    """부분 JSON에서 answer 문자열만 읽습니다. 나머지 필드는 화면에 보내지 않습니다."""
     answer = value.get("answer", "") if isinstance(value, dict) else ""
     return answer if isinstance(answer, str) else ""
+
 
 
 def judging_model(usage):
@@ -557,13 +576,16 @@ def judging_model(usage):
     )
 
 
-def stream_agent_answer(messages, on_answer=None, callbacks=()):
+def stream_agent_answer(messages, on_answer=None, callbacks=(), on_evidence=None):
     """에이전트를 흘려 받으며 부분 답변을 화면에 올리고, 최종 상태를 돌려줍니다.
 
     `callbacks`는 이 안쪽을 재는 자리입니다(`tool_timing`). 도구 본문을 건드리지 않고
     도구·모델의 시작과 끝을 받으므로, 도구가 늘어도 계측을 다시 손대지 않습니다.
+
+    `on_evidence(ids, calls)`는 근거 ID가 확정된 순간 메시지마다 한 번 불립니다 - 답 글이
+    시작되는 때입니다. 조건 검사를 그때 시작해 답 글을 쓰는 시간과 겹칩니다(ADR-085).
     """
-    result, message_id, buffer, displayed = {}, None, "", ""
+    result, message_id, buffer, displayed, offered = {}, None, "", "", False
     if on_answer is not None:
         on_answer("")  # 인용 수정 시 이전 초안을 지우고 새 답변으로 교체합니다.
     # messages는 생성 중인 토큰, values는 검색 기록·구조화 답변이 담긴 상태입니다.
@@ -576,9 +598,16 @@ def stream_agent_answer(messages, on_answer=None, callbacks=()):
         if metadata.get("langgraph_node") != "model" or not chunk.text:
             continue
         if chunk.id != message_id:
-            message_id, buffer = chunk.id, ""
+            message_id, buffer, offered = chunk.id, "", False
         buffer += chunk.text
-        answer = partial_answer(buffer)
+        value = partial_value(buffer)
+        if on_evidence is not None and not offered:
+            ids = early_judge.final_evidence(value)
+            if ids is not None:
+                # 마지막 `values` 상태에 이번 턴 전까지의 도구 결과가 다 들어 있습니다.
+                offered = True
+                on_evidence(ids, tool_calls_of(result.get("messages", [])))
+        answer = answer_of(value)
         if answer and answer != displayed:
             displayed = answer
             if on_answer is not None:
@@ -601,28 +630,45 @@ def ask(question, history, on_answer=None):
     # 평가 하네스가 앞 질문의 호출 시간을 다음 질문에 더합니다.
     inside_generate = tool_timing.InsideGenerate()
 
+    def fetch_cited(ids):
+        return run_read(
+            "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids "
+            "RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.abstract AS abstract",
+            {"ids": ids},
+        )
+
+    def judge(asked, papers, queries):
+        return judge_content(asked, papers, judging_model(validation_usage),
+                             graph_queries=queries)
+
+    def judge_early(ids, queries):
+        papers = fetch_cited(ids)
+        try:
+            return papers, judge(question, papers, queries)
+        except Exception as exc:  # noqa: BLE001 - 검사 흐름의 판정 자리에서 다시 올립니다.
+            return papers, exc
+
+    # 답 글을 쓰는 동안 판정을 돌립니다(ADR-085). 입력이 같을 때만 그 결과를 씁니다.
+    early = early_judge.EarlyJudge(judge_early)
+
     def check_conditions(user_question, response):
+        queries = early_judge.graph_queries(response["tool_calls"])
+        ahead = early.take(response["evidence_ids"], queries)
+        if ahead is None or user_question != question:
+            return assess_and_validate(
+                user_question, response, fetch_cited,
+                lambda asked, papers: judge(asked, papers, queries),
+            )
         return assess_and_validate(
             user_question, response,
-            lambda ids: run_read(
-                "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids "
-                "RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.abstract AS abstract",
-                {"ids": ids},
-            ),
-            lambda asked, papers: judge_content(
-                asked, papers,
-                judging_model(validation_usage),
-                graph_queries=[
-                    call["args"]["cypher"] for call in response["tool_calls"]
-                    if call["name"] == "search_graph" and call.get("status") == "success"
-                    and not call.get("output", {}).get("error")
-                ],
-            ),
+            lambda ids: ahead.result()[0],
+            lambda asked, papers: early_judge.unpack_verdict(ahead.result()[1]),
         )
 
     deps = agent_graph.Dependencies(
         stream_answer=lambda messages, attempt: stream_agent_answer(
-            messages, on_answer, [inside_generate]
+            messages, on_answer, [inside_generate],
+            on_evidence=lambda ids, calls: early.offer(ids, early_judge.graph_queries(calls)),
         ),
         collect=collect_response,
         check_format=validate_answer,
