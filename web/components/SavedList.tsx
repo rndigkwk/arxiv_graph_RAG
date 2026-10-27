@@ -1,20 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { MAX_SAVED, bibtexFile } from "@/lib/paper";
+import { MAX_SAVED, bibtexFile, savedCsv, savedGaps } from "@/lib/paper";
 import { useSaved } from "./useSaved";
 
 export function SavedList() {
   const { saved, toggle } = useSaved();
 
-  function download() {
-    const url = URL.createObjectURL(new Blob([bibtexFile(saved)], { type: "application/x-bibtex" }));
+  function download(text: string, type: string, name: string) {
+    const url = URL.createObjectURL(new Blob([text], { type }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = "arxiv-graphrag-saved.bib";
+    a.download = name;
     a.click();
     URL.revokeObjectURL(url);
   }
+
+  const gaps = savedGaps(saved);
+  const gapText = [gaps.author && `저자가 빈 항목 ${gaps.author}건`, gaps.year && `게재 연도가 빈 항목 ${gaps.year}건`].filter(Boolean).join(" · ");
 
   return (
     <section className="card panel">
@@ -42,10 +45,15 @@ export function SavedList() {
             ))}
           </ul>
           <div className="actions">
-            <button className="btn" onClick={download}>
+            <button className="btn" onClick={() => download(bibtexFile(saved), "application/x-bibtex", "arxiv-graphrag-saved.bib")}>
               BibTeX로 받기
             </button>
+            <button className="btn" onClick={() => download(savedCsv(saved), "text/csv", "arxiv-graphrag-saved.csv")}>
+              CSV로 받기
+            </button>
           </div>
+          {/* 빈 칸이 보이지 않으면 불완전한 파일을 완전한 줄 알고 인용합니다(ADR-042). */}
+          {gapText && <p className="route">{gapText} — 그래프에서 읽지 못한 값은 추측하지 않고 비워 둡니다.</p>}
         </>
       )}
     </section>

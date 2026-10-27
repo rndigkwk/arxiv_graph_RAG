@@ -46,3 +46,43 @@ export function bibtexFile(list: Saved[]): string {
 }
 
 export const year = (published: string | null) => (published ? published.slice(0, 10) : "");
+
+// BibTeX 필드 하나. 저장 목록에는 BibTeX만 남아 있어서, CSV의 저자·연도도 여기서 읽습니다.
+function field(bibtex: string, name: string): string {
+  const match = bibtex.match(new RegExp(String.raw`^\s*${name}\s*=\s*\{(.*)\},?\s*$`, "m"));
+  if (!match) return "";
+  // `citations.escape`를 거꾸로 합니다. 제목의 `\&`가 CSV에 그대로 나오면 안 됩니다.
+  return match[1]
+    .replace(/\\textbackslash\{\}/g, "\\")
+    .replace(/\\textasciitilde\{\}/g, "~")
+    .replace(/\\textasciicircum\{\}/g, "^")
+    .replace(/\\([{}&%$#_])/g, "$1");
+}
+
+export type SavedRow = { arxiv_id: string; title: string; authors: string; year: string; primary_category: string; url: string };
+
+export function savedRows(list: Saved[]): SavedRow[] {
+  return list.map((s) => ({
+    arxiv_id: s.arxiv_id,
+    title: s.title,
+    authors: field(s.bibtex, "author").split(" and ").filter(Boolean).join("; "),
+    year: field(s.bibtex, "year"),
+    primary_category: field(s.bibtex, "primaryClass"),
+    url: field(s.bibtex, "url"),
+  }));
+}
+
+const cell = (text: string) => (/[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text);
+
+// Excel이 BOM 없이는 한글 제목을 깨뜨립니다(Streamlit도 utf-8-sig로 내려보냈습니다).
+export function savedCsv(list: Saved[]): string {
+  const head: (keyof SavedRow)[] = ["arxiv_id", "title", "authors", "year", "primary_category", "url"];
+  const rows = savedRows(list).map((r) => head.map((k) => cell(r[k])).join(","));
+  return "﻿" + [head.join(","), ...rows].join("\n") + "\n";
+}
+
+/** 저자·연도가 빈 항목 수. 보이지 않으면 불완전한 파일을 완전한 줄 알고 씁니다(ADR-042). */
+export function savedGaps(list: Saved[]): { author: number; year: number } {
+  const rows = savedRows(list);
+  return { author: rows.filter((r) => !r.authors).length, year: rows.filter((r) => !r.year).length };
+}

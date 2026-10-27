@@ -40,7 +40,38 @@ export type Quality = {
   rationale?: Record<string, string>;
   slots?: { label: string; metric: string; variant: string | null; floor: number | null; measured: number | null; checked_by: string }[];
   rejected?: { model: string; slot: string; result: string; record: string }[];
+  basis?: Basis[];
+  prompts?: { prompt: string; baseline: string | null; code: string | null; same: boolean | null }[];
+  future?: Future | null;
 };
+// RAGAS 하한에 결함을 심어 걸리는지 본 표(`quality_board.basis_rows`).
+export type Basis = {
+  metric: string;
+  floor: number;
+  runs_seen: number;
+  worst_normal_run: number;
+  margin: number;
+  survives: boolean;
+  with_defect: number[];
+  defect_trips_it: boolean;
+};
+// 관련 논문 변형 비교(미래 라벨 과제)와 연결 정도별 recall@5.
+export type Future = {
+  cases: number;
+  feature_cut: string;
+  variants: {
+    variant: string;
+    deployed: boolean;
+    recall_at_k: number | null;
+    hit_at_k: number | null;
+    reciprocal_rank: number | null;
+    vs_incumbent: string;
+  }[];
+  degree_variants: string[];
+  degrees: ({ group: string; seeds: number; share: number } & Record<string, number | string>)[];
+};
+
+export const yesNo = (v: boolean | null | undefined) => (v == null ? "—" : v ? "예" : "아니오");
 
 // 기준선은 PR로만 바뀌므로 한 시간 캐시합니다.
 export async function getQuality(): Promise<Quality | null> {

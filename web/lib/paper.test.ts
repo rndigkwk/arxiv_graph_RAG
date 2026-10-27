@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ARXIV_ID, MAX_SAVED, askHref, bibtexFile, parseSaved, questionsFor, toggleSaved } from "./paper";
+import { ARXIV_ID, MAX_SAVED, askHref, bibtexFile, parseSaved, questionsFor, savedCsv, savedGaps, toggleSaved } from "./paper";
 
 const paper = (id: string) => ({ arxiv_id: id, title: `T ${id}`, bibtex: `@misc{${id},}` });
 
@@ -36,5 +36,25 @@ describe("paper helpers", () => {
     expect(ARXIV_ID.test("2210.03629")).toBe(true);
     expect(ARXIV_ID.test("2210.03629v3")).toBe(true);
     expect(ARXIV_ID.test("ReAct")).toBe(false);
+  });
+  it("reads authors and year back out of the stored BibTeX for the CSV", () => {
+    // `citations.entry`가 만든 모양 그대로입니다(제목의 & 와 _ 는 escape되어 있습니다).
+    const bibtex = [
+      "@misc{arxiv_2210_03629,",
+      "  author        = {X Y and Z},",
+      "  title         = {A \& B\_c},",
+      "  year          = {2022},",
+      "  primaryClass  = {cs.CL},",
+      "  url           = {https://arxiv.org/pdf/2210.03629}",
+      "}",
+    ].join("\n");
+    const csv = savedCsv([{ arxiv_id: "2210.03629", title: 'A & B_c, "quoted"', bibtex }]);
+    expect(csv.startsWith("﻿arxiv_id,title,authors,year,primary_category,url\n")).toBe(true);
+    expect(csv).toContain('2210.03629,"A & B_c, ""quoted""",X Y; Z,2022,cs.CL,https://arxiv.org/pdf/2210.03629');
+  });
+
+  it("counts entries whose author or year is blank", () => {
+    const full = "@misc{k,\n  author = {X},\n  year = {2022},\n}";
+    expect(savedGaps([paper("2210.03629"), { ...paper("2401.00001"), bibtex: full }])).toEqual({ author: 1, year: 1 });
   });
 });

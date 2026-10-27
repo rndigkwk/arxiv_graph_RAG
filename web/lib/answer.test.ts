@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Answer } from "./api";
-import { citedEvidence, graphIds, historyFor, routeLine, usedPath } from "./answer";
+import { GENERATE_CONTAINS, citedEvidence, generateSplit, graphIds, historyFor, routeLine, stageRows, usedPath } from "./answer";
 
 const answer = (over: Partial<Answer> = {}): Answer => ({
   question: "q",
@@ -36,5 +36,28 @@ describe("answer helpers", () => {
 
   it("explains the route with its cues", () => {
     expect(routeLine({ name: "graph", cues: ["citation"], vetoes: [] })).toContain("단서 citation");
+  });
+
+  it("lists every stage slowest first, keeps zero-second ones, and ends with the total", () => {
+    const rows = stageRows(
+      answer({
+        graph_trace: {
+          seconds: { route: 0, generate: 9.5, check_format: 0.2 },
+          visits: { route: 1, generate: 2, check_format: 2 },
+          attempts: 2,
+          total_seconds: 9.7,
+        },
+      }),
+    );
+    expect(rows.map((r) => r.node)).toEqual(["답변 생성", "형식·인용 검사", "경로 판정", "합계"]);
+    expect(rows.at(-1)).toMatchObject({ seconds: 9.7, visits: 5 });
+    expect(rows[0].note).toBe(GENERATE_CONTAINS);
+    expect(stageRows(answer())).toEqual([]);
+  });
+
+  it("splits generation only when the parts add up", () => {
+    const inside = { adds_up: true, model_seconds: 6, model_turns: 3, tools_seconds: 2.5, tool_calls: 2, unattributed_seconds: 0, other_seconds: 1 };
+    expect(generateSplit(answer({ generate_trace: inside }))).toBe("모델 6.0초 (3턴) · 도구 2.5초 (2회) · 그 외 1.0초");
+    expect(generateSplit(answer({ generate_trace: { ...inside, adds_up: false } }))).toBe("");
   });
 });

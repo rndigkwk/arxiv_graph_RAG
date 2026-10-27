@@ -26,6 +26,7 @@ import time
 from collections import defaultdict, deque
 from collections.abc import Callable
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -34,7 +35,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from src import citations, family_board, quality_board, release, routing, warmup
+from src import abstain, citations, family_board, quality_board, release, routing, warmup
 
 logger = logging.getLogger("arxiv_graph_rag.api")
 
@@ -52,6 +53,9 @@ RETURN c.arxiv_id AS arxiv_id, c.title AS title, c.primary_category AS primary_c
 ORDER BY {order} SKIP $skip LIMIT $limit
 """
 RANK_BY = ("cited", "pagerank", "personalized")
+# 그래프 소개 화면의 커뮤니티 그림. GDS로 Leiden을 돌린 노트북이 저장한 보고서를 읽습니다 -
+# VM의 Neo4j Community에는 GDS가 없어 다시 계산할 수 없습니다.
+COMMUNITY_REPORT = Path("reports/aura_graph_rag_quality_report.json")
 MAX_RANK_DEPTH = 500
 
 
@@ -264,7 +268,10 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
                 )
                 put("final", bot.to_jsonable(response))
             except bot.AnswerValidationError as exc:
-                put("abstain", {"message": str(exc), **exc.diagnostics()})
+                diagnostics = exc.diagnostics()
+                # 사유 코드를 사람 말로 바꾸는 일은 Streamlit과 같은 `abstain.explain`이 합니다.
+                put("abstain", {"message": str(exc), **diagnostics,
+                                "explained": abstain.explain(diagnostics)})
             except Exception as exc:  # noqa: BLE001 - 화면에는 사유만, 로그에는 전부
                 logger.exception("ask_failed")
                 put(
@@ -401,6 +408,52 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
                 {"model": m, "slot": slot, "result": result, "record": record}
                 for m, slot, result, record in quality_board.REJECTED
             ],
+            "basis": quality_board.basis_rows(quality_board.load(quality_board.FLOOR_BASIS)),
+            "prompts": quality_board.prompt_rows(baseline),
+            "future": future_study(),
+        }
+
+    def future_study() -> dict[str, Any] | None:
+        report = quality_board.load(quality_board.FUTURE_STUDY)
+        if not report:
+            return None
+        return {
+            "cases": report.get("cases"),
+            "feature_cut": report.get("feature_cut"),
+            "variants": quality_board.variant_rows(report),
+            "degree_variants": report.get("variants") or [],
+            "degrees": quality_board.degree_rows(report),
+        }
+
+    @app.get("/api/overview")
+    def overview() -> dict[str, Any]:
+        """그래프 소개 화면. 노드·관계 수는 지금 센 값이고, 커뮤니티는 커밋된 보고서입니다."""
+        return {"counts": chatbot().graph_counts(), "communities": communities()}
+
+    def communities() -> dict[str, Any] | None:
+        report = quality_board.load(COMMUNITY_REPORT)
+        if not report or not report.get("communities_top5"):
+            return None
+        rows = report["communities_top5"]
+        flow = report.get("community_citation_flow") or {}
+        labels = [row["label"] for row in rows]
+        # flow는 {인용한 쪽: {인용된 쪽: 건수}}입니다. 그림의 선은 방향 없이 양쪽을 합칩니다.
+        links = [
+            {"a": a, "b": b,
+             "citations": flow.get(a, {}).get(b, 0) + flow.get(b, {}).get(a, 0)}
+            for i, a in enumerate(labels) for b in labels[i + 1:]
+        ]
+        return {
+            "generated_at": report.get("generated_at"),
+            "mode": report.get("community_mode"),
+            "rows": [
+                {"label": row["label"], "papers": row["papers"],
+                 "primary_category": row["primary_category"],
+                 "secondary_category": row.get("secondary_category"),
+                 "inside": flow.get(row["label"], {}).get(row["label"], 0)}
+                for row in rows
+            ],
+            "links": [link for link in links if link["citations"]],
         }
 
     return app

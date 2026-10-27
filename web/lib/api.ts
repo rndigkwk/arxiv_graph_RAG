@@ -8,6 +8,32 @@ export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? "https://8-230-25-1
 export type Route = { name: "graph" | "any"; cues: string[]; vetoes: string[] };
 export type ToolCall = { id: string; name: string; args: unknown; status?: string };
 export type Related = { arxiv_id: string; title?: string; score?: number; reason?: string };
+// 넓은 경로의 벡터 검색 결과. 저자와 게재일은 없습니다(저장할 때 논문 API에서 읽습니다).
+export type VectorHit = {
+  arxiv_id: string;
+  title?: string;
+  abstract?: string;
+  score?: number;
+  categories?: string[];
+  pdf_url?: string;
+};
+// 노드별 시간(`agent_graph.summarize_trace`)과 `generate` 안쪽의 분해(`tool_timing.summary`).
+export type GraphTrace = {
+  seconds: Record<string, number>;
+  visits: Record<string, number>;
+  attempts: number;
+  total_seconds: number;
+  rejections?: { node: string; stage: string; attempt: number }[];
+};
+export type GenerateTrace = {
+  adds_up: boolean;
+  model_seconds: number;
+  model_turns: number;
+  tools_seconds: number;
+  tool_calls: number;
+  unattributed_seconds: number;
+  other_seconds: number;
+};
 export type Answer = {
   question: string;
   answer: string;
@@ -15,10 +41,21 @@ export type Answer = {
   tool_calls: ToolCall[];
   cyphers: string[];
   rows: Record<string, unknown>[];
-  papers: { arxiv_id: string; title?: string }[];
+  papers: VectorHit[];
   related: Related[];
+  graph_trace?: GraphTrace;
+  generate_trace?: GenerateTrace;
 };
-export type Abstain = { message: string; stage?: string; reason?: string; attempts?: number };
+// `explained`는 `abstain.explain`이 만든 문장입니다. API가 나중에 더한 칸이라 없을 수 있습니다.
+export type Abstain = {
+  message: string;
+  stage?: string;
+  reason?: string;
+  attempts?: number;
+  request_id?: string;
+  cyphers?: string[];
+  explained?: { headline: string; why: string; what: string; advice: string; stage: string; attempts: number; request_id: string; cyphers: string[] };
+};
 export type SubgraphPaper = {
   arxiv_id: string;
   title: string;
@@ -49,7 +86,13 @@ export type RankedPaper = {
   cited_by: number;
 };
 export type Ranking = { by: RankBy; category: string | null; scope: string; total: number; skip: number; papers: RankedPaper[] };
-export type Stats = { counts: { papers: number; references: number }; top_categories: { code: string; papers: number }[] };
+export type Counts = { papers: number; authors: number; authored: number; references: number };
+export type Stats = { counts: Counts; top_categories: { code: string; papers: number }[] };
+export type Community = { label: string; papers: number; primary_category: string; secondary_category: string | null; inside: number };
+export type Overview = {
+  counts: Counts;
+  communities: { generated_at: string; mode: string; rows: Community[]; links: { a: string; b: string; citations: number }[] } | null;
+};
 export type RelatedPaper = {
   arxiv_id: string;
   title: string;
@@ -130,6 +173,14 @@ export const getCiting = (id: string, order: CitingOrder, skip: number, limit = 
   json<{ order: CitingOrder; papers: CitingPaper[] }>(
     `/api/papers/${encodeURIComponent(id)}/citing?order=${order}&skip=${skip}&limit=${limit}`,
   );
+// 그래프 소개 화면. 노드 수는 주간 수집 때만 바뀌므로 한 시간 캐시합니다.
+export async function getOverview(): Promise<Overview | null> {
+  try {
+    return await json<Overview>("/api/overview", { next: { revalidate: 3600 } });
+  } catch {
+    return null;
+  }
+}
 export const search = (q: string, signal?: AbortSignal) =>
   json<SearchResult>(`/api/search?q=${encodeURIComponent(q)}`, { signal });
 

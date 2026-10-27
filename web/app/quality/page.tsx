@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FAMILY_LABEL, atCeiling, floorText, getQuality, judged, num } from "@/lib/quality";
+import { FAMILY_LABEL, type Future, atCeiling, floorText, getQuality, judged, num, yesNo } from "@/lib/quality";
 
 export const metadata: Metadata = { title: "품질 · arXiv GraphRAG" };
 
@@ -98,6 +98,81 @@ export default async function QualityPage() {
             ))}
           </dl>
         </details>
+        {q.basis && q.basis.length > 0 && (
+          <details>
+            <summary style={{ cursor: "pointer", fontWeight: 500 }}>RAGAS 하한이 무언가를 막는지 — 결함을 심어 확인</summary>
+            <p className="route">
+              물을 것은 &quot;평균이 하한보다 큰가&quot;가 아닙니다(ADR-004·ADR-043). <b>정상이던 실행 중 최악이 하한을 넘는가</b>,
+              그리고 <b>결함을 심으면 걸리는가</b>입니다. 둘째가 아니면 그 하한은 상수에 걸려 있습니다.
+            </p>
+            <div style={{ overflowX: "auto" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>지표</th>
+                    <th>하한</th>
+                    <th>본 실행</th>
+                    <th>최악 정상 실행</th>
+                    <th>하한까지 여유</th>
+                    <th>최악도 넘는가</th>
+                    <th>결함을 심으면</th>
+                    <th>그때 걸리는가</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {q.basis.map((b) => (
+                    <tr key={b.metric}>
+                      <td className="mono" style={{ fontSize: 13 }}>
+                        {b.metric}
+                      </td>
+                      <td className="mono">{num(b.floor)}</td>
+                      <td className="mono">{b.runs_seen}</td>
+                      <td className="mono">{num(b.worst_normal_run)}</td>
+                      <td className="mono">{num(b.margin)}</td>
+                      <td>{yesNo(b.survives)}</td>
+                      <td className="mono">{b.with_defect.map((v) => v.toFixed(4)).join(", ")}</td>
+                      <td>{yesNo(b.defect_trips_it)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        )}
+        {q.prompts && q.prompts.length > 0 && (
+          <details>
+            <summary style={{ cursor: "pointer", fontWeight: 500 }}>이 점수를 낸 프롬프트</summary>
+            <p className="route">
+              <span className="mono">sha256</span> 앞 12자입니다. <b>지문이 다르면 다른 프롬프트</b>이고, 게이트의{" "}
+              <span className="mono">prompt_version</span> 규칙이 막습니다 — <span className="mono">git_sha</span>로는 대신할 수
+              없습니다(ADR-018·ADR-041).
+            </p>
+            <div style={{ overflowX: "auto" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>프롬프트</th>
+                    <th>기준선</th>
+                    <th>지금 코드</th>
+                    <th>같은가</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {q.prompts.map((r) => (
+                    <tr key={r.prompt}>
+                      <td className="mono" style={{ fontSize: 13 }}>
+                        {r.prompt}
+                      </td>
+                      <td className="mono">{r.baseline ?? "—"}</td>
+                      <td className="mono">{r.code ?? "—"}</td>
+                      <td>{yesNo(r.same)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        )}
       </section>
 
       <section className="card panel">
@@ -162,6 +237,8 @@ export default async function QualityPage() {
         </section>
       )}
 
+      {q.future && q.future.variants.length > 0 && <FutureStudy future={q.future} />}
+
       <div className="two-col">
         <section className="card panel">
           <h2>평가 하네스 밖에서 지키는 선</h2>
@@ -196,5 +273,81 @@ export default async function QualityPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+// 관련 논문 변형 비교. 배포된 경로(현직)와 겨룬 결과이고, 연결 정도로 나눈 표가 붙습니다.
+function FutureStudy({ future }: { future: Future }) {
+  return (
+    <section className="card panel">
+      <h2>관련 논문 변형 비교 — 미래 라벨 과제</h2>
+      <p className="meta mono">
+        시드 {future.cases}건 · 피처 창 {future.feature_cut} 이전 · 배포된 경로와 겨룹니다
+      </p>
+      <div style={{ overflowX: "auto" }}>
+        <table>
+          <thead>
+            <tr>
+              <th>변형</th>
+              <th>recall@5</th>
+              <th>hit@5</th>
+              <th>MRR</th>
+              <th>배포 대비 recall@5 (95% 구간)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {future.variants.map((v) => (
+              <tr key={v.variant}>
+                <td className="mono">
+                  {v.deployed ? <b>{v.variant}</b> : v.variant} {v.deployed && <span className="tag">배포</span>}
+                </td>
+                <td className="mono">{num(v.recall_at_k, 4)}</td>
+                <td className="mono">{num(v.hit_at_k, 4)}</td>
+                <td className="mono">{num(v.reciprocal_rank, 4)}</td>
+                <td className="mono">{v.vs_incumbent || "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {future.degrees.length > 0 && (
+        <>
+          <h3 style={{ fontSize: 15, margin: "8px 0 0" }}>연결 정도로 나누면</h3>
+          <p className="route">
+            <b>집계만 보면 두 체제가 섞입니다</b>(ADR-037). 시드의 인용 간선 수로 나눈 recall@5입니다.
+          </p>
+          <div style={{ overflowX: "auto" }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>시드</th>
+                  <th>수</th>
+                  <th>비율</th>
+                  {future.degree_variants.map((v) => (
+                    <th key={v} className="mono">
+                      {v}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {future.degrees.map((d) => (
+                  <tr key={d.group}>
+                    <td>{d.group}</td>
+                    <td className="mono">{d.seeds}</td>
+                    <td className="mono">{(d.share * 100).toFixed(1)}%</td>
+                    {future.degree_variants.map((v) => (
+                      <td key={v} className="mono">
+                        {typeof d[v] === "number" ? (d[v] as number).toFixed(4) : "—"}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </section>
   );
 }
