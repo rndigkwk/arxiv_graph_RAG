@@ -15,6 +15,8 @@ Day 50~53 교안의 구조입니다. 바꾸는 것은 **흐름의 모양**이고
 5. **번역이 노드가 됩니다.** `translate`가 영어가 아닌 글자가 있는 질문만 에이전트 전에 번역합니다
    ([`pre_translate.py`](pre_translate.py), ADR-087). 모델이 도구로 번역을 고르던 때는 영어
    질문에서도 불러 턴 하나를 썼습니다. 노드로 두면 그 시간이 `generate` 밖에 따로 잡힙니다.
+6. **제목 해석도 노드가 됩니다.** `resolve`가 질문 전체로 지칭한 논문을 찾고, 확실할 때만 그
+   arxiv_id를 이번 턴의 메시지로 붙입니다([`pre_resolve.py`](pre_resolve.py), ADR-088).
 
 **행동은 바꾸지 않았습니다.** `abstain`은 지금도 `AnswerValidationError`를 올립니다. 평가
 하네스가 그 예외를 "답하지 못함"으로 세고 게이트의 `answer_failure_rate` 기준선이 그 정의로
@@ -56,6 +58,7 @@ class AnswerState(TypedDict, total=False):
     messages: list[Any]
     route: dict[str, Any]
     translation: dict[str, Any]
+    resolution: dict[str, Any]
     attempt: int
     result: dict[str, Any]
     response: dict[str, Any]
@@ -77,6 +80,8 @@ class Dependencies:
     # `{"record": 도구 호출 기록, "hint": 이번 턴에 붙일 메시지}` 또는 None(번역하지 않음).
     # 없으면 노드도 없습니다 - 번역을 쓰지 않는 테스트의 추적이 그대로입니다.
     translate: Callable[[str], dict[str, Any] | None] | None = None
+    # 같은 모양입니다. 질문이 지칭한 논문을 앱이 먼저 찾습니다(ADR-088). None이면 노드가 없습니다.
+    resolve: Callable[[str], dict[str, Any] | None] | None = None
 
 
 def _timed(name: str, state: AnswerState, work: Callable[[], dict[str, Any]]) -> dict[str, Any]:
@@ -115,6 +120,17 @@ def build_graph(deps: Dependencies):
             return update
 
         return _timed("translate", state, work)
+
+    def resolve(state: AnswerState) -> dict[str, Any]:
+        def work() -> dict[str, Any]:
+            done = deps.resolve(state["question"])
+            if not done:
+                return {}
+            # 번역과 같은 자리입니다. 확실하게 찾았을 때만 힌트가 옵니다.
+            return {"resolution": done,
+                    "messages": [*state["messages"], ("user", done["hint"])]}
+
+        return _timed("resolve", state, work)
 
     def route(state: AnswerState) -> dict[str, Any]:
         def work() -> dict[str, Any]:
@@ -155,6 +171,12 @@ def build_graph(deps: Dependencies):
                     response["translations"] = [
                         record["output"], *response.get("translations", [])
                     ]
+            # 앱이 찾은 논문도 같은 자리에 둡니다. 근거 허용 목록(`resolved`)과 관련 논문 시드가
+            # 이 기록을 읽습니다. 번역 뒤에 일어났으므로 번역 다음입니다.
+            if record := (state.get("resolution") or {}).get("record"):
+                position = 1 if (state.get("translation") or {}).get("record") else 0
+                response["tool_calls"].insert(position, record)
+                response["resolved"] = [record["output"], *response.get("resolved", [])]
             return {"response": response}
 
         return _timed("collect", state, work)
@@ -218,6 +240,8 @@ def build_graph(deps: Dependencies):
     graph = StateGraph(AnswerState)
     if deps.translate is not None:
         graph.add_node("translate", translate)
+    if deps.resolve is not None:
+        graph.add_node("resolve", resolve)
     for name, node in (
         ("route", route),
         ("generate", generate),
@@ -230,11 +254,13 @@ def build_graph(deps: Dependencies):
     ):
         graph.add_node(name, node)
 
-    if deps.translate is not None:
-        graph.add_edge(START, "translate")
-        graph.add_edge("translate", "route")
-    else:
-        graph.add_edge(START, "route")
+    # 앞 단계는 있는 것만 차례로 잇습니다: [translate] → [resolve] → route.
+    previous = START
+    for name, present in (("translate", deps.translate), ("resolve", deps.resolve)):
+        if present is not None:
+            graph.add_edge(previous, name)
+            previous = name
+    graph.add_edge(previous, "route")
     graph.add_edge("route", "generate")
     graph.add_edge("generate", "collect")
     graph.add_edge("collect", "check_format")

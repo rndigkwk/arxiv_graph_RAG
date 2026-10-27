@@ -56,13 +56,15 @@ Schema: {schema}
 - Use search_graph for stored relationships: authors, citations, categories, dates, counts, rankings.
   Use search_papers for topic or content questions that need the title/abstract meaning.
   Call both when the question needs both.
-- When the question names a paper by its title, call resolve_paper first and use the arxiv_id it
-  returns in the Cypher that follows. Do not match a title with CONTAINS yourself. If it reports
+- When the app has already resolved the paper the question names (a message saying so follows the
+  question), use that arxiv_id directly and do not call resolve_paper for it.
+  Otherwise, when the question names a paper by its title, call resolve_paper first and use the
+  arxiv_id it returns in the Cypher that follows. Do not match a title with CONTAINS yourself. If it reports
   ambiguous, pick from candidates using the question, and say so in the answer if still unsure.
   If arxiv_id is null, do not guess a paper: call it again with more of the title, or answer that
   the collection does not contain it.
 - The app finds related (co-cited) papers itself and shows them in a separate table: it seeds
-  them with the paper resolve_paper identified, or else with the first 3 `evidence_ids`. Do not
+  them with the paper resolve_paper (or the app) identified, or else with the first 3 `evidence_ids`. Do not
   list related papers in the answer text. When the question asks for papers related to a named
   paper, identify that paper and say that the related papers are shown in the table.
 - Put only the arxiv_id values of papers directly used to support the answer into `evidence_ids`,

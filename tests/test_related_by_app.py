@@ -70,7 +70,7 @@ def test_the_model_can_no_longer_call_the_related_tool():
 
 
 def test_the_app_ranks_related_papers_with_the_judgement_and_attaches_them():
-    assert "early_related.offer(related_by_app.seeds(calls, ids), ())" in SOURCE
+    assert "early_related.offer(related_by_app.seeds([*resolved_first, *calls], ids), ())" in SOURCE
     assert 'related_by_app.seeds(response["tool_calls"], response["evidence_ids"])' in SOURCE
     assert 'response["tool_calls"].append(record)' in SOURCE
     # 보류한 답에는 붙이지 않습니다 - 붙이는 자리가 보류 예외 뒤입니다.
