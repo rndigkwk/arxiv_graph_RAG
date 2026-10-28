@@ -193,7 +193,7 @@
 | 69 | 생성한 답의 숫자 대조 | 🧪 | 저장된 GraphRAG 답 120개 중 두 자리 이상 숫자가 있는 답 28개, 검색 문맥에 없는 숫자 0개. 막을 것이 없습니다. |
 | 69 | 오염 검사 | ✅ | 판정 보류 질문([ADR-059](adr/ADR-059-the-judge-prompt-is-measured-on-held-out-questions.md)), 재정렬 학습 데이터의 `leak_check`(`evals/export_rerank_training.py`). |
 | 69 | 데이터 카드 | ✅ | 평가 보고서마다 데이터셋 SHA-256·Git SHA·패키지 버전을 적습니다. |
-| 69 | 패러프레이즈 증강 + 뜻 보존 확인 | 🟢 | 평가 30문항이 가족마다 한 문형이라, "최근"을 담은 질문이 0건이었고 24~44초 걸리던 문제를 회귀 평가가 못 봤습니다([ADR-090](adr/ADR-090-recent-is-a-date-filtered-search.md)). 정답은 Cypher에서 나오므로 뜻이 같으면 다시 셀 필요가 없습니다. 게이트에 넣기 전에 원문과 같은 점수를 받는지 먼저 잽니다. |
+| 69 | 패러프레이즈 증강 + 뜻 보존 확인 | ✅ | 30문항을 영어·한국어로 바꿔 말한 60문항을 따로 둡니다(`evals/cases_graph_paraphrase.json`, [ADR-093](adr/ADR-093-paraphrased-eval-questions.md)). 정답을 정하는 값이 글자 그대로 남는지 테스트가 봅니다. 60문항 모두 원문과 같은 점수였습니다. |
 | 69 | 역번역 | ✅ | 한국어 질문의 번역 손실을 다섯 경로로 쟀습니다([ADR-010](adr/ADR-010-korean-translate-only-when-needed.md), ROADMAP 10-7절). |
 | 69 | LLM으로 학습 데이터 생성(로컬 Gemma 부록 포함) | ➖ | 라벨이 인용 관계로 이미 공짜입니다([ADR-011](adr/ADR-011-cocitation-link-prediction.md)). |
 
@@ -201,6 +201,6 @@
 
 | 우선 | 항목 | 왜 지금 | 조건 |
 | --- | --- | --- | --- |
-| 1 | 평가 질문 바꿔 말하기(Day 69) | 문형에 걸린 결함을 한 번 놓쳤음 | 정답 재계산 없음, 게이트 전에 따로 측정 |
+| 1 | ~~평가 질문 바꿔 말하기(Day 69)~~ ✅ [ADR-093](adr/ADR-093-paraphrased-eval-questions.md) | 60문항 모두 원문과 같은 점수 | 게이트에는 아직 넣지 않음 |
 | 2 | ~~레드팀 질문 셋(Day 62)~~ ✅ [ADR-094](adr/ADR-094-red-team-through-the-whole-app.md) | 범위 밖 질문 2/5에 관계없는 근거 | 고칠 자리는 라우터 또는 지시문 |
 | 3 | 저자 동명이인 구별(Day 39) | `coauthor` 가족의 거짓 공저자 | Semantic Scholar 저자 ID 수집과 함께 |
