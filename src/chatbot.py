@@ -41,6 +41,7 @@ from src import (
     pagerank,
     pre_recent,
     pre_resolve,
+    pre_scope,
     pre_translate,
     prompts,
     related_by_app,
@@ -739,6 +740,31 @@ def ask(question, history, on_answer=None):
         record = pre_recent.call_record(english, output, time.perf_counter() - started)
         return {"record": record, "hint": pre_recent.hint(output)}
 
+    def scope_first(asked, english):
+        """연구 단서가 없는 질문만 컬렉션에 가까운 논문이 있는지 봅니다(ADR-095)."""
+        if pre_scope.has_domain_cue(asked, english):
+            return None
+        # 이름만 적은 저자 질문은 단서도 없고 벡터 점수도 낮습니다. 그 저자가 그래프에 있으면
+        # 범위 안입니다.
+        if names := pre_scope.name_candidates(asked, english):
+            try:
+                if run_read("MATCH (a:ArxivAuthorName) WHERE a.name IN $names "
+                            "RETURN a.name AS name LIMIT 1", {"names": names}):
+                    return None
+            except Exception:  # noqa: BLE001 - 못 보면 거절하지 않습니다.
+                return None
+        started = time.perf_counter()
+        try:
+            result = vector_retriever.search(query_text=english, top_k=pre_scope.TOP_K)
+        except Exception:  # noqa: BLE001 - 못 보면 지금처럼 에이전트가 답합니다.
+            return None
+        output = {"query": english,
+                  "papers": [{**item.metadata, "abstract": item.content} for item in result.items]}
+        record = pre_scope.call_record(english, output, time.perf_counter() - started)
+        if pre_scope.decide(output) == "decline":
+            return {"decline": True, "answer": pre_scope.DECLINE_ANSWER, "record": record}
+        return {"hint": pre_scope.hint(output), "record": record}
+
     def check_conditions(user_question, response):
         queries = early_judge.graph_queries(response["tool_calls"])
         ahead = early.take(response["evidence_ids"], queries)
@@ -776,6 +802,7 @@ def ask(question, history, on_answer=None):
         translate=translate_first,
         resolve=resolve_first,
         recent=recent_first,
+        scope=scope_first,
     )
     state = agent_graph.build_graph(deps).invoke({
         "question": question,

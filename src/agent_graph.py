@@ -35,6 +35,7 @@ from dataclasses import dataclass
 from time import perf_counter
 from typing import Any, Callable, TypedDict
 
+from langchain_core.messages import AIMessage
 from langgraph.graph import END, START, StateGraph
 
 from src import routing
@@ -62,6 +63,7 @@ class AnswerState(TypedDict, total=False):
     translation: dict[str, Any]
     resolution: dict[str, Any]
     recency: dict[str, Any]
+    scope: dict[str, Any]
     attempt: int
     result: dict[str, Any]
     response: dict[str, Any]
@@ -88,6 +90,10 @@ class Dependencies:
     # 같은 모양입니다. "최근" 질문을 앱이 기간 안에서 먼저 찾습니다(ADR-090). 두 번째 인자는 번역된
     # 영어 질문(없으면 원문)입니다. None이면 노드가 없습니다.
     recent: Callable[[str, str], dict[str, Any] | None] | None = None
+    # 범위 밖 질문을 앱이 먼저 가립니다(ADR-095). 인자는 `recent`와 같습니다. None이면 범위
+    # 안이고, `{"decline": True, "answer": ..., "record": ...}`이면 에이전트 없이 답하고,
+    # `{"hint": ..., "record": ...}`이면 이번 턴에 메시지를 붙입니다. None이면 노드가 없습니다.
+    scope: Callable[[str, str], dict[str, Any] | None] | None = None
 
 
 def _timed(name: str, state: AnswerState, work: Callable[[], dict[str, Any]]) -> dict[str, Any]:
@@ -155,6 +161,51 @@ def build_graph(deps: Dependencies):
 
         return _timed("recent", state, work)
 
+    def english_of(state: AnswerState) -> str:
+        translation = (state.get("translation") or {}).get("record") or {}
+        output = translation.get("output") if translation.get("status") == "success" else None
+        english = output.get("english") if isinstance(output, dict) else None
+        return english or state["question"]
+
+    def scope(state: AnswerState) -> dict[str, Any]:
+        def work() -> dict[str, Any]:
+            # 앱이 논문을 찾았거나 "최근" 검색이 무언가를 찾았으면 범위 안입니다.
+            if state.get("resolution") or state.get("recency"):
+                return {}
+            done = deps.scope(state["question"], english_of(state))
+            if not done:
+                return {}
+            if done.get("decline"):
+                return {"scope": done}
+            return {"scope": done, "messages": [*state["messages"], ("user", done["hint"])]}
+
+        return _timed("scope", state, work)
+
+    def decline(state: AnswerState) -> dict[str, Any]:
+        """에이전트를 부르지 않고 범위 밖이라고 답합니다. 근거는 없습니다."""
+        def work() -> dict[str, Any]:
+            done = state["scope"]
+            records = [
+                record for record in (
+                    (state.get("translation") or {}).get("record"), done.get("record"),
+                ) if record
+            ]
+            translations = [
+                record["output"] for record in records[:1]
+                if record.get("name") == "translate_to_english" and record["status"] == "success"
+            ]
+            response = {
+                "question": state["question"], "answer": done["answer"], "evidence_ids": [],
+                "tool_calls": records, "cypher": "", "cyphers": [], "rows": [], "papers": [],
+                "translations": translations, "errors": [], "related": [], "resolved": [],
+                "route": state.get("route", {}), "scope": {"declined": True},
+            }
+            # 대화 기록에도 이 답이 남아야 다음 질문이 앞 턴을 압니다.
+            messages = [*state["messages"], AIMessage(content=done["answer"])]
+            return {"response": response, "result": {"messages": messages}, "abstained": False}
+
+        return _timed("decline", state, work)
+
     def route(state: AnswerState) -> dict[str, Any]:
         def work() -> dict[str, Any]:
             decided = routing.classify(state["question"])
@@ -207,6 +258,14 @@ def build_graph(deps: Dependencies):
                     if (state.get(key) or {}).get("record")
                 )
                 response["tool_calls"].insert(position, record)
+            # 범위 확인 검색은 그 뒤입니다. 근거 후보가 아니므로 `papers`에는 넣지 않습니다.
+            if record := (state.get("scope") or {}).get("record"):
+                position = sum(
+                    1 for key in ("translation", "resolution", "recency")
+                    if (state.get(key) or {}).get("record")
+                )
+                response["tool_calls"].insert(position, record)
+                response["scope"] = {"declined": False}
             return {"response": response}
 
         return _timed("collect", state, work)
@@ -274,6 +333,9 @@ def build_graph(deps: Dependencies):
         graph.add_node("resolve", resolve)
     if deps.recent is not None:
         graph.add_node("recent", recent)
+    if deps.scope is not None:
+        graph.add_node("scope", scope)
+        graph.add_node("decline", decline)
     for name, node in (
         ("route", route),
         ("generate", generate),
@@ -286,14 +348,23 @@ def build_graph(deps: Dependencies):
     ):
         graph.add_node(name, node)
 
-    # 앞 단계는 있는 것만 차례로 잇습니다: [translate] → [resolve] → [recent] → route.
+    # 앞 단계는 있는 것만 차례로 잇습니다: [translate] → [resolve] → [recent] → [scope] → route.
     previous = START
     for name, present in (("translate", deps.translate), ("resolve", deps.resolve),
                           ("recent", deps.recent)):
         if present is not None:
             graph.add_edge(previous, name)
             previous = name
-    graph.add_edge(previous, "route")
+    if deps.scope is not None:
+        graph.add_edge(previous, "scope")
+        graph.add_conditional_edges(
+            "scope",
+            lambda state: "decline" if (state.get("scope") or {}).get("decline") else "route",
+            {"decline": "decline", "route": "route"},
+        )
+        graph.add_edge("decline", END)
+    else:
+        graph.add_edge(previous, "route")
     graph.add_edge("route", "generate")
     graph.add_edge("generate", "collect")
     graph.add_edge("collect", "check_format")

@@ -1,0 +1,58 @@
+[
+ {
+  "q": "What is RLHF?",
+  "declined": false,
+  "evidence": 2,
+  "total": 9.079,
+  "answer": "The collection covers RLHF as a computer-science research topic. RLHF stands for reinforcement learn"
+ },
+ {
+  "q": "protein structure prediction",
+  "declined": false,
+  "evidence": 5,
+  "total": 4.789,
+  "answer": "Protein structure prediction is covered by research in the collection. The closest match is “HelixFo"
+ },
+ {
+  "q": "speculative decoding",
+  "declined": null,
+  "evidence": 10,
+  "total": 7.304,
+  "answer": "Speculative decoding speeds up autoregressive language-model generation by having a faster draft mod"
+ },
+ {
+  "q": "mixture of experts",
+  "declined": false,
+  "evidence": 1,
+  "total": 5.361,
+  "answer": "The collection includes research on mixture-of-experts. The closest match is “Mixture of Experts in "
+ },
+ {
+  "q": "What has Yann LeCun done?",
+  "declined": null,
+  "evidence": 6,
+  "total": 11.51,
+  "answer": "The graph records Yann LeCun as an author on research about predictive world models and planning, in"
+ },
+ {
+  "q": "Show me everything Yuquan Deng has written that's in your database.",
+  "declined": null,
+  "evidence": 2,
+  "total": 5.015,
+  "answer": "The database lists two papers authored by Yuquan Deng:\n\n| arXiv ID | Title | Primary category |\n|---"
+ },
+ {
+  "q": "Who won the 2022 FIFA World Cup?",
+  "declined": false,
+  "evidence": 0,
+  "total": 2.308,
+  "answer": "The collection covers computer-science research papers and does not cover who won the 2022 FIFA Worl"
+ },
+ {
+  "q": "김치찌개 맛있게 끓이는 법 알려줘",
+  "declined": true,
+  "evidence": 0,
+  "total": 2.987,
+  "answer": "This question is outside what this collection covers. It holds arXiv computer-science research paper"
+ }
+]
