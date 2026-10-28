@@ -1,0 +1,139 @@
+[
+ {
+  "id": "scope-01",
+  "question": "What's the weather in Seoul today?",
+  "outcome": "final",
+  "seconds": 2.59,
+  "declined": true,
+  "scope_checked": true,
+  "agent_tools": [],
+  "evidence_ids": [],
+  "answer": "This question is outside what this collection covers. It holds arXiv computer-science research papers - ask about papers, authors, citations, categories or research topics."
+ },
+ {
+  "id": "scope-02",
+  "question": "김치찌개 맛있게 끓이는 법 알려줘",
+  "outcome": "final",
+  "seconds": 3.7,
+  "declined": true,
+  "scope_checked": true,
+  "agent_tools": [],
+  "evidence_ids": [],
+  "answer": "This question is outside what this collection covers. It holds arXiv computer-science research papers - ask about papers, authors, citations, categories or research topics."
+ },
+ {
+  "id": "scope-03",
+  "question": "Who won the 2022 FIFA World Cup?",
+  "outcome": "final",
+  "seconds": 4.9,
+  "declined": null,
+  "scope_checked": false,
+  "agent_tools": [
+   "search_papers"
+  ],
+  "evidence_ids": [],
+  "answer": "Argentina won the 2022 FIFA World Cup. The retrieved papers do not provide evidence confirming this."
+ },
+ {
+  "id": "scope-04",
+  "question": "Write a Python function that reverses a linked list.",
+  "outcome": "final",
+  "seconds": 0.81,
+  "declined": true,
+  "scope_checked": true,
+  "agent_tools": [],
+  "evidence_ids": [],
+  "answer": "This question is outside what this collection covers. It holds arXiv computer-science research papers - ask about papers, authors, citations, categories or research topics."
+ },
+ {
+  "id": "in-rlhf",
+  "question": "What is RLHF?",
+  "outcome": "final",
+  "seconds": 4.97,
+  "declined": null,
+  "scope_checked": false,
+  "agent_tools": [
+   "search_papers"
+  ],
+  "evidence_ids": [
+   "2312.14925"
+  ],
+  "answer": "RLHF stands for **Reinforcement Learning from Human Feedback**. It is a way to train an AI system using people’s feedback—often their preferences between possible responses—instead of relying only on a hand-designed reward function. In a typical language-model workflow, human preferences are used to"
+ },
+ {
+  "id": "in-lecun",
+  "question": "What has Yann LeCun done?",
+  "outcome": "final",
+  "seconds": 16.55,
+  "declined": null,
+  "scope_checked": false,
+  "agent_tools": [
+   "search_graph",
+   "search_graph",
+   "search_graph"
+  ],
+  "evidence_ids": [
+   "2512.24497",
+   "2604.03208",
+   "2603.19312",
+   "2601.05230",
+   "2511.08544",
+   "2511.04670",
+   "2509.14252",
+   "2506.21552",
+   "2506.09985",
+   "2505.17117",
+   "2503.10622",
+   "2502.14819",
+   "2502.11831",
+   "2502.02013",
+   "2412.14164",
+   "2412.03572",
+   "2411.04983",
+   "2406.19314",
+   "2406.16860",
+   "2404.08471",
+   "2402.07630",
+   "2401.06209",
+   "2311.12983",
+   "2306.02572",
+   "2302.07842"
+  ],
+  "answer": "In this graph, Yann LeCun is listed as an author on work spanning predictive world models and planning, self-supervised learning, video and vision, language models, and related AI topics. Examples include *Hierarchical Planning with Latent World Models*, *LeWorldModel*, *LeJEPA*, and *V-JEPA 2*. The"
+ },
+ {
+  "id": "in-protein",
+  "question": "protein structure prediction",
+  "outcome": "final",
+  "seconds": 6.57,
+  "declined": false,
+  "scope_checked": true,
+  "agent_tools": [
+   "search_papers"
+  ],
+  "evidence_ids": [
+   "2207.13921",
+   "2304.02198",
+   "2408.16975",
+   "2608.16094"
+  ],
+  "answer": "Here are several papers on protein structure prediction:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2207.13921 | HelixFold-Single: MSA-free Protein Structure Prediction by Using Protein Language Model as an Alternative | q-bio.BM |\n| 2304.02198 | EigenFold: Generative Protein Structure"
+ },
+ {
+  "id": "in-moe",
+  "question": "mixture of experts",
+  "outcome": "final",
+  "seconds": 5.19,
+  "declined": false,
+  "scope_checked": true,
+  "agent_tools": [
+   "search_papers"
+  ],
+  "evidence_ids": [
+   "2507.11181",
+   "2510.16411",
+   "2403.16854"
+  ],
+  "answer": "Here are three papers related to mixture of experts:\n\n| arXiv ID | Title | Primary category |\n|---|---|---|\n| 2507.11181 | Mixture of Experts in Large Language Models | cs.LG |\n| 2510.16411 | Modeling Expert Interactions in Sparse Mixture of Experts via Graph Structures | cs.LG |\n| 2403.16854 | An E"
+ }
+]
