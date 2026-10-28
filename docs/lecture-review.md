@@ -158,7 +158,7 @@
 
 | Day | 교안 내용 | 상태 | 어떻게 / 결과 / 이유 |
 | --- | --- | --- | --- |
-| 62 | 위협 분석, 레드팀 질문 셋으로 공격 성공률 | ✅ | 레드팀 19문항을 앱 전체에 통과시킵니다(`evals/redteam.py`, [ADR-094](adr/ADR-094-red-team-through-the-whole-app.md)). 유출·쓰기·주입은 0건이었고, 범위 밖 질문 2개에 관계없는 근거가 붙었습니다. 고칠지는 따로 정합니다. |
+| 62 | 위협 분석, 레드팀 질문 셋으로 공격 성공률 | ✅ | 레드팀 19문항을 앱 전체에 통과시킵니다(`evals/redteam.py`, [ADR-094](adr/ADR-094-red-team-through-the-whole-app.md)). 유출·쓰기·주입은 0건이었고, 범위 밖 질문 2개에 관계없는 근거가 붙었고, 라우터 자리에서 앱이 먼저 가리도록 고쳤습니다([ADR-095](adr/ADR-095-out-of-scope-at-the-router.md)). |
 | 62 | NeMo Guardrails·Colang 대화 흐름 | ➖ | 대화 흐름이 없는 한 번짜리 질문입니다. 레일마다 모델 호출이 붙어 지연 목표와 맞서고, 의존성이 VM 메모리를 씁니다. |
 | 63 | 입력 self check 레일 | ➖ | 같은 이유(호출 하나 더). 판정이 이미 답 뒤에 있습니다. |
 | 63 | 민감정보 정규식 차단·가리기 | ➖ | 개인정보를 다루지 않습니다. |
@@ -202,5 +202,5 @@
 | 우선 | 항목 | 왜 지금 | 조건 |
 | --- | --- | --- | --- |
 | 1 | ~~평가 질문 바꿔 말하기(Day 69)~~ ✅ [ADR-093](adr/ADR-093-paraphrased-eval-questions.md) | 60문항 모두 원문과 같은 점수 | 게이트에는 아직 넣지 않음 |
-| 2 | ~~레드팀 질문 셋(Day 62)~~ ✅ [ADR-094](adr/ADR-094-red-team-through-the-whole-app.md) | 범위 밖 질문 2/5에 관계없는 근거 | 고칠 자리는 라우터 또는 지시문 |
+| 2 | ~~레드팀 질문 셋(Day 62)~~ ✅ [ADR-094](adr/ADR-094-red-team-through-the-whole-app.md) | 범위 밖 질문 2/5에 관계없는 근거 | 라우터로 고침([ADR-095](adr/ADR-095-out-of-scope-at-the-router.md)), 다시 돌려 범위 밖 4/4 |
 | 3 | 저자 동명이인 구별(Day 39) | `coauthor` 가족의 거짓 공저자 | Semantic Scholar 저자 ID 수집과 함께 |
