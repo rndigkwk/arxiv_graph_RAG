@@ -16,9 +16,8 @@
    짧은 주제 질문("What is RLHF?", "mixture of experts")은 0.74~0.88이었습니다(10개씩).
    - `DECLINE_BELOW`보다 낮으면 **에이전트를 부르지 않고** 정해진 문장으로 답합니다. 근거는 비어
      있습니다.
-   - 그 이상이면 에이전트에 맡기되, 이번 턴에만 "컴퓨터과학 연구 질문이 아니면 근거를 비우고 일반
-     지식으로 답하지 말라"는 메시지를 붙입니다. 월드컵 질문은 "AI World Cup" 논문 때문에 0.75가
-     나와 여기로 옵니다 - 점수만으로는 "What is RLHF?"(0.74)와 가를 수 없습니다.
+   - 그 이상이면 에이전트에 그대로 맡깁니다. 처음에는 "연구 질문이 아니면 근거를 비우라"는
+     메시지를 붙였는데, VM에서 "What is RLHF?"(0.74)까지 거절해서 뺐습니다(ADR-095 후속).
 
 이 모듈은 `chatbot`을 임포트하지 않습니다. 접속 없이 테스트합니다.
 """
@@ -49,22 +48,23 @@ DOMAIN_CUES = re.compile(
     re.IGNORECASE,
 )
 
-HINT = (
-    "Scope check: this question has no research terms, and the closest paper in the collection "
-    "is only loosely related ({title}). The collection holds computer-science research papers. "
-    "If the question is not about computer-science research, answer that the collection does "
-    "not cover it, with empty evidence_ids, and do not answer from general knowledge. If it is "
-    "a research question, answer it as usual and ignore this message."
-)
 DECLINE_ANSWER = (
     "This question is outside what this collection covers. It holds arXiv computer-science "
     "research papers - ask about papers, authors, citations, categories or research topics."
 )
 
 
+# 대문자가 둘 이상인 짧은 낱말 - RLHF·MoE·GANs·LLMs. "What is RLHF?"는 연구 용어가 없고 점수도
+# 메시지 쪽(0.74)이라, VM에서 모델이 메시지를 따라 거절했습니다(ADR-095 후속). "FIFA"도 여기에
+# 걸려 월드컵 질문은 에이전트가 그대로 받습니다 - 범위 안 질문을 막는 쪽이 더 비쌉니다.
+ACRONYM = re.compile(r"\b[A-Z][A-Za-z]{0,5}[A-Z]s?\b")
+
+
 def has_domain_cue(*texts: str | None) -> bool:
-    """연구 단서가 하나라도 있으면 True. 라우터의 관계 단서도 단서입니다."""
+    """연구 단서가 하나라도 있으면 True. 라우터의 관계 단서와 약어도 단서입니다."""
     for text in texts:
+        if ACRONYM.search(text or ""):
+            return True
         lowered = (text or "").lower()
         if DOMAIN_CUES.search(lowered) or any(
             re.search(pattern, lowered) for _, pattern in routing.RELATION_CUES
@@ -101,15 +101,10 @@ def top_score(output: Any) -> float | None:
 
 
 def decide(output: Any) -> str:
-    """`decline`(앱이 답함) 또는 `hint`(에이전트에 맡기고 메시지를 붙임)."""
+    """`decline`(앱이 답함) 또는 `pass`(에이전트에 그대로 맡김)."""
     score = top_score(output)
     # 점수를 모르면 거절하지 않습니다 - 범위 안 질문을 막는 쪽이 비쌉니다.
-    return "decline" if score is not None and score < DECLINE_BELOW else "hint"
-
-
-def hint(output: dict[str, Any]) -> str:
-    title = str((output.get("papers") or [{}])[0].get("title") or "no title")
-    return HINT.format(title=title.replace('"', "'"))
+    return "decline" if score is not None and score < DECLINE_BELOW else "pass"
 
 
 def call_record(query: str, output: Any, seconds: float) -> dict[str, Any]:

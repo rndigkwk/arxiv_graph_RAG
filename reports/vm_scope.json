@@ -1,0 +1,76 @@
+[
+ {
+  "id": "scope-01",
+  "question": "What's the weather in Seoul today?",
+  "outcome": "final",
+  "seconds": 4.27,
+  "declined": true,
+  "scope_checked": true,
+  "agent_tools": [],
+  "evidence_ids": [],
+  "answer": "This question is outside what this collection covers. It holds arXiv computer-science research papers - ask about papers, authors, citations, categories or research topics."
+ },
+ {
+  "id": "scope-02",
+  "question": "김치찌개 맛있게 끓이는 법 알려줘",
+  "outcome": "final",
+  "seconds": 2.85,
+  "declined": true,
+  "scope_checked": true,
+  "agent_tools": [],
+  "evidence_ids": [],
+  "answer": "This question is outside what this collection covers. It holds arXiv computer-science research papers - ask about papers, authors, citations, categories or research topics."
+ },
+ {
+  "id": "scope-03",
+  "question": "Who won the 2022 FIFA World Cup?",
+  "outcome": "final",
+  "seconds": 6.13,
+  "declined": false,
+  "scope_checked": true,
+  "agent_tools": [],
+  "evidence_ids": [],
+  "answer": "The collection covers computer-science research papers and does not provide an answer to who won the 2022 FIFA World Cup."
+ },
+ {
+  "id": "scope-04",
+  "question": "Write a Python function that reverses a linked list.",
+  "outcome": "final",
+  "seconds": 0.85,
+  "declined": true,
+  "scope_checked": true,
+  "agent_tools": [],
+  "evidence_ids": [],
+  "answer": "This question is outside what this collection covers. It holds arXiv computer-science research papers - ask about papers, authors, citations, categories or research topics."
+ },
+ {
+  "id": "in-rlhf",
+  "question": "What is RLHF?",
+  "outcome": "final",
+  "seconds": 2.62,
+  "declined": false,
+  "scope_checked": true,
+  "agent_tools": [],
+  "evidence_ids": [],
+  "answer": "The collection covers computer-science research papers, and this question is not framed as a research question. It therefore does not cover it."
+ },
+ {
+  "id": "in-lecun",
+  "question": "What has Yann LeCun done?",
+  "outcome": "final",
+  "seconds": 8.95,
+  "declined": null,
+  "scope_checked": false,
+  "agent_tools": [
+   "search_graph"
+  ],
+  "evidence_ids": [
+   "2604.03208",
+   "2603.19312",
+   "2512.24497",
+   "2511.08544",
+   "2506.09985"
+  ],
+  "answer": "The graph shows Yann LeCun as a coauthor on work about predictive world models and planning, including *Hierarchical Planning with Latent World Models* and *What Drives Success in Physical Planning with Joint-Embedding Predictive World Models?* It also lists his coauthorship on *LeWorldModel*, *LeJE"
+ }
+]

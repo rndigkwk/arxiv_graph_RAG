@@ -1,0 +1,88 @@
+[
+ {
+  "q": "What is RLHF?",
+  "cue": true,
+  "scope": null,
+  "evidence": 1,
+  "seconds": 28.31,
+  "answer": "RLHF stands for **reinforcement learning from human feedback**. It is a way to train or fine-tune a system using people’s feedback—often their preferences betwe"
+ },
+ {
+  "q": "Explain MoE.",
+  "cue": true,
+  "scope": null,
+  "evidence": 2,
+  "seconds": 5.48,
+  "answer": "**Mixture of Experts (MoE)** is a model design that contains multiple specialized sub-networks, called *experts*, plus a *router* (or gating function) that choo"
+ },
+ {
+  "q": "How do GANs work?",
+  "cue": true,
+  "scope": null,
+  "evidence": 1,
+  "seconds": 5.81,
+  "answer": "A GAN has two neural networks trained in competition:\n\n- **Generator:** takes random input (noise) and turns it into a synthetic sample, such as an image.\n- **D"
+ },
+ {
+  "q": "What is RAG?",
+  "cue": true,
+  "scope": null,
+  "evidence": 2,
+  "seconds": 5.88,
+  "answer": "RAG stands for **retrieval-augmented generation**. It combines information retrieval with a generative language model: the system retrieves relevant information"
+ },
+ {
+  "q": "protein structure prediction",
+  "cue": false,
+  "scope": {
+   "declined": false
+  },
+  "evidence": 6,
+  "seconds": 7.0,
+  "answer": "Relevant papers on protein structure prediction include work on MSA-free prediction using protein language models, diffusion-based generation of structural ense"
+ },
+ {
+  "q": "mixture of experts",
+  "cue": false,
+  "scope": {
+   "declined": false
+  },
+  "evidence": 3,
+  "seconds": 8.32,
+  "answer": "Mixture of Experts (MoE) is a model architecture that uses a routing mechanism to activate selected expert networks for each input, increasing model capacity wi"
+ },
+ {
+  "q": "speculative decoding",
+  "cue": false,
+  "scope": null,
+  "evidence": 5,
+  "seconds": 5.01,
+  "answer": "Speculative decoding accelerates language-model inference by drafting tokens with a faster auxiliary model and verifying them with the target model. The papers "
+ },
+ {
+  "q": "What has Yann LeCun done?",
+  "cue": false,
+  "scope": null,
+  "evidence": 25,
+  "seconds": 11.54,
+  "answer": "In this arXiv collection, Yann LeCun is listed as an author on research spanning predictive world models and planning, self-supervised learning, video understan"
+ },
+ {
+  "q": "Who won the 2022 FIFA World Cup?",
+  "cue": true,
+  "scope": null,
+  "evidence": 0,
+  "seconds": 3.89,
+  "answer": "Argentina won the 2022 FIFA World Cup, defeating France in the final. The retrieved papers do not provide evidence confirming this answer."
+ },
+ {
+  "q": "김치찌개 끓이는 법",
+  "cue": false,
+  "scope": {
+   "declined": true
+  },
+  "evidence": 0,
+  "seconds": 3.61,
+  "answer": "This question is outside what this collection covers. It holds arXiv computer-science research papers - ask about papers, authors, citations, categories or rese"
+ }
+]
