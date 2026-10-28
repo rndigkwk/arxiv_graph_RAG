@@ -575,7 +575,7 @@ def judging_model(usage):
     # `strict=True`는 OpenAI의 구조화 출력 경로입니다. 다른 공급자에는 그 인자가 없습니다 -
     # 그래서 스키마를 강제하는 방법이 공급자마다 다르고, ADR-058이 그 차이를 적어 둡니다.
     return structured_judge(
-        llm.with_structured_output(QuestionVerdict, strict=True, include_raw=True), usage
+        judge_llm.with_structured_output(QuestionVerdict, strict=True, include_raw=True), usage
     )
 
 
@@ -1359,6 +1359,10 @@ llm = ChatOpenAI(
     model=llm_model, api_key=openai_api_key,
     use_responses_api=True, streaming=True, timeout=60, max_retries=1,
 )
+# 조건 판정은 추론을 끕니다(ADR-089). 판정 연구 61문항에서 정확도는 그대로였고 판정 호출 p50이
+# 1.96초에서 1.57초로 줄었습니다. 답 쓰기에 쓰는 `llm`은 그대로입니다 - 복사본만 바꿉니다.
+JUDGE_REASONING = {"effort": "none"}
+judge_llm = llm.model_copy(update={"reasoning": JUDGE_REASONING})
 # 번역 도구와 번역 버튼이 함께 쓰는 짧은 호출용 모델입니다. 구조화 출력을 쓰지 않습니다.
 # 번역 지연은 잰 적이 없어서 제한 시간은 그대로 두고 재시도만 맞춥니다.
 translator = ChatOpenAI(model=llm_model, api_key=openai_api_key, timeout=60, max_retries=1)

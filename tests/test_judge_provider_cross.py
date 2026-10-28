@@ -166,6 +166,48 @@ def test_the_openai_judge_refuses_a_model_the_app_does_not_use():
     assert "OPENAI_MODEL" in str(caught.value)
 
 
+def test_reasoning_effort_changes_only_the_effort():
+    """추론 강도를 바꾼 심판은 앱의 판정 호출과 그것 하나만 달라야 합니다."""
+    try:
+        from src import chatbot
+    except Exception as exc:
+        pytest.skip(f"chatbot을 가져올 수 없습니다: {type(exc).__name__}")
+    assert judge_study.judge_for("openai", "")[0] is chatbot.judging_model
+    make, judge = judge_study.judge_for("openai", "", "none")
+    assert make is not chatbot.judging_model
+    assert "reasoning=none" in judge
+    # 대조: 앱의 `llm`은 그대로입니다. 복사하지 않고 고치면 답변 쪽까지 바뀝니다.
+    assert not chatbot.llm.reasoning
+
+
+def test_the_app_judge_turns_reasoning_off_and_says_so():
+    """ADR-089: 판정만 추론을 끄고, 보고서의 심판 이름에 그것이 적힙니다."""
+    try:
+        from src import chatbot
+    except Exception as exc:
+        pytest.skip(f"chatbot을 가져올 수 없습니다: {type(exc).__name__}")
+    assert chatbot.judge_llm.reasoning == {"effort": "none"}
+    assert chatbot.judge_llm.model_name == chatbot.llm.model_name
+    assert chatbot.judge_llm.request_timeout == chatbot.llm.request_timeout
+    assert chatbot.judge_llm.max_retries == chatbot.llm.max_retries
+    assert "reasoning=none" in judge_study.judge_for("openai", "")[1]
+
+
+def test_reasoning_effort_is_only_for_the_openai_judge():
+    with pytest.raises(SystemExit):
+        judge_study.judge_for("anthropic", "", "low")
+
+
+def test_old_rows_without_seconds_report_no_latency():
+    """옛 보고서의 행에는 시간이 없습니다. 0으로 채우면 빨라 보입니다."""
+    row = {"family": "topic", "content_correct": True, "graph_correct": True,
+           "got_content": True, "expect_content": True, "got_graph": False,
+           "expect_graph": False, "tokens": {}}
+    assert judge_study.summarize([row])["seconds_p50"] is None
+    timed = [{**row, "seconds": s} for s in (1.0, 3.0, 2.0)]
+    assert judge_study.summarize(timed)["seconds_p50"] == 2.0
+
+
 def test_the_anthropic_judge_asks_for_the_key_by_the_name_in_env(monkeypatch):
     monkeypatch.delenv(judge_study.ANTHROPIC_KEY, raising=False)
     with pytest.raises(SystemExit) as caught:
