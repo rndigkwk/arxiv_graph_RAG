@@ -1,0 +1,145 @@
+{
+ "note": "CI full 평가, main과 이 브랜치를 같은 시각에 짝으로 3회(ADR-091). pre = generate - 마지막 턴(판정 시작 전), post = 마지막 턴 + check_conditions.",
+ "runs": {
+  "40626532568": {
+   "arm": "main",
+   "agent_reasoning": null,
+   "total_p50": 8.84,
+   "total_p90": 16.775,
+   "generate_p50": 5.108,
+   "check_conditions_p50": 2.961,
+   "seconds_per_turn_p50": 2.344,
+   "last_turn_p50": 2.526,
+   "answer_evidence_precision": 1.0,
+   "answer_evidence_recall": 1.0,
+   "hit_at_k": 1.0,
+   "failures": 0,
+   "ragas_faithfulness": 0.9889,
+   "ragas_answer_relevancy": 0.8385
+  },
+  "40626538085": {
+   "arm": "main",
+   "agent_reasoning": null,
+   "total_p50": 8.794,
+   "total_p90": 16.313,
+   "generate_p50": 5.03,
+   "check_conditions_p50": 2.218,
+   "seconds_per_turn_p50": 2.259,
+   "last_turn_p50": 2.529,
+   "answer_evidence_precision": 1.0,
+   "answer_evidence_recall": 1.0,
+   "hit_at_k": 1.0,
+   "failures": 0,
+   "ragas_faithfulness": 0.9889,
+   "ragas_answer_relevancy": 0.8546
+  },
+  "40626543514": {
+   "arm": "main",
+   "agent_reasoning": null,
+   "total_p50": 9.159,
+   "total_p90": 15.83,
+   "generate_p50": 5.038,
+   "check_conditions_p50": 2.926,
+   "seconds_per_turn_p50": 2.294,
+   "last_turn_p50": 2.454,
+   "answer_evidence_precision": 1.0,
+   "answer_evidence_recall": 1.0,
+   "hit_at_k": 1.0,
+   "failures": 0,
+   "ragas_faithfulness": 0.9889,
+   "ragas_answer_relevancy": 0.8402
+  },
+  "40626535424": {
+   "arm": "agent_none",
+   "agent_reasoning": {
+    "effort": "none"
+   },
+   "total_p50": 7.685,
+   "total_p90": 18.199,
+   "generate_p50": 3.888,
+   "check_conditions_p50": 3.3,
+   "seconds_per_turn_p50": 1.722,
+   "last_turn_p50": 1.881,
+   "answer_evidence_precision": 1.0,
+   "answer_evidence_recall": 1.0,
+   "hit_at_k": 1.0,
+   "failures": 0,
+   "ragas_faithfulness": 0.9917,
+   "ragas_answer_relevancy": 0.8608
+  },
+  "40626540484": {
+   "arm": "agent_none",
+   "agent_reasoning": {
+    "effort": "none"
+   },
+   "total_p50": 9.439,
+   "total_p90": 20.333,
+   "generate_p50": 4.039,
+   "check_conditions_p50": 4.539,
+   "seconds_per_turn_p50": 1.815,
+   "last_turn_p50": 1.973,
+   "answer_evidence_precision": 1.0,
+   "answer_evidence_recall": 1.0,
+   "hit_at_k": 1.0,
+   "failures": 0,
+   "ragas_faithfulness": 1.0,
+   "ragas_answer_relevancy": 0.8491
+  },
+  "40626546930": {
+   "arm": "agent_none",
+   "agent_reasoning": {
+    "effort": "none"
+   },
+   "total_p50": 9.567,
+   "total_p90": 16.526,
+   "generate_p50": 4.144,
+   "check_conditions_p50": 3.652,
+   "seconds_per_turn_p50": 1.846,
+   "last_turn_p50": 2.026,
+   "answer_evidence_precision": 1.0,
+   "answer_evidence_recall": 1.0,
+   "hit_at_k": 1.0,
+   "failures": 0,
+   "ragas_faithfulness": 1.0,
+   "ragas_answer_relevancy": 0.8549
+  }
+ },
+ "per_case": {},
+ "paired": {
+  "total": {
+   "main_p50": 8.84,
+   "agent_none_p50": 8.982,
+   "per_case_diff_median": -0.586,
+   "per_case_diff_mean": -0.251,
+   "agent_none_faster": 21
+  },
+  "pre": {
+   "main_p50": 2.38,
+   "agent_none_p50": 2.0,
+   "per_case_diff_median": -0.446,
+   "per_case_diff_mean": -0.59,
+   "agent_none_faster": 26
+  },
+  "post": {
+   "main_p50": 5.185,
+   "agent_none_p50": 5.801,
+   "per_case_diff_median": -0.066,
+   "per_case_diff_mean": 0.329,
+   "agent_none_faster": 16
+  },
+  "last": {
+   "main_p50": 2.524,
+   "agent_none_p50": 1.932,
+   "per_case_diff_median": -0.566,
+   "per_case_diff_mean": -0.671,
+   "agent_none_faster": 30
+  },
+  "check_conditions": {
+   "main_p50": 2.255,
+   "agent_none_p50": 3.95,
+   "per_case_diff_median": 0.483,
+   "per_case_diff_mean": 0.999,
+   "agent_none_faster": 7
+  }
+ }
+}
