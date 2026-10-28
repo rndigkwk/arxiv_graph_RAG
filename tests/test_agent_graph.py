@@ -303,13 +303,14 @@ def test_an_out_of_scope_question_never_reaches_the_agent():
     assert state["result"]["messages"][-1].content == "outside"
 
 
-def test_a_loose_match_goes_to_the_agent_with_a_hint():
+def test_a_loose_match_goes_to_the_agent_untouched():
     deps, _, generated = make_deps()
     record = {"name": "search_papers", "by": "app", "status": "success", "output": {}}
-    deps = _with_scope(deps, lambda q, en: {"hint": "SCOPE HINT", "record": record})
-    state = run(deps, "Who won the World Cup?")
+    deps = _with_scope(deps, lambda q, en: {"record": record})
+    state = run(deps, "What is protein structure prediction?")
     assert nodes(state)[:3] == ["scope", "route", "generate"]
-    assert ("user", "SCOPE HINT") in generated[0]
+    # 메시지를 붙이지 않습니다 - 붙였더니 범위 안 질문까지 거절했습니다(ADR-095 후속).
+    assert generated[0] == [("user", "What is protein structure prediction?")]
     assert state["response"]["tool_calls"][0] is record
     assert state["response"]["scope"] == {"declined": False}
 

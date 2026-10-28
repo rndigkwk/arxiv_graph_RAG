@@ -92,7 +92,8 @@ class Dependencies:
     recent: Callable[[str, str], dict[str, Any] | None] | None = None
     # 범위 밖 질문을 앱이 먼저 가립니다(ADR-095). 인자는 `recent`와 같습니다. None이면 범위
     # 안이고, `{"decline": True, "answer": ..., "record": ...}`이면 에이전트 없이 답하고,
-    # `{"hint": ..., "record": ...}`이면 이번 턴에 메시지를 붙입니다. None이면 노드가 없습니다.
+    # `{"record": ...}`이면 확인 검색만 기록하고 에이전트에 그대로 맡깁니다. 메시지는 붙이지
+    # 않습니다 - 붙였더니 범위 안 질문까지 거절했습니다. None이면 노드가 없습니다.
     scope: Callable[[str, str], dict[str, Any] | None] | None = None
 
 
@@ -173,11 +174,7 @@ def build_graph(deps: Dependencies):
             if state.get("resolution") or state.get("recency"):
                 return {}
             done = deps.scope(state["question"], english_of(state))
-            if not done:
-                return {}
-            if done.get("decline"):
-                return {"scope": done}
-            return {"scope": done, "messages": [*state["messages"], ("user", done["hint"])]}
+            return {"scope": done} if done else {}
 
         return _timed("scope", state, work)
 

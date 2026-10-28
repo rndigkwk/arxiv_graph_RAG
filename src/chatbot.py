@@ -763,7 +763,7 @@ def ask(question, history, on_answer=None):
         record = pre_scope.call_record(english, output, time.perf_counter() - started)
         if pre_scope.decide(output) == "decline":
             return {"decline": True, "answer": pre_scope.DECLINE_ANSWER, "record": record}
-        return {"hint": pre_scope.hint(output), "record": record}
+        return {"record": record}
 
     def check_conditions(user_question, response):
         queries = early_judge.graph_queries(response["tool_calls"])
