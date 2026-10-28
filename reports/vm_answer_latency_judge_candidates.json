@@ -1,0 +1,1985 @@
+{
+  "generated_at": "2026-10-28T06:23:25+00:00",
+  "api": "https://8-230-25-138.sslip.io",
+  "commit": "2fb4ae4",
+  "module_commit": "2fb4ae4",
+  "dataset": "evals\\cases_graph.json",
+  "summary": {
+    "asked": 15,
+    "answered": 15,
+    "not_answered": [],
+    "server_seconds": {
+      "p50": 4.623,
+      "p90": 8.025,
+      "max": 8.138
+    },
+    "client_seconds": {
+      "p50": 5.089,
+      "p90": 8.117
+    },
+    "first_partial_seconds_p50": 0.266,
+    "target_p50": 10.0,
+    "meets_target": true,
+    "nodes": [
+      {
+        "node": "generate",
+        "p50": 4.347,
+        "share": 0.917
+      },
+      {
+        "node": "check_conditions",
+        "p50": 0.0,
+        "share": 0.052
+      },
+      {
+        "node": "resolve",
+        "p50": 0.091,
+        "share": 0.031
+      },
+      {
+        "node": "translate",
+        "p50": 0.0,
+        "share": 0.0
+      },
+      {
+        "node": "recent",
+        "p50": 0.0,
+        "share": 0.0
+      },
+      {
+        "node": "route",
+        "p50": 0.0,
+        "share": 0.0
+      },
+      {
+        "node": "collect",
+        "p50": 0.0,
+        "share": 0.0
+      },
+      {
+        "node": "check_format",
+        "p50": 0.0,
+        "share": 0.0
+      },
+      {
+        "node": "accept",
+        "p50": 0.0,
+        "share": 0.0
+      }
+    ],
+    "inside_generate": {
+      "traced": 15,
+      "model_turns_mean": 2,
+      "seconds_per_turn_p50": 2.161,
+      "model_share": 0.98,
+      "tools_share": 0.017
+    },
+    "tools": {
+      "search_graph": {
+        "calls": 15,
+        "p50": 0.038
+      },
+      "rank_related_papers": {
+        "calls": 15,
+        "p50": 0.256
+      },
+      "resolve_paper": {
+        "calls": 9,
+        "p50": 0.092
+      }
+    },
+    "judge": {
+      "early": 15,
+      "timed": 15,
+      "judge_seconds_p50": 1.977,
+      "ahead_seconds_p50": 1.977,
+      "waited_seconds_p50": 0.0
+    },
+    "last_turn": {
+      "traced": 15,
+      "last_seconds_p50": 2.151,
+      "earlier_seconds_p50": 1.93,
+      "last_output_tokens_p50": 159
+    },
+    "families_p50": {
+      "author": 4.079,
+      "citing": 4.589,
+      "coauthor": 5.274,
+      "reference": 4.623,
+      "topcited": 5.056
+    },
+    "vs_local": {
+      "pairs": 15,
+      "local_p50": 16.563,
+      "vm_p50": 4.623
+    }
+  },
+  "results": [
+    {
+      "id": "author-01",
+      "category": "author",
+      "outcome": "final",
+      "client_seconds": 8.117,
+      "first_partial_seconds": 0.894,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.819
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.004
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 7.202
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.819,
+          "recent": 0.0,
+          "route": 0.004,
+          "generate": 7.202,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 8.025
+      },
+      "generate_trace": {
+        "generate_seconds": 7.202,
+        "tools_seconds": 0.313,
+        "tools_seconds_summed": 0.313,
+        "tool_calls": 1,
+        "model_seconds": 6.867,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 4.779,
+            "output_tokens": 86
+          },
+          {
+            "seconds": 2.089,
+            "output_tokens": 116
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.022,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 1.977,
+        "ahead_seconds": 1.977,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "search_graph",
+          "seconds": 0.313
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.21
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "author-02",
+      "category": "author",
+      "outcome": "final",
+      "client_seconds": 4.362,
+      "first_partial_seconds": 0.312,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.091
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 3.988
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.091,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 3.988,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 4.079
+      },
+      "generate_trace": {
+        "generate_seconds": 3.988,
+        "tools_seconds": 0.009,
+        "tools_seconds_summed": 0.009,
+        "tool_calls": 1,
+        "model_seconds": 3.966,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 1.779,
+            "output_tokens": 86
+          },
+          {
+            "seconds": 2.187,
+            "output_tokens": 158
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.013,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 1.738,
+        "ahead_seconds": 1.738,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "search_graph",
+          "seconds": 0.009
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.267
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "author-03",
+      "category": "author",
+      "outcome": "final",
+      "client_seconds": 4.196,
+      "first_partial_seconds": 0.398,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.103
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 3.841
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.103,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 3.841,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 3.944
+      },
+      "generate_trace": {
+        "generate_seconds": 3.841,
+        "tools_seconds": 0.093,
+        "tools_seconds_summed": 0.093,
+        "tool_calls": 1,
+        "model_seconds": 3.736,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 1.689,
+            "output_tokens": 91
+          },
+          {
+            "seconds": 2.046,
+            "output_tokens": 145
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.012,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 1.887,
+        "ahead_seconds": 1.887,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "search_graph",
+          "seconds": 0.093
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.231
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "citing-01",
+      "category": "citing",
+      "outcome": "final",
+      "client_seconds": 4.713,
+      "first_partial_seconds": 0.29,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.106
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.483
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.106,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.483,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 4.589
+      },
+      "generate_trace": {
+        "generate_seconds": 4.483,
+        "tools_seconds": 0.009,
+        "tools_seconds_summed": 0.009,
+        "tool_calls": 1,
+        "model_seconds": 4.459,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 1.783,
+            "output_tokens": 89
+          },
+          {
+            "seconds": 2.676,
+            "output_tokens": 231
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.015,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 2.113,
+        "ahead_seconds": 2.113,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.106
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.009
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.286
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "citing-02",
+      "category": "citing",
+      "outcome": "final",
+      "client_seconds": 5.302,
+      "first_partial_seconds": 1.18,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.09
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.029
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.09,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.029,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 4.119
+      },
+      "generate_trace": {
+        "generate_seconds": 4.029,
+        "tools_seconds": 0.037,
+        "tools_seconds_summed": 0.037,
+        "tool_calls": 1,
+        "model_seconds": 3.98,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 1.818,
+            "output_tokens": 91
+          },
+          {
+            "seconds": 2.162,
+            "output_tokens": 140
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.012,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 1.71,
+        "ahead_seconds": 1.71,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.09
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.037
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.213
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "citing-03",
+      "category": "citing",
+      "outcome": "final",
+      "client_seconds": 5.343,
+      "first_partial_seconds": 0.163,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.087
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.159
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 1.021
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.087,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.159,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 1.021,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 5.267
+      },
+      "generate_trace": {
+        "generate_seconds": 4.159,
+        "tools_seconds": 0.104,
+        "tools_seconds_summed": 0.104,
+        "tool_calls": 1,
+        "model_seconds": 4.042,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 1.93,
+            "output_tokens": 75
+          },
+          {
+            "seconds": 2.111,
+            "output_tokens": 149
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.013,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 3.139,
+        "ahead_seconds": 2.118,
+        "waited_seconds": 1.021
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.087
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.104
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.19
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "reference-01",
+      "category": "reference",
+      "outcome": "final",
+      "client_seconds": 4.704,
+      "first_partial_seconds": 0.266,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.147
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.347
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.129
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.147,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.347,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.129,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 4.623
+      },
+      "generate_trace": {
+        "generate_seconds": 4.347,
+        "tools_seconds": 0.012,
+        "tools_seconds_summed": 0.012,
+        "tool_calls": 1,
+        "model_seconds": 4.322,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 2.171,
+            "output_tokens": 96
+          },
+          {
+            "seconds": 2.151,
+            "output_tokens": 167
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.013,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 2.287,
+        "ahead_seconds": 2.158,
+        "waited_seconds": 0.129
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.147
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.012
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.234
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "reference-02",
+      "category": "reference",
+      "outcome": "final",
+      "client_seconds": 5.089,
+      "first_partial_seconds": 0.379,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.221
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.782
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.221,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.782,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 5.003
+      },
+      "generate_trace": {
+        "generate_seconds": 4.782,
+        "tools_seconds": 0.011,
+        "tools_seconds_summed": 0.011,
+        "tool_calls": 1,
+        "model_seconds": 4.757,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 2.616,
+            "output_tokens": 96
+          },
+          {
+            "seconds": 2.141,
+            "output_tokens": 163
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.014,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 1.945,
+        "ahead_seconds": 1.945,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.221
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.011
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.256
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "reference-03",
+      "category": "reference",
+      "outcome": "final",
+      "client_seconds": 4.666,
+      "first_partial_seconds": 0.285,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.195
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.375
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.195,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.375,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 4.57
+      },
+      "generate_trace": {
+        "generate_seconds": 4.375,
+        "tools_seconds": 0.038,
+        "tools_seconds_summed": 0.038,
+        "tool_calls": 1,
+        "model_seconds": 4.323,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 2.0,
+            "output_tokens": 96
+          },
+          {
+            "seconds": 2.323,
+            "output_tokens": 188
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.014,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 2.297,
+        "ahead_seconds": 2.297,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.195
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.038
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.268
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "coauthor-01",
+      "category": "coauthor",
+      "outcome": "final",
+      "client_seconds": 5.42,
+      "first_partial_seconds": 0.172,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.083
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.581
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.61
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.083,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.581,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.61,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 5.274
+      },
+      "generate_trace": {
+        "generate_seconds": 4.581,
+        "tools_seconds": 0.152,
+        "tools_seconds_summed": 0.152,
+        "tool_calls": 1,
+        "model_seconds": 4.416,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 1.86,
+            "output_tokens": 117
+          },
+          {
+            "seconds": 2.557,
+            "output_tokens": 209
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.013,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 3.173,
+        "ahead_seconds": 2.563,
+        "waited_seconds": 0.61
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.083
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.152
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.211
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "coauthor-02",
+      "category": "coauthor",
+      "outcome": "final",
+      "client_seconds": 4.488,
+      "first_partial_seconds": 0.193,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.092
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.262
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.092,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.262,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 4.354
+      },
+      "generate_trace": {
+        "generate_seconds": 4.262,
+        "tools_seconds": 0.155,
+        "tools_seconds_summed": 0.155,
+        "tool_calls": 1,
+        "model_seconds": 4.093,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 2.258,
+            "output_tokens": 116
+          },
+          {
+            "seconds": 1.834,
+            "output_tokens": 150
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.014,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 1.829,
+        "ahead_seconds": 1.829,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.092
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.155
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.337
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "coauthor-03",
+      "category": "coauthor",
+      "outcome": "final",
+      "client_seconds": 5.827,
+      "first_partial_seconds": 0.156,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.083
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.005
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 1.652
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.083,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.005,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 1.652,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 5.74
+      },
+      "generate_trace": {
+        "generate_seconds": 4.005,
+        "tools_seconds": 0.124,
+        "tools_seconds_summed": 0.124,
+        "tool_calls": 1,
+        "model_seconds": 3.868,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 1.85,
+            "output_tokens": 116
+          },
+          {
+            "seconds": 2.018,
+            "output_tokens": 188
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.013,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 3.676,
+        "ahead_seconds": 2.025,
+        "waited_seconds": 1.651
+      },
+      "tools": [
+        {
+          "name": "resolve_paper",
+          "seconds": 0.083
+        },
+        {
+          "name": "search_graph",
+          "seconds": 0.124
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.221
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "topcited-01",
+      "category": "topcited",
+      "outcome": "final",
+      "client_seconds": 8.222,
+      "first_partial_seconds": 0.189,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.086
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 8.052
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.086,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 8.052,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 8.138
+      },
+      "generate_trace": {
+        "generate_seconds": 8.052,
+        "tools_seconds": 0.035,
+        "tools_seconds_summed": 0.035,
+        "tool_calls": 1,
+        "model_seconds": 8.003,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 2.03,
+            "output_tokens": 90
+          },
+          {
+            "seconds": 5.973,
+            "output_tokens": 169
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.014,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 1.829,
+        "ahead_seconds": 1.829,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "search_graph",
+          "seconds": 0.035
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.306
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "topcited-02",
+      "category": "topcited",
+      "outcome": "final",
+      "client_seconds": 4.093,
+      "first_partial_seconds": 0.162,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.085
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 3.928
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.085,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 3.928,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.0,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 4.013
+      },
+      "generate_trace": {
+        "generate_seconds": 3.928,
+        "tools_seconds": 0.056,
+        "tools_seconds_summed": 0.056,
+        "tool_calls": 1,
+        "model_seconds": 3.859,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 1.815,
+            "output_tokens": 103
+          },
+          {
+            "seconds": 2.044,
+            "output_tokens": 150
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.013,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 1.872,
+        "ahead_seconds": 1.872,
+        "waited_seconds": 0.0
+      },
+      "tools": [
+        {
+          "name": "search_graph",
+          "seconds": 0.056
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.274
+        }
+      ],
+      "detail": null
+    },
+    {
+      "id": "topcited-03",
+      "category": "topcited",
+      "outcome": "final",
+      "client_seconds": 5.209,
+      "first_partial_seconds": 0.169,
+      "graph_trace": {
+        "nodes": [
+          {
+            "node": "translate",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "resolve",
+            "attempt": 1,
+            "seconds": 0.083
+          },
+          {
+            "node": "recent",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "route",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "generate",
+            "attempt": 1,
+            "seconds": 4.371
+          },
+          {
+            "node": "collect",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_format",
+            "attempt": 1,
+            "seconds": 0.0
+          },
+          {
+            "node": "check_conditions",
+            "attempt": 1,
+            "seconds": 0.602
+          },
+          {
+            "node": "accept",
+            "attempt": 1,
+            "seconds": 0.0
+          }
+        ],
+        "visits": {
+          "translate": 1,
+          "resolve": 1,
+          "recent": 1,
+          "route": 1,
+          "generate": 1,
+          "collect": 1,
+          "check_format": 1,
+          "check_conditions": 1,
+          "accept": 1
+        },
+        "seconds": {
+          "translate": 0.0,
+          "resolve": 0.083,
+          "recent": 0.0,
+          "route": 0.0,
+          "generate": 4.371,
+          "collect": 0.0,
+          "check_format": 0.0,
+          "check_conditions": 0.602,
+          "accept": 0.0
+        },
+        "rejections": [],
+        "attempts": 1,
+        "total_seconds": 5.056
+      },
+      "generate_trace": {
+        "generate_seconds": 4.371,
+        "tools_seconds": 0.029,
+        "tools_seconds_summed": 0.029,
+        "tool_calls": 1,
+        "model_seconds": 4.329,
+        "model_turns": 2,
+        "turns": [
+          {
+            "seconds": 2.145,
+            "output_tokens": 98
+          },
+          {
+            "seconds": 2.184,
+            "output_tokens": 159
+          }
+        ],
+        "unattributed_seconds": 0.0,
+        "other_seconds": 0.013,
+        "adds_up": true,
+        "stray_ends": 0,
+        "attached": 1
+      },
+      "condition_timing": {
+        "early": true,
+        "source": "candidates",
+        "judge_seconds": 2.792,
+        "ahead_seconds": 2.19,
+        "waited_seconds": 0.602
+      },
+      "tools": [
+        {
+          "name": "search_graph",
+          "seconds": 0.029
+        },
+        {
+          "name": "rank_related_papers",
+          "seconds": 0.317
+        }
+      ],
+      "detail": null
+    }
+  ]
+}
