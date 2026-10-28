@@ -590,7 +590,8 @@ def judging_model(usage):
     )
 
 
-def stream_agent_answer(messages, on_answer=None, callbacks=(), on_evidence=None):
+def stream_agent_answer(messages, on_answer=None, callbacks=(), on_evidence=None,
+                        on_candidates=None):
     """에이전트를 흘려 받으며 부분 답변을 화면에 올리고, 최종 상태를 돌려줍니다.
 
     `callbacks`는 이 안쪽을 재는 자리입니다(`tool_timing`). 도구 본문을 건드리지 않고
@@ -598,6 +599,9 @@ def stream_agent_answer(messages, on_answer=None, callbacks=(), on_evidence=None
 
     `on_evidence(ids, calls)`는 근거 ID가 확정된 순간 메시지마다 한 번 불립니다 - 답 글이
     시작되는 때입니다. 조건 검사를 그때 시작해 답 글을 쓰는 시간과 겹칩니다(ADR-085).
+
+    `on_candidates(ids, calls)`는 도구 결과가 돌아올 때마다 불립니다. 그 결과로 근거를 짐작할 수
+    있으면 판정을 마지막 턴 **전에** 시작합니다(ADR-092).
     """
     result, message_id, buffer, displayed, offered = {}, None, "", "", False
     if on_answer is not None:
@@ -607,6 +611,12 @@ def stream_agent_answer(messages, on_answer=None, callbacks=(), on_evidence=None
                                     config={"callbacks": list(callbacks)}):
         if mode == "values":
             result = event
+            done = event.get("messages") or []
+            if on_candidates is not None and done and isinstance(done[-1], ToolMessage):
+                calls = tool_calls_of(done)
+                ids = early_judge.candidate_evidence(calls)
+                if ids is not None:
+                    on_candidates(ids, calls)
             continue
         chunk, metadata = event
         if metadata.get("langgraph_node") != "model" or not chunk.text:
@@ -753,6 +763,9 @@ def ask(question, history, on_answer=None):
         stream_answer=lambda messages, attempt: stream_agent_answer(
             messages, on_answer, [inside_generate],
             on_evidence=offer_early,
+            # 후보로 먼저 시작해 두면, 근거가 같을 때 `offer_early`는 새로 돌리지 않습니다.
+            on_candidates=lambda ids, calls: early.offer(
+                ids, early_judge.graph_queries(calls), source="candidates"),
         ),
         collect=collect_response,
         check_format=validate_answer,
