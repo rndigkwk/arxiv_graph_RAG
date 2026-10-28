@@ -171,3 +171,70 @@ def test_the_app_offers_and_takes_the_early_judgement():
 def test_the_app_records_the_judgement_timing_on_the_answer():
     assert "response[\"condition_timing\"] = early_judge.timing(" in SOURCE
     assert "response[\"condition_timing\"] = {\"early\": False}" in SOURCE
+
+
+# ── 후보로 먼저 시작하기(ADR-092) ─────────────────────────────────────────────
+
+def _graph(*ids, error=None):
+    return {"name": "search_graph", "status": "success", "args": {"cypher": "Q"},
+            "output": {"rows": [{"evidence_ids": [pid]} for pid in ids], "error": error}}
+
+
+def test_candidates_follow_the_order_the_report_uses():
+    """평가의 `retrieved_ids`와 같은 순서 - 벡터 결과가 먼저, 그다음 그래프 행입니다."""
+    calls = [
+        _graph("g1", "g2"),
+        {"name": "search_papers", "status": "success", "args": {"query": "x"},
+         "output": {"papers": [{"arxiv_id": "v1"}, {"arxiv_id": "g1"}]}},
+    ]
+    assert early_judge.candidate_evidence(calls) == ["v1", "g1", "g2"]
+
+
+def test_failed_or_unfinished_calls_are_not_candidates():
+    calls = [
+        _graph("bad", error="syntax"),
+        {"name": "search_graph", "status": "error", "args": {"cypher": "Q"}, "output": {}},
+        {"name": "search_graph", "args": {"cypher": "Q"}},  # 결과가 돌아오지 않은 호출
+        {"name": "rank_related_papers", "status": "success", "args": {},
+         "output": {"related": [{"arxiv_id": "r1"}]}},  # 관련 논문은 근거가 아닙니다.
+    ]
+    assert early_judge.candidate_evidence(calls) is None
+
+
+def test_too_many_candidates_are_not_judged_ahead():
+    """후보가 많으면 근거는 그중 일부라 열쇠가 맞지 않습니다 - 호출만 버립니다."""
+    many = [_graph(*[f"p{i}" for i in range(early_judge.CANDIDATE_LIMIT + 1)])]
+    assert early_judge.candidate_evidence(many) is None
+    enough = [_graph(*[f"p{i}" for i in range(early_judge.CANDIDATE_LIMIT)])]
+    assert len(early_judge.candidate_evidence(enough)) == early_judge.CANDIDATE_LIMIT
+
+
+def test_a_matching_evidence_list_reuses_the_candidate_judgement():
+    seen = []
+    judge = early_judge.EarlyJudge(lambda ids, queries: seen.append(ids) or ("p", "v"))
+    assert judge.offer(["a", "b"], ["Q"], source="candidates") is True
+    assert judge.offer(["a", "b"], ["Q"]) is False  # 근거가 후보와 같으면 다시 돌리지 않습니다.
+    future = judge.take(["a", "b"], ["Q"])
+    assert future.result() == ("p", "v") and seen == [["a", "b"]]
+    assert early_judge.timing(future, time.perf_counter(), 0.0)["source"] == "candidates"
+
+
+def test_a_different_evidence_list_judges_again():
+    seen = []
+    judge = early_judge.EarlyJudge(lambda ids, queries: seen.append(ids) or (ids, "v"))
+    judge.offer(["a", "b"], ["Q"], source="candidates")
+    assert judge.offer(["a"], ["Q"]) is True
+    future = judge.take(["a"], ["Q"])
+    assert future.result()[0] == ["a"]
+    assert early_judge.timing(future, time.perf_counter(), 0.0)["source"] == "evidence"
+
+
+def test_the_app_offers_the_candidates_when_tools_return():
+    assert "ids = early_judge.candidate_evidence(calls)" in SOURCE
+    assert 'ids, early_judge.graph_queries(calls), source="candidates")' in SOURCE
+    assert "isinstance(done[-1], ToolMessage)" in SOURCE
+
+
+def test_the_report_keeps_the_judgement_timing():
+    run = Path("evals/run.py").read_text(encoding="utf-8")
+    assert 'row["condition_timing"] = timing' in run

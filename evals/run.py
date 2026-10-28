@@ -292,6 +292,10 @@ def evaluate_case(
         inside = response.get("generate_trace")
         if inside:
             row["generate_trace"] = inside
+        # 판정이 언제 시작해 얼마나 겹쳤는지입니다(ADR-085·092). VM 측정에만 있고 평가 보고서에
+        # 없어서, CI의 짝 비교에서 판정 대기를 노드 시간으로만 짐작해야 했습니다.
+        if timing := response.get("condition_timing"):
+            row["condition_timing"] = timing
     return row
 
 

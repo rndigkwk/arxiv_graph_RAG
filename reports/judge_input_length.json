@@ -1,0 +1,976 @@
+{
+ "note": "판정 호출 시간 대 입력 길이(ADR-092). 로컬, judge_llm(추론 none). 정답이 3편 이상인 문항(논문 3~5편) x 2회, 문항마다 순서를 돌림. all = 그 문항의 정답 논문 전부.",
+ "cases": [
+  "author-02",
+  "author-03",
+  "author-04",
+  "citing-01",
+  "coauthor-01",
+  "coauthor-02",
+  "coauthor-03",
+  "coauthor-06",
+  "reference-01",
+  "reference-02",
+  "reference-03",
+  "topcited-01",
+  "topcited-02",
+  "topcited-03",
+  "topcited-04",
+  "topcited-05",
+  "topcited-06"
+ ],
+ "summary": {
+  "1 full": {
+   "calls": 34,
+   "seconds_p50": 1.629,
+   "seconds_p90": 1.965,
+   "papers_p50": 1.0,
+   "input_tokens_p50": 831.0,
+   "output_tokens_p50": 71.0,
+   "failed": 0
+  },
+  "all full": {
+   "calls": 34,
+   "seconds_p50": 1.834,
+   "seconds_p90": 2.03,
+   "papers_p50": 3.0,
+   "input_tokens_p50": 1456.0,
+   "output_tokens_p50": 102.0,
+   "failed": 0
+  },
+  "all cut300": {
+   "calls": 34,
+   "seconds_p50": 1.8565,
+   "seconds_p90": 2.081,
+   "papers_p50": 3.0,
+   "input_tokens_p50": 838.0,
+   "output_tokens_p50": 102.0,
+   "failed": 0
+  },
+  "paired_all_minus_one": {
+   "median": 0.21,
+   "mean": 0.134,
+   "cases": 17
+  }
+ },
+ "rows": [
+  {
+   "case": "author-02",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 2.694,
+   "input_tokens": 779,
+   "output_tokens": 58
+  },
+  {
+   "case": "author-02",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.997,
+   "input_tokens": 1322,
+   "output_tokens": 88
+  },
+  {
+   "case": "author-02",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.882,
+   "input_tokens": 838,
+   "output_tokens": 88
+  },
+  {
+   "case": "author-03",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.831,
+   "input_tokens": 1605,
+   "output_tokens": 90
+  },
+  {
+   "case": "author-03",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.806,
+   "input_tokens": 815,
+   "output_tokens": 90
+  },
+  {
+   "case": "author-03",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.782,
+   "input_tokens": 809,
+   "output_tokens": 60
+  },
+  {
+   "case": "author-04",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 2.047,
+   "input_tokens": 821,
+   "output_tokens": 86
+  },
+  {
+   "case": "author-04",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 2.133,
+   "input_tokens": 827,
+   "output_tokens": 56
+  },
+  {
+   "case": "author-04",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.89,
+   "input_tokens": 1456,
+   "output_tokens": 86
+  },
+  {
+   "case": "citing-01",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.69,
+   "input_tokens": 706,
+   "output_tokens": 59
+  },
+  {
+   "case": "citing-01",
+   "variant": "all full",
+   "papers": 5,
+   "ok": true,
+   "seconds": 2.031,
+   "input_tokens": 1910,
+   "output_tokens": 121
+  },
+  {
+   "case": "citing-01",
+   "variant": "all cut300",
+   "papers": 5,
+   "ok": true,
+   "seconds": 2.09,
+   "input_tokens": 1031,
+   "output_tokens": 121
+  },
+  {
+   "case": "reference-01",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 2.021,
+   "input_tokens": 1487,
+   "output_tokens": 105
+  },
+  {
+   "case": "reference-01",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.824,
+   "input_tokens": 861,
+   "output_tokens": 105
+  },
+  {
+   "case": "reference-01",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.623,
+   "input_tokens": 807,
+   "output_tokens": 75
+  },
+  {
+   "case": "reference-02",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.687,
+   "input_tokens": 844,
+   "output_tokens": 109
+  },
+  {
+   "case": "reference-02",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.635,
+   "input_tokens": 838,
+   "output_tokens": 79
+  },
+  {
+   "case": "reference-02",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.856,
+   "input_tokens": 1388,
+   "output_tokens": 109
+  },
+  {
+   "case": "reference-03",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.797,
+   "input_tokens": 910,
+   "output_tokens": 88
+  },
+  {
+   "case": "reference-03",
+   "variant": "all full",
+   "papers": 4,
+   "ok": true,
+   "seconds": 2.034,
+   "input_tokens": 1628,
+   "output_tokens": 130
+  },
+  {
+   "case": "reference-03",
+   "variant": "all cut300",
+   "papers": 4,
+   "ok": true,
+   "seconds": 1.897,
+   "input_tokens": 947,
+   "output_tokens": 133
+  },
+  {
+   "case": "coauthor-01",
+   "variant": "all full",
+   "papers": 4,
+   "ok": true,
+   "seconds": 1.837,
+   "input_tokens": 1765,
+   "output_tokens": 109
+  },
+  {
+   "case": "coauthor-01",
+   "variant": "all cut300",
+   "papers": 4,
+   "ok": true,
+   "seconds": 2.073,
+   "input_tokens": 943,
+   "output_tokens": 109
+  },
+  {
+   "case": "coauthor-01",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.651,
+   "input_tokens": 808,
+   "output_tokens": 64
+  },
+  {
+   "case": "coauthor-02",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.748,
+   "input_tokens": 830,
+   "output_tokens": 98
+  },
+  {
+   "case": "coauthor-02",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.614,
+   "input_tokens": 838,
+   "output_tokens": 70
+  },
+  {
+   "case": "coauthor-02",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.79,
+   "input_tokens": 1233,
+   "output_tokens": 100
+  },
+  {
+   "case": "coauthor-03",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.602,
+   "input_tokens": 705,
+   "output_tokens": 75
+  },
+  {
+   "case": "coauthor-03",
+   "variant": "all full",
+   "papers": 4,
+   "ok": true,
+   "seconds": 1.82,
+   "input_tokens": 1523,
+   "output_tokens": 119
+  },
+  {
+   "case": "coauthor-03",
+   "variant": "all cut300",
+   "papers": 4,
+   "ok": true,
+   "seconds": 2.069,
+   "input_tokens": 901,
+   "output_tokens": 120
+  },
+  {
+   "case": "coauthor-06",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.817,
+   "input_tokens": 1299,
+   "output_tokens": 88
+  },
+  {
+   "case": "coauthor-06",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.662,
+   "input_tokens": 817,
+   "output_tokens": 86
+  },
+  {
+   "case": "coauthor-06",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.394,
+   "input_tokens": 831,
+   "output_tokens": 58
+  },
+  {
+   "case": "topcited-01",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.82,
+   "input_tokens": 845,
+   "output_tokens": 101
+  },
+  {
+   "case": "topcited-01",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.652,
+   "input_tokens": 904,
+   "output_tokens": 72
+  },
+  {
+   "case": "topcited-01",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.758,
+   "input_tokens": 1388,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-02",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.524,
+   "input_tokens": 756,
+   "output_tokens": 73
+  },
+  {
+   "case": "topcited-02",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.886,
+   "input_tokens": 1180,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-02",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.683,
+   "input_tokens": 806,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-03",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.912,
+   "input_tokens": 1412,
+   "output_tokens": 103
+  },
+  {
+   "case": "topcited-03",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.862,
+   "input_tokens": 830,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-03",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.606,
+   "input_tokens": 838,
+   "output_tokens": 72
+  },
+  {
+   "case": "topcited-04",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.781,
+   "input_tokens": 822,
+   "output_tokens": 103
+  },
+  {
+   "case": "topcited-04",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.693,
+   "input_tokens": 866,
+   "output_tokens": 67
+  },
+  {
+   "case": "topcited-04",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.804,
+   "input_tokens": 1653,
+   "output_tokens": 103
+  },
+  {
+   "case": "topcited-05",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.575,
+   "input_tokens": 899,
+   "output_tokens": 72
+  },
+  {
+   "case": "topcited-05",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.945,
+   "input_tokens": 1726,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-05",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.819,
+   "input_tokens": 836,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-06",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.814,
+   "input_tokens": 1296,
+   "output_tokens": 101
+  },
+  {
+   "case": "topcited-06",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 2.005,
+   "input_tokens": 840,
+   "output_tokens": 101
+  },
+  {
+   "case": "topcited-06",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.606,
+   "input_tokens": 847,
+   "output_tokens": 71
+  },
+  {
+   "case": "author-02",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.764,
+   "input_tokens": 1322,
+   "output_tokens": 88
+  },
+  {
+   "case": "author-02",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.76,
+   "input_tokens": 838,
+   "output_tokens": 86
+  },
+  {
+   "case": "author-02",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.493,
+   "input_tokens": 779,
+   "output_tokens": 58
+  },
+  {
+   "case": "author-03",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.664,
+   "input_tokens": 815,
+   "output_tokens": 90
+  },
+  {
+   "case": "author-03",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.495,
+   "input_tokens": 809,
+   "output_tokens": 58
+  },
+  {
+   "case": "author-03",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.905,
+   "input_tokens": 1605,
+   "output_tokens": 90
+  },
+  {
+   "case": "author-04",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.409,
+   "input_tokens": 827,
+   "output_tokens": 53
+  },
+  {
+   "case": "author-04",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.77,
+   "input_tokens": 1456,
+   "output_tokens": 86
+  },
+  {
+   "case": "author-04",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.572,
+   "input_tokens": 821,
+   "output_tokens": 84
+  },
+  {
+   "case": "citing-01",
+   "variant": "all full",
+   "papers": 5,
+   "ok": true,
+   "seconds": 1.862,
+   "input_tokens": 1910,
+   "output_tokens": 121
+  },
+  {
+   "case": "citing-01",
+   "variant": "all cut300",
+   "papers": 5,
+   "ok": true,
+   "seconds": 1.975,
+   "input_tokens": 1031,
+   "output_tokens": 119
+  },
+  {
+   "case": "citing-01",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.395,
+   "input_tokens": 706,
+   "output_tokens": 59
+  },
+  {
+   "case": "reference-01",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.865,
+   "input_tokens": 861,
+   "output_tokens": 109
+  },
+  {
+   "case": "reference-01",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.719,
+   "input_tokens": 807,
+   "output_tokens": 75
+  },
+  {
+   "case": "reference-01",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.789,
+   "input_tokens": 1487,
+   "output_tokens": 105
+  },
+  {
+   "case": "reference-02",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.692,
+   "input_tokens": 838,
+   "output_tokens": 73
+  },
+  {
+   "case": "reference-02",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.828,
+   "input_tokens": 1388,
+   "output_tokens": 108
+  },
+  {
+   "case": "reference-02",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.893,
+   "input_tokens": 844,
+   "output_tokens": 103
+  },
+  {
+   "case": "reference-03",
+   "variant": "all full",
+   "papers": 4,
+   "ok": true,
+   "seconds": 2.03,
+   "input_tokens": 1628,
+   "output_tokens": 133
+  },
+  {
+   "case": "reference-03",
+   "variant": "all cut300",
+   "papers": 4,
+   "ok": true,
+   "seconds": 1.958,
+   "input_tokens": 947,
+   "output_tokens": 133
+  },
+  {
+   "case": "reference-03",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.684,
+   "input_tokens": 910,
+   "output_tokens": 82
+  },
+  {
+   "case": "coauthor-01",
+   "variant": "all cut300",
+   "papers": 4,
+   "ok": true,
+   "seconds": 1.777,
+   "input_tokens": 943,
+   "output_tokens": 109
+  },
+  {
+   "case": "coauthor-01",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.513,
+   "input_tokens": 808,
+   "output_tokens": 64
+  },
+  {
+   "case": "coauthor-01",
+   "variant": "all full",
+   "papers": 4,
+   "ok": true,
+   "seconds": 1.747,
+   "input_tokens": 1765,
+   "output_tokens": 109
+  },
+  {
+   "case": "coauthor-02",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.539,
+   "input_tokens": 838,
+   "output_tokens": 70
+  },
+  {
+   "case": "coauthor-02",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.685,
+   "input_tokens": 1233,
+   "output_tokens": 100
+  },
+  {
+   "case": "coauthor-02",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 2.018,
+   "input_tokens": 830,
+   "output_tokens": 100
+  },
+  {
+   "case": "coauthor-03",
+   "variant": "all full",
+   "papers": 4,
+   "ok": true,
+   "seconds": 1.929,
+   "input_tokens": 1523,
+   "output_tokens": 120
+  },
+  {
+   "case": "coauthor-03",
+   "variant": "all cut300",
+   "papers": 4,
+   "ok": true,
+   "seconds": 1.947,
+   "input_tokens": 901,
+   "output_tokens": 120
+  },
+  {
+   "case": "coauthor-03",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.512,
+   "input_tokens": 705,
+   "output_tokens": 74
+  },
+  {
+   "case": "coauthor-06",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.754,
+   "input_tokens": 817,
+   "output_tokens": 88
+  },
+  {
+   "case": "coauthor-06",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.653,
+   "input_tokens": 831,
+   "output_tokens": 56
+  },
+  {
+   "case": "coauthor-06",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.692,
+   "input_tokens": 1299,
+   "output_tokens": 88
+  },
+  {
+   "case": "topcited-01",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 5.163,
+   "input_tokens": 904,
+   "output_tokens": 71
+  },
+  {
+   "case": "topcited-01",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.877,
+   "input_tokens": 1388,
+   "output_tokens": 101
+  },
+  {
+   "case": "topcited-01",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 2.219,
+   "input_tokens": 845,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-02",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.727,
+   "input_tokens": 1180,
+   "output_tokens": 103
+  },
+  {
+   "case": "topcited-02",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.682,
+   "input_tokens": 806,
+   "output_tokens": 103
+  },
+  {
+   "case": "topcited-02",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.76,
+   "input_tokens": 756,
+   "output_tokens": 72
+  },
+  {
+   "case": "topcited-03",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.526,
+   "input_tokens": 830,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-03",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.52,
+   "input_tokens": 838,
+   "output_tokens": 75
+  },
+  {
+   "case": "topcited-03",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.96,
+   "input_tokens": 1412,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-04",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.543,
+   "input_tokens": 866,
+   "output_tokens": 73
+  },
+  {
+   "case": "topcited-04",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.67,
+   "input_tokens": 1653,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-04",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.851,
+   "input_tokens": 822,
+   "output_tokens": 103
+  },
+  {
+   "case": "topcited-05",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.657,
+   "input_tokens": 1726,
+   "output_tokens": 102
+  },
+  {
+   "case": "topcited-05",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 1.968,
+   "input_tokens": 836,
+   "output_tokens": 96
+  },
+  {
+   "case": "topcited-05",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.729,
+   "input_tokens": 899,
+   "output_tokens": 71
+  },
+  {
+   "case": "topcited-06",
+   "variant": "all cut300",
+   "papers": 3,
+   "ok": true,
+   "seconds": 2.77,
+   "input_tokens": 840,
+   "output_tokens": 101
+  },
+  {
+   "case": "topcited-06",
+   "variant": "1 full",
+   "papers": 1,
+   "ok": true,
+   "seconds": 1.69,
+   "input_tokens": 847,
+   "output_tokens": 72
+  },
+  {
+   "case": "topcited-06",
+   "variant": "all full",
+   "papers": 3,
+   "ok": true,
+   "seconds": 3.385,
+   "input_tokens": 1296,
+   "output_tokens": 102
+  }
+ ]
+}

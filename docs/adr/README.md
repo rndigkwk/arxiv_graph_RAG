@@ -163,4 +163,5 @@
 | [ADR-089](ADR-089-judge-without-reasoning.md) | 조건 판정은 추론을 끄고 부른다 — 같은 모델, 같은 프롬프트, 추론 강도 하나만 | 채택 |
 | [ADR-090](ADR-090-recent-is-a-date-filtered-search.md) | "최근" 논문은 앱이 먼저 기간 안에서 찾는다 — 지시문과 도구 스키마는 건드리지 않는다 | 채택 |
 | [ADR-091](ADR-091-agent-without-reasoning.md) | 답 쓰는 에이전트도 추론을 끄고 부른다 — 턴은 빨라지고, 그만큼 판정이 앞에 선다 | 채택 |
+| [ADR-092](ADR-092-judge-the-candidates-before-the-last-turn.md) | 판정은 검색 후보로 먼저 시작한다 — 마지막 턴 전에, 입력은 그대로 | 채택 |
 | [ADR-094](ADR-094-red-team-through-the-whole-app.md) | 레드팀 질문은 앱 전체에 통과시킨다 — 가드 아래가 아니라 모델 위에서 | 채택 |

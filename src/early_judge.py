@@ -50,6 +50,36 @@ def graph_queries(calls: Sequence[dict[str, Any]]) -> list[str]:
     ]
 
 
+# 후보가 이보다 많으면 근거가 그중 일부일 공산이 커서, 맞지 않을 판정에 호출을 쓰지 않습니다.
+# 회귀 평가 180건의 후보는 2~5편이었고 근거는 180건 모두 후보와 순서까지 같았습니다(ADR-092).
+CANDIDATE_LIMIT = 6
+
+
+def candidate_evidence(calls: Sequence[dict[str, Any]],
+                       limit: int = CANDIDATE_LIMIT) -> list[str] | None:
+    """도구가 돌려준 근거 후보. 모델이 근거로 적을 목록을 **미리** 짐작한 것입니다(ADR-092).
+
+    순서는 평가의 `retrieved_ids`와 같습니다 - 벡터 검색 결과, 그다음 그래프 조회 행. 열쇠가
+    순서까지 맞아야 앞당긴 판정을 씁니다. 후보가 없거나 `limit`보다 많으면 None입니다.
+    """
+    ids: list[str] = []
+    for call in calls:
+        output = call.get("output")
+        if call.get("status") != "success" or not isinstance(output, dict):
+            continue
+        if call["name"] == "search_papers":
+            ids.extend(hit["arxiv_id"] for hit in output.get("papers", []) if hit.get("arxiv_id"))
+    for call in calls:
+        output = call.get("output")
+        if call.get("status") != "success" or not isinstance(output, dict):
+            continue
+        if call["name"] == "search_graph" and not output.get("error"):
+            for row in output.get("rows", []):
+                ids.extend(row.get("evidence_ids") or [])
+    ids = list(dict.fromkeys(pid for pid in ids if isinstance(pid, str)))
+    return ids if 0 < len(ids) <= limit else None
+
+
 class EarlyJudge:
     """한 질문의 앞당긴 판정 하나. 근거 ID와 Cypher가 열쇠입니다.
 
@@ -65,8 +95,12 @@ class EarlyJudge:
         self._key: Key | None = None
         self._future: Future | None = None
 
-    def offer(self, ids: Sequence[str], queries: Sequence[str]) -> bool:
-        """판정을 시작합니다. 근거가 없거나 같은 입력으로 이미 시작했으면 하지 않습니다."""
+    def offer(self, ids: Sequence[str], queries: Sequence[str], source: str = "evidence") -> bool:
+        """판정을 시작합니다. 근거가 없거나 같은 입력으로 이미 시작했으면 하지 않습니다.
+
+        `source`는 무엇을 보고 시작했는지입니다 - 확정된 근거(`evidence`)인지, 도구가 돌려준
+        후보(`candidates`, ADR-092)인지. 결과에는 영향이 없고 `timing`에만 적힙니다.
+        """
         key = (tuple(ids), tuple(queries))
         if not ids:
             return False
@@ -74,14 +108,14 @@ class EarlyJudge:
             if key == self._key:
                 return False
             self._key = key
-            times: dict[str, float] = {}
+            times: dict[str, Any] = {"source": source}
             self._future = self._pool.submit(self._timed, times, list(ids), list(queries))
             # 판정이 언제 시작해 언제 끝났는지 결과와 함께 넘깁니다. 기다린 시간만으로는
             # "판정이 느렸나, 겹친 시간이 짧았나"를 가를 수 없었습니다(ADR-087).
             self._future.times = times  # type: ignore[attr-defined]
             return True
 
-    def _timed(self, times: dict[str, float], ids: list[str], queries: list[str]):
+    def _timed(self, times: dict[str, Any], ids: list[str], queries: list[str]):
         times["started"] = time.perf_counter()
         try:
             return self._work(ids, queries)
@@ -103,6 +137,7 @@ def timing(future: Future, check_started: float, waited: float) -> dict[str, Any
     - `judge_seconds`: 판정(논문 조회 포함) 자체가 걸린 시간
     - `ahead_seconds`: 검사 노드가 오기 전에 이미 돈 시간 - 답 글과 겹친 몫
     - `waited_seconds`: 검사 노드가 결과를 기다린 시간 - 겹치지 못한 몫
+    - `source`: 확정된 근거로 시작했는지(`evidence`), 도구의 후보로 시작했는지(`candidates`)
     """
     times = getattr(future, "times", {})
     started, finished = times.get("started"), times.get("finished")
@@ -110,6 +145,7 @@ def timing(future: Future, check_started: float, waited: float) -> dict[str, Any
         return {"early": True, "waited_seconds": round(waited, 3)}
     return {
         "early": True,
+        "source": times.get("source", "evidence"),
         "judge_seconds": round(finished - started, 3),
         "ahead_seconds": round(max(0.0, min(finished, check_started) - started), 3),
         "waited_seconds": round(waited, 3),
