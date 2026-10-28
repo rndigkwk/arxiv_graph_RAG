@@ -740,6 +740,9 @@ def main() -> None:
     )
     # 이 값이 없는 보고서는 이 변경 전의 것이고, 첫 관련 논문 호출이 차갑습니다.
     metadata["citation_graph_warmup_seconds"] = warmup_seconds
+    # 같은 모델이라도 추론 강도가 다르면 지연이 다릅니다(ADR-089·091). 없으면 기본 강도입니다.
+    metadata["agent_reasoning"] = getattr(chatbot, "AGENT_REASONING", None)
+    metadata["judge_reasoning"] = getattr(chatbot, "JUDGE_REASONING", None)
     report = {
         "schema_version": 2,
         "generated_at": metadata["timestamp_utc"],
