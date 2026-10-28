@@ -164,3 +164,4 @@
 | [ADR-090](ADR-090-recent-is-a-date-filtered-search.md) | "최근" 논문은 앱이 먼저 기간 안에서 찾는다 — 지시문과 도구 스키마는 건드리지 않는다 | 채택 |
 | [ADR-091](ADR-091-agent-without-reasoning.md) | 답 쓰는 에이전트도 추론을 끄고 부른다 — 턴은 빨라지고, 그만큼 판정이 앞에 선다 | 채택 |
 | [ADR-092](ADR-092-judge-the-candidates-before-the-last-turn.md) | 판정은 검색 후보로 먼저 시작한다 — 마지막 턴 전에, 입력은 그대로 | 채택 |
+| [ADR-093](ADR-093-paraphrased-eval-questions.md) | 평가 질문을 바꿔 말한 셋을 따로 둔다 — 정답은 그대로, 문형만 바꾼다 | 채택 |
