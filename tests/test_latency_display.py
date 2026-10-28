@@ -19,7 +19,7 @@ from pathlib import Path
 import app
 
 LATENCY = Path("reports/answer_latency.json")
-AGENT_NODES = ("translate", "resolve", "route", "generate", "collect", "check_format",
+AGENT_NODES = ("translate", "resolve", "recent", "route", "generate", "collect", "check_format",
                "check_conditions", "revise", "accept", "abstain")
 
 

@@ -48,6 +48,7 @@ export function seconds(ms: number): string {
 export const NODE_LABEL: Record<string, string> = {
   translate: "한국어→영어 번역",
   resolve: "제목으로 논문 찾기",
+  recent: "최근 논문 찾기",
   route: "경로 판정",
   generate: "답변 생성",
   collect: "결과 수집",

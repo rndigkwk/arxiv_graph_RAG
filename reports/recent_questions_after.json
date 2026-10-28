@@ -1,0 +1,134 @@
+[
+ {
+  "id": "gnn-en",
+  "total": 19.659,
+  "rejected": [],
+  "turns": 2,
+  "attempts": 1,
+  "calls": [
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "recent"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2602.07491\", \"2607.00924\", \"2608.06713\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2608.10480",
+   "2607.13115"
+  ]
+ },
+ {
+  "id": "gnn-ko",
+  "total": 16.276,
+  "rejected": [],
+  "turns": 2,
+  "attempts": 1,
+  "calls": [
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "\"최근 논문\""
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2608.06713\", \"2507.21873\", \"2602.07491\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.abstract AS abstract, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2608.10480",
+   "2607.13115"
+  ]
+ },
+ {
+  "id": "diffusion-en",
+  "total": 20.249,
+  "rejected": [],
+  "turns": 2,
+  "attempts": 1,
+  "calls": [
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "\"latest papers\""
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2511.20645\", \"2601.10332\", \"2609.00885\", \"2601.22158\", \"2511.03317\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.title AS answer_value, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published, [p.arxiv_id] AS evidence_ids ORDER BY published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2609.00885",
+   "2601.10332",
+   "2511.20645",
+   "2511.03317"
+  ]
+ },
+ {
+  "id": "rlhf-ko",
+  "total": 12.831,
+  "rejected": [],
+  "turns": 2,
+  "attempts": 1,
+  "calls": [
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "“최근에 나온”"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2604.23747\", \"2512.23515\", \"2606.31813\", \"2602.17276\", \"2607.20515\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2607.20515"
+  ]
+ },
+ {
+  "id": "agents-en",
+  "total": 12.354,
+  "rejected": [],
+  "turns": 2,
+  "attempts": 1,
+  "calls": [
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "recent"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2606.01975\", \"2608.26226\", \"2605.02801\", \"2606.26346\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_category, p.abstract AS abstract, p.published AS published, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2608.26226",
+   "2606.26346",
+   "2605.02801",
+   "2603.22862"
+  ]
+ },
+ {
+  "id": "retrieval-ko",
+  "total": 16.071,
+  "rejected": [],
+  "turns": 2,
+  "attempts": 1,
+  "calls": [
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "최신 연구"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2511.05385\", \"2608.08445\", \"2511.13201\", \"2512.20626\", \"2607.28397\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.title AS answer_value, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2608.08445",
+   "2607.28397",
+   "2512.20626",
+   "2511.13201",
+   "2511.05385"
+  ]
+ }
+]

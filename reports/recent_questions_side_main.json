@@ -1,0 +1,167 @@
+[
+ {
+  "id": "gnn-en",
+  "total": 35.714,
+  "rejected": [
+   "mixed_candidate_conditions"
+  ],
+  "turns": 7,
+  "attempts": 2,
+  "calls": [
+   "search_papers",
+   "search_papers",
+   "search_graph",
+   "search_graph",
+   "search_papers"
+  ],
+  "abstained": null,
+  "conditions": [
+   "“recent”"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2110.00987\", \"2110.04126\", \"2209.05582\"] AND (toLower(p.title) CONTAINS \"molecular property\" OR toLower(p.abstract) CONTAINS \"molecular property\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25",
+   "MATCH (p:ArxivPaper) WHERE p.published >= datetime(\"2026-04-01\") AND (toLower(p.title) CONTAINS \"molecular\" OR toLower(p.abstract) CONTAINS \"molecular property prediction\") AND toLower(p.abstract) CONTAINS \"gnn\" AND toLower(p.abstract) CONTAINS \"property\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2608.10480",
+   "2607.13115"
+  ]
+ },
+ {
+  "id": "gnn-ko",
+  "total": 36.579,
+  "rejected": [
+   "mixed_candidate_conditions"
+  ],
+  "turns": 5,
+  "attempts": 2,
+  "calls": [
+   "search_papers",
+   "search_papers",
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "최근"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2209.05582\", \"2110.00987\", \"2110.04126\"] RETURN p.arxiv_id AS answer_value, p.title AS title, p.published AS published, p.primary_category AS primary_category, p.abstract AS abstract, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2607.13115"
+  ]
+ },
+ {
+  "id": "diffusion-en",
+  "total": 27.643,
+  "rejected": [],
+  "turns": 5,
+  "attempts": 1,
+  "calls": [
+   "search_papers",
+   "search_graph",
+   "search_graph",
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "latest papers"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE toLower(p.abstract) CONTAINS \"diffusion\" AND (toLower(p.abstract) CONTAINS \"image generation\" OR toLower(p.abstract) CONTAINS \"image synthesis\" OR toLower(p.title) CONTAINS \"image generation\") RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25",
+   "MATCH (p:ArxivPaper) WHERE toLower(p.title) CONTAINS \"diffusion\" AND (toLower(p.title) CONTAINS \"image\" OR toLower(p.abstract) CONTAINS \"text-to-image\" OR toLower(p.abstract) CONTAINS \"image generation\") RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25",
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2610.28003\", \"2601.10332\", \"2511.22699\", \"2511.20645\", \"2512.07584\"] RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2610.28003",
+   "2601.10332",
+   "2512.07584",
+   "2511.22699",
+   "2511.20645"
+  ]
+ },
+ {
+  "id": "rlhf-ko",
+  "total": 22.17,
+  "rejected": [
+   "mixed_candidate_conditions"
+  ],
+  "turns": 4,
+  "attempts": 2,
+  "calls": [
+   "search_papers",
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "“최근에 나온”"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2501.08617\", \"2412.10400\", \"2409.19256\"] RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2501.08617",
+   "2412.10400",
+   "2409.19256"
+  ]
+ },
+ {
+  "id": "agents-en",
+  "total": 51.852,
+  "rejected": [
+   "mixed_candidate_conditions"
+  ],
+  "turns": 11,
+  "attempts": 2,
+  "calls": [
+   "search_papers",
+   "search_papers",
+   "search_graph",
+   "search_graph",
+   "search_papers",
+   "search_graph",
+   "search_papers",
+   "search_papers",
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "\"recent\""
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2502.11705\", \"2507.01489\", \"2508.17281\", \"2509.04198\"] RETURN p.title AS answer_value, p.arxiv_id AS arxiv_id, p.published AS published, p.primary_category AS primary_category, p.source AS source, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25",
+   "MATCH (p:ArxivPaper) WHERE p.published >= datetime(\"2025-12-24\") AND toLower(p.abstract) CONTAINS \"tool\" AND toLower(p.abstract) CONTAINS \"agent\" AND toLower(p.abstract) CONTAINS \"llm\" RETURN p.title AS answer_value, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25",
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2512.24565\", \"2603.19896\", \"2512.00672\", \"2511.01527\", \"2605.10787\", \"2508.07575\", \"2603.22862\"] RETURN p.title AS answer_value, p.arxiv_id AS arxiv_id, p.published AS published, p.primary_category AS primary_category, p.source AS source, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25",
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2512.24565\", \"2603.19896\"] AND p.source = \"ai\" AND p.published >= datetime(\"2026-06-14\") AND toLower(p.abstract) CONTAINS \"tool\" AND toLower(p.abstract) CONTAINS \"agent\" AND toLower(p.abstract) CONTAINS \"llm\" RETURN p.title AS answer_value, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2512.24565",
+   "2603.19896"
+  ]
+ },
+ {
+  "id": "retrieval-ko",
+  "total": 25.279,
+  "rejected": [
+   "mixed_candidate_conditions"
+  ],
+  "turns": 5,
+  "attempts": 2,
+  "calls": [
+   "search_papers",
+   "search_papers",
+   "search_graph"
+  ],
+  "abstained": null,
+  "conditions": [
+   "“최신”"
+  ],
+  "cyphers": [
+   "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2506.00054\", \"2507.18910\", \"2410.12837\"] AND (toLower(p.title) CONTAINS \"retrieval-augmented generation\" OR toLower(p.abstract) CONTAINS \"retrieval-augmented generation\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+  ],
+  "evidence": [
+   "2507.18910",
+   "2506.00054"
+  ]
+ }
+]

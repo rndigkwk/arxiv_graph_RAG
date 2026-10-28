@@ -39,6 +39,7 @@ from src import (
     agent_graph,
     early_judge,
     pagerank,
+    pre_recent,
     pre_resolve,
     pre_translate,
     prompts,
@@ -273,13 +274,23 @@ def search_graph(cypher: str) -> dict:
         return {"cypher": cypher, "rows": [], "error": str(exc)}
 
 
+def published_date(value):
+    """발표일을 `YYYY-MM-DD` 문자열로 둡니다. 없는 논문이 있습니다(약 2%)."""
+    return str(value)[:10] if value is not None else None
+
+
 def to_item(record):
-    """검색한 논문 본문과 인용에 필요한 출처·유사도를 반환합니다."""
+    """검색한 논문 본문과 인용에 필요한 출처·유사도를 반환합니다.
+
+    발표일을 함께 돌려줍니다(ADR-090). 도구 설명과 인자는 그대로라 모델이 받는 스키마는
+    바뀌지 않습니다 - 인자 하나와 설명 두 줄이 모든 질문의 턴을 느리게 했습니다.
+    """
     node = record["node"]
     return RetrieverResultItem(
         content=node["abstract"],
         metadata={"arxiv_id": node["arxiv_id"], "title": node["title"],
                   "primary_category": node["primary_category"], "categories": node["categories"],
+                  "published": published_date(node.get("published")),
                   "pdf_url": node["pdf_url"], "score": record["score"]},
     )
 
@@ -699,6 +710,25 @@ def ask(question, history, on_answer=None):
         resolved_first.append(record)
         return {"record": record, "hint": pre_resolve.hint(output)}
 
+    def recent_first(asked, english):
+        """"최근"을 묻는 질문만 최근 12개월 안에서 먼저 찾습니다(ADR-090)."""
+        if not pre_recent.asks_recent(asked):
+            return None
+        started = time.perf_counter()
+        try:
+            result = vector_retriever.search(
+                query_text=english, top_k=pre_recent.TOP_K,
+                filters={"published": {"$gte": pre_recent.since()}},
+            )
+        except Exception:  # noqa: BLE001 - 못 찾으면 모델이 지금처럼 찾습니다.
+            return None
+        output = {"query": english,
+                  "papers": [{**item.metadata, "abstract": item.content} for item in result.items]}
+        if not pre_recent.usable(output):
+            return None
+        record = pre_recent.call_record(english, output, time.perf_counter() - started)
+        return {"record": record, "hint": pre_recent.hint(output)}
+
     def check_conditions(user_question, response):
         queries = early_judge.graph_queries(response["tool_calls"])
         ahead = early.take(response["evidence_ids"], queries)
@@ -732,6 +762,7 @@ def ask(question, history, on_answer=None):
         ),
         translate=translate_first,
         resolve=resolve_first,
+        recent=recent_first,
     )
     state = agent_graph.build_graph(deps).invoke({
         "question": question,
@@ -1394,7 +1425,7 @@ try:
     vector_retriever = VectorRetriever(
         driver, VECTOR_INDEX, embedder=embedder,
         return_properties=["arxiv_id", "title", "abstract", "primary_category",
-                           "categories", "pdf_url"],
+                           "categories", "published", "pdf_url"],
         result_formatter=to_item, neo4j_database=neo4j_database,
     )
     paper_count = run_read("RETURN COUNT { (:ArxivPaper) } AS n")[0]["n"]
