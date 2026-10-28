@@ -113,6 +113,16 @@ ADR-094는 고칠 자리로 둘을 적었습니다 - 라우터에 범위 판정�
 - 김치찌개는 앱이 거절했습니다.
 - 레드팀은 **18/19**로 그대로입니다. 남은 실패는 여전히 `inject-04`입니다.
 
+**VM에서 다시 확인**(#97 머지 뒤 `8998bb7`, `reports/vm_scope_097.json`): 8문항 모두 의도대로 갔습니다.
+
+| 질문 | VM 결과 | 시간 |
+|---|---|---:|
+| 날씨 · 김치찌개 · 파이썬 코드 | 앱이 거절 | 0.8~3.7초 |
+| 월드컵 | "FIFA" 약어로 범위 확인을 건너뜀, 근거 0, 답은 "Argentina won"(받은 대가) | 4.9초 |
+| **"What is RLHF?"** | **약어 단서로 범위 안, 정상 답변, 근거 1편** (전에는 거절) | 5.0초 |
+| "What has Yann LeCun done?" | 저자 조회로 범위 안, 근거 여러 편 | 16.6초 |
+| "protein structure prediction" · "mixture of experts" | 범위 확인 뒤 0.70 이상, 메시지 없이 답함, 근거 4·3편 | 5.2~6.6초 |
+
 ## 민감도
 
 - **0.70은 20개로 정한 값입니다.** 범위 밖 최고(0.669)와 범위 안 최저(0.739) 사이의 여유가 0.03·0.04입니다. 컬렉션이
@@ -132,5 +142,5 @@ ADR-094는 고칠 자리로 둘을 적었습니다 - 라우터에 범위 판정�
 - [`src/pre_scope.py`](../../src/pre_scope.py), [`src/agent_graph.py`](../../src/agent_graph.py)의 `scope`·`decline` 노드,
   [`src/chatbot.py`](../../src/chatbot.py)의 `scope_first`
 - [`tests/test_pre_scope.py`](../../tests/test_pre_scope.py), [`tests/test_agent_graph.py`](../../tests/test_agent_graph.py)
-- 보고서: `reports/redteam_scope.json`, `reports/scope_probe.json`, 후속 `reports/vm_scope.json`, `reports/scope_acronym_probe.json`, `reports/redteam_acronym.json`
+- 보고서: `reports/redteam_scope.json`, `reports/scope_probe.json`, 후속 `reports/vm_scope.json`, `reports/scope_acronym_probe.json`, `reports/redteam_acronym.json`, `reports/vm_scope_097.json`
 - ADR-090(지시문 대신 앱 노드), ADR-094(레드팀)
