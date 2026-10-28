@@ -279,3 +279,52 @@ def test_both_failures_are_named_when_the_answer_is_abstained():
 
     assert [entry["attempt"] for entry in summary["rejections"]] == [1, 2]
     assert {entry["stage"] for entry in summary["rejections"]} == {FORMAT_STAGE}
+
+
+# ── 범위 밖 질문(ADR-095) ─────────────────────────────────────────────────────
+
+def _with_scope(deps, scope, recent=None):
+    from dataclasses import replace
+    return replace(deps, scope=scope, recent=recent)
+
+
+def test_an_out_of_scope_question_never_reaches_the_agent():
+    deps, _, generated = make_deps()
+    record = {"name": "search_papers", "by": "app", "status": "success", "output": {}}
+    deps = _with_scope(deps, lambda q, en: {"decline": True, "answer": "outside", "record": record})
+    state = run(deps, "What's the weather?")
+    assert generated == []  # 에이전트를 한 번도 부르지 않았습니다.
+    assert nodes(state) == ["scope", "decline"]
+    response = state["response"]
+    assert response["answer"] == "outside" and response["evidence_ids"] == []
+    assert response["tool_calls"] == [record] and response["scope"] == {"declined": True}
+    assert state["abstained"] is False
+    # 대화 기록에 이 답이 남습니다.
+    assert state["result"]["messages"][-1].content == "outside"
+
+
+def test_a_loose_match_goes_to_the_agent_with_a_hint():
+    deps, _, generated = make_deps()
+    record = {"name": "search_papers", "by": "app", "status": "success", "output": {}}
+    deps = _with_scope(deps, lambda q, en: {"hint": "SCOPE HINT", "record": record})
+    state = run(deps, "Who won the World Cup?")
+    assert nodes(state)[:3] == ["scope", "route", "generate"]
+    assert ("user", "SCOPE HINT") in generated[0]
+    assert state["response"]["tool_calls"][0] is record
+    assert state["response"]["scope"] == {"declined": False}
+
+
+def test_an_in_scope_question_is_untouched():
+    deps, _, generated = make_deps()
+    deps = _with_scope(deps, lambda q, en: None)
+    state = run(deps, "papers by X")
+    assert nodes(state)[:2] == ["scope", "route"]
+    assert generated[0] == [("user", "papers by X")]
+    assert "scope" not in state["response"]
+
+
+def test_a_recent_search_that_found_papers_skips_the_scope_check():
+    deps, _, _ = make_deps()
+    deps = _with_scope(deps, lambda q, en: pytest.fail("범위를 보면 안 됩니다"),
+                       recent=lambda q, en: {"record": None, "hint": "RECENT"})
+    run(deps, "recent papers")
