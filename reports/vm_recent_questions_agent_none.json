@@ -1,0 +1,248 @@
+{
+ "api": "https://8-230-25-138.sslip.io",
+ "commit": "d5f122d",
+ "results": [
+  {
+   "id": "gnn-en",
+   "question": "Recommend recent papers on predicting molecular properties with graph neural networks",
+   "outcome": "final",
+   "total": 14.797,
+   "client": 15.321,
+   "nodes": {
+    "translate": 0.0,
+    "resolve": 0.094,
+    "recent": 3.926,
+    "route": 0.0,
+    "generate": 9.645,
+    "collect": 0.0,
+    "check_format": 0.0,
+    "check_conditions": 1.132,
+    "revise": 0.0,
+    "accept": 0.0
+   },
+   "attempts": 2,
+   "rejected": [
+    "mixed_candidate_conditions"
+   ],
+   "turns": 4,
+   "tools": [
+    {
+     "name": "search_papers",
+     "seconds": 3.926
+    },
+    {
+     "name": "search_graph",
+     "seconds": 0.056
+    },
+    {
+     "name": "search_graph",
+     "seconds": 0.172
+    }
+   ],
+   "detail": null
+  },
+  {
+   "id": "gnn-ko",
+   "question": "그래프 신경망으로 분자 특성을 예측하는 최근 논문 추천해줘",
+   "outcome": "final",
+   "total": 11.239,
+   "client": 11.366,
+   "nodes": {
+    "translate": 1.923,
+    "resolve": 0.076,
+    "recent": 2.116,
+    "route": 0.0,
+    "generate": 6.449,
+    "collect": 0.0,
+    "check_format": 0.0,
+    "check_conditions": 0.675,
+    "accept": 0.0
+   },
+   "attempts": 1,
+   "rejected": [],
+   "turns": 2,
+   "tools": [
+    {
+     "name": "translate_to_english",
+     "seconds": 1.923
+    },
+    {
+     "name": "search_papers",
+     "seconds": 2.116
+    },
+    {
+     "name": "search_graph",
+     "seconds": 0.207
+    },
+    {
+     "name": "rank_related_papers",
+     "seconds": 0.078
+    }
+   ],
+   "detail": null
+  },
+  {
+   "id": "diffusion-en",
+   "question": "What are the latest papers on diffusion models for image generation?",
+   "outcome": "final",
+   "total": 11.916,
+   "client": 12.222,
+   "nodes": {
+    "translate": 0.0,
+    "resolve": 0.088,
+    "recent": 2.69,
+    "route": 0.0,
+    "generate": 8.354,
+    "collect": 0.0,
+    "check_format": 0.0,
+    "check_conditions": 0.784,
+    "accept": 0.0
+   },
+   "attempts": 1,
+   "rejected": [],
+   "turns": 2,
+   "tools": [
+    {
+     "name": "search_papers",
+     "seconds": 2.69
+    },
+    {
+     "name": "search_graph",
+     "seconds": 0.123
+    },
+    {
+     "name": "rank_related_papers",
+     "seconds": 0.179
+    }
+   ],
+   "detail": null
+  },
+  {
+   "id": "rlhf-ko",
+   "question": "최근에 나온 RLHF 관련 논문 알려줘",
+   "outcome": "final",
+   "total": 19.582,
+   "client": 20.135,
+   "nodes": {
+    "translate": 2.036,
+    "resolve": 0.081,
+    "recent": 2.182,
+    "route": 0.0,
+    "generate": 14.747,
+    "collect": 0.0,
+    "check_format": 0.0,
+    "check_conditions": 0.536,
+    "revise": 0.0,
+    "accept": 0.0
+   },
+   "attempts": 2,
+   "rejected": [
+    "mixed_candidate_conditions"
+   ],
+   "turns": 5,
+   "tools": [
+    {
+     "name": "translate_to_english",
+     "seconds": 2.036
+    },
+    {
+     "name": "search_papers",
+     "seconds": 2.182
+    },
+    {
+     "name": "search_graph",
+     "seconds": 0.095
+    },
+    {
+     "name": "search_papers",
+     "seconds": 0.401
+    },
+    {
+     "name": "search_graph",
+     "seconds": 0.081
+    },
+    {
+     "name": "rank_related_papers",
+     "seconds": 0.095
+    }
+   ],
+   "detail": null
+  },
+  {
+   "id": "agents-en",
+   "question": "Show me recent work on LLM agents that use tools",
+   "outcome": "final",
+   "total": 8.893,
+   "client": 9.087,
+   "nodes": {
+    "translate": 0.0,
+    "resolve": 0.077,
+    "recent": 2.761,
+    "route": 0.0,
+    "generate": 6.055,
+    "collect": 0.0,
+    "check_format": 0.0,
+    "check_conditions": 0.0,
+    "accept": 0.0
+   },
+   "attempts": 1,
+   "rejected": [],
+   "turns": 2,
+   "tools": [
+    {
+     "name": "search_papers",
+     "seconds": 2.761
+    },
+    {
+     "name": "search_graph",
+     "seconds": 0.056
+    },
+    {
+     "name": "rank_related_papers",
+     "seconds": 0.183
+    }
+   ],
+   "detail": null
+  },
+  {
+   "id": "retrieval-ko",
+   "question": "검색 증강 생성(RAG)에 관한 최신 연구는?",
+   "outcome": "final",
+   "total": 10.607,
+   "client": 10.871,
+   "nodes": {
+    "translate": 1.861,
+    "resolve": 0.083,
+    "recent": 2.111,
+    "route": 0.0,
+    "generate": 6.552,
+    "collect": 0.0,
+    "check_format": 0.0,
+    "check_conditions": 0.0,
+    "accept": 0.0
+   },
+   "attempts": 1,
+   "rejected": [],
+   "turns": 2,
+   "tools": [
+    {
+     "name": "translate_to_english",
+     "seconds": 1.86
+    },
+    {
+     "name": "search_papers",
+     "seconds": 2.111
+    },
+    {
+     "name": "search_graph",
+     "seconds": 0.038
+    },
+    {
+     "name": "rank_related_papers",
+     "seconds": 0.17
+    }
+   ],
+   "detail": null
+  }
+ ]
+}
