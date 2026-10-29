@@ -28,7 +28,11 @@ from pathlib import Path
 
 import pytest
 
-NOTEBOOKS = sorted(Path("notebooks").glob("*_colab.ipynb"))
+# RunPod 노트북도 같은 불변식을 받습니다(ADR-097). 이름이 `_colab`이 아니라고 검사 밖에 두면
+# 글로브를 쓴 이유가 사라집니다.
+NOTEBOOKS = sorted(
+    [*Path("notebooks").glob("*_colab.ipynb"), *Path("notebooks").glob("*_runpod.ipynb")]
+)
 # 이 수가 줄면 노트북이 사라졌거나 이름 규칙이 바뀐 것입니다. 늘면 그냥 새 노트북입니다.
 EXPECTED_AT_LEAST = 4
 
