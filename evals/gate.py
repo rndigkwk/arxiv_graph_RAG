@@ -417,7 +417,7 @@ def check(
                 )
             )
 
-    for case_id in baseline["stable_cases"]:
+    for case_id in stable_cases(baseline, split):
         case = report["cases"].get(case_id)
         if case is None:
             continue  # 이번에 평가하지 않은 사례는 보지 않습니다(smoke 분할).
@@ -436,11 +436,25 @@ def check(
     return violations
 
 
-def transient_failures(baseline: dict[str, Any], report: dict[str, Any]) -> list[str]:
+def stable_cases(baseline: dict[str, Any], split: str = "full") -> list[str]:
+    """Cases that must keep full marks in this split.
+
+    `stable_cases`는 기준선을 다시 쓸 때 full 실행에서 새로 계산합니다(`DERIVED_KEYS`). 다른
+    질문 셋을 쓰는 분할(`paraphrase`, ADR-093)의 만점 사례를 거기 섞으면 다음 재작성에서
+    사라지므로, 분할별로 `split_stable_cases`에 따로 둡니다 - 손으로 정한 값이라 재작성이
+    그대로 들고 옵니다.
+    """
+    extra = (baseline.get("split_stable_cases") or {}).get(split, [])
+    return [*baseline["stable_cases"], *extra]
+
+
+def transient_failures(
+    baseline: dict[str, Any], report: dict[str, Any], split: str = "full"
+) -> list[str]:
     """Stable cases whose agent raised this run. Information, not a violation."""
     return sorted(
         case_id
-        for case_id in baseline["stable_cases"]
+        for case_id in stable_cases(baseline, split)
         if (case := report["cases"].get(case_id)) and case["failed"]
     )
 
@@ -491,7 +505,7 @@ def write_summary(path: Path, baseline: dict[str, Any], report: dict[str, Any],
         floor = baseline["absolute_floor"].get(name)
         fmt = lambda value: "—" if value is None else f"{value:.4f}"  # noqa: E731
         lines.append(f"| `{name}` | {fmt(before)} | {fmt(now)} | {fmt(floor)} |")
-    if transient := transient_failures(baseline, report):
+    if transient := transient_failures(baseline, report, report.get("split", "full")):
         lines += [
             "",
             "### 일시 실패 (위반 아님)",
