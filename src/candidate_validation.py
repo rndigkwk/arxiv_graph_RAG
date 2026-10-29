@@ -5,7 +5,11 @@ import json
 from pydantic import BaseModel, Field
 
 from src import prompts
-from src.answer_validation import validate_mixed_candidates, validate_self_reference
+from src.answer_validation import (
+    validate_dictated_ids,
+    validate_mixed_candidates,
+    validate_self_reference,
+)
 
 
 class CandidateVerdict(BaseModel):
@@ -93,6 +97,7 @@ def assess_and_validate(question, response, fetch_papers, assess):
     # 질문이 명시적으로 제외한 논문은 모델 판정 없이 걸러집니다. 판정 호출보다 앞에
     # 두어, 걸릴 때 불필요한 호출을 하지 않습니다.
     validate_self_reference(question, papers, response)
+    validate_dictated_ids(question, response)
     assessment = assess(question, papers)
     validate_mixed_candidates(response, assessment)
     return assessment
