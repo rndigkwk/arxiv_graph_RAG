@@ -31,20 +31,25 @@ on:
   schedule:
     # 한국 시간 월요일 오전 7시. keep-alive(37분)와 겹치지 않게 비켜 둡니다.
     - cron: "0 22 * * 0"
+    # 한 시간 뒤 바꿔 말한 질문 60건(ADR-093). full과 같은 실행에 묶으면 75분 제한에 닿고,
+    # 같은 브랜치 concurrency가 앞 실행을 취소하므로 시간을 떼어 둡니다(full은 35분 안팎).
+    - cron: "0 23 * * 0"
   workflow_dispatch:
     inputs:
       split:
         description: "돌릴 분할"
         type: choice
         default: full
-        options: [smoke, full]
+        options: [smoke, full, paraphrase]
 
 permissions:
   contents: read
 
 concurrency:
   # 같은 브랜치에 새 커밋이 올라오면 진행 중인 평가를 취소해 토큰을 아낍니다.
-  group: regression-eval-${{ github.ref }}
+  # 분할도 묶음 이름에 넣습니다 - 두 크론이 같은 main에서 돌아, 늦게 끝난 full을 한 시간 뒤의
+  # paraphrase가 취소하지 않게 합니다. PR은 분할이 하나뿐이라 지금처럼 커밋마다 취소됩니다.
+  group: regression-eval-${{ github.ref }}-${{ github.event.schedule || inputs.split || 'pr' }}
   cancel-in-progress: true
 
 jobs:
@@ -142,6 +147,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             echo "name=smoke" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "0 23 * * 0" ]; then
+            echo "name=paraphrase" >> "$GITHUB_OUTPUT"
           else
             echo "name=${{ inputs.split || 'full' }}" >> "$GITHUB_OUTPUT"
           fi
@@ -160,9 +167,13 @@ jobs:
           baseline = json.load(open('baselines/eval_baseline.json', encoding='utf-8'))
           print(','.join(baseline['splits'][sys.argv[1]]))
           " "$split")
+          # 바꿔 말한 질문은 다른 파일입니다. 집계는 기준선과 모수가 달라 비교하지 않고, 사례별
+          # 만점만 봅니다(gate.stable_cases, ADR-093).
+          cases=evals/cases_graph.json
+          if [ "$split" = "paraphrase" ]; then cases=evals/cases_graph_paraphrase.json; fi
           uv run --locked python -m evals.run \
             --mode compare \
-            --cases evals/cases_graph.json \
+            --cases "$cases" \
             --case-ids "$ids" \
             --output "reports/regression_${split}.json"
 
