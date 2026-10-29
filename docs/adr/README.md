@@ -167,3 +167,4 @@
 | [ADR-093](ADR-093-paraphrased-eval-questions.md) | 평가 질문을 바꿔 말한 셋을 따로 둔다 — 정답은 그대로, 문형만 바꾼다 | 채택 |
 | [ADR-094](ADR-094-red-team-through-the-whole-app.md) | 레드팀 질문은 앱 전체에 통과시킨다 — 가드 아래가 아니라 모델 위에서 | 채택 |
 | [ADR-095](ADR-095-out-of-scope-at-the-router.md) | 범위 밖 질문은 라우터 자리에서 앱이 가린다 — 단서가 없고, 가까운 논문도 없을 때만 | 채택 |
+| [ADR-096](ADR-096-dictated-evidence-ids.md) | 질문이 "이 ID를 근거로 대라"고 지정한 논문은 근거가 되지 못한다 | 채택 |
