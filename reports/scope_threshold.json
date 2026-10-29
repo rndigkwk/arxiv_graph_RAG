@@ -1,0 +1,918 @@
+{
+ "generated_at": "2026-10-29T01:04:58+00:00",
+ "summary": {
+  "out": {
+   "cases": 50,
+   "by_path": {
+    "cue": 4,
+    "author": 0,
+    "score": 46
+   },
+   "declined": 46,
+   "score_min": 0.5624762773513794,
+   "score_max": 0.6832212805747986,
+   "score_median": 0.6177959144115448
+  },
+  "in": {
+   "cases": 50,
+   "by_path": {
+    "cue": 14,
+    "author": 0,
+    "score": 36
+   },
+   "declined": 0,
+   "score_min": 0.7409982085227966,
+   "score_max": 0.888393223285675,
+   "score_median": 0.8140740394592285
+  },
+  "decline_below": 0.7,
+  "by_threshold": {
+   "0.66": {
+    "out_missed": 11,
+    "in_refused": 0
+   },
+   "0.68": {
+    "out_missed": 5,
+    "in_refused": 0
+   },
+   "0.70": {
+    "out_missed": 4,
+    "in_refused": 0
+   },
+   "0.72": {
+    "out_missed": 4,
+    "in_refused": 0
+   },
+   "0.74": {
+    "out_missed": 4,
+    "in_refused": 0
+   }
+  }
+ },
+ "rows": [
+  {
+   "kind": "out",
+   "question": "What's the weather in Busan this weekend?",
+   "english": "What's the weather in Busan this weekend?",
+   "path": "score",
+   "score": 0.6561821103096008,
+   "title": "WeatherBench 2: A benchmark for the next generation of data-driven global weather models",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How do I make kimchi fried rice?",
+   "english": "How do I make kimchi fried rice?",
+   "path": "score",
+   "score": 0.6077383756637573,
+   "title": "KoBBQ: Korean Bias Benchmark for Question Answering",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Who won the 2018 Champions League final?",
+   "english": "Who won the 2018 Champions League final?",
+   "path": "score",
+   "score": 0.6630418300628662,
+   "title": "AI World Cup 2026: Benchmarking Large Language Models for End-to-End Football Tournament Prediction",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What is the capital of Australia?",
+   "english": "What is the capital of Australia?",
+   "path": "score",
+   "score": 0.5680311322212219,
+   "title": "International AI Safety Report 2026",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Recommend a good restaurant near Gangnam station",
+   "english": "Recommend a good restaurant near Gangnam station",
+   "path": "score",
+   "score": 0.6076192259788513,
+   "title": "Prospect Personalized Recommendation on Large Language Model-based Agent Platform",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Tell me a joke about cats",
+   "english": "Tell me a joke about cats",
+   "path": "score",
+   "score": 0.672555685043335,
+   "title": "Do Androids Laugh at Electric Sheep? Humor \"Understanding\" Benchmarks from The New Yorker Caption Contest",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How much is a flight from Seoul to Tokyo?",
+   "english": "How much is a flight from Seoul to Tokyo?",
+   "path": "score",
+   "score": 0.604019284248352,
+   "title": "End-to-End LLM Flight Planning with RAG-based Memory and Multi-modal Coach Agent",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What time does the Louvre open on Sundays?",
+   "english": "What time does the Louvre open on Sundays?",
+   "path": "score",
+   "score": 0.5742989182472229,
+   "title": "Seeing Isn't Orienting: A Cognitively Informed Hierarchical Benchmark for Object Orientation in MLLMs",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Translate 'good morning' into Spanish",
+   "english": "Translate 'good morning' into Spanish",
+   "path": "score",
+   "score": 0.5830737352371216,
+   "title": "Airavata: Introducing Hindi Instruction-tuned LLM",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How do I remove a red wine stain from a carpet?",
+   "english": "How do I remove a red wine stain from a carpet?",
+   "path": "score",
+   "score": 0.5871040225028992,
+   "title": "ReFoRCE: A Text-to-SQL Agent with Self-Refinement, Consensus Enforcement, and Column Exploration",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What's a good name for a golden retriever puppy?",
+   "english": "What's a good name for a golden retriever puppy?",
+   "path": "score",
+   "score": 0.5936881303787231,
+   "title": "Autoregressive Entity Retrieval",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Who wrote Pride and Prejudice?",
+   "english": "Who wrote Pride and Prejudice?",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "out",
+   "question": "How many calories are in a banana?",
+   "english": "How many calories are in a banana?",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "out",
+   "question": "What should I wear to a summer wedding?",
+   "english": "What should I wear to a summer wedding?",
+   "path": "score",
+   "score": 0.6306648254394531,
+   "title": "DressWild: Feed-Forward Pose-Agnostic Garment Sewing Pattern Generation from In-the-Wild Images",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Best exercises for lower back pain",
+   "english": "Best exercises for lower back pain",
+   "path": "score",
+   "score": 0.6637287139892578,
+   "title": "3D Pose Based Feedback for Physical Exercises",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How do I change a flat tire?",
+   "english": "How do I change a flat tire?",
+   "path": "score",
+   "score": 0.5723444223403931,
+   "title": "Welcome Your New AI Teammate: On Safety Analysis by Leashing Large Language Models",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What is the plot of Hamlet?",
+   "english": "What is the plot of Hamlet?",
+   "path": "score",
+   "score": 0.6685484647750854,
+   "title": "HAMLET: A Hierarchical and Adaptive Multi-Agent Framework for Live Embodied Theatrics",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "When is the next full moon?",
+   "english": "When is the next full moon?",
+   "path": "score",
+   "score": 0.6048353910446167,
+   "title": "Photometric Redshifts for Next-Generation Surveys",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How long should I boil an egg?",
+   "english": "How long should I boil an egg?",
+   "path": "score",
+   "score": 0.5843625068664551,
+   "title": "Speedrunning Relational Foundation Model Pretraining",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Which planet is closest to the sun?",
+   "english": "Which planet is closest to the sun?",
+   "path": "score",
+   "score": 0.6619830131530762,
+   "title": "Towards a Deterministic Model of Planetary Formation I: a Desert in the Mass and Semi Major Axis Distributions of Extra Solar Planets",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How do I grow tomatoes on a balcony?",
+   "english": "How do I grow tomatoes on a balcony?",
+   "path": "score",
+   "score": 0.6043568849563599,
+   "title": "Calibration-First Reward-Component Auditing for Reinforcement Learning Control in Smart Greenhouses",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What is the population of Canada?",
+   "english": "What is the population of Canada?",
+   "path": "score",
+   "score": 0.6424392461776733,
+   "title": "General Geospatial Inference with a Population Dynamics Foundation Model",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Write a birthday message for my mother",
+   "english": "Write a birthday message for my mother",
+   "path": "score",
+   "score": 0.5624762773513794,
+   "title": "Homebot: A Personal AI Agent for Conversational Home Assistance and Automation",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How tall is Mount Everest?",
+   "english": "How tall is Mount Everest?",
+   "path": "score",
+   "score": 0.5783172845840454,
+   "title": "SatMAE: Pre-training Transformers for Temporal and Multi-Spectral Satellite Imagery",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What are the symptoms of the common cold?",
+   "english": "What are the symptoms of the common cold?",
+   "path": "score",
+   "score": 0.6124081015586853,
+   "title": "Exploring the Impact of Temperature on Large Language Models:Hot or Cold?",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How do I file my income taxes?",
+   "english": "How do I file my income taxes?",
+   "path": "score",
+   "score": 0.6624505519866943,
+   "title": "Language Models and Logic Programs for Trustworthy Tax Reasoning",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Where can I buy cheap concert tickets?",
+   "english": "Where can I buy cheap concert tickets?",
+   "path": "score",
+   "score": 0.6118709444999695,
+   "title": "Market Design for Capacity Sharing in Networks",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Who painted the Mona Lisa?",
+   "english": "Who painted the Mona Lisa?",
+   "path": "score",
+   "score": 0.6411867141723633,
+   "title": "Sanyu Studio: A Multi-Agent System for Art-Historical Narrative Construction",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How do I train my dog to sit?",
+   "english": "How do I train my dog to sit?",
+   "path": "score",
+   "score": 0.6111468076705933,
+   "title": "Training Towards Critical Use: Learning to Situate AI Predictions Relative to Human Knowledge",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What's the best way to learn guitar?",
+   "english": "What's the best way to learn guitar?",
+   "path": "score",
+   "score": 0.6294498443603516,
+   "title": "SPaR: Self-Play with Tree-Search Refinement to Improve Instruction-Following in Large Language Models",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "서울 내일 비 와?",
+   "english": "Will it rain in Seoul tomorrow?",
+   "path": "score",
+   "score": 0.6566569805145264,
+   "title": "MZ-Rain: Moisture-Budget-Guided Zero-Inflated Model for Station-Level Precipitation Nowcasting",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "된장찌개 레시피 알려줘",
+   "english": "Tell me a recipe for doenjang jjigae.",
+   "path": "score",
+   "score": 0.6387205123901367,
+   "title": "KoBBQ: Korean Bias Benchmark for Question Answering",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "부산 여행 코스 추천해줘",
+   "english": "Recommend a travel itinerary for Busan.",
+   "path": "score",
+   "score": 0.6832212805747986,
+   "title": "ITINERA: Integrating Spatial Optimization with Large Language Models for Open-domain Urban Itinerary Planning",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "오늘 저녁 뭐 먹지?",
+   "english": "What should I eat for dinner tonight?",
+   "path": "score",
+   "score": 0.6327676773071289,
+   "title": "Bites of Tomorrow: Personalized Recommendations for a Healthier and Greener Plate",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "강아지 산책은 하루에 몇 번 해야 해?",
+   "english": "How many times a day should I walk my dog?",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "out",
+   "question": "주말에 볼 만한 영화 추천해줘",
+   "english": "movies worth watching this weekend",
+   "path": "score",
+   "score": 0.6566134691238403,
+   "title": "Movie Gen: A Cast of Media Foundation Models",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "감기에 좋은 음식 뭐야?",
+   "english": "What foods are good for a cold?",
+   "path": "score",
+   "score": 0.6132890582084656,
+   "title": "FAM-Bench: Benchmarking Condition-Aware Food-as-Medicine Reasoning in Vision-Language Models",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "제주도 날씨 어때?",
+   "english": "What is the weather like in Jeju Island?",
+   "path": "score",
+   "score": 0.6440975666046143,
+   "title": "ClimateIQA: A New Dataset and Benchmark to Advance Vision-Language Models in Meteorology Anomalies Analysis",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "이사할 때 챙겨야 할 것들",
+   "english": "Things to prepare when moving",
+   "path": "score",
+   "score": 0.6359895467758179,
+   "title": "TIDEE: Tidying Up Novel Rooms using Visuo-Semantic Commonsense Priors",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "커피 하루에 몇 잔까지 괜찮아?",
+   "english": "How many cups of coffee a day are okay?",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "out",
+   "question": "How do I tie a tie?",
+   "english": "How do I tie a tie?",
+   "path": "score",
+   "score": 0.6244186162948608,
+   "title": "A Tutorial on Principal Component Analysis",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What year did the Berlin Wall fall?",
+   "english": "What year did the Berlin Wall fall?",
+   "path": "score",
+   "score": 0.5790464878082275,
+   "title": "PRISM Edit: One Vector for All Temporal Answers",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What is a good gift for a coworker?",
+   "english": "What is a good gift for a coworker?",
+   "path": "score",
+   "score": 0.6398937106132507,
+   "title": "CoworkEnv: Synthesizing Training Environments for Long-Horizon Cowork Agents",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How do I unclog a kitchen sink?",
+   "english": "How do I unclog a kitchen sink?",
+   "path": "score",
+   "score": 0.5788997411727905,
+   "title": "A Topology-Guided GeoAI Agentic Framework for Urban Flood Screening",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Which wine goes well with steak?",
+   "english": "Which wine goes well with steak?",
+   "path": "score",
+   "score": 0.5763097405433655,
+   "title": "FoodieQA: A Multimodal Dataset for Fine-Grained Understanding of Chinese Food Culture",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How far is the moon from Earth?",
+   "english": "How far is the moon from Earth?",
+   "path": "score",
+   "score": 0.622302770614624,
+   "title": "Euclidean distance geometry and applications",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Suggest a weekend hiking trail near Seoul",
+   "english": "Suggest a weekend hiking trail near Seoul",
+   "path": "score",
+   "score": 0.6352148652076721,
+   "title": "Robot Parkour Learning",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "How do I make sourdough bread?",
+   "english": "How do I make sourdough bread?",
+   "path": "score",
+   "score": 0.5882436037063599,
+   "title": "Score-Based Generative Modeling through Stochastic Differential Equations",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "What are the rules of chess castling?",
+   "english": "What are the rules of chess castling?",
+   "path": "score",
+   "score": 0.6411612033843994,
+   "title": "Mastering Chess with a Transformer Model",
+   "declined": true
+  },
+  {
+   "kind": "out",
+   "question": "Who is the lead singer of Coldplay?",
+   "english": "Who is the lead singer of Coldplay?",
+   "path": "score",
+   "score": 0.5876656770706177,
+   "title": "Exploring the Collaborative Co-Creation Process with AI: A Case Study in Novice Music Production",
+   "declined": true
+  },
+  {
+   "kind": "in",
+   "question": "protein structure prediction",
+   "english": "protein structure prediction",
+   "path": "score",
+   "score": 0.7870336771011353,
+   "title": "HelixFold-Single: MSA-free Protein Structure Prediction by Using Protein Language Model as an Alternative",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "mixture of experts",
+   "english": "mixture of experts",
+   "path": "score",
+   "score": 0.7409982085227966,
+   "title": "Mixture of Experts in Large Language Models",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "speculative decoding",
+   "english": "speculative decoding",
+   "path": "score",
+   "score": 0.8181266784667969,
+   "title": "Speculative Decoding with a Speculative Vocabulary",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "contrastive pretraining for images and text",
+   "english": "contrastive pretraining for images and text",
+   "path": "score",
+   "score": 0.8098692297935486,
+   "title": "Improving CLIP Training with Language Rewrites",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "federated averaging under non-iid clients",
+   "english": "federated averaging under non-iid clients",
+   "path": "score",
+   "score": 0.8157272338867188,
+   "title": "Federated Learning with Non-IID Data",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "knowledge distillation for small students",
+   "english": "knowledge distillation for small students",
+   "path": "score",
+   "score": 0.8543334007263184,
+   "title": "Knowledge distillation: A good teacher is patient and consistent",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "graph coloring heuristics",
+   "english": "graph coloring heuristics",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "differential privacy in deep nets",
+   "english": "differential privacy in deep nets",
+   "path": "score",
+   "score": 0.888393223285675,
+   "title": "Deep Learning with Differential Privacy",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "zero-shot classification",
+   "english": "zero-shot classification",
+   "path": "score",
+   "score": 0.7726104855537415,
+   "title": "'Less Than One'-Shot Learning: Learning N Classes From M<N Samples",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "neural architecture search",
+   "english": "neural architecture search",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "reward hacking in reinforcement learning",
+   "english": "reward hacking in reinforcement learning",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "chain of thought prompting",
+   "english": "chain of thought prompting",
+   "path": "score",
+   "score": 0.8253733515739441,
+   "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "visual question answering",
+   "english": "visual question answering",
+   "path": "score",
+   "score": 0.8435312509536743,
+   "title": "VQA: Visual Question Answering",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "point cloud segmentation",
+   "english": "point cloud segmentation",
+   "path": "score",
+   "score": 0.7656905651092529,
+   "title": "PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "adversarial examples",
+   "english": "adversarial examples",
+   "path": "score",
+   "score": 0.8167933225631714,
+   "title": "Natural Adversarial Examples",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "self-supervised speech representations",
+   "english": "self-supervised speech representations",
+   "path": "score",
+   "score": 0.8355141282081604,
+   "title": "wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "code generation from natural language",
+   "english": "code generation from natural language",
+   "path": "score",
+   "score": 0.7845602035522461,
+   "title": "Text2DSL: LLM-Based Code Generation for Domain-Specific Languages",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "sparse attention for long sequences",
+   "english": "sparse attention for long sequences",
+   "path": "score",
+   "score": 0.8124208450317383,
+   "title": "Generating Long Sequences with Sparse Transformers",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "monocular depth estimation",
+   "english": "monocular depth estimation",
+   "path": "score",
+   "score": 0.7843809723854065,
+   "title": "UniDepth: Universal Monocular Metric Depth Estimation",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "multi-armed bandits with delayed feedback",
+   "english": "multi-armed bandits with delayed feedback",
+   "path": "score",
+   "score": 0.8189950585365295,
+   "title": "Regret Analysis of Stochastic and Nonstochastic Multi-armed Bandit Problems",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "byzantine fault tolerant consensus",
+   "english": "byzantine fault tolerant consensus",
+   "path": "score",
+   "score": 0.7895213961601257,
+   "title": "The Bedrock of Byzantine Fault Tolerance: A Unified Platform for BFT Protocol Design and Implementation",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "quantization of language models",
+   "english": "quantization of language models",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "test-time adaptation",
+   "english": "test-time adaptation",
+   "path": "score",
+   "score": 0.8002369999885559,
+   "title": "Beyond Confidence: Stability-Aware Test-Time Adaptation for LLM Reasoning",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "continual learning without forgetting",
+   "english": "continual learning without forgetting",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "causal discovery from observational data",
+   "english": "causal discovery from observational data",
+   "path": "score",
+   "score": 0.8318348526954651,
+   "title": "Argumentative Causal Discovery",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "text-to-image generation",
+   "english": "text-to-image generation",
+   "path": "score",
+   "score": 0.8216994404792786,
+   "title": "Text-to-Image Generative AI for Modeling and Simulation: Methods, Opportunities, and Applications",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "hallucination in large language models",
+   "english": "hallucination in large language models",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "low-rank adaptation of large models",
+   "english": "low-rank adaptation of large models",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "open-vocabulary object detection",
+   "english": "open-vocabulary object detection",
+   "path": "score",
+   "score": 0.8280439376831055,
+   "title": "YOLO-World: Real-Time Open-Vocabulary Object Detection",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "tokenization for multilingual text",
+   "english": "tokenization for multilingual text",
+   "path": "score",
+   "score": 0.7881110906600952,
+   "title": "Tokenization is Sensitive to Language Variation",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "program synthesis",
+   "english": "program synthesis",
+   "path": "score",
+   "score": 0.7716469168663025,
+   "title": "HYSYNTH: Context-Free LLM Approximation for Guiding Program Synthesis",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "neural radiance fields",
+   "english": "neural radiance fields",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "imitation learning from demonstrations",
+   "english": "imitation learning from demonstrations",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "membership inference attacks",
+   "english": "membership inference attacks",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "curriculum learning",
+   "english": "curriculum learning",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "few-shot segmentation",
+   "english": "few-shot segmentation",
+   "path": "score",
+   "score": 0.753899872303009,
+   "title": "'Less Than One'-Shot Learning: Learning N Classes From M<N Samples",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "time series forecasting with deep nets",
+   "english": "time series forecasting with deep nets",
+   "path": "score",
+   "score": 0.8425989747047424,
+   "title": "DeepAR: Probabilistic Forecasting with Autoregressive Recurrent Networks",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "symbolic regression",
+   "english": "symbolic regression",
+   "path": "score",
+   "score": 0.8402877449989319,
+   "title": "Neural Symbolic Regression that Scales",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "explainability of image classifiers",
+   "english": "explainability of image classifiers",
+   "path": "score",
+   "score": 0.8246064186096191,
+   "title": "Causal Explanations for Image Classifiers",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "autonomous driving trajectory prediction",
+   "english": "autonomous driving trajectory prediction",
+   "path": "score",
+   "score": 0.8437185287475586,
+   "title": "A Survey on Deep-Learning Approaches for Vehicle Trajectory Prediction in Autonomous Driving",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "단백질 구조 예측",
+   "english": "protein structure prediction",
+   "path": "score",
+   "score": 0.7870336771011353,
+   "title": "HelixFold-Single: MSA-free Protein Structure Prediction by Using Protein Language Model as an Alternative",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "혼합 전문가 모델",
+   "english": "mixture of experts model",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "적대적 예제",
+   "english": "adversarial examples",
+   "path": "score",
+   "score": 0.8167933225631714,
+   "title": "Natural Adversarial Examples",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "강화학습 보상 설계",
+   "english": "reward design in reinforcement learning",
+   "path": "cue",
+   "score": null
+  },
+  {
+   "kind": "in",
+   "question": "음성 인식",
+   "english": "speech recognition",
+   "path": "score",
+   "score": 0.7526077032089233,
+   "title": "Speech Recognition with Deep Recurrent Neural Networks",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "이미지 분할",
+   "english": "image segmentation",
+   "path": "score",
+   "score": 0.7443862557411194,
+   "title": "Q-Seg: Quantum Annealing-Based Unsupervised Image Segmentation",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "추천 시스템",
+   "english": "recommender systems",
+   "path": "score",
+   "score": 0.7695884108543396,
+   "title": "Interactive Recommendation Agent with Active User Commands",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "기계 번역",
+   "english": "machine translation",
+   "path": "score",
+   "score": 0.7457538843154907,
+   "title": "mT5: A massively multilingual pre-trained text-to-text transformer",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "지식 증류",
+   "english": "knowledge distillation",
+   "path": "score",
+   "score": 0.8454452753067017,
+   "title": "Why distillation helps: a statistical perspective",
+   "declined": false
+  },
+  {
+   "kind": "in",
+   "question": "연합학습",
+   "english": "federated learning",
+   "path": "cue",
+   "score": null
+  }
+ ]
+}

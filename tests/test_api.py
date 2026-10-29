@@ -368,3 +368,48 @@ def test_cors_takes_a_list_and_a_preview_pattern(monkeypatch):
     assert allowed("https://evil.example") is None
     got = c.get("/api/stats", headers={"origin": preview}).headers
     assert got["access-control-allow-origin"] == preview
+
+
+def _warm_app(bot):
+    from fastapi.testclient import TestClient as _Client
+
+    app = api.create_app(backend=bot, limiter=api.Limiter(100, 100, 100), warm=True)
+    with _Client(app) as started:
+        for _ in range(200):
+            state = started.get("/api/health").json()["citation_graph"]
+            if state["status"] in ("done", "failed"):
+                return state
+            import time
+
+            time.sleep(0.01)
+    raise AssertionError("예열이 끝나지 않았습니다")
+
+
+def test_boot_warms_the_agent_model_before_the_citation_graph():
+    order = []
+
+    class Bot(FakeBot):
+        def warm_agent_model(self):
+            order.append("model")
+
+        def citation_graph(self):
+            order.append("graph")
+            return super().citation_graph()
+
+    assert _warm_app(Bot())["status"] == "done"
+    assert order == ["model", "graph"]
+
+
+def test_a_failed_model_warmup_still_builds_the_citation_graph():
+    built = []
+
+    class Bot(FakeBot):
+        def warm_agent_model(self):
+            raise RuntimeError("down")
+
+        def citation_graph(self):
+            built.append(1)
+            return super().citation_graph()
+
+    assert _warm_app(Bot())["status"] == "done"
+    assert built == [1]

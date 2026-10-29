@@ -116,7 +116,10 @@ jobs:
             echo "run=1" >> "$GITHUB_OUTPUT"; exit 0
           fi
           # 답변에 닿는 파일 전부. 하나라도 빠지면 그 변경이 게이트를 지나지 않습니다.
-          watched='^(chatbot|prompts|agent_graph|routing|abstain|title_search|pagerank|answer_validation|candidate_validation|cypher_validation)\.py$|^evals/|^baselines/|^tests/test_eval_gate\.py$|^\.github/workflows/regression-eval\.yml$'
+          # 앱 모듈은 src/ 전체입니다. 이름을 하나씩 적던 목록은 2026-10-25에 모듈을 src/로
+          # 옮긴 뒤로 아무것도 맞추지 못해, 답변 경로를 바꾼 PR도 평가 없이 통과했습니다.
+          # tests/test_eval_gate_scope.py가 이 식을 실제 파일 목록에 대 봅니다.
+          watched='^src/[^/]+\.py$|^evals/|^baselines/|^tests/test_eval_gate\.py$|^\.github/workflows/regression-eval\.yml$'
           changed=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
           if echo "$changed" | grep -qE "$watched"; then
             echo "run=1" >> "$GITHUB_OUTPUT"

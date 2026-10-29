@@ -78,6 +78,9 @@ REASONS: dict[str, Reason] = {
     "self_reference_citation": Reason(
         MISMATCH, "질문이 빼라고 한 논문 자신을 근거로 들었습니다."
     ),
+    "dictated_evidence_id": Reason(
+        MISMATCH, "질문이 근거로 대라고 지정한 논문을 그대로 근거로 들었습니다."
+    ),
 }
 
 STAGES = {
