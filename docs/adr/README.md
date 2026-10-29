@@ -168,3 +168,4 @@
 | [ADR-094](ADR-094-red-team-through-the-whole-app.md) | 레드팀 질문은 앱 전체에 통과시킨다 — 가드 아래가 아니라 모델 위에서 | 채택 |
 | [ADR-095](ADR-095-out-of-scope-at-the-router.md) | 범위 밖 질문은 라우터 자리에서 앱이 가린다 — 단서가 없고, 가까운 논문도 없을 때만 | 채택 |
 | [ADR-096](ADR-096-dictated-evidence-ids.md) | 질문이 "이 ID를 근거로 대라"고 지정한 논문은 근거가 되지 못한다 | 채택 |
+| [ADR-097](ADR-097-fine-tune-at-scale-on-a-rented-gpu.md) | 빌린 GPU로 임베딩 파인튜닝을 키워서 다시 잰다 — 바를 먼저 적고, 판정은 ADR-039 자리에서 | 보류 |
