@@ -201,6 +201,6 @@
 
 | 우선 | 항목 | 왜 지금 | 조건 |
 | --- | --- | --- | --- |
-| 1 | ~~평가 질문 바꿔 말하기(Day 69)~~ ✅ [ADR-093](adr/ADR-093-paraphrased-eval-questions.md) | 60문항 모두 원문과 같은 점수 | 게이트에는 아직 넣지 않음 |
+| 1 | ~~평가 질문 바꿔 말하기(Day 69)~~ ✅ [ADR-093](adr/ADR-093-paraphrased-eval-questions.md) | 60문항 모두 원문과 같은 점수 | 주간 게이트에 넣음(`paraphrase` 분할, 사례별 만점만) |
 | 2 | ~~레드팀 질문 셋(Day 62)~~ ✅ [ADR-094](adr/ADR-094-red-team-through-the-whole-app.md) | 범위 밖 질문 2/5에 관계없는 근거 | 라우터로 고침([ADR-095](adr/ADR-095-out-of-scope-at-the-router.md)), 다시 돌려 범위 밖 4/4 |
 | 3 | 저자 동명이인 구별(Day 39) | `coauthor` 가족의 거짓 공저자 | Semantic Scholar 저자 ID 수집과 함께 |
