@@ -998,6 +998,18 @@ def read_with_retry(cypher, attempts=3, delay=2.0):
     raise RuntimeError("재시도를 모두 소진했습니다")
 
 
+def warm_agent_model():
+    """답 쓰는 모델을 한 번 짧게 불러, 프로세스 첫 호출의 일회성 비용을 부팅 때 냅니다.
+
+    프로세스의 첫 질문만 첫 턴이 3.4~4.8초였고 둘째부터는 1.7~2.1초였습니다. 질문 순서를 바꿔도
+    첫 질문이 느렸고, 시스템 지시문은 첫 호출에도 캐시에서 읽혔습니다(2366/2369토큰). 그러니
+    캐시가 아니라 프로세스 안의 첫 호출 비용입니다. "Say ok." 한 번이면 첫 턴이 1.9~2.0초로
+    돌아왔습니다(ROADMAP 12-6, `scripts/measure_agent_output.py`). 토큰은 호출당 수십 개입니다.
+    """
+    for _ in agent_llm.stream("Say ok."):
+        pass
+
+
 def citation_graph():
     """논문 목록과 REFERENCES 관계를 한 번 읽어 PageRank용 행렬을 만듭니다."""
     with graph_lock:

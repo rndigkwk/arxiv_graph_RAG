@@ -220,10 +220,21 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
                 state["backend"] = load_chatbot()
             return state["backend"]
 
+    def warm_everything() -> Any:
+        bot = chatbot()
+        # 모델을 먼저 깨웁니다 - 몇 초면 끝나므로 인용망(15초 안팎)을 기다리는 첫 질문보다
+        # 앞섭니다. 실패해도 인용망은 올립니다. 첫 질문이 그 2초를 낼 뿐입니다.
+        if (warm_model := getattr(bot, "warm_agent_model", None)) is not None:
+            try:
+                warm_model()
+            except Exception as exc:  # noqa: BLE001 - 예열 실패가 인용망을 막으면 안 됩니다.
+                warmup.warmup_logger.warning("model_warmup_failed reason=%s", type(exc).__name__)
+        return bot.citation_graph()
+
     def warmup_task() -> warmup.Warmup:
         with lock:
             if "warmup" not in state:
-                state["warmup"] = warmup.Warmup(lambda: chatbot().citation_graph())
+                state["warmup"] = warmup.Warmup(warm_everything)
             return state["warmup"]
 
     def guard(request: Request) -> None:
