@@ -57,3 +57,7 @@
   [`src/candidate_validation.py`](../../src/candidate_validation.py)의 `assess_and_validate`
 - [`tests/test_named_id_citation.py`](../../tests/test_named_id_citation.py)
 - ADR-094(레드팀), ADR-095(범위 밖 질문), ADR-069(조건 판정은 유지)
+
+## CI 전체 평가 (2026-10-29)
+
+이 브랜치에서 `split=full`을 손으로 돌렸습니다(CI run 40798971782). 판정은 **통과, 위반 0건**입니다. 근거 정밀도와 재현율, 충실도 모두 1.0입니다. 평가 질문 중에는 ID를 근거로 지정하는 질문이 없으므로, 새 검사는 정상 질문을 하나도 막지 않았습니다.
