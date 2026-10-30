@@ -100,7 +100,7 @@ def test_the_disk_does_not_fill_up(cells):
     body = "\n".join(code_cells(cells))
     assert 'require_free_disk("인코딩")' in body
     assert '(checkpoint / "trainer_state.json").exists()' in body
-    assert "VOLUME_GB - used_gb(WORK_DIR)" in body
+    assert "VOLUME_GB - used" in body and "if VOLUME_GB is None:" in body
 
 
 def test_only_this_notebooks_outputs_are_uploaded(body):
