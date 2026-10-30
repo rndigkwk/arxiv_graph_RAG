@@ -94,8 +94,10 @@ in-batch보다 낫다는 근거가 없다"이고, "hard가 더 나쁘다"는 아
 1. ~~**학습 규모** — 1 epoch, 36,554쌍이었습니다. epoch를 늘리거나 쌍을 늘리면 달라질 수 있습니다.~~
    **닫혔습니다(2026-10-29, [ADR-097](ADR-097-fine-tune-at-scale-on-a-rented-gpu.md)).** 배치 256·3 epoch로 키우자
    인용 과제에서는 OpenAI를 이겼지만, 판정 자리(미래 과제 간선 0개 집단)에서는 동점이었습니다.
-2. **과제 정식화** — 네거티브를 `primary_category` 동일로 뽑는 규칙 자체가 약할 수 있습니다
-   ([ADR-012](ADR-012-graph-hard-negatives.md)의 민감도와 같은 지적입니다).
+2. ~~**과제 정식화** — 네거티브를 `primary_category` 동일로 뽑는 규칙 자체가 약할 수 있습니다
+   ([ADR-012](ADR-012-graph-hard-negatives.md)의 민감도와 같은 지적입니다).~~
+   **닫혔습니다(2026-10-30, [ADR-098](ADR-098-fine-tune-on-co-citation-pairs.md)).** 학습 목표를 판정 자리와 같은
+   공동인용으로 맞췄더니 간선 0개 집단에서 OpenAI보다 hit@5·MRR이 낮았습니다(구간 0 제외). 로컬 임베딩 학습을 닫습니다.
 
 ## 재현
 

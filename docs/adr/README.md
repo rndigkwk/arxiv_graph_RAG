@@ -169,4 +169,4 @@
 | [ADR-095](ADR-095-out-of-scope-at-the-router.md) | 범위 밖 질문은 라우터 자리에서 앱이 가린다 — 단서가 없고, 가까운 논문도 없을 때만 | 채택 |
 | [ADR-096](ADR-096-dictated-evidence-ids.md) | 질문이 "이 ID를 근거로 대라"고 지정한 논문은 근거가 되지 못한다 | 채택 |
 | [ADR-097](ADR-097-fine-tune-at-scale-on-a-rented-gpu.md) | 빌린 GPU로 임베딩 파인튜닝을 키워서 다시 잰다 — 바를 먼저 적고, 판정은 ADR-039 자리에서 | 기각 |
-| [ADR-098](ADR-098-fine-tune-on-co-citation-pairs.md) | 공동인용 쌍으로 다시 학습한다 — 바꾸는 것은 쌍의 정의 하나, 바는 ADR-097 그대로 | 보류 |
+| [ADR-098](ADR-098-fine-tune-on-co-citation-pairs.md) | 공동인용 쌍으로 다시 학습한다 — 바꾸는 것은 쌍의 정의 하나, 바는 ADR-097 그대로 | 기각 |
