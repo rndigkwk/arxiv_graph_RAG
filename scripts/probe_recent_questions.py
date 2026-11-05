@@ -44,6 +44,7 @@ def probe(case, question):
                   if call.get("by") != "app"],
         "abstained": response.get("abstained"),
         "conditions": verdict.get("graph_conditions"),
+        "checked_by_app": verdict.get("graph_checked_by_app"),
         "cyphers": response.get("cyphers"),
         "evidence": response.get("evidence_ids"),
     }

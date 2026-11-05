@@ -156,3 +156,76 @@ def test_the_model_sees_the_same_prompt_and_tool_schema():
 def test_results_carry_the_publication_date():
     assert '"published": published_date(node.get("published"))' in SOURCE
     assert '"published", "pdf_url"]' in SOURCE
+
+
+# ── "최근" 조건을 앱이 직접 확인합니다(ADR-103) ──────────────────────────────
+
+NOW = dt.datetime(2026, 11, 5, tzinfo=dt.UTC)
+FRESH = {"arxiv_id": "2609.00885", "title": "T", "abstract": "A",
+         "published": "2026-09-01T00:00:00Z"}
+OLD = {"arxiv_id": "2401.00001", "title": "T", "abstract": "A",
+       "published": "2024-01-02T00:00:00Z"}
+
+
+@pytest.mark.parametrize("conditions", [["recent"], ['"latest"'], ["the most recent papers"],
+                                        ["최근 논문"], ["newest work"]])
+def test_date_words_alone_are_a_recency_condition(conditions):
+    assert pre_recent.recency_only(conditions)
+
+
+@pytest.mark.parametrize("conditions", [[], ["recent", "cs.CL"], ["published after 2024"],
+                                        ["recent papers citing AutoGen"], ["by Yann LeCun"]])
+def test_anything_beyond_the_date_word_stays_with_the_judge(conditions):
+    assert not pre_recent.recency_only(conditions)
+
+
+def test_the_app_covers_recency_only_when_every_cited_paper_is_inside_the_window():
+    question = "What are the latest papers on diffusion models for image generation?"
+    assert pre_recent.covers(question, ['"latest"'], [FRESH], now=NOW)
+    assert not pre_recent.covers(question, ['"latest"'], [FRESH, OLD], now=NOW)
+    # 발표일을 읽지 못하면 앱이 확인한 것이 아닙니다.
+    assert not pre_recent.covers(question, ['"latest"'], [{**FRESH, "published": None}], now=NOW)
+    # 질문이 "최근"을 묻지 않으면 판정의 결론을 그대로 둡니다.
+    assert not pre_recent.covers("Papers on diffusion models", ["recent"], [FRESH], now=NOW)
+
+
+def test_a_recency_verdict_the_app_confirmed_passes_without_graph_rows():
+    from src.candidate_validation import assess_and_validate
+
+    question = "What are the latest papers on diffusion models for image generation?"
+    response = {"evidence_ids": [FRESH["arxiv_id"]], "rows": []}
+    seen = []
+
+    def assess(asked, papers):
+        seen.extend(papers)
+        return {"requires_content": True, "requires_graph": True,
+                "graph_conditions": ["latest"], "graph_conditions_covered": False,
+                "content_matches": {FRESH["arxiv_id"]: True}}
+
+    result = assess_and_validate(question, response, lambda ids: [FRESH], assess)
+    assert result["graph_checked_by_app"] is True
+    assert result["graph_conditions_covered"] is True
+
+
+def test_the_app_does_not_rescue_an_old_paper_or_a_topic_mismatch():
+    from src.candidate_validation import assess_and_validate
+
+    question = "What are the latest papers on diffusion models for image generation?"
+
+    def verdict(matches):
+        return lambda asked, papers: {
+            "requires_content": True, "requires_graph": True, "graph_conditions": ["latest"],
+            "graph_conditions_covered": False, "content_matches": matches}
+
+    with pytest.raises(ValueError, match="그래프 검색 조건"):
+        assess_and_validate(question, {"evidence_ids": [OLD["arxiv_id"]], "rows": []},
+                            lambda ids: [OLD], verdict({OLD["arxiv_id"]: True}))
+    with pytest.raises(ValueError, match="내용 조건"):
+        assess_and_validate(question, {"evidence_ids": [FRESH["arxiv_id"]], "rows": []},
+                            lambda ids: [FRESH], verdict({FRESH["arxiv_id"]: False}))
+
+
+def test_the_judge_still_sees_only_id_title_and_abstract():
+    from src.candidate_validation import judge_view
+
+    assert judge_view([FRESH]) == [{"arxiv_id": FRESH["arxiv_id"], "title": "T", "abstract": "A"}]

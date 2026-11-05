@@ -46,6 +46,57 @@ def asks_recent(question: str) -> bool:
     return bool(CUES.search(question or ""))
 
 
+# 날짜 낱말 말고 조건 문구에 남아도 되는 말입니다.
+# 이것까지 지우고 아무것도 안 남아야 "최근"뿐입니다.
+FILLER = re.compile(
+    r"\b(?:the|most|papers?|works?|research|stud(?:y|ies)|published|ones?|in|on|of)\b"
+    r"|논문|연구|나온|발표된|것|에|의",
+    re.IGNORECASE,
+)
+
+
+def recency_only(conditions: list[str]) -> bool:
+    """판정이 적은 그래프 조건이 모두 "최근" 같은 날짜 낱말뿐인지(ADR-103).
+
+    "2024년 이후", "cited by X", "cs.CL"처럼 다른 것이 하나라도 남으면 False입니다.
+    """
+    if not conditions:
+        return False
+    for text in conditions:
+        rest = FILLER.sub(" ", CUES.sub(" ", text or ""))
+        if not CUES.search(text or "") or re.sub(r"[\W_]+", "", rest):
+            return False
+    return True
+
+
+def _published(value: Any) -> dt.datetime | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=dt.UTC)
+
+
+def covers(question: str, conditions: list[str], papers: list[dict[str, Any]],
+           now: dt.datetime | None = None) -> bool:
+    """"최근" 조건을 앱이 직접 확인합니다(ADR-103).
+
+    "최근 = 12개월"은 앱이 정한 뜻입니다(ADR-090). 판정은 그 뜻을 몰라, 같은 12개월 날짜 조회를
+    보고도 실행마다 충족·미충족을 다르게 냈습니다(EXPERIMENTS 11-60).
+
+    질문이 "최근"을 묻고, 판정의 그래프 조건이 날짜 낱말뿐이고, 인용한 논문이 **모두** 기간 안에
+    발표됐을 때만 True입니다. 발표일을 읽지 못한 논문이 하나라도 있으면 False - 판정의 결론을
+    그대로 둡니다.
+    """
+    if not (asks_recent(question) and recency_only(conditions) and papers):
+        return False
+    start = since(now=now)
+    dates = [_published(paper.get("published")) for paper in papers]
+    return all(date is not None and date >= start for date in dates)
+
+
 def since(months: int = WINDOW_MONTHS, now: dt.datetime | None = None) -> dt.datetime:
     """`months`개월 전 시각입니다.
 

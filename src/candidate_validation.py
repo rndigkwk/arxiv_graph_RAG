@@ -6,7 +6,7 @@ from collections import Counter
 from langchain_core.utils.json import parse_partial_json
 from pydantic import BaseModel, Field
 
-from src import prompts
+from src import pre_recent, prompts
 from src.answer_validation import (
     validate_dictated_ids,
     validate_mixed_candidates,
@@ -167,6 +167,23 @@ def judge_content(question, papers, invoke_model, graph_queries=()):
     }
 
 
+def app_checks_recency(question, assessment, papers):
+    """판정이 "최근" 조건을 못 지켰다고 봤어도, 앱이 발표일로 확인하면 충족으로 바꿉니다.
+
+    ADR-103입니다. 판정의 다른 결론(내용 일치, 다른 그래프 조건)은 건드리지 않습니다.
+    """
+    if assessment.get("graph_conditions_covered") or not pre_recent.covers(
+            question, assessment.get("graph_conditions") or [], papers):
+        return assessment
+    return {**assessment, "graph_conditions_covered": True, "graph_checked_by_app": True}
+
+
+def judge_view(papers):
+    """판정에 보내는 논문 필드입니다. 발표일은 앱이 따로 봅니다 - 판정의 입력은 그대로 둡니다."""
+    return [{key: paper.get(key) for key in ("arxiv_id", "title", "abstract")}
+            for paper in papers]
+
+
 def assess_and_validate(question, response, fetch_papers, assess):
     """Fetch cited papers, assess topic support, and enforce mixed-question evidence."""
     ids = response["evidence_ids"]
@@ -179,6 +196,6 @@ def assess_and_validate(question, response, fetch_papers, assess):
     # 두어, 걸릴 때 불필요한 호출을 하지 않습니다.
     validate_self_reference(question, papers, response)
     validate_dictated_ids(question, response)
-    assessment = assess(question, papers)
+    assessment = app_checks_recency(question, assess(question, papers), papers)
     validate_mixed_candidates(response, assessment)
     return assessment

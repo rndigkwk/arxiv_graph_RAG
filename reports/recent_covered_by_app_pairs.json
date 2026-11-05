@@ -1,0 +1,814 @@
+{
+ "generated_at": "2026-11-05",
+ "method": "scripts/probe_recent_questions.py, local app (Aura), main ae578c4 and this branch run at the same time, 3 rounds",
+ "main": {
+  "1": [
+   {
+    "id": "gnn-en",
+    "total": 9.766,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2602.07491\", \"2607.00924\", \"2608.06713\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.abstract AS abstract, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2607.13115",
+     "2608.10480"
+    ]
+   },
+   {
+    "id": "gnn-ko",
+    "total": 11.606,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2608.06713\", \"2507.21873\", \"2602.07491\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "diffusion-en",
+    "total": 18.869,
+    "rejected": [
+     "mixed_candidate_conditions"
+    ],
+    "turns": 5,
+    "attempts": 2,
+    "calls": [
+     "search_graph",
+     "search_graph",
+     "search_papers"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"latest\""
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2511.20645\", \"2601.10332\", \"2609.00885\", \"2601.22158\", \"2608.28256\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25",
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2609.00885\", \"2601.22158\", \"2601.10332\", \"2511.20645\", \"2608.28256\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2609.00885",
+     "2601.22158",
+     "2601.10332",
+     "2511.20645"
+    ]
+   },
+   {
+    "id": "rlhf-ko",
+    "error": "AnswerValidationError",
+    "total": 20.72
+   },
+   {
+    "id": "agents-en",
+    "total": 8.36,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"recent\""
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2606.01975\", \"2608.26226\", \"2605.02801\", \"2606.26346\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.26226",
+     "2606.26346",
+     "2605.02801",
+     "2603.22862"
+    ]
+   },
+   {
+    "id": "retrieval-ko",
+    "total": 11.496,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최신 연구"
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2608.08445\", \"2511.13201\", \"2512.20626\", \"2607.28397\", \"2602.03442\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, toString(p.published) AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.08445",
+     "2607.28397",
+     "2602.03442",
+     "2512.20626",
+     "2511.13201"
+    ]
+   }
+  ],
+  "2": [
+   {
+    "id": "gnn-en",
+    "error": "AnswerValidationError",
+    "total": 16.04
+   },
+   {
+    "id": "gnn-ko",
+    "total": 13.686,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2608.06713\", \"2608.29207\", \"2602.07491\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "diffusion-en",
+    "total": 8.768,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"latest\""
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2511.20645\", \"2601.10332\", \"2609.00885\", \"2601.22158\", \"2608.28256\"] AND p.published >= datetime() - duration(\"P12M\") AND (toLower(p.title) CONTAINS \"diffusion\" OR toLower(p.abstract) CONTAINS \"diffusion\") AND (toLower(p.title) CONTAINS \"image generation\" OR toLower(p.abstract) CONTAINS \"image generation\" OR toLower(p.title) CONTAINS \"text-to-image\" OR toLower(p.abstract) CONTAINS \"text-to-image\" OR toLower(p.title) CONTAINS \"image synthesis\" OR toLower(p.abstract) CONTAINS \"image synthesis\") RETURN p.title AS answer_value, [p.arxiv_id] AS evidence_ids, p.arxiv_id AS arxiv_id, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2609.00885",
+     "2601.22158",
+     "2601.10332",
+     "2511.20645"
+    ]
+   },
+   {
+    "id": "rlhf-ko",
+    "total": 15.287,
+    "rejected": [
+     "mixed_candidate_conditions"
+    ],
+    "turns": 4,
+    "attempts": 2,
+    "calls": [
+     "search_graph",
+     "search_papers"
+    ],
+    "abstained": null,
+    "conditions": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2604.23747\", \"2512.23515\", \"2606.31813\", \"2602.17276\", \"2607.20515\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS arxiv_id, p.title AS answer_value, p.abstract AS abstract, p.primary_category AS primary_category, p.published AS published, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": []
+   },
+   {
+    "id": "agents-en",
+    "total": 17.581,
+    "rejected": [
+     "mixed_candidate_conditions"
+    ],
+    "turns": 5,
+    "attempts": 2,
+    "calls": [
+     "search_graph",
+     "search_papers",
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"recent\""
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2606.01975\", \"2608.26226\", \"2605.02801\", \"2606.26346\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25",
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2606.01975\", \"2608.26226\", \"2605.02801\", \"2606.26346\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.26226",
+     "2606.26346",
+     "2605.02801",
+     "2603.22862"
+    ]
+   },
+   {
+    "id": "retrieval-ko",
+    "total": 10.951,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최신 연구"
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2608.08445\", \"2511.13201\", \"2512.20626\", \"2607.28397\", \"2602.03442\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.08445",
+     "2607.28397",
+     "2602.03442",
+     "2512.20626",
+     "2511.13201"
+    ]
+   }
+  ],
+  "3": [
+   {
+    "id": "gnn-en",
+    "total": 21.277,
+    "rejected": [
+     "mixed_candidate_conditions"
+    ],
+    "turns": 6,
+    "attempts": 2,
+    "calls": [
+     "search_graph",
+     "search_graph",
+     "search_papers",
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"recent\""
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2602.07491\", \"2607.00924\", \"2608.06713\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25",
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2608.10480\", \"2607.13115\", \"2608.06713\", \"2607.00924\", \"2602.07491\"] AND p.published >= datetime() - duration(\"P12M\") AND (toLower(p.title) CONTAINS \"molecular property prediction\" OR toLower(p.abstract) CONTAINS \"molecular property prediction\") AND toLower(p.abstract) CONTAINS \"graph neural network\" RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25",
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2608.10480\", \"2607.13115\"] AND p.published >= datetime() - duration(\"P12M\") AND (toLower(p.title) CONTAINS \"molecular property prediction\" OR toLower(p.abstract) CONTAINS \"molecular property prediction\") AND (toLower(p.abstract) CONTAINS \"gnn\" OR toLower(p.abstract) CONTAINS \"graph neural network\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "gnn-ko",
+    "total": 10.357,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"최근\""
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2507.21873\", \"2602.07491\", \"2607.00924\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, p.arxiv_id AS arxiv_id, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "diffusion-en",
+    "total": 10.145,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "latest"
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2511.20645\", \"2601.10332\", \"2609.00885\", \"2601.22158\", \"2608.28256\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS arxiv_id, p.title AS answer_value, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract, [p.arxiv_id] AS evidence_ids ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2609.00885",
+     "2601.22158",
+     "2601.10332",
+     "2511.20645"
+    ]
+   },
+   {
+    "id": "rlhf-ko",
+    "total": 14.518,
+    "rejected": [
+     "mixed_candidate_conditions"
+    ],
+    "turns": 4,
+    "attempts": 2,
+    "calls": [
+     "search_graph",
+     "search_papers"
+    ],
+    "abstained": null,
+    "conditions": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2604.23747\", \"2512.23515\", \"2602.17276\", \"2605.02801\", \"2607.05378\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, toString(p.published) AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": []
+   },
+   {
+    "id": "agents-en",
+    "total": 19.564,
+    "rejected": [
+     "mixed_candidate_conditions"
+    ],
+    "turns": 5,
+    "attempts": 2,
+    "calls": [
+     "search_graph",
+     "search_papers",
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"recent\""
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2606.01975\", \"2608.26226\", \"2605.02801\", \"2606.26346\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.abstract AS abstract, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25",
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2604.00137\", \"2606.26346\", \"2605.02801\", \"2509.12867\", \"2509.01055\", \"2508.17281\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2604.00137",
+     "2606.26346",
+     "2605.02801",
+     "2603.22862"
+    ]
+   },
+   {
+    "id": "retrieval-ko",
+    "total": 9.434,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최신 연구"
+    ],
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2608.08445\", \"2511.13201\", \"2512.20626\", \"2607.28397\", \"2602.03442\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.08445",
+     "2607.28397",
+     "2602.03442",
+     "2512.20626",
+     "2511.13201"
+    ]
+   }
+  ]
+ },
+ "branch": {
+  "1": [
+   {
+    "id": "gnn-en",
+    "total": 14.52,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"recent\""
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2602.07491\", \"2607.00924\", \"2608.06713\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "gnn-ko",
+    "total": 12.234,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [],
+    "checked_by_app": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2507.21873\", \"2602.07491\", \"2607.00924\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.abstract AS abstract, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "diffusion-en",
+    "total": 10.188,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"latest\""
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2511.20645\", \"2601.10332\", \"2609.00885\", \"2601.22158\", \"2608.28256\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2609.00885",
+     "2601.22158",
+     "2601.10332",
+     "2511.20645"
+    ]
+   },
+   {
+    "id": "rlhf-ko",
+    "total": 12.539,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최근에 나온"
+    ],
+    "checked_by_app": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2604.23747\", \"2512.23515\", \"2606.31813\", \"2602.17276\", \"2607.20515\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2607.20515"
+    ]
+   },
+   {
+    "id": "agents-en",
+    "total": 9.124,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"recent\""
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2606.01975\", \"2608.26226\", \"2605.02801\", \"2606.26346\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2606.26346",
+     "2603.22862"
+    ]
+   },
+   {
+    "id": "retrieval-ko",
+    "total": 13.05,
+    "rejected": [],
+    "turns": 3,
+    "attempts": 1,
+    "calls": [
+     "search_graph",
+     "search_papers"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최신"
+    ],
+    "checked_by_app": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2608.08445\", \"2511.13201\", \"2512.20626\", \"2607.28397\", \"2602.03442\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.08445",
+     "2607.28397",
+     "2602.03442",
+     "2512.20626",
+     "2511.13201"
+    ]
+   }
+  ],
+  "2": [
+   {
+    "id": "gnn-en",
+    "total": 11.096,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "recent"
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2602.07491\", \"2607.00924\", \"2608.06713\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.abstract AS abstract, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "gnn-ko",
+    "total": 10.63,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최근"
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2608.06713\", \"2507.21873\", \"2602.07491\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "diffusion-en",
+    "total": 13.725,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "latest"
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2511.20645\", \"2601.10332\", \"2609.00885\", \"2601.22158\", \"2608.28256\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2609.00885",
+     "2601.22158",
+     "2601.10332",
+     "2511.20645"
+    ]
+   },
+   {
+    "id": "rlhf-ko",
+    "total": 15.758,
+    "rejected": [
+     "mixed_candidate_conditions"
+    ],
+    "turns": 4,
+    "attempts": 2,
+    "calls": [
+     "search_graph",
+     "search_papers"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"최근에 나온\""
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2604.23747\", \"2602.17276\", \"2507.04136\", \"2605.02801\", \"2607.05378\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2507.04136"
+    ]
+   },
+   {
+    "id": "agents-en",
+    "total": 8.179,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"recent\""
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2606.01975\", \"2608.26226\", \"2605.02801\", \"2606.26346\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.26226",
+     "2606.26346",
+     "2605.02801",
+     "2603.22862"
+    ]
+   },
+   {
+    "id": "retrieval-ko",
+    "total": 9.382,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최신 연구"
+    ],
+    "checked_by_app": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2608.08445\", \"2511.13201\", \"2512.20626\", \"2607.28397\", \"2602.03442\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.08445",
+     "2607.28397",
+     "2602.03442",
+     "2512.20626",
+     "2511.13201"
+    ]
+   }
+  ],
+  "3": [
+   {
+    "id": "gnn-en",
+    "total": 9.259,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "recent"
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2602.07491\", \"2607.00924\", \"2608.06713\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.abstract AS abstract, p.primary_category AS primary_category, p.published AS published ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "gnn-ko",
+    "total": 10.175,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최근"
+    ],
+    "checked_by_app": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2607.13115\", \"2608.10480\", \"2608.06713\", \"2507.21873\", \"2602.07491\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.10480",
+     "2607.13115"
+    ]
+   },
+   {
+    "id": "diffusion-en",
+    "total": 8.539,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"latest\""
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2511.20645\", \"2601.10332\", \"2609.00885\", \"2601.22158\", \"2608.28256\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2609.00885",
+     "2601.22158",
+     "2601.10332",
+     "2511.20645"
+    ]
+   },
+   {
+    "id": "rlhf-ko",
+    "total": 16.152,
+    "rejected": [
+     "mixed_candidate_conditions"
+    ],
+    "turns": 5,
+    "attempts": 2,
+    "calls": [
+     "search_graph",
+     "search_papers",
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": null,
+    "checked_by_app": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2604.23747\", \"2512.23515\", \"2606.31813\", \"2602.17276\", \"2607.20515\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25",
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2307.04964\", \"2309.00754\", \"2404.08555\", \"2409.19256\", \"2309.00267\", \"2309.06256\", \"2501.08617\", \"2310.12773\", \"2310.06452\", \"2412.10400\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": []
+   },
+   {
+    "id": "agents-en",
+    "total": 9.211,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "\"recent\""
+    ],
+    "checked_by_app": true,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2603.22862\", \"2606.01975\", \"2608.26226\", \"2605.02801\", \"2606.26346\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published, p.abstract AS abstract ORDER BY p.published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.26226",
+     "2606.26346",
+     "2605.02801",
+     "2603.22862"
+    ]
+   },
+   {
+    "id": "retrieval-ko",
+    "total": 9.725,
+    "rejected": [],
+    "turns": 2,
+    "attempts": 1,
+    "calls": [
+     "search_graph"
+    ],
+    "abstained": null,
+    "conditions": [
+     "최신"
+    ],
+    "checked_by_app": null,
+    "cyphers": [
+     "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN [\"2608.08445\", \"2511.13201\", \"2512.20626\", \"2607.28397\", \"2602.03442\"] AND p.published >= datetime() - duration(\"P12M\") RETURN p.arxiv_id AS answer_value, [p.arxiv_id] AS evidence_ids, p.title AS title, p.primary_category AS primary_category, p.published AS published ORDER BY published DESC LIMIT 25"
+    ],
+    "evidence": [
+     "2608.08445",
+     "2607.28397",
+     "2602.03442",
+     "2512.20626",
+     "2511.13201"
+    ]
+   }
+  ]
+ }
+}

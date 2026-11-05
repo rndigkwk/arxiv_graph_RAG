@@ -60,6 +60,7 @@ from src.candidate_validation import (
     QuestionVerdict,
     assess_and_validate,
     judge_content,
+    judge_view,
     structured_judge,
 )
 from src.cypher_validation import check_external_io, check_order_by, refuse_unless_read_only
@@ -658,12 +659,14 @@ def ask(question, history, on_answer=None):
     def fetch_cited(ids):
         return run_read(
             "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids "
-            "RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.abstract AS abstract",
+            "RETURN p.arxiv_id AS arxiv_id, p.title AS title, p.abstract AS abstract, "
+            "toString(p.published) AS published",
             {"ids": ids},
         )
 
     def judge(asked, papers, queries):
-        return judge_content(asked, papers, judging_model(validation_usage),
+        # 발표일은 "최근" 확인(ADR-103)에만 씁니다. 판정에는 지금과 같은 세 필드만 보냅니다.
+        return judge_content(asked, judge_view(papers), judging_model(validation_usage),
                              graph_queries=queries)
 
     def judge_early(ids, queries):
