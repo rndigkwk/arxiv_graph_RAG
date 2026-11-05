@@ -1,7 +1,9 @@
 """Check final paper IDs against the question's content and graph conditions."""
 
 import json
+from collections import Counter
 
+from langchain_core.utils.json import parse_partial_json
 from pydantic import BaseModel, Field
 
 from src import prompts
@@ -9,6 +11,7 @@ from src.answer_validation import (
     validate_dictated_ids,
     validate_mixed_candidates,
     validate_self_reference,
+    validation_logger,
 )
 
 # 판정 호출을 몇 번까지 부를지입니다(ADR-101). 판정이 깨진 것은 답의 잘못이 아닙니다. 그런데 이
@@ -18,7 +21,63 @@ JUDGE_ATTEMPTS = 2
 
 
 class IncompleteVerdict(ValueError):
-    """판정 모델이 논문마다 하나씩 판정을 돌려주지 못했습니다. 다시 부르면 됩니다."""
+    """판정 모델이 논문마다 하나씩 판정을 돌려주지 못했습니다. 다시 부르면 됩니다.
+
+    `shape`는 깨진 판정의 **모양**입니다(ADR-102). 원문은 담지 않습니다 - 판정 출력에는
+    질문에서 따온 조건과 논문 ID가 들어 있고, 실패 로그는 그것을 남기지 않기로 했습니다
+    (`answer_validation.log_validation_failure`).
+    """
+
+    def __init__(self, message: str, shape: dict | None = None):
+        super().__init__(message)
+        self.shape = shape or {}
+
+
+def _repeat(items) -> int:
+    """목록에서 가장 많이 되풀이된 항목의 횟수입니다. 끝없는 판정이 무엇을 되풀이했는지 봅니다."""
+    keys = [json.dumps(item, sort_keys=True, ensure_ascii=False) for item in items]
+    return max(Counter(keys).values(), default=0)
+
+
+def unreadable_shape(raw, error) -> dict:
+    """읽지 못한 판정의 모양: 출력 토큰, 잘린 이유, 읽을 수 있던 데까지의 필드 길이."""
+    shape: dict = {"error": type(error).__name__ if error else None}
+    usage = getattr(raw, "usage_metadata", None)
+    if isinstance(usage, dict):
+        shape["output_tokens"] = usage.get("output_tokens")
+    metadata = getattr(raw, "response_metadata", None) or {}
+    shape["status"] = metadata.get("status")
+    details = metadata.get("incomplete_details")
+    shape["incomplete"] = details.get("reason") if isinstance(details, dict) else details
+    text = getattr(raw, "text", "") if raw is not None else ""
+    text = text if isinstance(text, str) else ""
+    shape["chars"] = len(text)
+    try:
+        partial = parse_partial_json(text) if text else None
+    except (json.JSONDecodeError, ValueError):
+        partial = None
+    shape["partial_json"] = isinstance(partial, dict)
+    if isinstance(partial, dict):
+        for key in ("graph_conditions", "candidates"):
+            value = partial.get(key)
+            if isinstance(value, list):
+                shape[f"{key}_len"] = len(value)
+                shape[f"{key}_max_repeat"] = _repeat(value)
+    return shape
+
+
+def mismatch_shape(candidates, expected: set[str]) -> dict:
+    """읽었지만 논문 수가 맞지 않는 판정의 모양입니다. ID 자체는 담지 않습니다."""
+    ids = [item.arxiv_id for item in candidates]
+    return {"error": "count_mismatch", "expected": len(expected), "candidates": len(ids),
+            "duplicates": len(ids) - len(set(ids)), "unknown": len(set(ids) - expected),
+            "missing": len(expected - set(ids))}
+
+
+def log_judge_retry(attempt: int, shape: dict) -> None:
+    """판정을 다시 부를 때 한 줄을 남깁니다. 값은 모두 숫자와 상태 이름입니다."""
+    fields = " ".join(f"{key}={value}" for key, value in shape.items())
+    validation_logger.warning("condition_judge_unreadable attempt=%d %s", attempt, fields)
 
 
 class CandidateVerdict(BaseModel):
@@ -62,7 +121,10 @@ def structured_judge(structured, usage):
                     usage[key] = (usage.get(key) or 0) + value
         parsed = result.get("parsed")
         if parsed is None:
-            raise IncompleteVerdict("인용 논문의 내용 판정 결과가 불완전합니다.")
+            raise IncompleteVerdict(
+                "인용 논문의 내용 판정 결과가 불완전합니다.",
+                unreadable_shape(result.get("raw"), result.get("parsing_error")),
+            )
         return parsed
 
     return invoke
@@ -81,9 +143,12 @@ def judge_content(question, papers, invoke_model, graph_queries=()):
             verdict = invoke_model(messages)
             matches = {item.arxiv_id: item.content_matches for item in verdict.candidates}
             if len(verdict.candidates) != len(papers) or set(matches) != expected:
-                raise IncompleteVerdict("인용 논문의 내용 판정 결과가 불완전합니다.")
+                raise IncompleteVerdict("인용 논문의 내용 판정 결과가 불완전합니다.",
+                                        mismatch_shape(verdict.candidates, expected))
             break
-        except IncompleteVerdict:
+        except IncompleteVerdict as exc:
+            # 다시 부를 때도, 두 번 다 깨져 올릴 때도 모양을 남깁니다.
+            log_judge_retry(attempt, exc.shape)
             # 제한 시간·연결 같은 다른 예외는 다시 부르지 않습니다. 기다림만 두 배가 됩니다.
             if attempt == JUDGE_ATTEMPTS:
                 raise
