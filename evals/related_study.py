@@ -43,8 +43,10 @@ from __future__ import annotations
 
 import argparse
 import collections
+import itertools
 import json
 import statistics
+from collections.abc import Iterable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -107,6 +109,7 @@ class Graph:
         *,
         feature_cut: int | None = None,
         embeddings: Path | None = None,
+        extra_references: Iterable[dict[str, str]] = (),
     ) -> None:
         cache = features.Cache(snap)
         self.ids: list[str] = list(cache.ids)
@@ -132,9 +135,14 @@ class Graph:
         cited_by: dict[str, set[str]] = collections.defaultdict(set)
         rows, cols = [], []
         self.dropped_edges = 0
-        for row in snap.rows("references"):
+        # `extra_references`는 스냅샷에 아직 없는 간선을 얹어 봅니다(ADR-100). 자르는 선은
+        # 스냅샷 간선과 같고, 이미 있는 간선은 두 번 세지 않습니다 - 겹치면 전이 행렬의
+        # 가중치가 조용히 두 배가 됩니다.
+        for row in itertools.chain(snap.rows("references"), extra_references):
             citing, cited = row["citing"], row["cited"]
             if citing not in self.position or cited not in self.position:
+                continue
+            if cited in cites.get(citing, ()):
                 continue
             if feature_cut is not None:
                 month = month_index(citing)
