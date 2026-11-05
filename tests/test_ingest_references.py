@@ -1,12 +1,9 @@
 """주간 수집의 참고문헌·밖 논문·재조회(ADR-099, ADR-104). 네트워크와 그래프를 타지 않습니다."""
 
-import xml.etree.ElementTree as ElementTree
-
 import pytest
 
-from pipeline import ingest, oai, s2
+from pipeline import arxiv_api, ingest, oai, s2
 from pipeline import references as outside
-from tests.test_ingest_pipeline import record_xml
 
 
 def batch(references=None, empty=(), not_found=(), failures=()):
@@ -98,7 +95,7 @@ def plan(harvested, state, refs, graph=(), records=None):
         return refs
 
     def get_records(ids):
-        lookup = oai.RecordLookup()
+        lookup = arxiv_api.RecordLookup()
         for arxiv_id in ids:
             if records is None or arxiv_id in records:
                 lookup.records.append({"arxiv_id": arxiv_id, "source": "oai", "authors": []})
@@ -181,36 +178,6 @@ def test_the_merge_fills_a_missing_publication_date_from_the_first_version():
     assert "datetime(row.created)" in ingest.MERGE_PAPER
 
 
-# --- oai.get_records --------------------------------------------------------------
-
-OAI = 'xmlns="http://www.openarchives.org/OAI/2.0/"'
-
-
-def test_get_record_parses_each_paper_and_keeps_failures_apart():
-    def fetch(params):
-        identifier = params["identifier"]
-        assert params["verb"] == "GetRecord"
-        if identifier.endswith("gone"):
-            return f'<OAI-PMH {OAI}><error code="idDoesNotExist">no</error></OAI-PMH>'
-        if identifier.endswith("boom"):
-            raise TimeoutError("slow")
-        return f"<OAI-PMH {OAI}><GetRecord>{record_xml('2101.00001')}</GetRecord></OAI-PMH>"
-
-    pauses = []
-    lookup = oai.get_records(["2101.00001", "gone", "boom"], fetch=fetch, sleep=pauses.append)
-
-    assert [r["arxiv_id"] for r in lookup.records] == ["2101.00001"]
-    assert lookup.records[0]["created"] == "2026-09-18"
-    assert lookup.missing == ["gone"]
-    assert lookup.failures[0]["arxiv_id"] == "boom"
-    assert len(pauses) == 2
-
-
-def test_old_style_ids_keep_their_slash():
-    assert oai.oai_identifier("cs/0501001") == "oai:arXiv.org:cs/0501001"
-    ElementTree.fromstring(f"<OAI-PMH {OAI}/>")  # 네임스페이스 문자열이 유효한지
-
-
 def test_the_backfill_writes_only_the_publication_date_and_never_guesses():
     import importlib.util
     from pathlib import Path
@@ -224,3 +191,84 @@ def test_the_backfill_writes_only_the_publication_date_and_never_guesses():
         {"arxiv_id": "a", "created": "2026-10-01"}]
     assert "SET p.published = coalesce(p.published" in module.FILL
     assert "DELETE" not in module.FILL and "MERGE" not in module.FILL
+
+
+class _Response:
+    def __init__(self, body):
+        self.body = body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def read(self):
+        return self.body
+
+
+def test_a_read_timeout_is_retried_and_then_given_up(monkeypatch):
+    calls = []
+
+    def urlopen(request, timeout):
+        calls.append(timeout)
+        if len(calls) == 1:
+            raise TimeoutError("The read operation timed out")
+        return _Response(b"<ok/>")
+
+    monkeypatch.setattr(oai.urllib.request, "urlopen", urlopen)
+    pauses = []
+    assert oai.http_fetch({"verb": "Identify"}, sleep=pauses.append) == "<ok/>"
+    assert len(calls) == 2 and len(pauses) == 1
+
+    def always(request, timeout):
+        calls.append(timeout)
+        raise TimeoutError("slow")
+
+    calls.clear()
+    monkeypatch.setattr(oai.urllib.request, "urlopen", always)
+    with pytest.raises(TimeoutError):
+        oai.http_fetch({"verb": "Identify"}, sleep=lambda _: None)
+    assert len(calls) == oai.NETWORK_RETRIES + 1
+
+
+
+ATOM = """<feed xmlns="http://www.w3.org/2005/Atom" xmlns:arxiv="http://arxiv.org/schemas/atom">
+  <entry><id>http://arxiv.org/abs/1706.03762v7</id>
+    <published>2017-06-12T17:57:34Z</published><title>Attention Is
+      All You Need</title><summary> The dominant ... </summary>
+    <author><name>Ashish Vaswani</name></author><author><name>Noam Shazeer</name></author>
+    <arxiv:primary_category term="cs.CL"/><category term="cs.CL"/><category term="cs.LG"/>
+  </entry>
+  <entry><id>http://arxiv.org/abs/cs/0501001v1</id><published>2005-01-01T03:14:14Z</published>
+    <title>Old</title><summary>s</summary><category term="cs.CR"/></entry>
+</feed>"""
+
+
+def test_the_arxiv_api_rows_match_the_loader_and_keep_old_ids():
+    lookup = arxiv_api.get_records(["1706.03762", "cs/0501001", "9999.99999"],
+                                   fetch=lambda ids: ATOM, sleep=lambda _: None)
+
+    first, old = lookup.records
+    assert first["arxiv_id"] == "1706.03762"
+    assert first["title"] == "Attention Is All You Need"
+    assert first["created"] == "2017-06-12T17:57:34Z"
+    assert first["authors"] == ["Ashish Vaswani", "Noam Shazeer"]
+    assert first["primary_category"] == "cs.CL" and first["categories"] == ["cs.CL", "cs.LG"]
+    assert old["arxiv_id"] == "cs/0501001" and old["primary_category"] == "cs.CR"
+    assert lookup.missing == ["9999.99999"]
+
+
+def test_one_failed_arxiv_batch_does_not_lose_the_others():
+    def fetch(ids):
+        if "b" in ids:
+            raise TimeoutError("slow")
+        return ATOM
+
+    pauses = []
+    lookup = arxiv_api.get_records(["1706.03762", "b"], fetch=fetch, sleep=pauses.append,
+                                   batch_size=1)
+
+    assert [r["arxiv_id"] for r in lookup.records] == ["1706.03762"]
+    assert lookup.failures[0]["arxiv_id"] == "b"
+    assert pauses == [arxiv_api.REQUEST_INTERVAL_SECONDS]

@@ -8,7 +8,7 @@
     uv run python scripts/backfill_published.py --load    # 씁니다
 
 **`published` 하나만 씁니다.** 이미 값이 있으면 덮지 않습니다(`coalesce`). 다른 속성·간선은
-건드리지 않습니다. 한 편에 OAI 요청 하나(3초 간격)라 811편이면 약 41분입니다.
+건드리지 않습니다. arXiv 조회 API로 100편씩 받으므로 811편이면 요청 9번입니다.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from pipeline import oai  # noqa: E402
+from pipeline import arxiv_api  # noqa: E402
 from pipeline.console import use_utf8_stdout  # noqa: E402
 
 REPORT = Path("reports/backfill_published.json")
@@ -62,7 +62,7 @@ def main() -> int:
         ids = [row["arxiv_id"] for row in graph.read(MISSING)]
         todo = ids[:args.limit] if args.limit else ids
         print(f"발표일이 없는 수집 논문 {len(ids)}편, 이번에 받을 것 {len(todo)}편")
-        lookup = oai.get_records(todo)
+        lookup = arxiv_api.get_records(todo)
         fill = rows(lookup.records)
         report = {
             "generated_at": datetime.now(UTC).isoformat(),
@@ -70,7 +70,7 @@ def main() -> int:
             "asked": len(todo),
             "received": len(lookup.records),
             "with_created": len(fill),
-            "not_in_oai": len(lookup.missing),
+            "not_in_arxiv": len(lookup.missing),
             "failed": len(lookup.failures),
             "loaded": False,
         }

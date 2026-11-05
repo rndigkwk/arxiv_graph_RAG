@@ -52,7 +52,7 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from pipeline import embed, oai, s2
+from pipeline import arxiv_api, embed, oai, s2
 from pipeline import references as outside
 from pipeline.console import use_utf8_stdout
 
@@ -71,7 +71,7 @@ NODE_LIMIT = 200_000
 RELATIONSHIP_LIMIT = 400_000
 CAPACITY_SAFETY = 0.95
 MAX_ENRICHMENT_FAILURE_RATE = 0.1
-# 한 실행에 들이는 밖 논문의 상한입니다. 한 편에 OAI 요청 하나(3초 간격)라 200편이면 10분입니다.
+# 한 실행에 들이는 밖 논문의 상한입니다. arXiv 조회 API로 100편씩 받으므로 요청 2번입니다.
 # ADR-099의 측정은 주 8편이었습니다. 넘는 논문은 대기열에 남아 다음 주에 들어갑니다.
 MAX_OUTSIDE_PER_RUN = 200
 # 그래프에 있는지 한 번에 물어볼 ID 수입니다. 대기열은 주마다 3,000편 남짓씩 늘어납니다.
@@ -100,7 +100,7 @@ def plan_references(
     *,
     fetch_references: Callable[[list[str]], s2.ReferenceBatch],
     in_graph: Callable[[set[str]], set[str]],
-    get_records: Callable[[list[str]], oai.RecordLookup],
+    get_records: Callable[[list[str]], arxiv_api.RecordLookup],
 ) -> ReferencePlan:
     """S2 참고문헌 → 그래프 안 간선, 밖 논문 대기열, 다시 물을 목록(ADR-099, ADR-104).
 
@@ -636,7 +636,7 @@ def main() -> int:
         plan = plan_references(
             [str(paper["arxiv_id"]) for paper in harvested.records], reference_state,
             fetch_references=s2.fetch_references, in_graph=in_graph,
-            get_records=oai.get_records,
+            get_records=arxiv_api.get_records,
         )
         enrichment = plan.enrichment
         # 들이는 밖 논문도 새 논문과 같은 길로 실립니다 - 저자·임베딩·되읽기 모두.
