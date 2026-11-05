@@ -205,3 +205,58 @@ def pages(
         # 재개 요청에는 토큰만 보냅니다. 다른 인자를 함께 보내면 badArgument가 돌아옵니다.
         request = {"verb": "ListRecords", "resumptionToken": token}
         sleep(REQUEST_INTERVAL_SECONDS)
+
+
+def oai_identifier(arxiv_id: str) -> str:
+    """OAI의 레코드 식별자입니다. 옛 형식(`cs/0501001`)도 같은 접두어를 씁니다."""
+    return f"oai:arXiv.org:{arxiv_id}"
+
+
+@dataclass
+class RecordLookup:
+    """ID로 받은 레코드들. 못 받은 논문은 사유와 함께 남깁니다(dead letter와 같은 선)."""
+
+    records: list[dict[str, object]] = field(default_factory=list)
+    missing: list[str] = field(default_factory=list)
+    failures: list[dict[str, str]] = field(default_factory=list)
+
+
+def get_records(
+    arxiv_ids: list[str],
+    *,
+    fetch: Callable[[dict[str, str]], str] = http_fetch,
+    sleep: Callable[[float], None] = time.sleep,
+) -> RecordLookup:
+    """논문 ID마다 `GetRecord`로 메타데이터를 받습니다(ADR-104).
+
+    주간 수집이 그래프 밖 논문을 노드로 들일 때 씁니다. 그 논문은 이번 주의 `ListRecords`
+    창에 없으므로 ID로 따로 받습니다. 주 몇 편이라 한 편씩 받아도 요청 간격 안에서 끝납니다.
+    한 편이 실패해도 나머지는 받습니다 - 실패한 논문은 다음 주에 다시 들일 후보로 남습니다.
+    """
+    result = RecordLookup()
+    for index, arxiv_id in enumerate(dict.fromkeys(arxiv_ids)):
+        if index:
+            sleep(REQUEST_INTERVAL_SECONDS)
+        params = {"verb": "GetRecord", "metadataPrefix": METADATA_PREFIX,
+                  "identifier": oai_identifier(arxiv_id)}
+        try:
+            document = ElementTree.fromstring(fetch(params))
+        except Exception as exc:  # noqa: BLE001 - 한 편의 실패는 나머지를 막지 않습니다
+            result.failures.append({"arxiv_id": arxiv_id,
+                                    "error": f"{type(exc).__name__}: {str(exc)[:200]}"})
+            continue
+        error = document.find("oai:error", NAMESPACES)
+        if error is not None:
+            if error.attrib.get("code") == "idDoesNotExist":
+                result.missing.append(arxiv_id)
+            else:
+                result.failures.append({"arxiv_id": arxiv_id,
+                                        "error": f"OAI {error.attrib.get('code', '')}"})
+            continue
+        node = document.find("oai:GetRecord/oai:record", NAMESPACES)
+        parsed = parse_record(node) if node is not None else None
+        if parsed is None:
+            result.missing.append(arxiv_id)
+        else:
+            result.records.append(parsed)
+    return result

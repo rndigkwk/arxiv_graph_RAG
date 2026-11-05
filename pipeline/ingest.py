@@ -13,12 +13,16 @@
 **워터마크.** 지난 실행에서 본 가장 늦은 OAI 날짜도장을 저장하고, 다음 실행은 그 다음날부터
 받습니다. 전체 재수집을 하지 않으므로 실행 시간이 데이터 총량이 아니라 증가분에 비례합니다.
 
-**부분 실패 격리.** 인용 보강은 논문마다 따로 실패합니다. 한 편이 실패해도 배치를 버리지 않고
+**인용 보강.** 참고문헌은 Semantic Scholar에서 받고, 그래프 밖 논문은 새 논문이 누적 3편
+인용하면 노드로 들입니다(ADR-099, ADR-104, `pipeline/references.py`).
+
+**부분 실패 격리.** 인용 보강은 묶음마다 따로 실패합니다. 한 편이 실패해도 배치를 버리지 않고
 사유와 함께 별도 목록(dead letter)에 남기고 계속 갑니다. 실패율이 임계값을 넘을 때만 실행을
 실패로 처리합니다.
 
 **용량 검사.** 적재 전에 늘어날 노드·관계 수를 세어 Aura 무료 한도와 비교합니다. 한도를 넘으면
-적재하지 않고 멈춥니다. 이 검사는 게이트보다 먼저 돕니다. 데이터가 깨끗해도 들어갈 자리가
+적재하지 않고 멈춥니다. VM의 Neo4j에 쓸 때는 한도가 없으므로 세기만 합니다(ADR-104).
+이 검사는 게이트보다 먼저 돕니다. 데이터가 깨끗해도 들어갈 자리가
 없으면 적재해서는 안 됩니다.
 
 **임베딩 검사.** OAI 수집은 임베딩을 만들지 않습니다. 임베딩 없는 논문을 적재하면 그래프
@@ -48,7 +52,8 @@ from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from pipeline import embed, oai
+from pipeline import embed, oai, s2
+from pipeline import references as outside
 from pipeline.console import use_utf8_stdout
 
 # 스냅샷 게이트와 **같은 상수**를 씁니다. 여기서 다시 적으면 두 검사가 조용히 갈라지고,
@@ -66,6 +71,83 @@ NODE_LIMIT = 200_000
 RELATIONSHIP_LIMIT = 400_000
 CAPACITY_SAFETY = 0.95
 MAX_ENRICHMENT_FAILURE_RATE = 0.1
+# 한 실행에 들이는 밖 논문의 상한입니다. 한 편에 OAI 요청 하나(3초 간격)라 200편이면 10분입니다.
+# ADR-099의 측정은 주 8편이었습니다. 넘는 논문은 대기열에 남아 다음 주에 들어갑니다.
+MAX_OUTSIDE_PER_RUN = 200
+# 그래프에 있는지 한 번에 물어볼 ID 수입니다. 대기열은 주마다 3,000편 남짓씩 늘어납니다.
+LOOKUP_CHUNK = 20_000
+
+
+def targets_aura(uri: str | None) -> bool:
+    """Aura Free에 쓰는지. 노드·관계 한도는 Aura Free의 것이라 VM의 Neo4j에는 없습니다(ADR-104)."""
+    return "databases.neo4j.io" in (uri or "")
+
+
+@dataclass
+class ReferencePlan:
+    """이번 실행이 쓸 참고문헌 간선과 밖 논문, 그리고 적재가 끝나면 저장할 대기열."""
+
+    references: list[dict[str, str]]
+    outside_records: list[dict[str, Any]]
+    state: dict[str, Any]
+    enrichment: Enrichment
+    report: dict[str, Any]
+
+
+def plan_references(
+    harvested_ids: list[str],
+    state: dict[str, Any],
+    *,
+    fetch_references: Callable[[list[str]], s2.ReferenceBatch],
+    in_graph: Callable[[set[str]], set[str]],
+    get_records: Callable[[list[str]], oai.RecordLookup],
+) -> ReferencePlan:
+    """S2 참고문헌 → 그래프 안 간선, 밖 논문 대기열, 다시 물을 목록(ADR-099, ADR-104).
+
+    **그래프에 쓰지 않습니다.** 받은 `state`도 바꾸지 않고 새 상태를 돌려줍니다 - 시험 실행이면
+    버리고, 적재가 끝났을 때만 저장합니다. 적재하지 않은 논문의 인용을 대기열에 세면, 그 논문이
+    그래프에 없는데도 밖 논문이 "3번 인용됐다"며 들어옵니다.
+    """
+    harvested = list(dict.fromkeys(harvested_ids))
+    retry_ids = [arxiv_id for arxiv_id in state.get("retry", {}) if arxiv_id not in set(harvested)]
+    asked = harvested + retry_ids
+    batch = fetch_references(asked)
+    enrichment = Enrichment(attempted=len(asked), failures=list(batch.failures))
+    waiting_before = state.get("waiting", {})
+    present = in_graph(outside.candidate_ids(batch.references, waiting_before)) | set(asked)
+    edges, waiting = outside.count_citations(batch.references, waiting_before, in_graph=present)
+    candidates = outside.ready(waiting)
+    lookup = get_records(candidates[:MAX_OUTSIDE_PER_RUN])
+    outside_records = [{**record, "source": "reference"} for record in lookup.records]
+    outside_edges, waiting = outside.admit(
+        waiting, [str(record["arxiv_id"]) for record in outside_records])
+    unresolved = batch.empty + batch.not_found + [item["arxiv_id"] for item in batch.failures]
+    retry, dropped = outside.next_retry(state.get("retry", {}), asked=unresolved,
+                                        resolved=batch.references)
+    enrichment.references = edges + outside_edges
+    report = {
+        "asked": len(asked),
+        "asked_again": len(retry_ids),
+        "with_references": len(batch.references),
+        "empty": len(batch.empty),
+        "not_found": len(batch.not_found),
+        "non_arxiv_dropped": batch.non_arxiv,
+        "s2_requests": batch.requests,
+        "edges_in_graph": len(edges),
+        "outside_ready": len(candidates),
+        "outside_admitted": len(outside_records),
+        "outside_edges": len(outside_edges),
+        "outside_missing": len(lookup.missing),
+        "outside_failed": len(lookup.failures),
+        "waiting_before": len(waiting_before),
+        "waiting_after": len(waiting),
+        "retry_queue": len(retry),
+        "retry_dropped": len(dropped),
+        "min_citers": outside.OUTSIDE_MIN_CITERS,
+    }
+    return ReferencePlan(references=enrichment.references, outside_records=outside_records,
+                         state={"waiting": waiting, "retry": retry}, enrichment=enrichment,
+                         report=report)
 
 MERGE_PAPER = """
 UNWIND $rows AS row
@@ -77,6 +159,11 @@ SET p.title = row.title,
     p.pdf_url = row.pdf_url,
     p.source = row.source,
     p.oai_datestamp = row.oai_datestamp,
+    // arXiv 첫 버전 날짜입니다(ADR-104). 2026-10-24 적재는 이 줄이 없어 934편 중 811편이
+    // 발표일 없이 들어갔고, "최근" 검색(ADR-090)과 앱의 날짜 확인(ADR-103)에서 빠졌습니다.
+    // 이미 있는 발표일은 덮지 않습니다 - 씨앗 논문의 값은 그래프를 지을 때의 기준입니다.
+    p.published = coalesce(p.published,
+                           CASE WHEN row.created IS NULL THEN NULL ELSE datetime(row.created) END),
     // **`coalesce`입니다.** 레코드가 임베딩을 가져왔을 때만 씁니다 - 없으면 노드가 갖고
     // 있던 것을 그대로 남깁니다. 2026-10-24에 이 줄이 없어서 `--embed`가 만든 벡터 934개가
     // 조용히 버려졌고, 811편이 벡터 검색에 안 보이는 상태로 적재됐습니다.
@@ -149,37 +236,6 @@ class Enrichment:
     @property
     def failure_rate(self) -> float:
         return len(self.failures) / self.attempted if self.attempted else 0.0
-
-
-def enrich_references(
-    papers: Iterable[dict[str, Any]],
-    lookup: Callable[[str], list[str]],
-) -> Enrichment:
-    """Fetch each paper's references one at a time so one failure cannot lose the batch.
-
-    `lookup` raising for a paper is normal operation, not an outage: a paper may be absent
-    upstream, or one request may time out. The paper is recorded and retried on a later run.
-    """
-    enrichment = Enrichment()
-    for paper in papers:
-        arxiv_id = str(paper.get("arxiv_id") or "")
-        if not arxiv_id:
-            continue
-        enrichment.attempted += 1
-        try:
-            cited_ids = lookup(arxiv_id)
-        except Exception as exc:  # noqa: BLE001 - 개별 논문의 실패는 배치를 멈추지 않습니다
-            enrichment.failures.append({
-                "arxiv_id": arxiv_id,
-                "error": f"{type(exc).__name__}: {str(exc)[:200]}",
-            })
-            continue
-        enrichment.references.extend(
-            {"citing": arxiv_id, "cited": cited}
-            for cited in dict.fromkeys(cited_ids)
-            if cited and cited != arxiv_id
-        )
-    return enrichment
 
 
 def authored_rows(papers: Iterable[dict[str, Any]]) -> list[dict[str, str]]:
@@ -494,7 +550,7 @@ def main() -> int:
                         help="쉼표로 구분한 대표 분류. 비우면 cs 집합 전체입니다.")
     parser.add_argument("--max-pages", type=int, default=20)
     parser.add_argument("--load", action="store_true",
-                        help="실제로 Aura에 적재합니다. 기본은 적재하지 않습니다.")
+                        help="실제로 그래프에 적재합니다. 기본은 적재하지 않습니다.")
     parser.add_argument("--verify-idempotent", action="store_true",
                         help="같은 배치를 두 번 적재해 노드·관계 수가 그대로인지 확인합니다.")
     parser.add_argument(
@@ -559,21 +615,35 @@ def main() -> int:
         _finish(report, args.output, state, harvested.last_datestamp, advance=True)
         return 0
 
-    from pipeline.graph import connect
+    from pipeline.graph import connect, env
 
+    aura = targets_aura(env("NEO4J_URI"))
+    reference_state = outside.read_state()
     with connect() as graph:
-        def lookup(arxiv_id: str) -> list[str]:
-            rows = graph.read(
-                "MATCH (p:ArxivPaper {arxiv_id: $id})-[:REFERENCES]->(q:ArxivPaper) "
-                "RETURN q.arxiv_id AS arxiv_id",
-                {"id": arxiv_id},
-            )
-            return [row["arxiv_id"] for row in rows]
+        def in_graph(ids: set[str]) -> set[str]:
+            ordered = sorted(ids)
+            found: set[str] = set()
+            for start_at in range(0, len(ordered), LOOKUP_CHUNK):
+                rows = graph.read(
+                    "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids RETURN p.arxiv_id AS arxiv_id",
+                    {"ids": ordered[start_at:start_at + LOOKUP_CHUNK]},
+                )
+                found.update(row["arxiv_id"] for row in rows)
+            return found
 
-        enrichment = enrich_references(harvested.records, lookup)
-        authored = authored_rows(harvested.records)
+        # 참고문헌은 S2에서 받습니다(ADR-104). 전에는 그래프 자신을 조회해서, 새 논문에는
+        # 나가는 간선이 없으니 항상 비어 있었습니다(2026-10-24 적재 934편 중 888편이 0개).
+        plan = plan_references(
+            [str(paper["arxiv_id"]) for paper in harvested.records], reference_state,
+            fetch_references=s2.fetch_references, in_graph=in_graph,
+            get_records=oai.get_records,
+        )
+        enrichment = plan.enrichment
+        # 들이는 밖 논문도 새 논문과 같은 길로 실립니다 - 저자·임베딩·되읽기 모두.
+        papers = harvested.records + plan.outside_records
+        authored = authored_rows(papers)
         counts = graph.read(COUNT_CYPHER)[0]
-        harvested_ids = [str(paper["arxiv_id"]) for paper in harvested.records]
+        harvested_ids = [str(paper["arxiv_id"]) for paper in papers]
         known = graph.read(
             "MATCH (p:ArxivPaper) WHERE p.arxiv_id IN $ids RETURN p.arxiv_id AS arxiv_id",
             {"ids": harvested_ids},
@@ -594,7 +664,7 @@ def main() -> int:
             {"names": sorted({row["author"] for row in authored})},
         )
         capacity = plan_capacity(
-            harvested.records,
+            papers,
             enrichment.references,
             authored,
             counts={"nodes": counts["nodes"], "relationships": counts["relationships"]},
@@ -602,7 +672,7 @@ def main() -> int:
             known_authors={row["name"] for row in known_authors},
         )
         embeddings = plan_embeddings(
-            harvested.records, known_papers={row["arxiv_id"] for row in known}
+            papers, known_papers={row["arxiv_id"] for row in known}
         )
         report["enrichment"] = {
             "attempted": enrichment.attempted,
@@ -610,6 +680,7 @@ def main() -> int:
             "failures": len(enrichment.failures),
             "failure_rate": round(enrichment.failure_rate, 4),
             "dead_letters_written": write_dead_letters(enrichment.failures),
+            **plan.report,
         }
         report["capacity"] = capacity.as_dict()
         report["embeddings"] = embeddings.as_dict()
@@ -618,21 +689,23 @@ def main() -> int:
             report["stopped_at"] = "enrichment_failure_rate"
             _finish(report, args.output, state, harvested.last_datestamp, advance=False)
             return 1
-        if not capacity.fits:
+        # 노드·관계 한도는 Aura Free의 것입니다. VM의 Neo4j에는 없으므로 수만 남깁니다(ADR-104).
+        report["capacity"]["checked"] = aura
+        if aura and not capacity.fits:
             report["stopped_at"] = "capacity"
             _finish(report, args.output, state, harvested.last_datestamp, advance=False)
             return 1
         # **용량 검사 뒤에 둡니다.** 들어갈 자리가 없는 배치에 임베딩 비용을 쓰지 않습니다.
         if args.embed:
             report["embedding_run"] = embed.attach_embeddings(
-                harvested.records,
+                papers,
                 embed.client(),
                 max_cost_usd=args.max_cost,
                 already_embedded=already_embedded,
             )
             # 임베딩을 붙인 뒤 다시 셉니다. 이 수가 아래 가드가 보는 수입니다.
             embeddings = plan_embeddings(
-                harvested.records, known_papers={row["arxiv_id"] for row in known}
+                papers, known_papers={row["arxiv_id"] for row in known}
             )
             report["embeddings"] = embeddings.as_dict()
             if report["embedding_run"]["stopped_at"] == "cost_ceiling":
@@ -664,16 +737,18 @@ def main() -> int:
 
         before = graph.read(COUNT_CYPHER)[0]
         report["written"] = load_batch(
-            graph.write, harvested.records, authored, enrichment.references
+            graph.write, papers, authored, enrichment.references
         )
         after = graph.read(COUNT_CYPHER)[0]
         report["loaded"] = True
+        # 대기열은 **적재한 뒤에만** 저장합니다. 인용한 새 논문이 그래프에 있어야 그 인용을 셉니다.
+        outside.write_state(plan.state)
         report["counts"] = {"before": dict(before), "after": dict(after)}
         # **쓴 것을 되읽습니다.** 상류 가드는 수집 레코드를 보므로, 적재기가 그 값을
         # 버렸는지 알 수 없습니다 — 2026-10-24에 그렇게 버렸고 811편이 벡터 검색에
         # 안 보이는 상태로 들어갔습니다.
         report["loaded_embeddings"] = verify_loaded_embeddings(
-            graph.read, harvested.records
+            graph.read, papers
         )
         if not report["loaded_embeddings"]["complete"]:
             report["stopped_at"] = "loaded_without_embeddings"
@@ -686,7 +761,7 @@ def main() -> int:
             )
         if args.verify_idempotent:
             # 같은 배치를 다시 적재합니다. MERGE가 제대로라면 수가 그대로여야 합니다.
-            load_batch(graph.write, harvested.records, authored, enrichment.references)
+            load_batch(graph.write, papers, authored, enrichment.references)
             repeated = graph.read(COUNT_CYPHER)[0]
             report["idempotent"] = dict(repeated) == dict(after)
             report["counts"]["after_repeat"] = dict(repeated)

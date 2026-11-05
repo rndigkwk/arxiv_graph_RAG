@@ -126,6 +126,7 @@ sudo systemctl start arxiv-deploy.timer
 
 ## 1단계에서 아직 아닌 것
 
-- **주간 수집은 Aura에 씁니다.** 1단계의 VM은 옮긴 날의 사본을 보여 줍니다. 수집을 VM의 cron으로
-  옮기는 것은 2단계이고, 그때 한 번 더 내보내 싣습니다.
+- ~~**주간 수집은 Aura에 씁니다.** 1단계의 VM은 옮긴 날의 사본을 보여 줍니다.~~ 2026-11-05부터 수집은 VM에서 돕니다
+  ([ADR-104](adr/ADR-104-weekly-ingest-runs-on-the-vm.md)). 시험 실행은 `deploy/vm/ingest.sh dry`, 적재는 `deploy/vm/ingest.sh load`,
+  주간 타이머 설치는 `deploy/vm/install_ingest_timer.sh`입니다. 보고서·워터마크·대기열은 `pipeline/state/`(git이 무시)에 남습니다.
 - 백업 앱(0단계)과 Aura `keep-alive`는 그대로 둡니다.

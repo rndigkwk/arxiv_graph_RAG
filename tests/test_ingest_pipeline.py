@@ -181,31 +181,6 @@ def test_harvest_window_recovers_from_a_corrupt_watermark():
     assert (start, end) == ("2026-09-17", "2026-09-20")
 
 
-def test_one_papers_enrichment_failure_does_not_lose_the_batch():
-    papers = [{"arxiv_id": "a"}, {"arxiv_id": "b"}, {"arxiv_id": "c"}]
-
-    def lookup(arxiv_id):
-        if arxiv_id == "b":
-            raise TimeoutError("upstream timed out")
-        return [f"{arxiv_id}-ref"]
-
-    enrichment = ingest.enrich_references(papers, lookup)
-
-    assert [row["citing"] for row in enrichment.references] == ["a", "c"]
-    assert enrichment.attempted == 3
-    assert enrichment.failures[0]["arxiv_id"] == "b"
-    assert "TimeoutError" in enrichment.failures[0]["error"]
-    assert enrichment.failure_rate == pytest.approx(1 / 3)
-
-
-def test_enrichment_drops_duplicate_and_self_references():
-    enrichment = ingest.enrich_references(
-        [{"arxiv_id": "a"}], lambda _: ["x", "x", "a", ""]
-    )
-
-    assert enrichment.references == [{"citing": "a", "cited": "x"}]
-
-
 def test_capacity_counts_only_genuinely_new_nodes():
     papers = [{"arxiv_id": "new"}, {"arxiv_id": "known"}]
     authored = [
