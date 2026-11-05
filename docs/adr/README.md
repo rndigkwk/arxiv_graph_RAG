@@ -172,3 +172,4 @@
 | [ADR-098](ADR-098-fine-tune-on-co-citation-pairs.md) | 공동인용 쌍으로 다시 학습한다 — 바꾸는 것은 쌍의 정의 하나, 바는 ADR-097 그대로 | 기각 |
 | [ADR-099](ADR-099-keep-the-weekly-ingest-criteria.md) | 주간 적재 기준은 그대로 둔다 — cs.AI 1차 전부, 밖 논문은 누적 3회 인용부터 | 채택 |
 | [ADR-100](ADR-100-dont-backfill-old-references.md) | 그래프 안 논문끼리 빠진 인용 간선을 채우지 않는다 — 옛 논문의 참고문헌은 판정 자리를 깎는다 | 기각 |
+| [ADR-101](ADR-101-retry-a-broken-condition-verdict.md) | 깨진 조건 판정은 답을 고치게 하지 않고 판정을 다시 부른다 — 판정 출력에는 상한을 둔다 | 채택 |

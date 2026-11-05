@@ -401,7 +401,7 @@ def check(
             violations.append(Violation("floor", f"{name}이 이번 결과에 없습니다"))
         elif _worse(name, value, floor):
             violations.append(
-                Violation("floor", f"{name} {value:.4f}이 하한 {floor:.4f}을 넘었습니다")
+                Violation("floor", f"{name} {value:.4f}이 하한 {floor:.4f}보다 나쁩니다")
             )
 
     for name, allowed in ((baseline["allowed_drop"] or {}).items() if aggregates else ()):

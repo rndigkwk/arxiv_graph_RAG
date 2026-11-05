@@ -1445,7 +1445,13 @@ llm = ChatOpenAI(
 # 조건 판정은 추론을 끕니다(ADR-089). 판정 연구 61문항에서 정확도는 그대로였고 판정 호출 p50이
 # 1.96초에서 1.57초로 줄었습니다. 원본 `llm`은 그대로입니다 - 복사본만 바꿉니다.
 JUDGE_REASONING = {"effort": "none"}
-judge_llm = llm.model_copy(update={"reasoning": JUDGE_REASONING})
+# 판정 한 번의 출력 상한입니다(ADR-101). 정기 평가 90문항에서 답과 판정을 합친 문항당 출력은
+# 최대 1,085토큰이었습니다. 11-02에 판정 한 번이 끝없이 이어져 12.8만 토큰과 1,442초를 썼습니다 -
+# 흘려 받으므로 `timeout=60`은 조각이 계속 오는 동안 끊지 않습니다. 상한에서 잘린 판정은 읽을 수
+# 없으므로 `IncompleteVerdict`가 되어 한 번 더 부릅니다.
+JUDGE_MAX_TOKENS = 4_000
+judge_llm = llm.model_copy(update={"reasoning": JUDGE_REASONING,
+                                   "max_tokens": JUDGE_MAX_TOKENS})
 # 답 쓰는 에이전트도 추론을 끕니다(ADR-091). 로컬에서 같은 질문을 강도별로 번갈아 물어 턴당
 # p50이 3.00초에서 2.15초로 줄었고, 정답 적중과 근거 정밀도는 그대로였습니다. 논문 비교
 # (`compare_papers`)는 원본 `llm`을 씁니다.
