@@ -1,0 +1,886 @@
+{
+  "generated_at": "2026-11-05T02:17:20+00:00",
+  "snapshot": "2026-10-14",
+  "targets": {
+    "papers_without_outgoing_edges": 34602,
+    "by_source": {
+      "reference": 31387,
+      "ai": 3215
+    }
+  },
+  "s2": {
+    "requests": 70,
+    "with_references": 11985,
+    "empty": 22602,
+    "not_found": 15,
+    "fetched": 34602
+  },
+  "edges": {
+    "existing": 69438,
+    "new_inside_graph": 233159,
+    "growth": 3.358,
+    "by_citing_source": {
+      "reference": 213029,
+      "ai": 20130
+    },
+    "isolated_before": 2958,
+    "isolated_connected": 1253,
+    "store_mb_estimated": 133.2
+  },
+  "future_related": {
+    "cases": "evals/cases_related_future.json",
+    "feature_cut": "2026-08",
+    "top_k": 5,
+    "by_edge_set": {
+      "all": {
+        "edges": 233159,
+        "edges_kept_after_cut": {
+          "before": 36673,
+          "after": 259780
+        },
+        "all": {
+          "seeds": 1377,
+          "gained_edges": 746,
+          "still_no_edges": 499,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.2791,
+              "after": 0.237,
+              "diff": {
+                "mean": -0.0421,
+                "low": -0.0527,
+                "high": -0.032,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.5679,
+              "after": 0.5185,
+              "diff": {
+                "mean": -0.0494,
+                "low": -0.0719,
+                "high": -0.0276,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.4623,
+              "after": 0.4035,
+              "diff": {
+                "mean": -0.0588,
+                "low": -0.0786,
+                "high": -0.0403,
+                "excludes_zero": true
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.175,
+              "after": 0.1685,
+              "diff": {
+                "mean": -0.0065,
+                "low": -0.0186,
+                "high": 0.0052,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.1852,
+              "after": 0.3217,
+              "diff": {
+                "mean": 0.1365,
+                "low": 0.1147,
+                "high": 0.1576,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.0896,
+              "after": 0.1861,
+              "diff": {
+                "mean": 0.0965,
+                "low": 0.081,
+                "high": 0.1133,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "no_citation_edges": {
+          "seeds": 1112,
+          "gained_edges": 613,
+          "still_no_edges": 499,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.1227,
+              "after": 0.1082,
+              "diff": {
+                "mean": -0.0145,
+                "low": -0.0221,
+                "high": -0.007,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4739,
+              "after": 0.4388,
+              "diff": {
+                "mean": -0.0351,
+                "low": -0.0612,
+                "high": -0.0081,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.3457,
+              "after": 0.3045,
+              "diff": {
+                "mean": -0.0412,
+                "low": -0.063,
+                "high": -0.0206,
+                "excludes_zero": true
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.0,
+              "after": 0.048,
+              "diff": {
+                "mean": 0.048,
+                "low": 0.0415,
+                "high": 0.0551,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.0,
+              "after": 0.2032,
+              "diff": {
+                "mean": 0.2032,
+                "low": 0.1799,
+                "high": 0.2284,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.0,
+              "after": 0.1331,
+              "diff": {
+                "mean": 0.1331,
+                "low": 0.1153,
+                "high": 0.1511,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "degree_1_to_4": {
+          "seeds": 251,
+          "gained_edges": 130,
+          "still_no_edges": 0,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.9832,
+              "after": 0.8161,
+              "diff": {
+                "mean": -0.1672,
+                "low": -0.2107,
+                "high": -0.1259,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.992,
+              "after": 0.8765,
+              "diff": {
+                "mean": -0.1155,
+                "low": -0.1594,
+                "high": -0.0757,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.992,
+              "after": 0.8509,
+              "diff": {
+                "mean": -0.1411,
+                "low": -0.1826,
+                "high": -0.1009,
+                "excludes_zero": true
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.9561,
+              "after": 0.7056,
+              "diff": {
+                "mean": -0.2505,
+                "low": -0.2984,
+                "high": -0.2012,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.992,
+              "after": 0.8327,
+              "diff": {
+                "mean": -0.1594,
+                "low": -0.2032,
+                "high": -0.1155,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.4814,
+              "after": 0.4145,
+              "diff": {
+                "mean": -0.0669,
+                "low": -0.0975,
+                "high": -0.0347,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "degree_5_or_more": {
+          "seeds": 14,
+          "gained_edges": 3,
+          "still_no_edges": 0,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.0793,
+              "after": 0.0851,
+              "diff": {
+                "mean": 0.0059,
+                "low": -0.0432,
+                "high": 0.0539,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4286,
+              "after": 0.4286,
+              "diff": {
+                "mean": 0.0,
+                "low": -0.2857,
+                "high": 0.2857,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.231,
+              "after": 0.25,
+              "diff": {
+                "mean": 0.019,
+                "low": -0.1715,
+                "high": 0.1738,
+                "excludes_zero": false
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.0713,
+              "after": 0.1135,
+              "diff": {
+                "mean": 0.0421,
+                "low": 0.0151,
+                "high": 0.0751,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4286,
+              "after": 0.5714,
+              "diff": {
+                "mean": 0.1429,
+                "low": 0.0,
+                "high": 0.3571,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.1774,
+              "after": 0.2976,
+              "diff": {
+                "mean": 0.1202,
+                "low": 0.0476,
+                "high": 0.2095,
+                "excludes_zero": true
+              }
+            }
+          }
+        }
+      },
+      "ai_citers": {
+        "edges": 20130,
+        "edges_kept_after_cut": {
+          "before": 36673,
+          "after": 48028
+        },
+        "all": {
+          "seeds": 1377,
+          "gained_edges": 78,
+          "still_no_edges": 1049,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.2791,
+              "after": 0.2775,
+              "diff": {
+                "mean": -0.0016,
+                "low": -0.0037,
+                "high": 0.0003,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.5679,
+              "after": 0.5628,
+              "diff": {
+                "mean": -0.0051,
+                "low": -0.0116,
+                "high": 0.0015,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.4623,
+              "after": 0.4576,
+              "diff": {
+                "mean": -0.0047,
+                "low": -0.0105,
+                "high": 0.0009,
+                "excludes_zero": false
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.175,
+              "after": 0.1772,
+              "diff": {
+                "mean": 0.0022,
+                "low": 0.0002,
+                "high": 0.0046,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.1852,
+              "after": 0.1983,
+              "diff": {
+                "mean": 0.0131,
+                "low": 0.0073,
+                "high": 0.0203,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.0896,
+              "after": 0.0956,
+              "diff": {
+                "mean": 0.0061,
+                "low": 0.0023,
+                "high": 0.0104,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "no_citation_edges": {
+          "seeds": 1112,
+          "gained_edges": 63,
+          "still_no_edges": 1049,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.1227,
+              "after": 0.121,
+              "diff": {
+                "mean": -0.0017,
+                "low": -0.004,
+                "high": 0.0006,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4739,
+              "after": 0.4667,
+              "diff": {
+                "mean": -0.0072,
+                "low": -0.0153,
+                "high": 0.0,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.3457,
+              "after": 0.3388,
+              "diff": {
+                "mean": -0.0068,
+                "low": -0.0141,
+                "high": -0.0001,
+                "excludes_zero": true
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.0,
+              "after": 0.0035,
+              "diff": {
+                "mean": 0.0035,
+                "low": 0.0017,
+                "high": 0.0059,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.0,
+              "after": 0.0153,
+              "diff": {
+                "mean": 0.0153,
+                "low": 0.009,
+                "high": 0.0225,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.0,
+              "after": 0.0084,
+              "diff": {
+                "mean": 0.0084,
+                "low": 0.0043,
+                "high": 0.0133,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "degree_1_to_4": {
+          "seeds": 251,
+          "gained_edges": 15,
+          "still_no_edges": 0,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.9832,
+              "after": 0.9808,
+              "diff": {
+                "mean": -0.0024,
+                "low": -0.008,
+                "high": 0.0011,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.992,
+              "after": 0.992,
+              "diff": {
+                "mean": 0.0,
+                "low": 0.0,
+                "high": 0.0,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.992,
+              "after": 0.992,
+              "diff": {
+                "mean": 0.0,
+                "low": 0.0,
+                "high": 0.0,
+                "excludes_zero": false
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.9561,
+              "after": 0.951,
+              "diff": {
+                "mean": -0.0051,
+                "low": -0.012,
+                "high": 0.0017,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.992,
+              "after": 0.992,
+              "diff": {
+                "mean": 0.0,
+                "low": 0.0,
+                "high": 0.0,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.4814,
+              "after": 0.4734,
+              "diff": {
+                "mean": -0.008,
+                "low": -0.0146,
+                "high": -0.0007,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "degree_5_or_more": {
+          "seeds": 14,
+          "gained_edges": 0,
+          "still_no_edges": 0,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.0793,
+              "after": 0.0951,
+              "diff": {
+                "mean": 0.0159,
+                "low": 0.0,
+                "high": 0.0397,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4286,
+              "after": 0.5,
+              "diff": {
+                "mean": 0.0714,
+                "low": 0.0,
+                "high": 0.2143,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.231,
+              "after": 0.306,
+              "diff": {
+                "mean": 0.075,
+                "low": 0.0119,
+                "high": 0.1596,
+                "excludes_zero": true
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.0713,
+              "after": 0.0951,
+              "diff": {
+                "mean": 0.0238,
+                "low": 0.0,
+                "high": 0.0476,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4286,
+              "after": 0.5,
+              "diff": {
+                "mean": 0.0714,
+                "low": 0.0,
+                "high": 0.2143,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.1774,
+              "after": 0.2524,
+              "diff": {
+                "mean": 0.075,
+                "low": 0.0119,
+                "high": 0.1596,
+                "excludes_zero": true
+              }
+            }
+          }
+        }
+      },
+      "reference_citers": {
+        "edges": 213029,
+        "edges_kept_after_cut": {
+          "before": 36673,
+          "after": 248425
+        },
+        "all": {
+          "seeds": 1377,
+          "gained_edges": 724,
+          "still_no_edges": 516,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.2791,
+              "after": 0.2353,
+              "diff": {
+                "mean": -0.0438,
+                "low": -0.0543,
+                "high": -0.0337,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.5679,
+              "after": 0.5134,
+              "diff": {
+                "mean": -0.0545,
+                "low": -0.0763,
+                "high": -0.0334,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.4623,
+              "after": 0.4008,
+              "diff": {
+                "mean": -0.0615,
+                "low": -0.0813,
+                "high": -0.0431,
+                "excludes_zero": true
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.175,
+              "after": 0.1679,
+              "diff": {
+                "mean": -0.0071,
+                "low": -0.0192,
+                "high": 0.0043,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.1852,
+              "after": 0.3166,
+              "diff": {
+                "mean": 0.1314,
+                "low": 0.1097,
+                "high": 0.1525,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.0896,
+              "after": 0.1833,
+              "diff": {
+                "mean": 0.0938,
+                "low": 0.0782,
+                "high": 0.1102,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "no_citation_edges": {
+          "seeds": 1112,
+          "gained_edges": 596,
+          "still_no_edges": 516,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.1227,
+              "after": 0.1058,
+              "diff": {
+                "mean": -0.0169,
+                "low": -0.0243,
+                "high": -0.0095,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4739,
+              "after": 0.4326,
+              "diff": {
+                "mean": -0.0414,
+                "low": -0.0666,
+                "high": -0.0153,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.3457,
+              "after": 0.3012,
+              "diff": {
+                "mean": -0.0444,
+                "low": -0.0664,
+                "high": -0.0236,
+                "excludes_zero": true
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.0,
+              "after": 0.0457,
+              "diff": {
+                "mean": 0.0457,
+                "low": 0.0393,
+                "high": 0.0524,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.0,
+              "after": 0.1951,
+              "diff": {
+                "mean": 0.1951,
+                "low": 0.1726,
+                "high": 0.2203,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.0,
+              "after": 0.1287,
+              "diff": {
+                "mean": 0.1287,
+                "low": 0.1109,
+                "high": 0.1464,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "degree_1_to_4": {
+          "seeds": 251,
+          "gained_edges": 125,
+          "still_no_edges": 0,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.9832,
+              "after": 0.8173,
+              "diff": {
+                "mean": -0.1659,
+                "low": -0.2095,
+                "high": -0.1252,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.992,
+              "after": 0.8765,
+              "diff": {
+                "mean": -0.1155,
+                "low": -0.1594,
+                "high": -0.0757,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.992,
+              "after": 0.8513,
+              "diff": {
+                "mean": -0.1408,
+                "low": -0.1823,
+                "high": -0.1009,
+                "excludes_zero": true
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.9561,
+              "after": 0.7122,
+              "diff": {
+                "mean": -0.2439,
+                "low": -0.2908,
+                "high": -0.1951,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.992,
+              "after": 0.8406,
+              "diff": {
+                "mean": -0.1514,
+                "low": -0.1952,
+                "high": -0.1076,
+                "excludes_zero": true
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.4814,
+              "after": 0.4199,
+              "diff": {
+                "mean": -0.0616,
+                "low": -0.0919,
+                "high": -0.0297,
+                "excludes_zero": true
+              }
+            }
+          }
+        },
+        "degree_5_or_more": {
+          "seeds": 14,
+          "gained_edges": 3,
+          "still_no_edges": 0,
+          "cocited": {
+            "recall_at_k": {
+              "before": 0.0793,
+              "after": 0.0851,
+              "diff": {
+                "mean": 0.0059,
+                "low": -0.0432,
+                "high": 0.0539,
+                "excludes_zero": false
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4286,
+              "after": 0.4286,
+              "diff": {
+                "mean": 0.0,
+                "low": -0.2857,
+                "high": 0.2857,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.231,
+              "after": 0.2381,
+              "diff": {
+                "mean": 0.0071,
+                "low": -0.1857,
+                "high": 0.162,
+                "excludes_zero": false
+              }
+            }
+          },
+          "ppr": {
+            "recall_at_k": {
+              "before": 0.0713,
+              "after": 0.1135,
+              "diff": {
+                "mean": 0.0421,
+                "low": 0.0151,
+                "high": 0.0751,
+                "excludes_zero": true
+              }
+            },
+            "hit_at_k": {
+              "before": 0.4286,
+              "after": 0.5714,
+              "diff": {
+                "mean": 0.1429,
+                "low": 0.0,
+                "high": 0.3571,
+                "excludes_zero": false
+              }
+            },
+            "reciprocal_rank": {
+              "before": 0.1774,
+              "after": 0.2798,
+              "diff": {
+                "mean": 0.1024,
+                "low": 0.0286,
+                "high": 0.1976,
+                "excludes_zero": true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
