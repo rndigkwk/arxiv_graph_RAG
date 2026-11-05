@@ -55,3 +55,10 @@ def test_the_judgement_and_the_last_turn_are_summarised_when_the_server_records_
                                 "ahead_seconds_p50": 2.0, "waited_seconds_p50": 2.0}
     assert summary["last_turn"] == {"traced": 3, "last_seconds_p50": 3.5,
                                     "earlier_seconds_p50": 1.5, "last_output_tokens_p50": 200}
+
+
+def test_recent_cases_are_the_six_probe_questions_without_importing_the_app():
+    cases = m.recent_cases()
+    assert [case["id"] for case in cases] == [
+        "gnn-en", "gnn-ko", "diffusion-en", "rlhf-ko", "agents-en", "retrieval-ko"]
+    assert {case["category"] for case in cases} == {"recent"}

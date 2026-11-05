@@ -2,6 +2,7 @@
 
     uv run --locked python scripts/measure_vm_answer_latency.py
     uv run --locked python scripts/measure_vm_answer_latency.py --per-family 3
+    uv run --locked python scripts/measure_vm_answer_latency.py --recent
 
 목표는 p50 10초입니다(2026-10-27). 로컬 측정(`reports/inside_generate_2026-10-26.json`, Aura,
 30문항)은 VM으로 옮기기 전 것이고, VM 첫날(`reports/vm_day1.json`)은 질문 하나가 30~42초였습니다 -
@@ -14,6 +15,9 @@
 
 **상한(ADR-081)을 지킵니다.** IP마다 분당 3회라 요청 사이를 21초 띄우고, 429가 오면
 `Retry-After`만큼 기다립니다. 하루 30회 상한이 있으므로 한 번에 30문항을 넘기지 않습니다.
+
+`--recent`는 그래프 가족 대신 "최근" 질문 6개(`probe_recent_questions.QS`)를 묻습니다.
+ADR-090·091과 같은 문항입니다. 15문항 세트에는 이 질문이 없습니다.
 """
 
 from __future__ import annotations
@@ -36,6 +40,7 @@ API = "https://8-230-25-138.sslip.io"
 CASES = Path("evals/cases_graph.json")
 LOCAL = Path("reports/inside_generate_2026-10-26.json")
 OUTPUT = Path("reports/vm_answer_latency.json")
+RECENT_OUTPUT = Path("reports/vm_answer_latency_recent.json")
 GAP_SECONDS = 21  # 분당 3회 상한 아래로.
 TARGET_P50 = 10.0
 
@@ -56,6 +61,20 @@ def pick_cases(cases: list[dict[str, Any]], per_family: int) -> list[dict[str, A
             seen[case["category"]] += 1
             picked.append(case)
     return picked
+
+
+def recent_cases() -> list[dict[str, Any]]:
+    """ADR-090·091이 잰 "최근" 질문 6개입니다. 문항이 같아야 10-28의 수와 나란히 놓습니다.
+
+    `probe_recent_questions`는 가져오는 순간 앱(`chatbot`)을 띄우므로, 목록만 글로 읽습니다.
+    """
+    import ast
+
+    tree = ast.parse(Path("scripts/probe_recent_questions.py").read_text(encoding="utf-8"))
+    qs = next(node.value for node in tree.body if isinstance(node, ast.Assign)
+              and getattr(node.targets[0], "id", None) == "QS")
+    return [{"id": case, "category": "recent", "question": question}
+            for case, question in ast.literal_eval(qs)]
 
 
 def read_events(lines) -> list[tuple[str, dict[str, Any], float]]:
@@ -100,7 +119,7 @@ def ask(api: str, question: str) -> dict[str, Any]:
         "graph_trace": data.get("graph_trace") if kind == "final" else None,
         "generate_trace": data.get("generate_trace") if kind == "final" else None,
         "condition_timing": data.get("condition_timing") if kind == "final" else None,
-        "tools": [{"name": c.get("name"), "seconds": c.get("seconds")}
+        "tools": [{"name": c.get("name"), "seconds": c.get("seconds"), "by": c.get("by")}
                   for c in data.get("tool_calls", [])] if kind == "final" else [],
         "detail": None if kind == "final" else data,
     }
@@ -204,10 +223,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--api", default=API)
     parser.add_argument("--per-family", type=int, default=3)
-    parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--recent", action="store_true", help="'최근' 질문 6개를 묻습니다")
     args = parser.parse_args()
+    args.output = args.output or (RECENT_OUTPUT if args.recent else OUTPUT)
 
-    cases = pick_cases(json.loads(CASES.read_text(encoding="utf-8"))["cases"], args.per_family)
+    if args.recent:
+        cases = recent_cases()
+    else:
+        cases = pick_cases(json.loads(CASES.read_text(encoding="utf-8"))["cases"],
+                           args.per_family)
     if len(cases) > 30:
         raise SystemExit("하루 상한(30회)을 넘깁니다. --per-family를 줄이세요.")
     health = json.loads(urllib.request.urlopen(args.api + "/api/health", timeout=30).read())
@@ -227,7 +252,7 @@ def main() -> int:
         "api": args.api,
         "commit": health.get("commit"),
         "module_commit": health.get("module_commit"),
-        "dataset": str(CASES),
+        "dataset": "scripts/probe_recent_questions.py" if args.recent else str(CASES),
         "summary": summarize(rows, local),
         "results": rows,
     }
