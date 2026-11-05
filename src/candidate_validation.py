@@ -11,6 +11,15 @@ from src.answer_validation import (
     validate_self_reference,
 )
 
+# 판정 호출을 몇 번까지 부를지입니다(ADR-101). 판정이 깨진 것은 답의 잘못이 아닙니다. 그런데 이
+# 자리에서 올리면 에이전트가 "주제 조건도 확인하라"는 수정 요청을 받고, 질문에 없던 주제 조건을
+# 지어내 정답 논문을 뺍니다(11-02 정기 평가 두 번의 실패가 모두 이것이었습니다).
+JUDGE_ATTEMPTS = 2
+
+
+class IncompleteVerdict(ValueError):
+    """판정 모델이 논문마다 하나씩 판정을 돌려주지 못했습니다. 다시 부르면 됩니다."""
+
 
 class CandidateVerdict(BaseModel):
     arxiv_id: str
@@ -53,7 +62,7 @@ def structured_judge(structured, usage):
                     usage[key] = (usage.get(key) or 0) + value
         parsed = result.get("parsed")
         if parsed is None:
-            raise ValueError("인용 논문의 내용 판정 결과가 불완전합니다.")
+            raise IncompleteVerdict("인용 논문의 내용 판정 결과가 불완전합니다.")
         return parsed
 
     return invoke
@@ -66,11 +75,18 @@ def judge_content(question, papers, invoke_model, graph_queries=()):
         ("user", json.dumps({"question": question, "papers": papers,
                              "graph_queries": graph_queries}, ensure_ascii=False)),
     ]
-    verdict = invoke_model(messages)
-    matches = {item.arxiv_id: item.content_matches for item in verdict.candidates}
     expected = {paper["arxiv_id"] for paper in papers}
-    if len(verdict.candidates) != len(papers) or set(matches) != expected:
-        raise ValueError("인용 논문의 내용 판정 결과가 불완전합니다.")
+    for attempt in range(1, JUDGE_ATTEMPTS + 1):
+        try:
+            verdict = invoke_model(messages)
+            matches = {item.arxiv_id: item.content_matches for item in verdict.candidates}
+            if len(verdict.candidates) != len(papers) or set(matches) != expected:
+                raise IncompleteVerdict("인용 논문의 내용 판정 결과가 불완전합니다.")
+            break
+        except IncompleteVerdict:
+            # 제한 시간·연결 같은 다른 예외는 다시 부르지 않습니다. 기다림만 두 배가 됩니다.
+            if attempt == JUDGE_ATTEMPTS:
+                raise
     # 조건을 이름으로 적게 해, 불리언 하나만 뒤집혀 없는 조건이 생기는 일을 막습니다.
     conditions = [
         text.strip() for text in verdict.graph_conditions

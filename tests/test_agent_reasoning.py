@@ -44,3 +44,13 @@ def test_the_agent_is_built_from_the_copy():
 def test_the_report_says_which_effort_answered():
     run = Path("evals/run.py").read_text(encoding="utf-8")
     assert 'metadata["agent_reasoning"] = getattr(chatbot, "AGENT_REASONING", None)' in run
+
+
+def test_only_the_judge_output_is_capped(chatbot):
+    """판정 한 번이 12.8만 토큰을 쓴 11-02 사고 뒤의 상한입니다(ADR-101).
+
+    답 쓰는 쪽은 그대로입니다.
+    """
+    assert chatbot.judge_llm.max_tokens == chatbot.JUDGE_MAX_TOKENS
+    assert chatbot.llm.max_tokens is None
+    assert chatbot.agent_llm.max_tokens is None

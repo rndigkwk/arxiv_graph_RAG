@@ -6,6 +6,7 @@ from src.candidate_validation import (
     QuestionVerdict,
     assess_and_validate,
     judge_content,
+    structured_judge,
 )
 
 
@@ -90,6 +91,56 @@ def test_topic_judge_rejects_missing_candidate_verdict():
                               graph_conditions_covered=True, candidates=[])
     with pytest.raises(ValueError, match="판정 결과"):
         judge_content("shared memory papers citing AutoGen", papers, lambda messages: verdict)
+
+
+def test_a_broken_verdict_is_asked_again_before_the_answer_is_sent_back():
+    """11-02 정기 평가: 판정이 한 번 깨지자 답을 고쳐 쓰게 했고, 고친 답이 정답 논문을 뺐습니다."""
+    papers = [{"arxiv_id": "p1", "title": "Shared Memory", "abstract": "For LLM agents"}]
+    good = QuestionVerdict(requires_content=False, graph_conditions=["cite X"],
+                           graph_conditions_covered=True,
+                           candidates=[CandidateVerdict(arxiv_id="p1", content_matches=True)])
+    replies = [QuestionVerdict(requires_content=False, graph_conditions=["cite X"],
+                               graph_conditions_covered=True, candidates=[]), good]
+    calls = []
+
+    def invoke(messages):
+        calls.append(messages)
+        return replies[len(calls) - 1]
+
+    assessment = judge_content("Which papers cite X?", papers, invoke)
+    assert len(calls) == 2
+    assert assessment["content_matches"] == {"p1": True}
+
+
+def test_an_unreadable_verdict_is_asked_again_too():
+    papers = [{"arxiv_id": "p1", "title": "Shared Memory", "abstract": "For LLM agents"}]
+    usage = {}
+    raw = [{"raw": None, "parsed": None},
+           {"raw": None, "parsed": QuestionVerdict(
+               requires_content=False, graph_conditions=[], graph_conditions_covered=True,
+               candidates=[CandidateVerdict(arxiv_id="p1", content_matches=True)])}]
+
+    class Structured:
+        def invoke(self, messages):
+            return raw.pop(0)
+
+    assessment = judge_content("Which papers cite X?", papers,
+                               structured_judge(Structured(), usage))
+    assert assessment["content_matches"] == {"p1": True}
+    assert raw == []
+
+
+def test_other_judge_errors_are_not_retried():
+    papers = [{"arxiv_id": "p1", "title": "Shared Memory", "abstract": "For LLM agents"}]
+    calls = []
+
+    def invoke(messages):
+        calls.append(messages)
+        raise TimeoutError("provider stalled")
+
+    with pytest.raises(TimeoutError):
+        judge_content("Which papers cite X?", papers, invoke)
+    assert len(calls) == 1
 
 
 def test_unnamed_graph_condition_does_not_trigger_the_coverage_check():
