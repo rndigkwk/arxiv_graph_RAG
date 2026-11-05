@@ -174,3 +174,4 @@
 | [ADR-100](ADR-100-dont-backfill-old-references.md) | 그래프 안 논문끼리 빠진 인용 간선을 채우지 않는다 — 옛 논문의 참고문헌은 판정 자리를 깎는다 | 기각 |
 | [ADR-101](ADR-101-retry-a-broken-condition-verdict.md) | 깨진 조건 판정은 답을 고치게 하지 않고 판정을 다시 부른다 — 판정 출력에는 상한을 둔다 | 채택 |
 | [ADR-102](ADR-102-log-the-shape-of-a-broken-verdict.md) | 깨진 조건 판정은 원문이 아니라 모양을 남긴다 | 채택 |
+| [ADR-103](ADR-103-the-app-checks-recent-itself.md) | "최근" 조건은 앱이 발표일로 직접 확인한다 — 판정이 날짜 낱말만 적었을 때만 | 채택 |

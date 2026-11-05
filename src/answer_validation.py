@@ -109,7 +109,9 @@ def validate_mixed_candidates(response: dict, assessment: dict) -> None:
     }
     cited_ids = set(response["evidence_ids"])
     missing_graph = cited_ids - graph_ids
-    if missing_graph:
+    # 그래프 조건이 "최근"뿐이고 앱이 발표일로 직접 확인했으면, 조회 행에 없어도 조건은 지켜졌습니다
+    # (ADR-103). 내용 조건은 아래에서 그대로 봅니다.
+    if missing_graph and not assessment.get("graph_checked_by_app"):
         raise ValueError(f"그래프 조건을 통과하지 않은 논문: {sorted(missing_graph)}")
     missing_content = {
         paper_id for paper_id in cited_ids
