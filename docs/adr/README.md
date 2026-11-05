@@ -175,3 +175,4 @@
 | [ADR-101](ADR-101-retry-a-broken-condition-verdict.md) | 깨진 조건 판정은 답을 고치게 하지 않고 판정을 다시 부른다 — 판정 출력에는 상한을 둔다 | 채택 |
 | [ADR-102](ADR-102-log-the-shape-of-a-broken-verdict.md) | 깨진 조건 판정은 원문이 아니라 모양을 남긴다 | 채택 |
 | [ADR-103](ADR-103-the-app-checks-recent-itself.md) | "최근" 조건은 앱이 발표일로 직접 확인한다 — 판정이 날짜 낱말만 적었을 때만 | 채택 |
+| [ADR-104](ADR-104-weekly-ingest-runs-on-the-vm.md) | 주간 수집은 VM에서 돌고, 참고문헌은 S2에서 받는다 — 밖 논문은 대기열에 쌓아 누적 3회부터 | 채택 |

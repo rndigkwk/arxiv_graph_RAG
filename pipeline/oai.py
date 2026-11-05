@@ -31,6 +31,10 @@ MAX_RETRIES = 8
 BACKOFF_BASE_SECONDS = 10.0
 BACKOFF_MAX_SECONDS = 300.0
 RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+# 상태 코드가 없는 끊김(읽기 시간 초과 등)도 다시 시도합니다. 시간 초과는 한 번에 120초를 쓰므로
+# 상태 코드보다 적게 다시 시도합니다.
+RETRYABLE_NETWORK = (urllib.error.URLError, TimeoutError, ConnectionError)
+NETWORK_RETRIES = 3
 
 NAMESPACES = {
     "oai": "http://www.openarchives.org/OAI/2.0/",
@@ -65,6 +69,11 @@ def http_fetch(params: dict[str, str], *, sleep: Callable[[float], None] = time.
             retry_after = headers.get("Retry-After") if headers else None
             error.close()
             sleep(backoff_delay(attempt, retry_after))
+        except RETRYABLE_NETWORK:
+            # HTTPError도 URLError의 하위 클래스지만 위에서 먼저 잡힙니다.
+            if attempt >= NETWORK_RETRIES:
+                raise
+            sleep(backoff_delay(attempt, None))
     raise RuntimeError("재시도를 모두 소진했습니다")
 
 
@@ -205,3 +214,4 @@ def pages(
         # 재개 요청에는 토큰만 보냅니다. 다른 인자를 함께 보내면 badArgument가 돌아옵니다.
         request = {"verb": "ListRecords", "resumptionToken": token}
         sleep(REQUEST_INTERVAL_SECONDS)
+
