@@ -193,3 +193,57 @@ def test_named_graph_condition_without_covering_cypher_still_fails():
     assert assessment["requires_graph"] is True
     with pytest.raises(ValueError, match="그래프 검색 조건"):
         validate_mixed_candidates({"rows": [], "evidence_ids": ["p1"]}, assessment)
+
+
+def test_a_runaway_verdict_leaves_its_shape_but_not_its_text(caplog):
+    """11-02의 12.8만 토큰 판정이 무엇을 되풀이했는지 다음에는 볼 수 있어야 합니다(ADR-102)."""
+    from langchain_core.messages import AIMessage
+
+    secret = "Which papers cite Needle in the Haystack?"
+    truncated = ('{"requires_content": false, "graph_conditions": ['
+                 + ", ".join(['"cite Needle in the Haystack"'] * 50))
+    raw = AIMessage(content=truncated,
+                    usage_metadata={"input_tokens": 10, "output_tokens": 4000,
+                                    "total_tokens": 4010},
+                    response_metadata={"status": "incomplete",
+                                       "incomplete_details": {"reason": "max_output_tokens"}})
+    good = QuestionVerdict(requires_content=False, graph_conditions=["cite X"],
+                           graph_conditions_covered=True,
+                           candidates=[CandidateVerdict(arxiv_id="2603.04191",
+                                                        content_matches=True)])
+    replies = [{"raw": raw, "parsed": None, "parsing_error": ValueError("bad json")},
+               {"raw": None, "parsed": good}]
+
+    class Structured:
+        def invoke(self, messages):
+            return replies.pop(0)
+
+    papers = [{"arxiv_id": "2603.04191", "title": "T", "abstract": "A"}]
+    with caplog.at_level("WARNING", logger="arxiv_graph_rag.validation"):
+        judge_content(secret, papers, structured_judge(Structured(), {}))
+
+    (line,) = [r.getMessage() for r in caplog.records]
+    assert line.startswith("condition_judge_unreadable attempt=1 ")
+    for field in ("output_tokens=4000", "status=incomplete", "incomplete=max_output_tokens",
+                  "partial_json=True", "graph_conditions_len=50",
+                  "graph_conditions_max_repeat=50", "error=ValueError"):
+        assert field in line
+    assert "Needle" not in line and "2603.04191" not in line
+
+
+def test_a_verdict_with_the_wrong_papers_leaves_counts_only(caplog):
+    papers = [{"arxiv_id": "p1", "title": "T", "abstract": "A"},
+              {"arxiv_id": "p2", "title": "T", "abstract": "A"}]
+    bad = QuestionVerdict(requires_content=False, graph_conditions=[],
+                          graph_conditions_covered=True,
+                          candidates=[CandidateVerdict(arxiv_id="p1", content_matches=True),
+                                      CandidateVerdict(arxiv_id="p1", content_matches=True)])
+    with caplog.at_level("WARNING", logger="arxiv_graph_rag.validation"), \
+            pytest.raises(ValueError, match="판정 결과"):
+        judge_content("Which papers cite X?", papers, lambda messages: bad)
+
+    lines = [r.getMessage() for r in caplog.records]
+    assert [line.split()[1] for line in lines] == ["attempt=1", "attempt=2"]
+    assert ("error=count_mismatch expected=2 candidates=2 duplicates=1 unknown=0 missing=1"
+            in lines[0])
+    assert "p1" not in lines[0]
