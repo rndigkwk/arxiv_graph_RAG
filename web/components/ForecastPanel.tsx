@@ -25,7 +25,7 @@ export function ForecastPanel({ id }: { id: string }) {
 
   return (
     <details className="section">
-      <summary style={{ cursor: "pointer", fontWeight: 500 }}>앞으로 함께 인용될 논문 (예측 모델)</summary>
+      <summary style={{ cursor: "pointer", fontWeight: 500 }}>앞으로 함께 인용될 것 같은 논문 보기</summary>
       <p className="route">
         지금 함께 인용되는 논문이 아니라, <b>앞으로</b> 이 논문과 함께 인용될 논문을 자체 학습한 모델로 예측합니다.
         정답은 아직 오지 않았고, 모델이 통과한 기준은 과거 구간에서 잰 것입니다.

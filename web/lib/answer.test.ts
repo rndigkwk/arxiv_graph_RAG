@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Answer } from "./api";
-import { GENERATE_CONTAINS, citedEvidence, forecastSeed, generateSplit, graphIds, historyFor, routeLine, stageRows, usedPath } from "./answer";
+import { GENERATE_CONTAINS, citedEvidence, forecastSeed, generateSplit, graphIds, hasHangul, historyFor, howLine, paperLine, routeLine, rowCap, stageRows, usedPath } from "./answer";
 
 const answer = (over: Partial<Answer> = {}): Answer => ({
   question: "q",
@@ -67,5 +67,30 @@ describe("answer helpers", () => {
     const inside = { adds_up: true, model_seconds: 6, model_turns: 3, tools_seconds: 2.5, tool_calls: 2, unattributed_seconds: 0, other_seconds: 1 };
     expect(generateSplit(answer({ generate_trace: inside }))).toBe("모델 6.0초 (3턴) · 도구 2.5초 (2회) · 그 외 1.0초");
     expect(generateSplit(answer({ generate_trace: { ...inside, adds_up: false } }))).toBe("");
+  });
+});
+
+describe("answer-first screen", () => {
+  it("translates only questions asked in Korean", () => {
+    expect(hasHangul("Yoshua Bengio가 쓴 논문이 있어?")).toBe(true);
+    expect(hasHangul("Which papers cite ReAct?")).toBe(false);
+  });
+
+  it("says when the query stopped at its LIMIT", () => {
+    const rows = (n: number) => Array.from({ length: n }, (_, i) => ({ id: i }));
+    expect(rowCap(answer({ cyphers: ["MATCH (p) RETURN p ORDER BY p.title LIMIT 25"], rows: rows(25) }))).toBe(25);
+    expect(rowCap(answer({ cyphers: ["MATCH (p) RETURN p LIMIT 25"], rows: rows(7) }))).toBeNull();
+    expect(rowCap(answer({ cyphers: ["MATCH (p) RETURN count(p)"], rows: rows(1) }))).toBeNull();
+    expect(rowCap(answer({ cyphers: [], rows: [] }))).toBeNull();
+  });
+
+  it("summarises how the answer was found in one line", () => {
+    expect(howLine(answer(), 6090)).toBe("그래프 경로 · 그래프 조회 1번 · 6.1초");
+    expect(howLine(answer({ cyphers: [] }))).toBe("그래프 경로 · 의미 검색으로 찾음");
+  });
+
+  it("writes the paper line from the graph only", () => {
+    expect(paperLine({ arxiv_id: "1", authors: ["A"], author_count: 3, primary_category: "cs.LG" }, "1")).toBe("A 외 · cs.LG · 1");
+    expect(paperLine(undefined, "1406.2661")).toBe("1406.2661");
   });
 });

@@ -121,10 +121,13 @@ class FakeBot:
         ]
 
 
-def client(bot=None, limiter=None):
+def client(bot=None, limiter=None, translate_limiter=None):
     return TestClient(
         api.create_app(
-            backend=bot or FakeBot(), limiter=limiter or api.Limiter(100, 100, 100), warm=False
+            backend=bot or FakeBot(),
+            limiter=limiter or api.Limiter(100, 100, 100),
+            translate_limiter=translate_limiter or limiter or api.Limiter(100, 100, 100),
+            warm=False,
         )
     )
 
@@ -176,11 +179,32 @@ def test_paid_paths_are_rate_limited_per_ip():
     c = client(limiter=api.Limiter(per_minute=1, per_day=10, total_per_day=10))
     headers = {"x-forwarded-for": "1.1.1.1"}
     assert c.post("/api/ask", json={"question": "q"}, headers=headers).status_code == 200
-    blocked = c.post("/api/translate", json={"text": "t"}, headers=headers)
+    blocked = c.post("/api/ask", json={"question": "q"}, headers=headers)
     assert blocked.status_code == 429
     assert int(blocked.headers["retry-after"]) > 0
     other = c.post("/api/ask", json={"question": "q"}, headers={"x-forwarded-for": "2.2.2.2"})
     assert other.status_code == 200
+
+
+def test_translation_counts_against_its_own_limit():
+    """화면이 한국어 질문마다 번역을 부릅니다(ADR-108).
+
+    질문 상한을 같이 쓰면 질문 수가 절반이 됩니다."""
+    c = client(
+        limiter=api.Limiter(per_minute=1, per_day=10, total_per_day=10),
+        translate_limiter=api.Limiter(per_minute=1, per_day=10, total_per_day=10),
+    )
+    headers = {"x-forwarded-for": "1.1.1.1"}
+    assert c.post("/api/ask", json={"question": "q"}, headers=headers).status_code == 200
+    assert c.post("/api/translate", json={"text": "t"}, headers=headers).status_code == 200
+    blocked = c.post("/api/translate", json={"text": "t"}, headers=headers)
+    assert blocked.status_code == 429 and int(blocked.headers["retry-after"]) > 0
+
+
+def test_limits_read_their_own_environment(monkeypatch):
+    monkeypatch.setenv("API_TRANSLATE_PER_MINUTE", "7")
+    assert api.Limiter.from_env("API_TRANSLATE").per_minute == 7
+    assert api.Limiter.from_env().per_minute == 3
 
 
 def test_free_paths_are_not_limited():

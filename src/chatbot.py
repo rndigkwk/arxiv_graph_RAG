@@ -863,7 +863,8 @@ def ask(question, history, on_answer=None):
 
 
 def translate_to_korean(text):
-    """화면의 영어 답변을 한국어로 번역합니다. 번역 버튼에서만 사용합니다."""
+    """화면의 영어 답변을 한국어로 번역합니다. 웹 화면은 한국어 질문의 답을 바로 부르고(ADR-108),
+    Streamlit은 번역 버튼에서만 부릅니다."""
     if not text or not text.strip():
         return text
     message = translator.invoke([("system", korean_system), ("user", text)])
