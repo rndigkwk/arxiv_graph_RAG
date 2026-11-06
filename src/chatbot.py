@@ -725,14 +725,14 @@ def ask(question, history, on_answer=None):
         return {"record": record, "hint": pre_resolve.hint(output)}
 
     def recent_first(asked, english):
-        """"최근"을 묻는 질문만 최근 12개월 안에서 먼저 찾습니다(ADR-090)."""
+        """"최근"을 묻는 질문만 기간 안에서 먼저 찾습니다(ADR-090, 기간은 ADR-105)."""
         if not pre_recent.asks_recent(asked):
             return None
         started = time.perf_counter()
         try:
             result = vector_retriever.search(
                 query_text=english, top_k=pre_recent.TOP_K,
-                filters={"published": {"$gte": pre_recent.since()}},
+                filters={"published": {"$gte": pre_recent.since(question=asked)}},
             )
         except Exception:  # noqa: BLE001 - 못 찾으면 모델이 지금처럼 찾습니다.
             return None
@@ -740,8 +740,9 @@ def ask(question, history, on_answer=None):
                   "papers": [{**item.metadata, "abstract": item.content} for item in result.items]}
         if not pre_recent.usable(output):
             return None
-        record = pre_recent.call_record(english, output, time.perf_counter() - started)
-        return {"record": record, "hint": pre_recent.hint(output)}
+        record = pre_recent.call_record(english, output, time.perf_counter() - started,
+                                        question=asked)
+        return {"record": record, "hint": pre_recent.hint(output, question=asked)}
 
     def scope_first(asked, english):
         """연구 단서가 없는 질문만 컬렉션에 가까운 논문이 있는지 봅니다(ADR-095)."""
