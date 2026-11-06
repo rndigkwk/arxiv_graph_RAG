@@ -22,6 +22,7 @@
 **그래프의 `recent` 노드가 "최근"을 묻는 질문만 최근 12개월 안에서 먼저 찾아, 이번 턴의 메시지로 붙입니다**
 ([`src/pre_recent.py`](../../src/pre_recent.py)). `resolve` 다음, `route` 전입니다. 번역([ADR-087](ADR-087-translate-before-the-agent.md))·
 제목 해석([ADR-088](ADR-088-resolve-the-named-paper-before-the-agent.md))과 같은 자리입니다.
+(11-06: 질문이 "2주", "지난 3개월"처럼 기간을 적으면 12개월 대신 그 기간입니다 - [ADR-105](ADR-105-recent-uses-the-period-the-question-names.md).)
 
 - **"최근"인지는 코드가 가립니다.** recent·recently·latest·newest·new papers/work/research/studies·최근·최신·요즘. "a new
   method"는 걸지 않습니다.

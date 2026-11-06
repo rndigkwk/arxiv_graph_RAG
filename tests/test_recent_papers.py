@@ -58,6 +58,55 @@ def test_the_hint_lists_the_papers_and_the_same_window():
     assert 'duration("P12M")' in hint and "last 12 months" in hint
 
 
+@pytest.mark.parametrize(("question", "days", "duration", "label"), [
+    ("최근 2주 동안 나온 LLM 에이전트 논문 몇 편 소개해줘", 14, "P2W", "last 2 weeks"),
+    ("지난 3개월 사이 RAG 논문", 84, "P3M", "last 3 months"),  # 달은 28일
+    ("최근 한 달 동안 나온 확산 모델 논문", 28, "P1M", "last 1 month"),
+    ("최근 10일 논문", 10, "P10D", "last 10 days"),
+    ("최근 1년 RLHF 연구", 365, "P1Y", "last 1 year"),
+    ("Papers on LLM agents from the past two weeks", 14, "P2W", "last 2 weeks"),
+    ("diffusion papers from the last 30 days", 30, "P30D", "last 30 days"),
+    ("What came out last week on RAG?", 7, "P1W", "last 1 week"),
+])
+def test_a_period_the_question_names_becomes_the_window(question, days, duration, label):
+    span = pre_recent.window(question)
+    assert (span.days, span.duration, span.label) == (days, duration, label)
+    assert pre_recent.asks_recent(question)
+
+
+@pytest.mark.parametrize("question", [
+    "최근에 나온 RLHF 관련 논문 알려줘",  # 기간이 없으면 12개월
+    "최근 100년 동안의 논문",  # 너무 길면 "최근"이 아닙니다
+    "What are the latest papers on diffusion models?",
+])
+def test_without_a_usable_period_the_window_stays_twelve_months(question):
+    assert pre_recent.window(question) == pre_recent.DEFAULT
+
+
+def test_last_without_a_time_unit_is_not_a_period():
+    assert not pre_recent.asks_recent("Which methods fine-tune only the last layer?")
+
+
+def test_the_named_period_reaches_the_filter_the_hint_and_the_record():
+    question = "최근 2주 동안 나온 LLM 에이전트 논문"
+    assert pre_recent.since(now=NOW, question=question) == NOW - dt.timedelta(days=14)
+    hint = pre_recent.hint(FOUND, question=question)
+    assert 'duration("P2W")' in hint and "last 2 weeks" in hint and "P12M" not in hint
+    record = pre_recent.call_record("llm agents", FOUND, 0.1, question=question)
+    assert record["args"]["published_within"] == "P2W"
+
+
+def test_the_app_checks_the_named_period_not_twelve_months():
+    question = "최근 2주 동안 나온 LLM 에이전트 논문"
+    ten_days = {**FRESH, "published": (NOW - dt.timedelta(days=10)).isoformat()}
+    twenty_days = {**FRESH, "published": (NOW - dt.timedelta(days=20)).isoformat()}
+    conditions = ["published in the last two weeks"]
+    assert pre_recent.recency_only(conditions)
+    assert pre_recent.recency_only(["published within the past 2 weeks"])
+    assert pre_recent.covers(question, conditions, [ten_days], now=NOW)
+    assert not pre_recent.covers(question, conditions, [twenty_days], now=NOW)
+
+
 def test_an_empty_search_is_not_used():
     assert not pre_recent.usable({"query": "q", "papers": []})
     assert not pre_recent.usable(None)
@@ -142,7 +191,7 @@ SOURCE = Path("src/chatbot.py").read_text(encoding="utf-8")
 
 def test_the_app_filters_inside_the_vector_search():
     assert "recent=recent_first," in SOURCE
-    assert 'filters={"published": {"$gte": pre_recent.since()}}' in SOURCE
+    assert 'filters={"published": {"$gte": pre_recent.since(question=asked)}}' in SOURCE
 
 
 def test_the_model_sees_the_same_prompt_and_tool_schema():
