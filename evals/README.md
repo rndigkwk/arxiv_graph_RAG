@@ -1,5 +1,7 @@
 # Retrieval and answer evaluation
 
+> **Start with [`docs/EVALUATION.md`](../docs/EVALUATION.md)** (Korean): every case set, what it measures, how its labels were made, and why each gate metric was chosen. This page covers only the first two sets below (`cases.json`, `cases_curated.json`), which are retired from the gate; the regression gate runs `cases_graph.json` (30) and `cases_graph_paraphrase.json` (60).
+
 `cases.json` contains 31 fixed cases tied to the bundled 6,467-paper seed snapshot (2026-06-15 to 2026-09-14). Ten topic cases use a transparent lexical rule (the phrase appears in title or abstract across the bundled seed and reference metadata); twenty-one exact-title cases use the source title and arXiv ID. These are a reproducible smoke benchmark, not expert relevance labels or a claim of general RAG quality.
 
 ## Run

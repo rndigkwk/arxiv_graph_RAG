@@ -14,6 +14,7 @@ arXiv AI 논문을 구조화된 지식 그래프로 만들고, 그래프 탐색�
 | 보고 싶은 것 | 어디로 |
 |---|---|
 | **지금 무엇을 쓰고 무엇을 왜 안 쓰는가** | [`docs/MODELS.md`](docs/MODELS.md) — 앱이 쓰는 모델, 재서 기각한 아홉 |
+| **평가를 어떻게 만들었나** | [`docs/EVALUATION.md`](docs/EVALUATION.md) — 평가 셋마다 무엇을 재려고 몇 문항을 어떻게 만들었나, 지표마다 무엇을 재고 왜 골랐나, 한계 |
 | **결정과 그 근거 수치** | [결정 기록](docs/adr/README.md) — 채택·기각·보류, 뒤집힌 것은 지우지 않고 표시 |
 | **측정이 기록으로 남는 모양** | 배포된 앱의 **[품질 화면](https://arxiv-graphrag.vercel.app/quality)** — 게이트 일곱 규칙, 지표별 하한·여유·변동폭, 기각한 모델 |
 | **어떻게 알았는가** | [`EXPERIMENTS.md`](EXPERIMENTS.md) — 질문 / 방법 / 결과 / 결론 |
@@ -577,6 +578,7 @@ hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-ty
 ## Advanced evaluation
 
 RAG 검색·답변 평가 방법과 이번 개선 변경점은 [`advanced.md`](advanced.md)에 정리했습니다.
+평가 셋·지표·표본 크기·게이트를 한곳에 모은 색인은 [`docs/EVALUATION.md`](docs/EVALUATION.md)입니다.
 
 ```bash
 # 그래프 조건 평가 케이스를 만들고 정답을 라이브 DB의 Cypher와 대조합니다
