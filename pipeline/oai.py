@@ -141,6 +141,8 @@ class HarvestResult:
     stopped_on: str = ""
     stop_error: str = ""
     days: int = 0
+    # 페이지 한도로 중간에 끊긴 날입니다. 그날 받은 레코드는 남기되 워터마크는 그 앞날에 멈춥니다.
+    truncated_on: str = ""
 
 
 def harvest(
@@ -240,6 +242,12 @@ def harvest_by_day(
     **어떤 날이 실패하면 그 앞날까지 받은 것을 돌려줍니다.** 워터마크는 받은 레코드의 가장 늦은
     날짜도장이므로, 다음 실행이 실패한 날부터 다시 받습니다. 첫날부터 실패하면 예외를 그대로
     올립니다 - 받은 것이 없는데 성공처럼 끝내지 않습니다.
+
+    **페이지 한도로 하루가 중간에 끊기면 그날은 끝난 날로 치지 않습니다.** 하루 창의 레코드는 모두
+    그날 날짜도장을 가지므로, 끊긴 날의 날짜도장을 워터마크로 삼으면 다음 실행이 그 다음 날부터 받아
+    그날 나머지를 영영 건너뜁니다. 그래서 `last_datestamp`는 끝까지 받은 날까지만 올리고, 끊긴 날은
+    `truncated_on`에 적습니다. 그날 받은 레코드는 그대로 돌려줍니다 - 적재는 MERGE라 다음 실행이
+    그날을 처음부터 다시 받아도 겹치지 않습니다.
     """
     first, last = date.fromisoformat(start), date.fromisoformat(end)
     merged = HarvestResult()
@@ -265,8 +273,10 @@ def harvest_by_day(
         merged.pages += one.pages
         merged.deleted += one.deleted
         merged.skipped += one.skipped
-        merged.last_datestamp = max(merged.last_datestamp, one.last_datestamp)
         if one.truncated_by_page_limit:
             merged.truncated_by_page_limit = True
+            merged.truncated_on = stamp
+            break
+        merged.last_datestamp = max(merged.last_datestamp, one.last_datestamp)
         day += timedelta(days=1)
     return merged
