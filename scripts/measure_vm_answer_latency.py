@@ -132,6 +132,20 @@ def local_totals(report: dict[str, Any] | None) -> dict[str, float]:
             for row in report.get("results", []) if row.get("graph_trace")}
 
 
+def within_target(done: list[dict[str, Any]]) -> dict[str, Any]:
+    """목표(10초) 안에 끝난 답의 몫과, 넘긴 문항입니다. **보여 주기만 합니다** - 게이트는 p50입니다.
+
+    p50이 목표 안이어도 절반 가까이가 넘을 수 있습니다. 넘긴 문항을 느린 순으로 적어 어디를
+    볼지 바로 고르게 합니다.
+    """
+    over = sorted(({"id": row["id"], "seconds": row["graph_trace"]["total_seconds"]}
+                   for row in done if row["graph_trace"]["total_seconds"] > TARGET_P50),
+                  key=lambda item: -item["seconds"])
+    count = len(done) - len(over)
+    return {"count": count, "of": len(done),
+            "share": round(count / len(done), 3) if done else None, "over": over}
+
+
 def summarize(rows: list[dict[str, Any]], local: dict[str, float]) -> dict[str, Any]:
     """서버가 잰 합계가 목표의 기준입니다. 브라우저 쪽 시간은 그 위에 얹히는 몫을 보려고 둡니다."""
     done = [row for row in rows if row["graph_trace"]]
@@ -166,6 +180,7 @@ def summarize(rows: list[dict[str, Any]], local: dict[str, float]) -> dict[str, 
             [r["first_partial_seconds"] for r in done if r["first_partial_seconds"]], 0.5),
         "target_p50": TARGET_P50,
         "meets_target": (percentile(server, 0.5) or 1e9) <= TARGET_P50,
+        "within_target": within_target(done),
         "nodes": sorted(({"node": node, "p50": percentile(values, 0.5),
                           "share": round(sum(values) / total, 3)}
                          for node, values in nodes.items()), key=lambda n: -n["share"]),
@@ -259,6 +274,11 @@ def main() -> int:
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n",
                            encoding="utf-8", newline="\n")
     print(json.dumps(report["summary"], ensure_ascii=False, indent=2))
+    inside = report["summary"]["within_target"]
+    if inside["of"]:
+        print(f"{TARGET_P50:g}초 안: {inside['count']}/{inside['of']} ({inside['share']:.0%})"
+              + ("" if not inside["over"] else " · 넘긴 문항: " + ", ".join(
+                  f"{item['id']} {item['seconds']:.1f}초" for item in inside["over"])))
     return 0
 
 

@@ -35,6 +35,19 @@ def test_a_slow_middle_misses_the_target():
     assert summary["vs_local"]["pairs"] == 0
 
 
+def test_the_share_within_ten_seconds_names_the_slow_ones_without_gating():
+    rows = [row("a-1", 8.0), row("a-2", 12.0), row("a-3", 9.5), row("a-4", 10.0),
+            row("b-1", 15.5), row("c-1", 0, outcome="abstain")]
+    inside = m.summarize(rows, {})["within_target"]
+    # 10초 정각은 안입니다. 답하지 못한 문항은 세지 않습니다.
+    assert inside == {"count": 3, "of": 5, "share": 0.6,
+                      "over": [{"id": "b-1", "seconds": 15.5}, {"id": "a-2", "seconds": 12.0}]}
+    # 게이트는 그대로 p50입니다.
+    assert m.summarize(rows, {})["meets_target"] is True
+    assert m.summarize([], {})["within_target"] == {"count": 0, "of": 0, "share": None,
+                                                    "over": []}
+
+
 def test_cases_are_picked_per_family_in_file_order():
     cases = [{"id": f"{c}-{i}", "category": c} for c in ("author", "citing") for i in range(5)]
     picked = [c["id"] for c in m.pick_cases(cases, 2)]
