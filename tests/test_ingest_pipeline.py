@@ -511,3 +511,40 @@ def test_the_page_limit_stops_the_days_too():
                                 sleep=lambda _: None, max_pages=2)
 
     assert len(calls) == 2 and result.truncated_by_page_limit
+    assert result.last_datestamp == "2026-10-31"  # 두 날은 끝까지 받았습니다
+    assert result.truncated_on == ""
+
+
+def _cut_on(cut_day):
+    """`cut_day`에서 페이지 한도에 걸려 하루 중간에 끊기는 수집입니다."""
+    calls = []
+
+    def harvest_one(start, end, *, sleep, max_pages, **kwargs):
+        calls.append(start)
+        result = oai.HarvestResult(pages=1, last_datestamp=start)
+        result.records.append({"arxiv_id": start, "oai_datestamp": start})
+        result.truncated_by_page_limit = start == cut_day
+        return result
+
+    return harvest_one, calls
+
+
+def test_a_day_cut_by_the_page_limit_does_not_move_the_watermark_past_it():
+    harvest_one, calls = _cut_on("2026-10-31")
+    result = oai.harvest_by_day("2026-10-30", "2026-11-05", harvest_one=harvest_one,
+                                sleep=lambda _: None)
+
+    assert calls == ["2026-10-30", "2026-10-31"]  # 끊긴 날 뒤로는 받지 않습니다
+    assert [r["arxiv_id"] for r in result.records] == ["2026-10-30", "2026-10-31"]
+    assert result.last_datestamp == "2026-10-30"  # 다음 실행은 10-31을 처음부터 다시 받습니다
+    assert result.truncated_on == "2026-10-31" and result.truncated_by_page_limit
+
+
+def test_a_cut_first_day_leaves_the_watermark_where_it_was():
+    harvest_one, _ = _cut_on("2026-10-30")
+    result = oai.harvest_by_day("2026-10-30", "2026-11-05", harvest_one=harvest_one,
+                                sleep=lambda _: None)
+
+    assert len(result.records) == 1  # 받은 것은 적재합니다(MERGE라 다시 받아도 겹치지 않음)
+    assert result.last_datestamp == ""  # 빈 워터마크는 _finish가 옮기지 않습니다
+    assert result.truncated_on == "2026-10-30"

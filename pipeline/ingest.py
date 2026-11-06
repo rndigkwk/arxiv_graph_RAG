@@ -609,6 +609,7 @@ def main() -> int:
             "truncated_by_page_limit": harvested.truncated_by_page_limit,
             "days": harvested.days,
             "stopped_on": harvested.stopped_on,
+            "truncated_on": harvested.truncated_on,
             "stop_error": harvested.stop_error,
         },
         "loaded": False,

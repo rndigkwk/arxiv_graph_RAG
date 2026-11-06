@@ -51,10 +51,11 @@ DB가 먼저입니다.
   `CITATION_EDGES` p95. 메모리가 모자라면 8GB(e2-standard-2)로 올립니다.
 - 배포 점검(`scripts/visit_deployed_app.py`)의 주소를 새 앱으로 바꿉니다.
 
-## 2. 수집 확장 — 코드 끝남 (2026-11-05, [ADR-104](adr/ADR-104-weekly-ingest-runs-on-the-vm.md))
+## 2. 수집 확장 — 끝남 (2026-11-06, [ADR-104](adr/ADR-104-weekly-ingest-runs-on-the-vm.md))
 
 - VM에서 주 1회 돕니다(`deploy/vm/ingest.sh`, `arxiv-ingest.timer`). 참고문헌은 S2에서, 밖 논문은 대기열에 쌓아 누적 3회부터 들입니다.
 - 첫 적재는 시험 실행을 사람이 확인한 뒤에 합니다. 타이머는 그다음에 설치합니다(`deploy/vm/install_ingest_timer.sh`).
+- 11-06 첫 적재(09-14~11-05, 6,462편 + 밖 논문 200편)와 타이머 설치를 마쳤습니다. 숫자는 ADR-104의 "첫 적재"에 있습니다.
 - 아래는 계획할 때의 메모입니다.
 
 
