@@ -6,6 +6,7 @@ import { ForecastPanel } from "@/components/ForecastPanel";
 import { PaperActions } from "@/components/PaperActions";
 import { PaperSearch } from "@/components/PaperSearch";
 import { getPaper } from "@/lib/api";
+import { categoryLabel } from "@/lib/categories";
 import { ARXIV_ID, askHref, authorQuestion, questionsFor, year } from "@/lib/paper";
 
 type Props = { params: Promise<{ id: string }> };
@@ -33,9 +34,10 @@ export default async function PaperPage({ params }: Props) {
       </section>
 
       <article className="card panel paper-head">
-        <p className="meta mono">
-          <a href={`https://arxiv.org/abs/${paper.arxiv_id}`}>arXiv {paper.arxiv_id}</a> · {paper.categories.join(" · ")}
-          {paper.published ? ` · ${year(paper.published)}` : ""}
+        <p className="meta">
+          {[categoryLabel(paper.primary_category), paper.published ? year(paper.published) : "", `arXiv ${paper.arxiv_id}`]
+            .filter(Boolean)
+            .join(" · ")}
         </p>
         <h1>{paper.title}</h1>
         {paper.authors.length > 0 && (
@@ -50,10 +52,22 @@ export default async function PaperPage({ params }: Props) {
             ))}
           </p>
         )}
+        {/* 초록을 접지 않습니다. 논문 페이지에 온 사람이 가장 먼저 읽는 것입니다(ADR-109). */}
+        {paper.abstract && <p className="abstract">{paper.abstract}</p>}
+        <div className="actions">
+          <a className="btn btn-link" href={`https://arxiv.org/abs/${paper.arxiv_id}`} target="_blank" rel="noreferrer">
+            arXiv에서 보기
+          </a>
+          {paper.pdf_url && (
+            <a className="btn btn-link" href={paper.pdf_url} target="_blank" rel="noreferrer">
+              PDF
+            </a>
+          )}
+        </div>
         <PaperActions paper={paper} />
         <dl className="tiles">
           <div>
-            <dt>이 그래프에서 인용한 논문</dt>
+            <dt>이 논문을 인용한 논문 (그래프 안)</dt>
             <dd className="mono">{paper.cited_by.toLocaleString("ko-KR")}</dd>
           </div>
           <div>
@@ -66,29 +80,21 @@ export default async function PaperPage({ params }: Props) {
           </div>
         </dl>
         {paper.references === 0 && (
-          <p className="note">
-            <b>이 논문의 참고문헌은 그래프에 저장되지 않았습니다.</b> 인용한 논문이 없다는 뜻이 아닙니다 — 그래프의 논문 대부분이
-            참고문헌 없이 들어와 있어서, "이 논문이 인용한 논문" 질문은 빈 답이 나옵니다.
+          // 대부분의 논문이 그렇습니다. 경고 상자 대신 한 줄로 적습니다(ADR-109).
+          <p className="hint">
+            이 논문의 참고문헌은 그래프에 없습니다. 인용한 논문이 없다는 뜻은 아니지만, &quot;이 논문이 인용한 논문&quot;은 답하지 못합니다.
           </p>
-        )}
-        {paper.abstract && (
-          <details>
-            <summary style={{ cursor: "pointer", fontWeight: 500 }}>초록</summary>
-            <p className="answer-text" style={{ marginTop: 8 }}>
-              {paper.abstract}
-            </p>
-          </details>
         )}
       </article>
 
       <div className="two-col">
         <section className="card panel">
           <h2>함께 인용되는 논문</h2>
-          <p className="route">
+          <p className="hint">
             {short}와 같은 논문에 함께 인용된 횟수입니다. 인기 순위가 아니라 같이 읽히는 순서입니다.
           </p>
           {paper.related.length === 0 ? (
-            <p className="route">저장된 인용 관계가 없어 찾지 못했습니다.</p>
+            <p className="hint">저장된 인용 관계가 없어 찾지 못했습니다.</p>
           ) : (
             <ol className="plain-list numbered">
               {paper.related.map((r) => (
@@ -108,7 +114,7 @@ export default async function PaperPage({ params }: Props) {
 
       <section className="card panel">
         <h2>이 논문에서 시작하는 질문</h2>
-        <p className="route">누르면 질문 칸이 채워집니다. 보내기는 직접 누릅니다.</p>
+        <p className="hint">누르면 질문 칸이 채워집니다. 보내기는 직접 누릅니다.</p>
         <div className="actions">
           {questionsFor(paper).map((q) => (
             <Link key={q.label} className="btn btn-link" href={askHref(q.question)}>

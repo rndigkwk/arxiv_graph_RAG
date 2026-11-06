@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { type CitingOrder, type CitingPaper, getCiting } from "@/lib/api";
+import { categoryName } from "@/lib/categories";
 import { year } from "@/lib/paper";
 
 const PAGE = 20;
@@ -55,7 +56,7 @@ export function CitingList({ id, total }: { id: string; total: number }) {
               <li key={p.arxiv_id}>
                 <Link href={`/papers/${p.arxiv_id}`}>{p.title}</Link>
                 <span className="mono sub">
-                  {p.arxiv_id} · {p.primary_category} · {year(p.published)}
+                  {categoryName(p.primary_category)} · {year(p.published)} · {p.arxiv_id}
                   {p.cited_by > 0 ? ` · 인용 ${p.cited_by}` : ""}
                 </span>
               </li>

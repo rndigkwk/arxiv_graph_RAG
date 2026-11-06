@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { RankedPaper } from "./api";
-import { barShare, rankQuery, rankingCsv } from "./explore";
+import { barShare, formatValue, rankQuery, rankingCsv } from "./explore";
 
 const paper = (over: Partial<RankedPaper> = {}): RankedPaper => ({
   rank: 1, score: 0.0006, arxiv_id: "2210.03629", title: "ReAct", primary_category: "cs.CL",
@@ -31,5 +31,11 @@ describe("explore helpers", () => {
     expect(barShare(240, 480)).toBe(0.5);
     expect(barShare(1, 1000)).toBe(0.01);
     expect(barShare(3, 0)).toBe(0);
+  });
+
+  it("shows scores relative to the top paper and counts as counts", () => {
+    expect(formatValue("pagerank", 0.0003, 0.0006)).toBe("50");
+    expect(formatValue("personalized", 0.0006, 0.0006)).toBe("100");
+    expect(formatValue("cited", 1234)).toBe("1,234");
   });
 });

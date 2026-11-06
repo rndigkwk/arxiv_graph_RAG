@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ApiError, type RankBy, type RankedPaper, type Stats, getRanking, getStats } from "@/lib/api";
-import { BY_LABEL, PAGE, barShare, formatValue, rankQuery, rankingCsv, valueOf } from "@/lib/explore";
+import { categoryLabel, categoryName } from "@/lib/categories";
+import { BY_HINT, BY_LABEL, PAGE, barShare, formatValue, rankQuery, rankingCsv, valueOf } from "@/lib/explore";
 import { ARXIV_ID } from "@/lib/paper";
 
 const CATEGORIES = 6;
 const column = { border: 0, margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 6 } as const;
-const option = { display: "flex", gap: 8, minHeight: 28, alignItems: "center" } as const;
+const option = { display: "flex", gap: 8, minHeight: 44, alignItems: "flex-start", paddingTop: 10 } as const;
 
 export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
   const [by, setBy] = useState<RankBy>(initialSeed ? "personalized" : "cited");
@@ -73,8 +74,8 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
   const inGraph = stats ? stats.counts.papers.toLocaleString("ko-KR") : "…";
   const title =
     by === "personalized"
-      ? `${seed || "한 논문"}에서 출발해 가까운 논문`
-      : `${by === "cited" ? "가장 많이 인용된 논문" : "PageRank가 높은 논문"} — ${category || "전체 분류"}, 그래프 안 인용`;
+      ? `${seed || "한 논문"}과 가까운 논문`
+      : `${by === "cited" ? "가장 많이 인용된 논문" : "영향력이 큰 논문"} — ${category ? categoryName(category) : "전체 분야"}`;
 
   return (
     <div className="two-col">
@@ -85,7 +86,11 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
           </legend>
           {(Object.keys(BY_LABEL) as RankBy[]).map((key) => (
             <label key={key} style={option}>
-              <input type="radio" name="by" checked={by === key} onChange={() => setBy(key)} /> {BY_LABEL[key]}
+              <input type="radio" name="by" checked={by === key} onChange={() => setBy(key)} style={{ marginTop: 4 }} />
+              <span>
+                {BY_LABEL[key]}
+                <span className="sub">{BY_HINT[key]}</span>
+              </span>
             </label>
           ))}
         </fieldset>
@@ -112,7 +117,7 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
         ) : (
           <fieldset style={column}>
             <legend className="lbl" style={{ marginBottom: 6 }}>
-              분류
+              분야
             </legend>
             <div className="actions">
               <button className="btn" aria-pressed={!category} onClick={() => setCategory("")}>
@@ -121,11 +126,12 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
               {(stats?.top_categories ?? []).slice(0, CATEGORIES).map((c) => (
                 <button
                   key={c.code}
-                  className="btn mono"
+                  className="btn"
                   aria-pressed={category === c.code}
                   onClick={() => setCategory(c.code)}
+                  title={c.code}
                 >
-                  {c.code}
+                  {categoryName(c.code)}
                 </button>
               ))}
             </div>
@@ -136,7 +142,7 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
                   checked={includeSecondary}
                   onChange={(e) => setIncludeSecondary(e.target.checked)}
                 />{" "}
-                보조 분류도 포함
+                이 분야를 보조 분류로 단 논문도 포함
               </label>
             )}
             {category && by === "pagerank" && (
@@ -146,16 +152,14 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
                   checked={scope === "subgraph"}
                   onChange={(e) => setScope(e.target.checked ? "subgraph" : "global")}
                 />{" "}
-                {category} 논문끼리의 인용만으로 계산
+                {categoryName(category)} 논문끼리의 인용만으로 계산
               </label>
             )}
           </fieldset>
         )}
 
-        <p className="route">
-          &quot;그래프 안&quot;은 이 앱에 적재된 {inGraph}편 사이의 인용만 셉니다. 바깥 세상의 피인용 수가 아닙니다.
-          {by === "pagerank" && " PageRank는 중요한 논문에게 인용받을수록 올라가서, 피인용 수가 적어도 위로 갈 수 있습니다."}
-          {by === "personalized" && " 출발 논문과 인용으로 가까운 논문입니다(인용 방향은 따지지 않습니다)."}
+        <p className="hint">
+          인용은 이 앱에 적재된 {inGraph}편 사이에서만 셉니다. 바깥 세상의 피인용 수가 아닙니다.
         </p>
       </aside>
 
@@ -163,7 +167,7 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
         <h1>{title}</h1>
         {total > 0 && <p className="meta mono">순위에 든 논문 {total.toLocaleString("ko-KR")}편</p>}
         {message && <p className="note">{message}</p>}
-        {busy && !papers.length && <p className="route">순위를 계산하는 중…</p>}
+        {busy && !papers.length && <p className="hint">순위를 계산하는 중…</p>}
         {papers.length > 0 && (
           <div style={{ overflowX: "auto" }}>
             <table>
@@ -171,8 +175,8 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
                 <tr>
                   <th>#</th>
                   <th>제목</th>
-                  <th>분류</th>
-                  <th>{by === "cited" ? "인용" : "점수"}</th>
+                  <th>분야</th>
+                  <th>{by === "cited" ? "인용" : "점수 (1위=100)"}</th>
                   <th style={{ width: "22%" }}>상대 크기</th>
                 </tr>
               </thead>
@@ -184,10 +188,10 @@ export function Explorer({ initialSeed = "" }: { initialSeed?: string }) {
                       <Link href={`/papers/${p.arxiv_id}`}>{p.title}</Link>
                       {by !== "cited" && <span className="mono sub">인용 {p.cited_by}</span>}
                     </td>
-                    <td className="mono" style={{ fontSize: 12 }}>
-                      {p.primary_category}
+                    <td style={{ fontSize: 13 }} title={p.primary_category}>
+                      {categoryLabel(p.primary_category)}
                     </td>
-                    <td className="mono">{formatValue(by, valueOf(by, p))}</td>
+                    <td className="mono">{formatValue(by, valueOf(by, p), top)}</td>
                     <td>
                       <div className="bar" style={{ width: `${barShare(valueOf(by, p), top) * 100}%` }} />
                     </td>
