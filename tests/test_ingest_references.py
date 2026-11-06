@@ -193,6 +193,52 @@ def test_the_backfill_writes_only_the_publication_date_and_never_guesses():
     assert "DELETE" not in module.FILL and "MERGE" not in module.FILL
 
 
+def _backfill_module():
+    import importlib.util
+    from pathlib import Path
+
+    spec = importlib.util.spec_from_file_location(
+        "backfill_published", Path("scripts/backfill_published.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_the_harvest_takes_the_first_version_date_not_the_oai_one():
+    # 2602.12164: v1 02-12, v2 10-22. OAI `created`는 10-22를 줬습니다(2026-11-06).
+    records = [{"arxiv_id": "2602.12164", "created": "2026-10-22"},
+               {"arxiv_id": "2610.00001", "created": "2026-10-01"},
+               {"arxiv_id": "2610.00002", "created": "2026-10-02"}]
+
+    def get_records(ids):
+        return arxiv_api.RecordLookup(
+            records=[{"arxiv_id": "2602.12164", "created": "2026-02-12T16:46:00Z"},
+                     {"arxiv_id": "2610.00001", "created": "2026-10-01T09:00:00Z"}],
+            missing=["2610.00002"])
+
+    report = ingest.first_version_dates(records, get_records=get_records)
+
+    assert [r["created"] for r in records] == ["2026-02-12T16:46:00Z", "2026-10-01T09:00:00Z", None]
+    assert report == {"asked": 3, "received": 2, "differs_from_oai": 1, "missing": 1, "failed": 0}
+
+
+def test_the_recheck_overwrites_only_dates_that_differ():
+    module = _backfill_module()
+    current = {"rev": "2026-10-22T00:00:00Z", "same": "2026-10-01T00:00:00Z", "gone": None,
+               "unanswered": "2026-10-05T00:00:00Z"}
+    records = [{"arxiv_id": "rev", "created": "2026-02-12T16:46:00Z"},
+               {"arxiv_id": "same", "created": "2026-10-01T17:00:00Z"},
+               {"arxiv_id": "gone", "created": "2026-09-30T01:00:00Z"}]
+
+    fix = module.corrections(current, records)
+
+    assert [(r["arxiv_id"], r["was"]) for r in fix] == [("rev", "2026-10-22T00:00:00Z"),
+                                                        ("gone", None)]
+    assert "SET p.published = datetime(row.created)" in module.CORRECT
+    assert "DELETE" not in module.CORRECT and "MERGE" not in module.CORRECT
+    assert "p.source = 'oai'" in module.ALL_HARVESTED
+
+
 class _Response:
     def __init__(self, body):
         self.body = body

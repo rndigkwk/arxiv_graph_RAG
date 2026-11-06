@@ -94,6 +94,36 @@ class ReferencePlan:
     report: dict[str, Any]
 
 
+def first_version_dates(
+    records: list[dict[str, Any]], *, get_records: Callable[[list[str]], Any]
+) -> dict[str, int]:
+    """수집 레코드의 `created`를 arXiv 첫 버전 날짜로 바꿉니다(ADR-104, 11-06 추가).
+
+    **OAI의 `created`는 첫 버전 날짜가 아닙니다.** 새 끝점(oaipmh.arxiv.org)은 마지막 버전의 날짜를
+    줍니다 - 2602.12164는 v1이 02-12인데 OAI `created`는 v2 날짜인 10-22였습니다. 11-06 첫 적재의
+    6,461편 중 992편이 이 때문에 ID의 달보다 늦은 발표일로 들어가, "최근" 질문에 몇 달 전 논문이
+    최근 논문처럼 잡혔습니다. 조회 API의 `published`는 첫 버전 시각이므로 그것을 씁니다.
+
+    못 받은 논문은 `created`를 비웁니다 - OAI 값으로 되돌아가지 않습니다(개정된 논문이면 틀립니다).
+    발표일이 빈 채로 실리고, `scripts/backfill_published.py`가 다음에 채웁니다.
+    """
+    lookup = get_records([str(record["arxiv_id"]) for record in records])
+    first = {str(row["arxiv_id"]): row.get("created") for row in lookup.records}
+    changed = 0
+    for record in records:
+        value = first.get(str(record["arxiv_id"])) or None
+        if value and record.get("created") and str(value)[:10] != str(record["created"])[:10]:
+            changed += 1
+        record["created"] = value
+    return {
+        "asked": len(records),
+        "received": len(lookup.records),
+        "differs_from_oai": changed,
+        "missing": len(lookup.missing),
+        "failed": len(lookup.failures),
+    }
+
+
 def plan_references(
     harvested_ids: list[str],
     state: dict[str, Any],
@@ -162,6 +192,7 @@ SET p.title = row.title,
     // arXiv 첫 버전 날짜입니다(ADR-104). 2026-10-24 적재는 이 줄이 없어 934편 중 811편이
     // 발표일 없이 들어갔고, "최근" 검색(ADR-090)과 앱의 날짜 확인(ADR-103)에서 빠졌습니다.
     // 이미 있는 발표일은 덮지 않습니다 - 씨앗 논문의 값은 그래프를 지을 때의 기준입니다.
+    // `row.created`는 OAI 값이 아니라 조회 API의 첫 버전 시각입니다(`first_version_dates`).
     p.published = coalesce(p.published,
                            CASE WHEN row.created IS NULL THEN NULL ELSE datetime(row.created) END),
     // **`coalesce`입니다.** 레코드가 임베딩을 가져왔을 때만 씁니다 - 없으면 노드가 갖고
@@ -619,6 +650,9 @@ def main() -> int:
         report["stopped_at"] = "harvest_empty"
         _finish(report, args.output, state, harvested.last_datestamp, advance=True)
         return 0
+
+    report["first_version"] = first_version_dates(harvested.records,
+                                                  get_records=arxiv_api.get_records)
 
     from pipeline.graph import connect, env
 

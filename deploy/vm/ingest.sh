@@ -27,3 +27,9 @@ out="pipeline/state/reports/ingest-$(date -u +%Y%m%dT%H%M%SZ)-$mode.json"
 docker compose --env-file .env -f deploy/vm/compose.yml run --rm --no-deps -T api \
   python -m pipeline.ingest "${flags[@]}" --output "$out" "$@"
 echo "보고서: $out"
+
+# 첫 버전 날짜를 받지 못해 발표일이 빈 채로 실린 논문을 채웁니다(ADR-104). 빈 것만 받으므로
+# 보통은 0편이고 요청도 없습니다.
+if [ "$mode" = load ]; then
+  docker compose --env-file .env -f deploy/vm/compose.yml run --rm --no-deps -T api     python scripts/backfill_published.py --load     --output "pipeline/state/reports/backfill-$(date -u +%Y%m%dT%H%M%SZ).json"
+fi
