@@ -180,3 +180,4 @@
 | [ADR-106](ADR-106-alert-when-the-vm-ingest-stops.md) | VM 주간 수집이 멈추면 배포 점검이 알린다 — 상태는 `/api/health`가 파일에서 읽는다 | 채택 |
 | [ADR-107](ADR-107-restart-the-api-only-when-it-reads-the-change.md) | 앱이 읽는 파일이 바뀐 배포만 API를 재시작한다 — 재시작이 진행 중인 답을 끊는다 | 채택 |
 | [ADR-108](ADR-108-the-question-screen-shows-the-answer-first.md) | 질문 화면은 답을 먼저 보여 준다 — 한국어 질문은 답이 오자마자 번역한다 | 채택 |
+| [ADR-109](ADR-109-paper-and-explore-pages-speak-plainly.md) | 논문·탐색 화면은 코드 대신 이름과 설명을 보여 준다 — 초록은 펴 두고, 경고는 한 줄로 | 채택 |
