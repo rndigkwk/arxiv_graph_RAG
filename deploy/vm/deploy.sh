@@ -25,7 +25,15 @@ fi
 # 내린 서비스(2026-10-27의 app)는 --remove-orphans가 지웁니다. 남기면 메모리를 계속 씁니다.
 $C up -d --remove-orphans
 # 코드는 마운트돼 있고 파일 감시를 켜지 않았으므로, 새 코드는 재시작해야 읽힙니다.
-$C restart api
+# 다만 재시작은 진행 중인 답을 끊습니다(2026-11-06, 문서만 바꾼 머지가 답을 끊었습니다). 앱이 읽지
+# 않는 파일만 바뀌었으면 건너뜁니다(ADR-107). 목록은 no-restart-paths 한 곳에 있습니다.
+runtime=$(git diff --no-renames --name-only "$old" "$new" \
+  | grep -vE -f <(grep -vE '^(#|$)' deploy/vm/no-restart-paths) || true)
+if [ -n "$runtime" ]; then
+  $C restart api
+else
+  echo "앱이 읽는 파일이 바뀌지 않아 API를 재시작하지 않습니다"
+fi
 if changed deploy/vm/Caddyfile; then
   $C restart caddy
 fi

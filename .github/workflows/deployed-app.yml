@@ -35,6 +35,10 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          # The API is not restarted when a merge changes only files it does not read (ADR-107), so
+          # its module commit can be a few commits behind. The check diffs the two with git.
+          fetch-depth: 100
       - name: Check the deployed API and screens
         run: python3 scripts/visit_deployed_app.py --expect-commit "${{ github.sha }}"
       - name: Check the VM's weekly ingest

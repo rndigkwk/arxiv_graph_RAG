@@ -178,3 +178,4 @@
 | [ADR-104](ADR-104-weekly-ingest-runs-on-the-vm.md) | 주간 수집은 VM에서 돌고, 참고문헌은 S2에서 받는다 — 밖 논문은 대기열에 쌓아 누적 3회부터 | 채택 |
 | [ADR-105](ADR-105-recent-uses-the-period-the-question-names.md) | "최근"은 질문이 적은 기간을 쓴다 — 적지 않으면 지금처럼 12개월 | 채택 |
 | [ADR-106](ADR-106-alert-when-the-vm-ingest-stops.md) | VM 주간 수집이 멈추면 배포 점검이 알린다 — 상태는 `/api/health`가 파일에서 읽는다 | 채택 |
+| [ADR-107](ADR-107-restart-the-api-only-when-it-reads-the-change.md) | 앱이 읽는 파일이 바뀐 배포만 API를 재시작한다 — 재시작이 진행 중인 답을 끊는다 | 채택 |
