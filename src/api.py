@@ -8,7 +8,8 @@ Streamlit이 `on_answer`로 부분 답변을 그리던 자리를 SSE의 `partial
 **돈이 드는 길에는 문턱을 둡니다.** 질문(`/api/ask`)과 번역(`/api/translate`)은 OpenAI를 부릅니다.
 Streamlit 화면은 사람이 버튼을 눌러야 하지만, API는 스크립트 한 줄로 수천 번 부를 수 있습니다.
 그래서 IP마다 분당·하루 상한과, 모든 IP를 합친 하루 상한을 둡니다(`Limiter`). 값은 환경변수로
-바꿉니다. 나머지 길은 그래프만 읽습니다.
+바꿉니다. 질문과 번역은 상한을 따로 셉니다 - 화면이 한국어 질문의 답을 바로 번역하므로, 같이 세면
+질문 상한이 절반이 됩니다(ADR-108). 나머지 길은 그래프만 읽습니다.
 
 **기다리지 않는 것.** `chatbot`은 처음 불릴 때 불러옵니다(드라이버·모델 객체를 만들고 `.env`를
 읽습니다). 테스트는 `create_app(backend=...)`로 가짜를 넣어 접속 없이 돕니다.
@@ -124,11 +125,11 @@ class Limiter:
         self._total: deque[float] = deque()
 
     @classmethod
-    def from_env(cls) -> Limiter:
+    def from_env(cls, prefix: str = "API_ASK") -> Limiter:
         return cls(
-            env_int("API_ASK_PER_MINUTE", 3),
-            env_int("API_ASK_PER_DAY", 30),
-            env_int("API_ASK_TOTAL_PER_DAY", 300),
+            env_int(f"{prefix}_PER_MINUTE", 3),
+            env_int(f"{prefix}_PER_DAY", 30),
+            env_int(f"{prefix}_TOTAL_PER_DAY", 300),
         )
 
     def check(self, key: str) -> int | None:
@@ -197,7 +198,12 @@ def load_chatbot() -> Any:
     return chatbot
 
 
-def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool = True) -> FastAPI:
+def create_app(
+    backend: Any = None,
+    limiter: Limiter | None = None,
+    warm: bool = True,
+    translate_limiter: Limiter | None = None,
+) -> FastAPI:
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
         if warm:
@@ -220,6 +226,8 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
             allow_headers=["content-type"],
         )
     limiter = limiter or Limiter.from_env()
+    # 번역은 질문보다 훨씬 싸고(짧은 입력 한 번), 화면이 한국어 질문마다 한 번 부릅니다(ADR-108).
+    translate_limiter = translate_limiter or Limiter.from_env("API_TRANSLATE")
     state: dict[str, Any] = {"backend": backend}
     lock = threading.Lock()
 
@@ -246,8 +254,8 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
                 state["warmup"] = warmup.Warmup(warm_everything)
             return state["warmup"]
 
-    def guard(request: Request) -> None:
-        wait = limiter.check(client_ip(request))
+    def guard(request: Request, which: Limiter | None = None) -> None:
+        wait = (which or limiter).check(client_ip(request))
         if wait is not None:
             raise HTTPException(
                 429,
@@ -320,7 +328,7 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
 
     @app.post("/api/translate")
     def translate(body: TranslateBody, request: Request) -> dict[str, str]:
-        guard(request)
+        guard(request, translate_limiter)
         return {"text": chatbot().translate_to_korean(body.text)}
 
     @app.get("/api/papers/{arxiv_id}")

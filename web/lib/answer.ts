@@ -93,3 +93,43 @@ export function stageRows(answer: Answer): StageRow[] {
 
 /** 재시도는 느린 답의 흔한 이유입니다. 숨기면 합계만 보고 모델을 의심하게 됩니다. */
 export const attemptsOf = (answer: Answer) => answer.graph_trace?.attempts ?? 1;
+
+// 질문 화면은 답을 먼저 보여 줍니다(ADR-108). 아래는 그 화면이 쓰는 계산입니다.
+
+/** 한국어 질문인가. 한국어로 물은 사람에게는 답을 바로 번역해 보여 줍니다(영어 질문은 번역하지 않습니다). */
+export const hasHangul = (text: string) => /[ㄱ-ㆎ가-힣]/.test(text);
+
+/** `/api/translate`가 받는 최대 글자 수(`src/api.py`의 MAX_TRANSLATE_CHARS). 넘으면 부르지 않습니다. */
+export const MAX_TRANSLATE_CHARS = 8000;
+
+/** 처음에 보여 줄 근거 논문 수. 나머지는 "모두 보기"로 폅니다. */
+export const EVIDENCE_PREVIEW = 5;
+
+/**
+ * 조회가 `LIMIT`에서 끊겼으면 그 수. 돌아온 행이 상한과 같으면 더 있을 수 있습니다 - 화면이 그 말을
+ * 하지 않으면 25편이 전부인 것처럼 읽힙니다.
+ */
+export function rowCap(answer: Answer): number | null {
+  const limits = answer.cyphers
+    .map((c) => /\bLIMIT\s+(\d+)\s*;?\s*$/i.exec(c.trim())?.[1])
+    .filter((n): n is string => !!n)
+    .map(Number);
+  if (!limits.length) return null;
+  const cap = Math.max(...limits);
+  return answer.rows.length >= cap ? cap : null;
+}
+
+/** "어떻게 찾았나"를 접은 채로 보여 줄 한 줄. */
+export function howLine(answer: Answer, ms?: number): string {
+  const graph = answer.cyphers.length ? `그래프 조회 ${answer.cyphers.length}번` : "의미 검색으로 찾음";
+  const turns = answer.generate_trace?.model_turns;
+  return [usedPath(answer), graph, turns ? `모델 호출 ${turns}번` : "", ms ? seconds(ms) : ""].filter(Boolean).join(" · ");
+}
+
+/** 근거 카드 아래 한 줄: 첫 저자, 분류, arXiv ID. 그래프에서 읽은 것만 씁니다. */
+export function paperLine(paper: { arxiv_id: string; authors?: string[]; author_count?: number; primary_category?: string } | undefined, id: string): string {
+  if (!paper) return id;
+  const first = paper.authors?.[0];
+  const more = (paper.author_count ?? paper.authors?.length ?? 0) > 1 ? " 외" : "";
+  return [first ? first + more : "", paper.primary_category ?? "", id].filter(Boolean).join(" · ");
+}

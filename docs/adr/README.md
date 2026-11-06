@@ -179,3 +179,4 @@
 | [ADR-105](ADR-105-recent-uses-the-period-the-question-names.md) | "최근"은 질문이 적은 기간을 쓴다 — 적지 않으면 지금처럼 12개월 | 채택 |
 | [ADR-106](ADR-106-alert-when-the-vm-ingest-stops.md) | VM 주간 수집이 멈추면 배포 점검이 알린다 — 상태는 `/api/health`가 파일에서 읽는다 | 채택 |
 | [ADR-107](ADR-107-restart-the-api-only-when-it-reads-the-change.md) | 앱이 읽는 파일이 바뀐 배포만 API를 재시작한다 — 재시작이 진행 중인 답을 끊는다 | 채택 |
+| [ADR-108](ADR-108-the-question-screen-shows-the-answer-first.md) | 질문 화면은 답을 먼저 보여 준다 — 한국어 질문은 답이 오자마자 번역한다 | 채택 |

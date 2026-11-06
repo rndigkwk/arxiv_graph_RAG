@@ -14,7 +14,7 @@ async function load<T>(path: string): Promise<T | null> {
 }
 
 export async function SiteHeader() {
-  const [stats, health] = await Promise.all([load<Stats>("/api/stats"), load<Health>("/api/health")]);
+  const stats = await load<Stats>("/api/stats");
   return (
     <header className="site-header">
       <a href="/" className="brand">
@@ -32,12 +32,22 @@ export async function SiteHeader() {
       <div className="stats mono">
         {stats && <span>논문 {stats.counts.papers.toLocaleString("ko-KR")}편</span>}
         {stats && <span>인용 {stats.counts.references.toLocaleString("ko-KR")}</span>}
-        {health?.commit && (
-          <a href={`https://github.com/rndigkwk/arxiv_graph_RAG/commit/${health.commit}`} title="답을 내는 API의 커밋">
-            배포 {health.commit}
-          </a>
-        )}
       </div>
     </header>
+  );
+}
+
+// 배포 커밋은 개발자가 보는 값이라 머리줄이 아니라 맨 아래에 작게 둡니다(ADR-108).
+export async function SiteFooter() {
+  const health = await load<Health>("/api/health");
+  return (
+    <footer className="site-footer">
+      <span>답은 그래프에 있는 논문만 근거로 씁니다.</span>
+      {health?.commit && (
+        <a href={`https://github.com/rndigkwk/arxiv_graph_RAG/commit/${health.commit}`} title="답을 내는 API의 커밋">
+          배포 {health.commit}
+        </a>
+      )}
+    </footer>
   );
 }
