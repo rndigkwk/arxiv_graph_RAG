@@ -177,3 +177,4 @@
 | [ADR-103](ADR-103-the-app-checks-recent-itself.md) | "최근" 조건은 앱이 발표일로 직접 확인한다 — 판정이 날짜 낱말만 적었을 때만 | 채택 |
 | [ADR-104](ADR-104-weekly-ingest-runs-on-the-vm.md) | 주간 수집은 VM에서 돌고, 참고문헌은 S2에서 받는다 — 밖 논문은 대기열에 쌓아 누적 3회부터 | 채택 |
 | [ADR-105](ADR-105-recent-uses-the-period-the-question-names.md) | "최근"은 질문이 적은 기간을 쓴다 — 적지 않으면 지금처럼 12개월 | 채택 |
+| [ADR-106](ADR-106-alert-when-the-vm-ingest-stops.md) | VM 주간 수집이 멈추면 배포 점검이 알린다 — 상태는 `/api/health`가 파일에서 읽는다 | 채택 |

@@ -67,7 +67,27 @@ def test_deploy_check_looks_at_the_vm():
     assert visit_deployed_app.API_URL == "https://8-230-25-138.sslip.io"
     workflow = yaml.safe_load(Path(".github/workflows/deployed-app.yml").read_text(
         encoding="utf-8"))
-    step = workflow["jobs"]["check"]["steps"][-1]["run"]
-    assert "visit_deployed_app.py --expect-commit" in step
-    assert "streamlit" not in step
+    runs = [step.get("run", "") for step in workflow["jobs"]["check"]["steps"]]
+    deploy = next(run for run in runs if "--expect-commit" in run)
+    assert "visit_deployed_app.py --expect-commit" in deploy
+    assert "streamlit" not in deploy
+
+
+def test_deploy_check_also_reads_the_weekly_ingest():
+    """VM 타이머의 수집은 GitHub이 못 봅니다. 배포 점검의 둘째 단계가 읽습니다(ADR-106)."""
+    workflow = yaml.safe_load(Path(".github/workflows/deployed-app.yml").read_text(
+        encoding="utf-8"))
+    steps = workflow["jobs"]["check"]["steps"]
+    ingest = next(step for step in steps if "--ingest" in step.get("run", ""))
+    # 배포 점검이 실패해도 돕니다. 한 알림에 둘 다 적히게.
+    assert ingest["if"] == "${{ !cancelled() }}"
+    assert workflow[True]["schedule"]  # YAML은 `on`을 True로 읽습니다
+
+
+def test_ingest_sh_writes_the_status_even_when_the_run_fails():
+    script = Path("deploy/vm/ingest.sh").read_text(encoding="utf-8")
+    # 수집이 실패해도 set -e로 끝나지 않고 종료 코드를 상태 파일에 적습니다.
+    assert "set +e" in script and "ingest_exit=$?" in script
+    assert "pipeline/state/last-ingest.json" in script
+    assert script.rstrip().endswith('[ "$ingest_exit" -eq 0 ] && [ "$backfill_exit" = 0 ]')
 

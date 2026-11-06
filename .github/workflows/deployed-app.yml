@@ -9,6 +9,9 @@ name: Check deployed app
 # commit (an old module after a merge is what ADR-072 was about). It then reads /api/stats to see
 # the graph answer, and fetches the Vercel page.
 #
+# A second step reads the weekly ingest the VM's timer runs (ADR-106): GitHub cannot see that run,
+# so a failed or missing ingest would otherwise leave the graph quietly behind.
+#
 # No model calls. A failure on main opens an issue through alert-on-failure.yml.
 # The Streamlit Cloud backup app can still be checked by hand with --streamlit (see the script).
 on:
@@ -34,3 +37,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Check the deployed API and screens
         run: python3 scripts/visit_deployed_app.py --expect-commit "${{ github.sha }}"
+      - name: Check the VM's weekly ingest
+        # Runs even when the deploy check failed, so one alert names both.
+        if: ${{ !cancelled() }}
+        run: python3 scripts/visit_deployed_app.py --ingest

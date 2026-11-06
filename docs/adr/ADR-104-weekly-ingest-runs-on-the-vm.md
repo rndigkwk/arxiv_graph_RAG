@@ -22,6 +22,7 @@
 **실행 위치.** VM에서 주 1회 돕니다(`deploy/vm/ingest.sh`, 월요일 03:19 UTC의 `arxiv-ingest.timer`). api 이미지로
 컨테이너를 한 번 띄우고, compose 네트워크로 DB에 붙습니다. DB 포트를 열지 않고, GitHub에 DB 자격도 주지 않습니다.
 키는 VM의 `.env`에 이미 있던 `OPENAI_API_KEY`·`NEO4J_PASSWORD`만 씁니다.
+(11-06: 실패하거나 돌지 않으면 배포 점검이 알림을 엽니다 - [ADR-106](ADR-106-alert-when-the-vm-ingest-stops.md).)
 
 **참고문헌.** S2 `/paper/batch`에서 받습니다. 키 없이 받고, 주 1,000편이면 요청 2번입니다. 받은 참고문헌은 셋으로
 나눕니다(`pipeline/references.py`).

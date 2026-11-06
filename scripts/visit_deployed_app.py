@@ -1,6 +1,7 @@
 """배포가 깨어 있고 **새 코드를 돌리는지** 확인합니다.
 
     python scripts/visit_deployed_app.py --expect-commit <sha>      # VM의 API와 Vercel 화면
+    python scripts/visit_deployed_app.py --ingest                   # VM의 주간 수집(ADR-106)
     uvx --with playwright==1.64.1 python scripts/visit_deployed_app.py --streamlit [URL]
     # Streamlit 판(백업 앱). 처음 한 번: uvx --with playwright==1.64.1 playwright install chromium
 
@@ -179,6 +180,45 @@ def wait_ready(page, started: float) -> str:
     raise SystemExit(f"실패: {READY_TIMEOUT_S}초 안에 첫 화면이 뜨지 않았습니다")
 
 
+INGEST_PROBLEMS = {
+    "no_state": "수집 상태 파일이 없습니다(pipeline/state/ingest.json)",
+    "never_loaded": "적재한 기록이 없습니다",
+    "load_stale": "마지막 적재가 8일보다 오래됐습니다 - 타이머가 돌았는지 보세요",
+    "no_watermark": "워터마크를 읽지 못했습니다",
+    "watermark_behind": "워터마크가 12일보다 뒤입니다 - 보고서의 truncated_on을 보세요",
+    "ingest_failed": "마지막 수집이 실패로 끝났습니다",
+    "backfill_failed": "마지막 발표일 채우기가 실패로 끝났습니다",
+    "not_idempotent": "다시 적재했을 때 수가 늘었습니다",
+}
+
+
+def ingest_problem(health: dict) -> str | None:
+    """`/api/health`의 `ingest`(src.ingest_status)를 읽습니다. 문제가 없으면 `None`입니다."""
+    status = health.get("ingest")
+    if not isinstance(status, dict):
+        return "API가 수집 상태를 내지 않습니다 - 이 점검보다 오래된 코드입니다"
+    if status.get("status") == "ok":
+        return None
+    problems = status.get("problems") or ["unknown"]
+    reasons = [INGEST_PROBLEMS.get(name, name) for name in problems]
+    return ("VM 주간 수집에 문제가 있습니다: " + "; ".join(reasons)
+            + ". `journalctl -u arxiv-ingest`와 pipeline/state/reports/를 보세요")
+
+
+def check_ingest(base: str) -> int:
+    """VM의 주간 수집이 제때 끝났는지 봅니다(ADR-106). 파일만 읽는 길이라 0원입니다."""
+    health = read_json(base + "/api/health")
+    problem = ingest_problem(health)
+    if problem:
+        raise SystemExit(f"실패: {problem}")
+    status = health["ingest"]
+    report = status.get("report") or {}
+    summary(f"- 수집: 마지막 적재 {status.get('last_load_at')} · 워터마크 {status.get('watermark')}"
+            + (f" · {report.get('records')}편" if report else "")
+            + (f" · 잘린 날 {report['truncated_on']}" if report.get("truncated_on") else ""))
+    return 0
+
+
 def summary(line: str) -> None:
     print(line)
     path = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -226,10 +266,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="배포가 깨어 있고 새 코드를 돌리는지 봅니다.")
     parser.add_argument("--streamlit", nargs="?", const=APP_URL, metavar="URL",
                         help="API 대신 Streamlit 판을 브라우저로 엽니다(기본은 백업 앱)")
+    parser.add_argument("--ingest", action="store_true",
+                        help="VM의 주간 수집이 제때 끝났는지만 봅니다(ADR-106)")
     parser.add_argument("--expect-commit", help="배포돼 있어야 할 커밋(워크플로가 넘깁니다)")
     args = parser.parse_args()
     if args.streamlit:
         return check(args.streamlit, args.expect_commit)
+    if args.ingest:
+        return check_ingest(API_URL)
     return check_api(API_URL, WEB_URL, args.expect_commit)
 
 
