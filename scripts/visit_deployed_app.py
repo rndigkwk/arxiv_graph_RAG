@@ -29,8 +29,10 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import subprocess
 import sys
 import time
+from pathlib import Path
 
 # VM은 API와 DB만 돌립니다(ADR-083). Streamlit 판은 Streamlit Cloud의 백업 앱 하나만 남았습니다.
 API_URL = "https://8-230-25-138.sslip.io"
@@ -96,6 +98,35 @@ def api_stamp(health: dict) -> dict[str, str | None]:
             "module": health.get("module_commit") or (OLDER if commit else None)}
 
 
+NO_RESTART = Path("deploy/vm/no-restart-paths")
+
+
+def restart_free(old: str, new: str, root: Path = Path(".")) -> bool:
+    """`old`에서 `new`까지 앱이 읽지 않는 파일만 바뀌었는지(ADR-107).
+
+    VM은 그런 배포에서 API를 재시작하지 않아, 검색 모듈의 커밋이 옛것으로 남습니다. 그것은 옛 코드가
+    아닙니다. git이 두 커밋을 모르면(얕은 체크아웃) False - 옛 모듈로 셉니다.
+    """
+    try:
+        changed = subprocess.run(
+            ["git", "diff", "--no-renames", "--name-only", old, new],
+            cwd=root, capture_output=True, text=True, check=True,
+        ).stdout.split()
+        lines = (root / NO_RESTART).read_text(encoding="utf-8").splitlines()
+    except (OSError, subprocess.CalledProcessError):
+        return False
+    patterns = [re.compile(line) for line in lines if line and not line.startswith("#")]
+    return all(any(pattern.search(path) for pattern in patterns) for path in changed)
+
+
+def settle(stamp: dict[str, str | None]) -> tuple[dict[str, str | None], str]:
+    """모듈이 옛 커밋이어도 그 사이가 재시작 없는 배포뿐이면 새 코드로 봅니다(ADR-107)."""
+    app, module = stamp["app"], stamp["module"]
+    if app and module and module not in (app, OLDER) and restart_free(module, app):
+        return {**stamp, "module": app}, f" (모듈 {module} - 그 뒤로 앱이 읽는 파일은 그대로)"
+    return stamp, ""
+
+
 def read_json(url: str) -> dict:
     import json
     from urllib.request import Request, urlopen
@@ -111,10 +142,11 @@ def check_api(base: str, web: str, expected: str | None) -> int:
     started = time.perf_counter()
     while True:
         try:
-            stamp = api_stamp(read_json(base + "/api/health"))
+            stamp, note = settle(api_stamp(read_json(base + "/api/health")))
             problem = verdict(expected, stamp)
         except OSError as exc:  # 재시작 중이면 잠깐 502입니다
             stamp, problem = {"found": False, "app": None, "module": None}, f"API 응답 없음({exc})"
+            note = ""
         waiting = problem and (stamp["app"] is None or still_deploying(expected, stamp))
         if not waiting or time.perf_counter() - started > COMMIT_WAIT_S:
             break
@@ -129,8 +161,8 @@ def check_api(base: str, web: str, expected: str | None) -> int:
     if WEB_READY_TEXT not in page:
         raise SystemExit(f"실패: 화면({web})에 {WEB_READY_TEXT!r}가 없습니다")
     waited = time.perf_counter() - started
-    summary(f"- API {stamp['app']} · 모듈 {stamp['module']} · 논문 {papers:,}편 · 화면 응답 · "
-            f"{waited:.0f}초" + (f" · 기대 {expected[:7]}" if expected else ""))
+    summary(f"- API {stamp['app']} · 모듈 {stamp['module']}{note} · 논문 {papers:,}편 · "
+            f"화면 응답 · {waited:.0f}초" + (f" · 기대 {expected[:7]}" if expected else ""))
     return 0
 
 

@@ -1,0 +1,15 @@
+# 이 정규식(grep -E) 중 하나에 맞는 파일만 바뀐 배포는 API를 재시작하지 않습니다(ADR-107).
+# 재시작은 진행 중인 답을 끊습니다. API 프로세스가 임포트하거나 읽는 파일은 여기에 넣지 않습니다 -
+# src/, pipeline/, models/, baselines/, reports/(VM 측정 보고서 reports/vm_* 빼고), 의존성 파일,
+# compose.yml, Caddyfile이 그렇습니다.
+# deploy/vm/deploy.sh와 scripts/visit_deployed_app.py가 이 파일을 함께 읽습니다. 빈 줄은 두지 않습니다.
+^docs/
+^tests/
+^web/
+^notebooks/
+^scripts/
+^evals/
+^\.github/
+\.md$
+^reports/vm_
+^deploy/vm/(ingest|install_ingest_timer|setup)\.sh$
