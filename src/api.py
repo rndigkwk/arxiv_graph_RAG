@@ -35,7 +35,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from src import abstain, citations, family_board, quality_board, release, routing, warmup
+from src import (
+    abstain,
+    citations,
+    family_board,
+    ingest_status,
+    quality_board,
+    release,
+    routing,
+    warmup,
+)
 
 logger = logging.getLogger("arxiv_graph_rag.api")
 
@@ -253,6 +262,8 @@ def create_app(backend: Any = None, limiter: Limiter | None = None, warm: bool =
             "commit": release.commit(),
             "module_commit": getattr(state["backend"], "LOADED_COMMIT", None),
             "citation_graph": warmup_task().state(),
+            # VM의 주간 수집 상태입니다. 배포 점검이 8시간마다 읽습니다(ADR-106).
+            "ingest": ingest_status.summary(),
         }
 
     @app.get("/api/stats")

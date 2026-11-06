@@ -275,6 +275,8 @@ def test_rank_rejects_unknown_orders():
 def test_health_reports_commits_without_loading_the_model():
     data = client().get("/api/health").json()
     assert data["status"] == "ok" and data["module_commit"] == "abc1234"
+    # VM의 주간 수집 상태도 함께 냅니다(ADR-106). 그래프에 묻지 않고 파일만 읽습니다.
+    assert data["ingest"]["status"] in {"ok", "problem", "unknown"}
 
 
 def test_quality_reads_the_committed_baseline():
