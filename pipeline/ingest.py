@@ -592,7 +592,8 @@ def main() -> int:
         frozenset(code.strip() for code in args.categories.split(",") if code.strip())
         or None
     )
-    harvested = oai.harvest(
+    # 하루씩 받습니다. OAI의 새 끝점은 긴 창에 응답하지 않습니다(ADR-104).
+    harvested = oai.harvest_by_day(
         start, end, max_pages=args.max_pages, categories=categories
     )
 
@@ -606,6 +607,9 @@ def main() -> int:
             "skipped": harvested.skipped,
             "last_datestamp": harvested.last_datestamp,
             "truncated_by_page_limit": harvested.truncated_by_page_limit,
+            "days": harvested.days,
+            "stopped_on": harvested.stopped_on,
+            "stop_error": harvested.stop_error,
         },
         "loaded": False,
     }

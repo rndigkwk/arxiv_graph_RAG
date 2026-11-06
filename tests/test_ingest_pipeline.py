@@ -453,3 +453,61 @@ def test_the_capacity_guard_still_counts_rows_on_purpose():
 
     assert "new_authored=len(authored)" in source.replace(" ", "")
     assert "new_references=len(references)" in source.replace(" ", "")
+
+
+# --- 하루씩 받기 (ADR-104) ----------------------------------------------------------
+
+
+def _day_harvest(fail_on=()):
+    calls = []
+
+    def harvest_one(start, end, *, sleep, max_pages, **kwargs):
+        calls.append((start, end, max_pages, kwargs))
+        if start in fail_on:
+            raise TimeoutError("The read operation timed out")
+        result = oai.HarvestResult(pages=1, last_datestamp=start)
+        result.records.append({"arxiv_id": start, "oai_datestamp": start})
+        return result
+
+    return harvest_one, calls
+
+
+def test_the_window_is_harvested_one_day_at_a_time():
+    harvest_one, calls = _day_harvest()
+    pauses = []
+    result = oai.harvest_by_day("2026-10-30", "2026-11-01", harvest_one=harvest_one,
+                                sleep=pauses.append, max_pages=10, categories={"cs.AI"})
+
+    assert [(start, end) for start, end, *_ in calls] == [
+        ("2026-10-30", "2026-10-30"), ("2026-10-31", "2026-10-31"), ("2026-11-01", "2026-11-01")]
+    assert [max_pages for _, _, max_pages, _ in calls] == [10, 9, 8]  # 페이지 상한은 전체에 겁니다
+    assert calls[0][3] == {"categories": {"cs.AI"}}
+    assert result.days == 3 and result.pages == 3 and len(result.records) == 3
+    assert result.last_datestamp == "2026-11-01"
+    assert len(pauses) == 2
+
+
+def test_a_failed_day_keeps_what_came_before_and_the_watermark_stops_there():
+    harvest_one, _ = _day_harvest(fail_on={"2026-10-31"})
+    result = oai.harvest_by_day("2026-10-30", "2026-11-01", harvest_one=harvest_one,
+                                sleep=lambda _: None)
+
+    assert [r["arxiv_id"] for r in result.records] == ["2026-10-30"]
+    assert result.last_datestamp == "2026-10-30"  # 다음 실행은 10-31부터
+    assert result.stopped_on == "2026-10-31"
+    assert "TimeoutError" in result.stop_error
+
+
+def test_failing_on_the_first_day_is_an_error_not_an_empty_success():
+    harvest_one, _ = _day_harvest(fail_on={"2026-10-30"})
+    with pytest.raises(TimeoutError):
+        oai.harvest_by_day("2026-10-30", "2026-11-01", harvest_one=harvest_one,
+                           sleep=lambda _: None)
+
+
+def test_the_page_limit_stops_the_days_too():
+    harvest_one, calls = _day_harvest()
+    result = oai.harvest_by_day("2026-10-30", "2026-11-05", harvest_one=harvest_one,
+                                sleep=lambda _: None, max_pages=2)
+
+    assert len(calls) == 2 and result.truncated_by_page_limit

@@ -22,6 +22,7 @@ import urllib.request
 import xml.etree.ElementTree as ElementTree
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
+from datetime import date, timedelta
 
 OAI_URL = "https://export.arxiv.org/oai2"
 METADATA_PREFIX = "arXiv"
@@ -136,6 +137,10 @@ class HarvestResult:
     skipped: int = 0
     last_datestamp: str = ""
     truncated_by_page_limit: bool = False
+    # 하루씩 받다가 멈춘 날과 이유입니다(`harvest_by_day`). 그 앞날까지 받은 것은 남습니다.
+    stopped_on: str = ""
+    stop_error: str = ""
+    days: int = 0
 
 
 def harvest(
@@ -215,3 +220,53 @@ def pages(
         request = {"verb": "ListRecords", "resumptionToken": token}
         sleep(REQUEST_INTERVAL_SECONDS)
 
+
+
+def harvest_by_day(
+    start: str,
+    end: str,
+    *,
+    harvest_one: Callable[..., HarvestResult] = harvest,
+    sleep: Callable[[float], None] = time.sleep,
+    max_pages: int = 200,
+    **kwargs: object,
+) -> HarvestResult:
+    """창을 하루씩 끊어 받습니다(ADR-104).
+
+    OAI의 새 끝점(oaipmh.arxiv.org)은 긴 창에 응답하지 않습니다. 2026-11-05에 VM에서 재 보니 하루
+    창은 0.3초에 첫 페이지가 왔고, 13일 창은 100초 동안 아무것도 오지 않았습니다. 첫 VM 시험 실행이
+    이것으로 읽기 시간 초과에 걸려 멈췄습니다.
+
+    **어떤 날이 실패하면 그 앞날까지 받은 것을 돌려줍니다.** 워터마크는 받은 레코드의 가장 늦은
+    날짜도장이므로, 다음 실행이 실패한 날부터 다시 받습니다. 첫날부터 실패하면 예외를 그대로
+    올립니다 - 받은 것이 없는데 성공처럼 끝내지 않습니다.
+    """
+    first, last = date.fromisoformat(start), date.fromisoformat(end)
+    merged = HarvestResult()
+    day = first
+    while day <= last:
+        if merged.pages >= max_pages:
+            merged.truncated_by_page_limit = True
+            break
+        if merged.days:
+            sleep(REQUEST_INTERVAL_SECONDS)
+        stamp = day.isoformat()
+        try:
+            one = harvest_one(stamp, stamp, sleep=sleep, max_pages=max_pages - merged.pages,
+                              **kwargs)
+        except Exception as exc:
+            if not merged.days:
+                raise
+            merged.stopped_on = stamp
+            merged.stop_error = f"{type(exc).__name__}: {str(exc)[:200]}"
+            break
+        merged.days += 1
+        merged.records.extend(one.records)
+        merged.pages += one.pages
+        merged.deleted += one.deleted
+        merged.skipped += one.skipped
+        merged.last_datestamp = max(merged.last_datestamp, one.last_datestamp)
+        if one.truncated_by_page_limit:
+            merged.truncated_by_page_limit = True
+        day += timedelta(days=1)
+    return merged
