@@ -59,7 +59,7 @@
   ([ADR-105](ADR-105-recent-uses-the-period-the-question-names.md)). 그동안은 영어 원문과
   "한국어로 옮기는 중…"을 보여 줍니다. 답 지연 측정(`measure_vm_answer_latency.py`)은 `/api/ask`만 재므로
   이 2초는 들어가지 않습니다.
-  **2026-11-07에 쟀습니다**(`--examples`, 화면의 한국어 예시 7문항, `reports/vm_answer_latency_examples.json`).
+  **2026-11-07에 쟀습니다**(`--examples`, 화면의 한국어 예시 7문항, `reports/vm_answer_latency_examples_before_adr111.json`).
   번역은 p50 2.52초였고, 25행 표가 든 답은 7초까지 걸렸습니다. 한국어 답이 뜨기까지(받는 쪽 답 + 번역)
   p50 12.12초, p90 22.46초, 10초 안은 1/7입니다. 서버만 보면 p50 10.01초로, 영어 15문항(6.09초)보다 깁니다 -
   질문을 영어로 옮기는 노드가 p50 1.69초를 더합니다. 목표 10초는 영어 질문에서만 지킵니다.
