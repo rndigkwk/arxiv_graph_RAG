@@ -6,7 +6,7 @@
 ## 맥락
 
 [ADR-108](ADR-108-the-question-screen-shows-the-answer-first.md)의 화면은 한국어 질문에 대한 영어 답을
-`/api/translate`로 옮깁니다. 2026-11-07 측정(`reports/vm_answer_latency_examples.json`)에서 번역은 p50
+`/api/translate`로 옮깁니다. 2026-11-07 측정(`reports/vm_answer_latency_examples_before_adr111.json`)에서 번역은 p50
 2.52초였지만, "Attention Is All You Need를 인용한 논문을 알려 줘"처럼 25행 표가 든 답은 7초까지 걸렸습니다.
 한국어 답이 뜨기까지 p50 12.12초 가운데 번역이 가장 큰 단일 몫이었습니다.
 
@@ -49,6 +49,10 @@ VM에서 화면 예시 3문항의 답을 받고(2026-11-07), 같은 답을 로�
 **로컬에서 잰 수치입니다.** VM은 같은 OpenAI 모델을 부르지만 네트워크가 다릅니다. 머지 뒤
 `measure_vm_answer_latency.py --examples`로 한국어 답이 뜨기까지를 다시 재서
 [EVALUATION.md](../EVALUATION.md)에 적습니다.
+
+**머지 뒤 VM에서 쟀습니다**(2026-11-07, 81a39c9, `reports/vm_answer_latency_examples.json`). 번역 p50은
+2.52초 → 2.30초, 표가 긴 두 답(예시 4·5)은 6.99·7.14초 → 2.66·2.08초입니다. 한국어 답이 뜨기까지 p50은
+12.12초 → 11.24초입니다. p90(22.67초)은 예시 4의 서버 답이 이번에 19.91초로 길어진 탓이라 번역과는 상관없습니다.
 
 ## 고르지 않은 것
 
