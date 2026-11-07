@@ -331,6 +331,39 @@ def create_app(
         guard(request, translate_limiter)
         return {"text": chatbot().translate_to_korean(body.text)}
 
+    @app.post("/api/translate/stream")
+    async def translate_stream(body: TranslateBody, request: Request) -> StreamingResponse:
+        """번역을 흘려 보냅니다(ADR-114). 상한은 `/api/translate`와 같은 것을 셉니다."""
+        guard(request, translate_limiter)
+        bot = chatbot()
+        loop = asyncio.get_running_loop()
+        queue: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
+
+        def put(kind: str, data: Any) -> None:
+            loop.call_soon_threadsafe(queue.put_nowait, (kind, data))
+
+        def work() -> None:
+            try:
+                text = bot.translate_to_korean(
+                    body.text, lambda so_far: put("partial", {"text": so_far}))
+                put("final", {"text": text})
+            except Exception as exc:  # noqa: BLE001 - 화면에는 사유만, 로그에는 전부
+                logger.exception("translate_failed")
+                put("error", {"message": "번역하지 못했습니다.", "type": type(exc).__name__})
+
+        loop.run_in_executor(None, work)
+
+        async def events():
+            while True:
+                kind, data = await queue.get()
+                yield sse(kind, data)
+                if kind != "partial":
+                    return
+
+        return StreamingResponse(
+            events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
+        )
+
     @app.get("/api/papers/{arxiv_id}")
     def paper(arxiv_id: str) -> dict[str, Any]:
         bot = chatbot()

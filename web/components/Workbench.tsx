@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { type Abstain, type Answer, type Subgraph, type SubgraphPaper, ask, getSubgraph, translate } from "@/lib/api";
+import { type Abstain, type Answer, type Subgraph, type SubgraphPaper, ask, getSubgraph, translateStream } from "@/lib/api";
 import {
   EVIDENCE_PREVIEW,
   MAX_TRANSLATE_CHARS,
@@ -72,11 +72,20 @@ export function Workbench({ initial = "" }: { initial?: string }) {
       return;
     }
     update(id, { translation: "pending" });
+    // 번역을 흘려 받아 첫 조각부터 한국어로 보여 줍니다(ADR-114). 한국어로 넘기는 것은 첫 조각
+    // 한 번뿐입니다 - 받는 동안 원문을 누른 사람을 다시 끌어오지 않습니다.
+    let shown = false;
     try {
-      update(id, { korean: (await translate(text)).text, translation: "done", lang: "ko" });
+      const korean = await translateStream(text, (partial) => {
+        if (!partial.trim()) return;
+        update(id, shown ? { korean: partial } : { korean: partial, lang: "ko" });
+        shown = true;
+      });
+      update(id, shown ? { korean, translation: "done" } : { korean, translation: "done", lang: "ko" });
     } catch {
       // 상한이거나 연결 문제입니다. 영어 답은 그대로 둡니다.
-      update(id, { translation: "failed" });
+      // 반쯤 옮긴 글은 지웁니다. 끊긴 번역을 다 옮긴 글처럼 보여 주지 않습니다.
+      update(id, { translation: "failed", korean: undefined, lang: "en" });
     }
   }
 
@@ -233,14 +242,17 @@ function TurnView({ turn, onKorean, onLang }: { turn: Turn; onKorean: () => void
         {a && (
           <div className="lang-row">
             {turn.korean ? (
-              <div role="group" aria-label="답 언어" className="segmented">
-                <button type="button" aria-pressed={turn.lang === "ko"} onClick={() => onLang("ko")}>
-                  한국어
-                </button>
-                <button type="button" aria-pressed={turn.lang === "en"} onClick={() => onLang("en")}>
-                  원문 (English)
-                </button>
-              </div>
+              <>
+                <div role="group" aria-label="답 언어" className="segmented">
+                  <button type="button" aria-pressed={turn.lang === "ko"} onClick={() => onLang("ko")}>
+                    한국어
+                  </button>
+                  <button type="button" aria-pressed={turn.lang === "en"} onClick={() => onLang("en")}>
+                    원문 (English)
+                  </button>
+                </div>
+                {turn.translation === "pending" && <span className="hint">옮기는 중…</span>}
+              </>
             ) : turn.translation === "pending" ? (
               <span className="hint">한국어로 옮기는 중… 아래는 영어 원문입니다.</span>
             ) : turn.translation === "too-long" ? (
