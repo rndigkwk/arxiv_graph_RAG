@@ -54,3 +54,10 @@ def test_only_the_judge_output_is_capped(chatbot):
     assert chatbot.judge_llm.max_tokens == chatbot.JUDGE_MAX_TOKENS
     assert chatbot.llm.max_tokens is None
     assert chatbot.agent_llm.max_tokens is None
+
+
+def test_translation_turns_reasoning_off_on_the_same_model(chatbot):
+    """번역도 추론을 끕니다(ADR-112). 더 작은 모델은 용어를 잃어 고르지 않았습니다."""
+    assert chatbot.TRANSLATE_REASONING == {"effort": "none"}
+    assert chatbot.translator.reasoning == {"effort": "none"}
+    assert chatbot.translator.model_name == chatbot.llm_model
