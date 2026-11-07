@@ -184,4 +184,5 @@
 | [ADR-110](ADR-110-cards-skip-papers-the-answer-already-tabled.md) | 근거 카드는 답의 표에 이미 있는 논문을 빼고 그린다 — 지시문은 그대로 둔다 | 채택 |
 | [ADR-111](ADR-111-translation-skips-table-rows.md) | 답을 한국어로 옮길 때 표의 행은 보내지 않는다 — 머리줄과 설명 열은 옮긴다 | 채택 |
 | [ADR-112](ADR-112-translation-without-reasoning.md) | 번역도 추론을 끈다 — 더 작은 모델로 바꾸지는 않는다 | 채택 |
+| [ADR-113](ADR-113-search-the-named-category-before-the-agent.md) | 분류 코드와 주제를 함께 묻는 질문은 앱이 그 분류 안에서 먼저 찾는다 — 도구에 인자를 더하지 않는다 | 채택 |
 | [ADR-114](ADR-114-the-translation-streams.md) | 답의 한국어 번역을 흘려 보낸다 — 첫 조각부터 한국어로 보여 준다 | 채택 |
