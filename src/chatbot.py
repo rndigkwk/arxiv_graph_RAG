@@ -39,6 +39,7 @@ from src import (
     agent_graph,
     early_judge,
     pagerank,
+    pre_category,
     pre_recent,
     pre_resolve,
     pre_scope,
@@ -745,6 +746,27 @@ def ask(question, history, on_answer=None):
                                         question=asked)
         return {"record": record, "hint": pre_recent.hint(output, question=asked)}
 
+    def category_first(asked, english):
+        """분류 코드와 주제를 함께 묻는 질문만 그 분류 안에서 먼저 찾습니다(ADR-113)."""
+        found = pre_category.asks(asked, english)
+        if found is None:
+            return None
+        started = time.perf_counter()
+        try:
+            result = vector_retriever.search(
+                query_text=english, top_k=pre_category.TOP_K,
+                filters={"primary_category": found},
+            )
+        except Exception:  # noqa: BLE001 - 못 찾으면 모델이 지금처럼 찾습니다.
+            return None
+        output = {"query": english,
+                  "papers": [{**item.metadata, "abstract": item.content} for item in result.items]}
+        if not pre_category.usable(output):
+            return None
+        record = pre_category.call_record(english, found, output,
+                                          time.perf_counter() - started)
+        return {"record": record, "hint": pre_category.hint(output, found)}
+
     def scope_first(asked, english):
         """연구 단서가 없는 질문만 컬렉션에 가까운 논문이 있는지 봅니다(ADR-095)."""
         if pre_scope.has_domain_cue(asked, english):
@@ -807,6 +829,7 @@ def ask(question, history, on_answer=None):
         translate=translate_first,
         resolve=resolve_first,
         recent=recent_first,
+        category=category_first,
         scope=scope_first,
     )
     state = agent_graph.build_graph(deps).invoke({

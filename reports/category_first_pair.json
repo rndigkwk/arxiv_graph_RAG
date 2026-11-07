@@ -1,0 +1,394 @@
+{
+ "date": "2026-11-07",
+ "adr": "ADR-113",
+ "where": "local, main과 브랜치를 동시에 두 프로세스로, 같은 6문항 x 3회",
+ "main_commit": "4ddc1ba",
+ "main": {
+  "answered": 16,
+  "of": 18,
+  "seconds_p50": 11.975,
+  "seconds_p90": 17.95,
+  "seconds_max": 101.12,
+  "turns_p50": 2.0,
+  "turns_max": 26,
+  "retried": 4,
+  "evidence": [
+   0,
+   0,
+   0,
+   1,
+   1,
+   4,
+   5,
+   11,
+   12,
+   14,
+   20,
+   25,
+   25,
+   25,
+   25,
+   25,
+   25,
+   25
+  ],
+  "runs": [
+   {
+    "q": "대규모 언어 모델 에이전트를 다루는 cs.CL 논문을 알려 줘",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 17.95,
+    "turns": 5,
+    "attempts": 2,
+    "evidence": 0
+   },
+   {
+    "q": "Which cs.LG papers study diffusion models?",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 11.62,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 25
+   },
+   {
+    "q": "cs.CV papers on vision-language models",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 11.25,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 25
+   },
+   {
+    "q": "cs.AI 분야에서 검색 증강 생성을 다룬 논문은?",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 9.93,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 11
+   },
+   {
+    "q": "cs.CL에서 기계 번역 논문을 찾아 줘",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 7.71,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 4
+   },
+   {
+    "q": "cs.RO papers about robot manipulation with language models",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 5.88,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "대규모 언어 모델 에이전트를 다루는 cs.CL 논문을 알려 줘",
+    "rep": 1,
+    "outcome": "AnswerValidationError",
+    "seconds": 15.46,
+    "turns": null,
+    "attempts": null,
+    "evidence": null
+   },
+   {
+    "q": "Which cs.LG papers study diffusion models?",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 10.34,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 25
+   },
+   {
+    "q": "cs.CV papers on vision-language models",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 12.12,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 25
+   },
+   {
+    "q": "cs.AI 분야에서 검색 증강 생성을 다룬 논문은?",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 29.07,
+    "turns": 10,
+    "attempts": 2,
+    "evidence": 1
+   },
+   {
+    "q": "cs.CL에서 기계 번역 논문을 찾아 줘",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 101.12,
+    "turns": 26,
+    "attempts": 2,
+    "evidence": 20
+   },
+   {
+    "q": "cs.RO papers about robot manipulation with language models",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 16.04,
+    "turns": 5,
+    "attempts": 2,
+    "evidence": 1
+   },
+   {
+    "q": "대규모 언어 모델 에이전트를 다루는 cs.CL 논문을 알려 줘",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 11.83,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 25
+   },
+   {
+    "q": "Which cs.LG papers study diffusion models?",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 14.9,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 25
+   },
+   {
+    "q": "cs.CV papers on vision-language models",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 14.4,
+    "turns": 3,
+    "attempts": 1,
+    "evidence": 25
+   },
+   {
+    "q": "cs.AI 분야에서 검색 증강 생성을 다룬 논문은?",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 15.46,
+    "turns": 5,
+    "attempts": 1,
+    "evidence": 12
+   },
+   {
+    "q": "cs.CL에서 기계 번역 논문을 찾아 줘",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 11.49,
+    "turns": 3,
+    "attempts": 1,
+    "evidence": 14
+   },
+   {
+    "q": "cs.RO papers about robot manipulation with language models",
+    "rep": 2,
+    "outcome": "AnswerValidationError",
+    "seconds": 18.27,
+    "turns": null,
+    "attempts": null,
+    "evidence": null
+   }
+  ]
+ },
+ "branch": {
+  "answered": 18,
+  "of": 18,
+  "seconds_p50": 8.35,
+  "seconds_p90": 13.3,
+  "seconds_max": 26.05,
+  "turns_p50": 2.0,
+  "turns_max": 5,
+  "retried": 2,
+  "evidence": [
+   3,
+   4,
+   4,
+   4,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   5,
+   7
+  ],
+  "runs": [
+   {
+    "q": "대규모 언어 모델 에이전트를 다루는 cs.CL 논문을 알려 줘",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 26.05,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "Which cs.LG papers study diffusion models?",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 5.95,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "cs.CV papers on vision-language models",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 6.44,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "cs.AI 분야에서 검색 증강 생성을 다룬 논문은?",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 9.53,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 3
+   },
+   {
+    "q": "cs.CL에서 기계 번역 논문을 찾아 줘",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 8.42,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 4
+   },
+   {
+    "q": "cs.RO papers about robot manipulation with language models",
+    "rep": 0,
+    "outcome": "final",
+    "seconds": 6.39,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "대규모 언어 모델 에이전트를 다루는 cs.CL 논문을 알려 줘",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 8.55,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "Which cs.LG papers study diffusion models?",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 6.27,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "cs.CV papers on vision-language models",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 6.27,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "cs.AI 분야에서 검색 증강 생성을 다룬 논문은?",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 9.44,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 4
+   },
+   {
+    "q": "cs.CL에서 기계 번역 논문을 찾아 줘",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 17.07,
+    "turns": 5,
+    "attempts": 2,
+    "evidence": 7
+   },
+   {
+    "q": "cs.RO papers about robot manipulation with language models",
+    "rep": 1,
+    "outcome": "final",
+    "seconds": 6.03,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "대규모 언어 모델 에이전트를 다루는 cs.CL 논문을 알려 줘",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 12.48,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "Which cs.LG papers study diffusion models?",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 6.17,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "cs.CV papers on vision-language models",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 11.54,
+    "turns": 4,
+    "attempts": 2,
+    "evidence": 5
+   },
+   {
+    "q": "cs.AI 분야에서 검색 증강 생성을 다룬 논문은?",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 13.3,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   },
+   {
+    "q": "cs.CL에서 기계 번역 논문을 찾아 줘",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 8.28,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 4
+   },
+   {
+    "q": "cs.RO papers about robot manipulation with language models",
+    "rep": 2,
+    "outcome": "final",
+    "seconds": 6.81,
+    "turns": 2,
+    "attempts": 1,
+    "evidence": 5
+   }
+  ]
+ }
+}
