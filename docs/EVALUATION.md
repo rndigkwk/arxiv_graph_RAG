@@ -209,8 +209,10 @@ RAGAS 점수는 판정 모델(`ragas_judge_model`)에 따라 달라지므로, �
 | 2026-11-06 VM 15문항 ([`reports/vm_answer_latency_2026-11-06.json`](../reports/vm_answer_latency_2026-11-06.json)) | 9041c5d | 6.09초 | 7.87초 | 15/15 |
 | 2026-11-07 VM 화면 예시 7문항, 서버 ([`reports/vm_answer_latency_examples_before_adr111.json`](../reports/vm_answer_latency_examples_before_adr111.json)) | e8ace8e | 10.01초 | 15.05초 | 3/7 |
 | 같은 7문항, 한국어 답이 뜨기까지(받는 쪽 답 + 번역) | e8ace8e | 12.12초 | 22.46초 | 1/7 |
-| 2026-11-07 같은 7문항, 표 행 건너뛰기 뒤 서버 ([`reports/vm_answer_latency_examples.json`](../reports/vm_answer_latency_examples.json)) | 81a39c9 | 8.85초 | 19.91초 | 4/7 |
+| 2026-11-07 같은 7문항, 표 행 건너뛰기 뒤 서버 ([`reports/vm_answer_latency_examples_81a39c9.json`](../reports/vm_answer_latency_examples_81a39c9.json)) | 81a39c9 | 8.85초 | 19.91초 | 4/7 |
 | 같은 7문항, 한국어 답이 뜨기까지 | 81a39c9 | 11.24초 | 22.67초 | 2/7 |
+| 2026-11-08 같은 7문항, 번역 추론 끔·분류 노드·번역 스트리밍 뒤 서버 ([`reports/vm_answer_latency_examples.json`](../reports/vm_answer_latency_examples.json)) | 3ee8abb | 6.91초 | 12.77초 | 6/7 |
+| 같은 7문항, 한국어 답이 뜨기까지 | 3ee8abb | 8.77초 | 14.31초 | 5/7 |
 
 **15문항은 모두 영어이고, 사람이 누르는 화면 예시는 모두 한국어입니다.** 한국어 질문은 번역을 두 번 거칩니다.
 서버가 질문을 영어로 옮기고(노드 `translate`, p50 1.69초), 화면이 영어 답을 한국어로 옮깁니다(`/api/translate`,
@@ -224,6 +226,16 @@ p50 2.52초, 25행 표가 든 답은 7초)([ADR-108](adr/ADR-108-the-question-sc
 다시 쟀더니(81a39c9) 번역 p50은 2.52초에서 2.30초, 표가 긴 두 답(예시 4·5)은 6.99·7.14초에서 2.66·2.08초가
 되었습니다. 한국어 답이 뜨기까지 p50은 12.12초에서 11.24초입니다. p90은 22.67초로 그대로인데, 예시 4의 서버 답이
 이번에 19.91초(지난번 11.81초)로 번역이 아니라 답 쓰기에서 늘었습니다. 한 번씩 잰 7문항이라 서버 쪽 차이는 잡음 범위입니다.
+
+**2026-11-08, 3ee8abb에서 다시 쟀습니다.** 그 사이 세 가지가 들어갔습니다. 번역의 추론을 끄고
+([ADR-112](adr/ADR-112-translation-without-reasoning.md)), 분류+주제 질문은 앱이 그 분류 안에서 먼저 찾고
+([ADR-113](adr/ADR-113-search-the-named-category-before-the-agent.md)), 답 번역을 흘려 보냅니다
+([ADR-114](adr/ADR-114-the-translation-streams.md)).
+- 질문 번역 노드 p50은 1.6초 안팎에서 1.28초로 줄었습니다. 답 번역 p50은 2.30초에서 1.64초입니다.
+- 예시 4(cs.CL + LLM 에이전트)는 서버 19.91초에서 7.80초가 되었습니다(턴 2개, 분류 노드 1.65초).
+- 한국어 답이 다 뜨기까지 p50은 8.77초이고, 7문항 중 5문항이 10초 안입니다.
+- 화면은 번역 첫 조각부터 한국어로 보여 줍니다. VM 스트림에서 첫 조각은 0.76~0.91초, 끝은 1.5~1.6초였습니다.
+  운영 화면에서 예시 4를 한 번 물었을 때는 영어 답 8.1초, 한국어 첫 글 9.1초, 한국어 끝 9.8초였습니다.
 
 ## 5. 한계 — 이 평가가 주장하지 않는 것
 

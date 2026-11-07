@@ -50,7 +50,7 @@ VM에서 화면 예시 3문항의 답을 받고(2026-11-07), 같은 답을 로�
 `measure_vm_answer_latency.py --examples`로 한국어 답이 뜨기까지를 다시 재서
 [EVALUATION.md](../EVALUATION.md)에 적습니다.
 
-**머지 뒤 VM에서 쟀습니다**(2026-11-07, 81a39c9, `reports/vm_answer_latency_examples.json`). 번역 p50은
+**머지 뒤 VM에서 쟀습니다**(2026-11-07, 81a39c9, `reports/vm_answer_latency_examples_81a39c9.json`). 번역 p50은
 2.52초 → 2.30초, 표가 긴 두 답(예시 4·5)은 6.99·7.14초 → 2.66·2.08초입니다. 한국어 답이 뜨기까지 p50은
 12.12초 → 11.24초입니다. p90(22.67초)은 예시 4의 서버 답이 이번에 19.91초로 길어진 탓이라 번역과는 상관없습니다.
 
