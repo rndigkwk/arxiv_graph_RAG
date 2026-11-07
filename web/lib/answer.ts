@@ -133,3 +133,23 @@ export function paperLine(paper: { arxiv_id: string; authors?: string[]; author_
   const more = (paper.author_count ?? paper.authors?.length ?? 0) > 1 ? " 외" : "";
   return [first ? first + more : "", paper.primary_category ?? "", id].filter(Boolean).join(" · ");
 }
+
+const ARXIV_IN_TEXT = /\b\d{4}\.\d{4,5}\b/g;
+
+/**
+ * 근거를 "답의 표에 이미 있는 것"과 "나머지"로 가릅니다. 모델이 답에 근거 표를 쓰면 카드가 같은 논문을 한 번 더
+ * 보여 줘 페이지가 두 배가 됩니다(11-06 운영, 25행 표 + 카드). 지시문을 바꾸지 않고 화면에서 겹침을 뺍니다(ADR-110).
+ * 표 줄(`|`로 시작)에 적힌 arXiv ID만 봅니다 - 문장 속에 한 번 언급된 논문은 카드로 남깁니다.
+ */
+export function splitEvidence(answer: Pick<Answer, "answer" | "evidence_ids">): { inTable: string[]; rest: string[] } {
+  const listed = new Set(
+    answer.answer
+      .split("\n")
+      .filter((line) => line.trimStart().startsWith("|"))
+      .flatMap((line) => line.match(ARXIV_IN_TEXT) ?? []),
+  );
+  return {
+    inTable: answer.evidence_ids.filter((id) => listed.has(id)),
+    rest: answer.evidence_ids.filter((id) => !listed.has(id)),
+  };
+}
