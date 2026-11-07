@@ -1,0 +1,89 @@
+{
+ "date": "2026-11-07",
+ "adr": "ADR-112",
+ "where": "local, same OpenAI models as the VM",
+ "question_translation": {
+  "method": "cases_korean.json 순수 한국어 13문항 + 화면 예시 7문항, 세 설정을 순서를 돌려 가며 한 번씩",
+  "n": 20,
+  "p50_seconds": {
+   "luna": 1.704,
+   "luna-none": 1.326,
+   "mini": 1.004
+  },
+  "max_seconds": {
+   "luna": 5.877,
+   "luna-none": 3.662,
+   "mini": 1.235
+  },
+  "labels": {
+   "luna": "gpt-6-luna (기본 추론)",
+   "luna-none": "gpt-6-luna, reasoning effort none",
+   "mini": "gpt-4o-mini"
+  }
+ },
+ "korean_retrieval_61": {
+  "luna": {
+   "mixed_translated": {
+    "hit_at_k": 0.5246,
+    "recall_at_k": 0.3514,
+    "reciprocal_rank": 0.5082,
+    "recovered_original_share": 0.1475
+   },
+   "pure_translated": {
+    "hit_at_k": 0.5082,
+    "recall_at_k": 0.3458,
+    "reciprocal_rank": 0.5,
+    "recovered_original_share": 0.2623
+   }
+  },
+  "none": {
+   "mixed_translated": {
+    "hit_at_k": 0.5246,
+    "recall_at_k": 0.3514,
+    "reciprocal_rank": 0.5082,
+    "recovered_original_share": 0.1639
+   },
+   "pure_translated": {
+    "hit_at_k": 0.5082,
+    "recall_at_k": 0.3458,
+    "reciprocal_rank": 0.5082,
+    "recovered_original_share": 0.2459
+   }
+  },
+  "mini": {
+   "mixed_translated": {
+    "hit_at_k": 0.5246,
+    "recall_at_k": 0.3514,
+    "reciprocal_rank": 0.5055,
+    "recovered_original_share": 0.1639
+   },
+   "pure_translated": {
+    "hit_at_k": 0.4918,
+    "recall_at_k": 0.3457,
+    "reciprocal_rank": 0.4918,
+    "recovered_original_share": 0.2459
+   }
+  }
+ },
+ "mini_miss": "topic-retrieval-augmented-generation: '검색 증강 생성' -> 'search augmentation generation' (hit 1 -> 0)",
+ "answer_translation": [
+  {
+   "chars": 2915,
+   "old_p50": 2.464,
+   "new_p50": 1.875,
+   "fallbacks": 0
+  },
+  {
+   "chars": 590,
+   "old_p50": 2.1215,
+   "new_p50": 1.4255,
+   "fallbacks": 0
+  },
+  {
+   "chars": 562,
+   "old_p50": 2.455,
+   "new_p50": 2.3049999999999997,
+   "fallbacks": 0
+  }
+ ]
+}

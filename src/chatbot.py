@@ -1493,8 +1493,12 @@ judge_llm = llm.model_copy(update={"reasoning": JUDGE_REASONING,
 AGENT_REASONING = {"effort": "none"}
 agent_llm = llm.model_copy(update={"reasoning": AGENT_REASONING})
 # 번역 도구와 번역 버튼이 함께 쓰는 짧은 호출용 모델입니다. 구조화 출력을 쓰지 않습니다.
-# 번역 지연은 잰 적이 없어서 제한 시간은 그대로 두고 재시도만 맞춥니다.
-translator = ChatOpenAI(model=llm_model, api_key=openai_api_key, timeout=60, max_retries=1)
+# 번역도 추론을 끕니다(ADR-112). 한국어 질문마다 앞길에서 기다리는 호출이고, 한국어 검색
+# 평가 61문항의 적중은 그대로였습니다. 더 작은 모델(gpt-4o-mini)은 더 빨랐지만 "검색 증강
+# 생성"을 "search augmentation generation"으로 옮겨 그 문항을 놓쳤습니다.
+TRANSLATE_REASONING = {"effort": "none"}
+translator = ChatOpenAI(model=llm_model, api_key=openai_api_key, use_responses_api=True,
+                        reasoning=TRANSLATE_REASONING, timeout=60, max_retries=1)
 embedder = OpenAIEmbeddings(model=EMBEDDING_MODEL, timeout=60, max_retries=1)
 # 적재 노트북과 같이 질문 벡터도 768차원으로 고정합니다.
 embedder.embed_query = partial(embedder.embed_query, dimensions=EMBEDDING_DIMENSIONS)
