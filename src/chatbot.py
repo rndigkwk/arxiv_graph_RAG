@@ -47,6 +47,7 @@ from src import (
     related_by_app,
     release,
     source_check,
+    table_passthrough,
     title_search,
     tool_timing,
 )
@@ -864,9 +865,25 @@ def ask(question, history, on_answer=None):
 
 def translate_to_korean(text):
     """화면의 영어 답변을 한국어로 번역합니다. 웹 화면은 한국어 질문의 답을 바로 부르고(ADR-108),
-    Streamlit은 번역 버튼에서만 부릅니다."""
+    Streamlit은 번역 버튼에서만 부릅니다.
+
+    표는 보내지 않고 그대로 되돌립니다(ADR-111). 표의 제목·저자·ID는 어차피 영어로 남고,
+    모델이 그것을 다시 쓰느라 25행 표가 든 답은 7초가 걸렸습니다. 자리표시가 번역에서 깨지면
+    예전처럼 전체를 보냅니다.
+    """
     if not text or not text.strip():
         return text
+    prose, tables = table_passthrough.split_tables(text)
+    if tables and not table_passthrough.has_prose(prose):
+        return text  # 표뿐인 답 - 옮길 문장이 없습니다.
+    if tables:
+        restored = table_passthrough.restore(_to_korean(prose), tables)
+        if restored is not None:
+            return restored
+    return _to_korean(text)
+
+
+def _to_korean(text):
     message = translator.invoke([("system", korean_system), ("user", text)])
     return (message.text or "").strip() or text
 
