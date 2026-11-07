@@ -18,12 +18,19 @@
 
 `--recent`는 그래프 가족 대신 "최근" 질문 6개(`probe_recent_questions.QS`)를 묻습니다.
 ADR-090·091과 같은 문항입니다. 15문항 세트에는 이 질문이 없습니다.
+
+**한국어 질문은 번역까지 잽니다(ADR-108).** 웹 화면은 한글이 든 질문의 답을 받자마자
+`/api/translate`를 부르고, 사람은 그 번역이 와야 한국어 답을 읽습니다. `/api/ask`만 재면 그 몫이
+빠집니다. 화면과 같은 규칙(질문에 한글이 있으면)으로 번역을 부르고, 받는 쪽 답 시간에 번역을 더한
+`korean_ready_seconds`를 따로 적습니다. 게이트(서버 p50)는 그대로입니다. 15문항 세트는 모두 영어라
+번역하지 않습니다 - `--examples`가 질문 화면의 한국어 예시를 묻습니다.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import statistics
 import sys
 import time
@@ -41,6 +48,12 @@ CASES = Path("evals/cases_graph.json")
 LOCAL = Path("reports/inside_generate_2026-10-26.json")
 OUTPUT = Path("reports/vm_answer_latency.json")
 RECENT_OUTPUT = Path("reports/vm_answer_latency_recent.json")
+EXAMPLES_OUTPUT = Path("reports/vm_answer_latency_examples.json")
+WORKBENCH = Path("web/components/Workbench.tsx")
+# 웹 화면의 `hasHangul`(web/lib/answer.ts)과 같은 범위입니다. 화면이 번역하는 질문만
+# 번역하려면 같아야 합니다.
+HANGUL = re.compile("[ㄱ-ㆎ가-힣]")
+MAX_TRANSLATE_CHARS = 8000  # src/api.py와 같습니다. 넘으면 화면도 부르지 않습니다.
 GAP_SECONDS = 21  # 분당 3회 상한 아래로.
 TARGET_P50 = 10.0
 
@@ -75,6 +88,24 @@ def recent_cases() -> list[dict[str, Any]]:
               and getattr(node.targets[0], "id", None) == "QS")
     return [{"id": case, "category": "recent", "question": question}
             for case, question in ast.literal_eval(qs)]
+
+
+def example_cases() -> list[dict[str, Any]]:
+    """질문 화면의 예시(`EXAMPLES`)입니다. 사람이 누르는 질문이라 한국어 쪽 지연을 이것으로 봅니다.
+
+    화면 코드를 글로 읽습니다 - 목록을 여기 베끼면 화면이 바뀔 때 조용히 갈라집니다.
+    """
+    text = WORKBENCH.read_text(encoding="utf-8")
+    block = re.search(r"const EXAMPLES = \[(.*?)\];", text, re.DOTALL)
+    if not block:
+        raise SystemExit(f"{WORKBENCH}에서 EXAMPLES를 찾지 못했습니다")
+    questions = re.findall(r'"([^"]+)"', block.group(1))
+    return [{"id": f"example-{n}", "category": "example", "question": q}
+            for n, q in enumerate(questions, 1)]
+
+
+def needs_translation(question: str) -> bool:
+    return bool(HANGUL.search(question))
 
 
 def read_events(lines) -> list[tuple[str, dict[str, Any], float]]:
@@ -122,6 +153,45 @@ def ask(api: str, question: str) -> dict[str, Any]:
         "tools": [{"name": c.get("name"), "seconds": c.get("seconds"), "by": c.get("by")}
                   for c in data.get("tool_calls", [])] if kind == "final" else [],
         "detail": None if kind == "final" else data,
+        # 번역에 넘길 원문입니다. 보고서에는 남기지 않습니다(`main`이 꺼냅니다).
+        "answer_text": data.get("answer") if kind == "final" else None,
+    }
+
+
+def translate(api: str, text: str) -> dict[str, Any]:
+    """화면처럼 답 원문을 번역합니다. 번역은 질문과 따로 센 상한을 씁니다(ADR-108)."""
+    body = json.dumps({"text": text}).encode("utf-8")
+    while True:
+        request = urllib.request.Request(api + "/api/translate", data=body,
+                                         headers={"content-type": "application/json"})
+        started = time.perf_counter()
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                json.loads(response.read())
+        except urllib.error.HTTPError as exc:
+            if exc.code == 429:
+                wait = int(exc.headers.get("retry-after") or 60)
+                print(f"  번역 상한에 걸려 {wait}초 기다립니다", flush=True)
+                time.sleep(wait)
+                continue
+            return {"translate_seconds": None, "translate_error": exc.code}
+        return {"translate_seconds": round(time.perf_counter() - started, 3)}
+
+
+def translation_summary(done: list[dict[str, Any]]) -> dict[str, Any]:
+    """한국어 답이 화면에 뜨기까지. 목표 10초와 견주되 **보여 주기만 합니다**.
+
+    게이트는 서버 p50입니다.
+    """
+    timed = [row for row in done if row.get("translate_seconds") is not None]
+    ready = [row["client_seconds"] + row["translate_seconds"] for row in timed]
+    return {
+        "translated": len(timed),
+        "of": len(done),
+        "translate_seconds_p50": percentile([row["translate_seconds"] for row in timed], 0.5),
+        "korean_ready_seconds": {"p50": percentile(ready, 0.5), "p90": percentile(ready, 0.9),
+                                 "max": round(max(ready), 3) if ready else None},
+        "korean_ready_within_target": sum(1 for value in ready if value <= TARGET_P50),
     }
 
 
@@ -181,6 +251,7 @@ def summarize(rows: list[dict[str, Any]], local: dict[str, float]) -> dict[str, 
         "target_p50": TARGET_P50,
         "meets_target": (percentile(server, 0.5) or 1e9) <= TARGET_P50,
         "within_target": within_target(done),
+        "translation": translation_summary(done),
         "nodes": sorted(({"node": node, "p50": percentile(values, 0.5),
                           "share": round(sum(values) / total, 3)}
                          for node, values in nodes.items()), key=lambda n: -n["share"]),
@@ -240,11 +311,18 @@ def main() -> int:
     parser.add_argument("--per-family", type=int, default=3)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--recent", action="store_true", help="'최근' 질문 6개를 묻습니다")
+    parser.add_argument("--examples", action="store_true",
+                        help="질문 화면의 한국어 예시를 묻습니다(번역까지 잽니다)")
     args = parser.parse_args()
-    args.output = args.output or (RECENT_OUTPUT if args.recent else OUTPUT)
+    if args.recent and args.examples:
+        raise SystemExit("--recent와 --examples는 함께 쓰지 않습니다")
+    args.output = args.output or (
+        RECENT_OUTPUT if args.recent else EXAMPLES_OUTPUT if args.examples else OUTPUT)
 
     if args.recent:
         cases = recent_cases()
+    elif args.examples:
+        cases = example_cases()
     else:
         cases = pick_cases(json.loads(CASES.read_text(encoding="utf-8"))["cases"],
                            args.per_family)
@@ -256,10 +334,16 @@ def main() -> int:
         if index:
             time.sleep(GAP_SECONDS)
         result = ask(args.api, case["question"])
+        answer = result.pop("answer_text", None)
+        # 화면과 같은 규칙입니다: 한국어 질문의 답이 오면 바로 부르고, 너무 길면 부르지 않습니다.
+        if answer and needs_translation(case["question"]) and len(answer) <= MAX_TRANSLATE_CHARS:
+            result.update(translate(args.api, answer))
         rows.append({"id": case["id"], "category": case["category"], **result})
         server = (result["graph_trace"] or {}).get("total_seconds")
+        extra = (f" · 번역 {result['translate_seconds']}초"
+                 if result.get("translate_seconds") is not None else "")
         print(f"{index + 1}/{len(cases)} {case['id']}: {result['outcome']} "
-              f"서버 {server}초 · 받는 쪽 {result['client_seconds']}초", flush=True)
+              f"서버 {server}초 · 받는 쪽 {result['client_seconds']}초{extra}", flush=True)
 
     local = local_totals(json.loads(LOCAL.read_text(encoding="utf-8")) if LOCAL.exists() else None)
     report = {
@@ -267,7 +351,8 @@ def main() -> int:
         "api": args.api,
         "commit": health.get("commit"),
         "module_commit": health.get("module_commit"),
-        "dataset": "scripts/probe_recent_questions.py" if args.recent else str(CASES),
+        "dataset": ("scripts/probe_recent_questions.py" if args.recent
+                    else f"{WORKBENCH} EXAMPLES" if args.examples else str(CASES)),
         "summary": summarize(rows, local),
         "results": rows,
     }
@@ -279,6 +364,11 @@ def main() -> int:
         print(f"{TARGET_P50:g}초 안: {inside['count']}/{inside['of']} ({inside['share']:.0%})"
               + ("" if not inside["over"] else " · 넘긴 문항: " + ", ".join(
                   f"{item['id']} {item['seconds']:.1f}초" for item in inside["over"])))
+    korean = report["summary"]["translation"]
+    if korean["translated"]:
+        ready = korean["korean_ready_seconds"]
+        print(f"한국어 답이 뜨기까지(답 + 번역): p50 {ready['p50']}초 · p90 {ready['p90']}초 · "
+              f"{TARGET_P50:g}초 안 {korean['korean_ready_within_target']}/{korean['translated']}")
     return 0
 
 
