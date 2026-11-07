@@ -174,6 +174,25 @@ export const getStats = () => json<Stats>("/api/stats");
 export const getRanking = (query: string) => json<Ranking>(`/api/rank?${query}`);
 export const translate = (text: string) => json<{ text: string }>("/api/translate", post({ text }));
 
+/**
+ * 번역을 흘려 받습니다(ADR-114). `onPartial`이 지금까지 옮긴 글을 받고, 끝난 글을 돌려줍니다.
+ * API가 아직 흘려 보내지 않으면(404, 배포 전) 한 번에 받는 `/api/translate`로 돌아갑니다.
+ */
+export async function translateStream(text: string, onPartial: (text: string) => void): Promise<string> {
+  const response = await fetch(API_BASE + "/api/translate/stream", post({ text }));
+  if (response.status === 404) return (await translate(text)).text;
+  if (!response.ok || !response.body) {
+    throw new ApiError(response.status, response.statusText, Number(response.headers.get("retry-after")) || undefined);
+  }
+  for await (const { event, data } of readEvents(response.body)) {
+    const d = data as Record<string, unknown>;
+    if (event === "partial") onPartial(String(d.text ?? ""));
+    else if (event === "final") return String(d.text ?? "");
+    else if (event === "error") throw new ApiError(500, String(d.message ?? "번역하지 못했습니다."));
+  }
+  throw new ApiError(500, "번역이 끝나지 않았습니다.");
+}
+
 // 논문 페이지는 서버에서 그립니다. 그래프는 주간 수집 때만 바뀌므로 한 시간 캐시합니다.
 // 이 길들은 모델을 부르지 않아 상한이 없고, 그래서 Vercel을 거쳐도 됩니다(ADR-082는 질문·번역 얘기).
 export async function getPaper(id: string): Promise<Paper | null> {

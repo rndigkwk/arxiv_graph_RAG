@@ -50,7 +50,12 @@ class FakeBot:
     def to_jsonable(value):
         return value
 
-    def translate_to_korean(self, text):
+    def translate_to_korean(self, text, on_partial=None):
+        if self.mode == "boom":
+            raise RuntimeError("secret detail")
+        if on_partial is not None:
+            on_partial("번역")
+            on_partial("번역: ")
         return "번역: " + text
 
     def graph_counts(self):
@@ -199,6 +204,31 @@ def test_translation_counts_against_its_own_limit():
     assert c.post("/api/translate", json={"text": "t"}, headers=headers).status_code == 200
     blocked = c.post("/api/translate", json={"text": "t"}, headers=headers)
     assert blocked.status_code == 429 and int(blocked.headers["retry-after"]) > 0
+
+
+def test_translation_streams_partials_then_one_final():
+    """번역을 흘려 보냅니다(ADR-114). 끝난 글은 `/api/translate`와 같습니다."""
+    response = client().post("/api/translate/stream", json={"text": "t"})
+    assert response.headers["content-type"].startswith("text/event-stream")
+    got = events(response.text)
+    assert got == [("partial", {"text": "번역"}), ("partial", {"text": "번역: "}),
+                   ("final", {"text": "번역: t"})]
+
+
+def test_a_failed_stream_says_so_without_the_message():
+    bot = FakeBot()
+    bot.mode = "boom"
+    kind, data = events(client(bot).post("/api/translate/stream", json={"text": "t"}).text)[-1]
+    assert kind == "error" and data["type"] == "RuntimeError"
+    assert "secret" not in json.dumps(data)
+
+
+def test_the_stream_counts_against_the_translation_limit():
+    c = client(translate_limiter=api.Limiter(per_minute=1, per_day=10, total_per_day=10))
+    headers = {"x-forwarded-for": "1.1.1.1"}
+    assert c.post("/api/translate", json={"text": "t"}, headers=headers).status_code == 200
+    blocked = c.post("/api/translate/stream", json={"text": "t"}, headers=headers)
+    assert blocked.status_code == 429
 
 
 def test_limits_read_their_own_environment(monkeypatch):

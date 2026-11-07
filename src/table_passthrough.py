@@ -83,3 +83,23 @@ def restore(translated: str, tables: list[str]) -> str | None:
         return None
     joined = _GAP_BEFORE_MARKER.sub("\n", translated)
     return _MARKER.sub(lambda m: tables[int(m.group(1)) - 1], joined)
+
+
+# 흘려 받는 중에 끝에 걸린 반쪽 자리표시("[[TAB", "[[TABLE_1]")입니다.
+# 화면에 비치지 않게 잘라 둡니다.
+_PARTIAL_TAIL = re.compile(r"\[(?:\[(?:T(?:A(?:B(?:L(?:E(?:_\d*\]?)?)?)?)?)?)?)?$")
+
+
+def restore_partial(translated: str, tables: list[str]) -> str:
+    """흘려 받는 중인 번역에 이미 도착한 자리표시만 표로 바꿉니다(ADR-114).
+
+    끝에 걸린 반쪽 자리표시는 지웁니다. 번호가 표 수를 넘는 자리표시는 그대로 둡니다 - 끝나고
+    `restore`가 `None`을 돌려주면 부르는 쪽이 전체를 다시 번역합니다.
+    """
+    text = _PARTIAL_TAIL.sub("", _GAP_BEFORE_MARKER.sub("\n", translated))
+
+    def table(match: re.Match[str]) -> str:
+        index = int(match.group(1)) - 1
+        return tables[index] if 0 <= index < len(tables) else match.group(0)
+
+    return _MARKER.sub(table, text)

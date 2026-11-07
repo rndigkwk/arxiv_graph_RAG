@@ -74,3 +74,15 @@ def test_an_answer_that_is_only_a_table_has_nothing_to_translate():
 
 def test_text_without_tables_is_unchanged():
     assert t.split_tables("No table here.\nTwo lines.") == ("No table here.\nTwo lines.", [])
+
+
+def test_a_streaming_translation_shows_tables_once_their_marker_arrives():
+    """흘려 받는 중에는 도착한 자리표시만 표가 됩니다(ADR-114). 반쪽 자리표시는 비치지 않습니다."""
+    rows = ["| 1 | A |"]
+    assert t.restore_partial("그래프 [[TAB", rows) == "그래프 "
+    assert t.restore_partial("| ID |\n|---|\n[[TABLE_1]", rows) == "| ID |\n|---|\n"
+    restored = t.restore_partial("| ID |\n|---|\n\n[[TABLE_1]]\n끝", rows)
+    assert restored == "| ID |\n|---|\n| 1 | A |\n끝"
+    assert t.restore_partial("[보통 괄호] 글", rows) == "[보통 괄호] 글"
+    # 번호가 넘치면 그대로 둡니다. 끝나고 `restore`가 None이면 전체를 다시 번역합니다.
+    assert t.restore_partial("[[TABLE_2]]", rows) == "[[TABLE_2]]"

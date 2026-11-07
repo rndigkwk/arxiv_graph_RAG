@@ -1,0 +1,82 @@
+{
+ "date": "2026-11-07",
+ "adr": "ADR-114",
+ "where": "local, VM이 낸 답 3개를 4번씩 흘려 받아 옮김",
+ "translator_now": [
+  {
+   "chars": 2915,
+   "first_p50": 2.042,
+   "total_p50": 2.75,
+   "partials_p50": 78.0,
+   "last_partial_equals_final": [
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "chars": 590,
+   "first_p50": 1.586,
+   "total_p50": 2.028,
+   "partials_p50": 57.0,
+   "last_partial_equals_final": [
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "chars": 562,
+   "first_p50": 0.781,
+   "total_p50": 2.01,
+   "partials_p50": 154.0,
+   "last_partial_equals_final": [
+    true,
+    true,
+    true,
+    true
+   ]
+  }
+ ],
+ "translator_reasoning_off_ADR112": [
+  {
+   "chars": 2915,
+   "first_p50": 0.706,
+   "total_p50": 1.484,
+   "partials_p50": 77.5,
+   "last_partial_equals_final": [
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "chars": 590,
+   "first_p50": 0.632,
+   "total_p50": 1.231,
+   "partials_p50": 55.0,
+   "last_partial_equals_final": [
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "chars": 562,
+   "first_p50": 0.728,
+   "total_p50": 1.922,
+   "partials_p50": 158.0,
+   "last_partial_equals_final": [
+    true,
+    true,
+    true,
+    true
+   ]
+  }
+ ],
+ "checks": "모든 실행에서 자리표시가 화면 조각에 비치지 않았고, 마지막 조각이 끝난 글과 같았고, 표 행이 모두 그대로 돌아왔습니다."
+}

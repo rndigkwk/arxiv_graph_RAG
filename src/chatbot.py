@@ -863,13 +863,16 @@ def ask(question, history, on_answer=None):
 
 
 
-def translate_to_korean(text):
+def translate_to_korean(text, on_partial=None):
     """화면의 영어 답변을 한국어로 번역합니다. 웹 화면은 한국어 질문의 답을 바로 부르고(ADR-108),
     Streamlit은 번역 버튼에서만 부릅니다.
 
     표는 보내지 않고 그대로 되돌립니다(ADR-111). 표의 제목·저자·ID는 어차피 영어로 남고,
     모델이 그것을 다시 쓰느라 25행 표가 든 답은 7초가 걸렸습니다. 자리표시가 번역에서 깨지면
     예전처럼 전체를 보냅니다.
+
+    `on_partial`을 주면 번역을 흘려 받으며 지금까지 옮긴 글(표를 되돌린 모양)을 넘깁니다(ADR-114).
+    끝난 글은 주지 않을 때와 같습니다.
     """
     if not text or not text.strip():
         return text
@@ -877,15 +880,25 @@ def translate_to_korean(text):
     if tables and not table_passthrough.has_prose(prose):
         return text  # 표뿐인 답 - 옮길 문장이 없습니다.
     if tables:
-        restored = table_passthrough.restore(_to_korean(prose), tables)
+        show = None if on_partial is None else (
+            lambda so_far: on_partial(table_passthrough.restore_partial(so_far, tables)))
+        restored = table_passthrough.restore(_to_korean(prose, show), tables)
         if restored is not None:
             return restored
-    return _to_korean(text)
+    return _to_korean(text, on_partial)
 
 
-def _to_korean(text):
-    message = translator.invoke([("system", korean_system), ("user", text)])
-    return (message.text or "").strip() or text
+def _to_korean(text, on_partial=None):
+    messages = [("system", korean_system), ("user", text)]
+    if on_partial is None:
+        message = translator.invoke(messages)
+        return (message.text or "").strip() or text
+    parts = []
+    for chunk in translator.stream(messages):
+        if piece := chunk.text:
+            parts.append(piece)
+            on_partial("".join(parts))
+    return "".join(parts).strip() or text
 
 
 GRAPH_COUNTS = """
