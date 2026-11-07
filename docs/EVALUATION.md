@@ -207,6 +207,14 @@ RAGAS 점수는 판정 모델(`ragas_judge_model`)에 따라 달라지므로, �
 | 측정 | 커밋 | p50 | p90 | 10초 안 |
 |---|---|---:|---:|---:|
 | 2026-11-06 VM 15문항 ([`reports/vm_answer_latency_2026-11-06.json`](../reports/vm_answer_latency_2026-11-06.json)) | 9041c5d | 6.09초 | 7.87초 | 15/15 |
+| 2026-11-07 VM 화면 예시 7문항, 서버 ([`reports/vm_answer_latency_examples.json`](../reports/vm_answer_latency_examples.json)) | e8ace8e | 10.01초 | 15.05초 | 3/7 |
+| 같은 7문항, 한국어 답이 뜨기까지(받는 쪽 답 + 번역) | e8ace8e | 12.12초 | 22.46초 | 1/7 |
+
+**15문항은 모두 영어이고, 사람이 누르는 화면 예시는 모두 한국어입니다.** 한국어 질문은 번역을 두 번 거칩니다.
+서버가 질문을 영어로 옮기고(노드 `translate`, p50 1.69초), 화면이 영어 답을 한국어로 옮깁니다(`/api/translate`,
+p50 2.52초, 25행 표가 든 답은 7초)([ADR-108](adr/ADR-108-the-question-screen-shows-the-answer-first.md)).
+그래서 10초 목표는 영어 15문항에서만 지키고, 한국어 사용자가 기다리는 시간은 그보다 깁니다. 게이트는 15문항
+서버 p50 그대로이고, 한국어 쪽(`--examples`)은 보여 주기만 합니다.
 
 ## 5. 한계 — 이 평가가 주장하지 않는 것
 

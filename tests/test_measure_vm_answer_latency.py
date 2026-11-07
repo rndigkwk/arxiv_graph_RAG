@@ -75,3 +75,24 @@ def test_recent_cases_are_the_six_probe_questions_without_importing_the_app():
     assert [case["id"] for case in cases] == [
         "gnn-en", "gnn-ko", "diffusion-en", "rlhf-ko", "agents-en", "retrieval-ko"]
     assert {case["category"] for case in cases} == {"recent"}
+
+
+def test_korean_questions_are_timed_until_the_translation_arrives():
+    """화면은 한국어 질문의 답을 받자마자 번역합니다(ADR-108).
+
+    그 몫을 따로 적되 게이트는 그대로입니다.
+    """
+    korean = {**row("e-1", 6.0), "translate_seconds": 2.0}  # 받는 쪽 6.4초 + 번역 2초
+    slow = {**row("e-2", 9.0), "translate_seconds": 3.0}  # 9.4 + 3 = 12.4초
+    summary = m.summarize([korean, slow, row("a-1", 7.0)], {})
+    assert summary["translation"]["translated"] == 2 and summary["translation"]["of"] == 3
+    assert summary["translation"]["korean_ready_seconds"]["max"] == 12.4
+    assert summary["translation"]["korean_ready_within_target"] == 1
+    assert summary["meets_target"] is True  # 서버 p50 7초 - 번역은 게이트에 들어가지 않습니다
+
+
+def test_examples_are_read_from_the_question_screen_and_all_get_translated():
+    cases = m.example_cases()
+    assert len(cases) >= 5
+    assert all(m.needs_translation(case["question"]) for case in cases)
+    assert not m.needs_translation("Which papers cite ReAct?")
