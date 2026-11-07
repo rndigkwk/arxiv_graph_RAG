@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Answer } from "./api";
-import { GENERATE_CONTAINS, citedEvidence, forecastSeed, generateSplit, graphIds, hasHangul, historyFor, howLine, paperLine, routeLine, rowCap, stageRows, usedPath } from "./answer";
+import { GENERATE_CONTAINS, citedEvidence, forecastSeed, generateSplit, graphIds, hasHangul, historyFor, howLine, paperLine, routeLine, rowCap, splitEvidence, stageRows, usedPath } from "./answer";
 
 const answer = (over: Partial<Answer> = {}): Answer => ({
   question: "q",
@@ -92,5 +92,17 @@ describe("answer-first screen", () => {
   it("writes the paper line from the graph only", () => {
     expect(paperLine({ arxiv_id: "1", authors: ["A"], author_count: 3, primary_category: "cs.LG" }, "1")).toBe("A 외 · cs.LG · 1");
     expect(paperLine(undefined, "1406.2661")).toBe("1406.2661");
+  });
+});
+
+describe("evidence the answer already tabled", () => {
+  const ids = ["2610.20922", "2610.18511", "1406.2661"];
+  it("drops cards for papers the answer's table lists", () => {
+    const text = ["Yes:", "", "| arXiv ID | Title |", "|---|---|", "| 2610.20922 | A |", "| 2610.18511 | B |"].join(String.fromCharCode(10));
+    expect(splitEvidence({ answer: text, evidence_ids: ids })).toEqual({ inTable: ["2610.20922", "2610.18511"], rest: ["1406.2661"] });
+  });
+
+  it("keeps papers that are only mentioned in a sentence", () => {
+    expect(splitEvidence({ answer: "See 1406.2661 for GANs.", evidence_ids: ids })).toEqual({ inTable: [], rest: ids });
   });
 });

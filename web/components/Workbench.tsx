@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { type Abstain, type Answer, type Subgraph, ask, getSubgraph, translate } from "@/lib/api";
+import { type Abstain, type Answer, type Subgraph, type SubgraphPaper, ask, getSubgraph, translate } from "@/lib/api";
 import {
   EVIDENCE_PREVIEW,
   MAX_TRANSLATE_CHARS,
@@ -16,6 +16,7 @@ import {
   paperLine,
   rowCap,
   seconds,
+  splitEvidence,
   stageRows,
 } from "@/lib/answer";
 import { EvidenceGraph } from "./EvidenceGraph";
@@ -212,8 +213,11 @@ function TurnView({ turn, onKorean, onLang }: { turn: Turn; onKorean: () => void
     : turn.status === "streaming"
       ? "답을 만드는 중…"
       : "";
-  const evidence = a ? (allEvidence ? a.evidence_ids : a.evidence_ids.slice(0, EVIDENCE_PREVIEW)) : [];
+  // 답의 표에 이미 있는 근거는 카드로 다시 그리지 않습니다(ADR-110). 표가 전부 덮으면 카드는 접어 둡니다.
+  const { inTable, rest } = a ? splitEvidence(a) : { inTable: [], rest: [] };
+  const evidence = allEvidence ? rest : rest.slice(0, EVIDENCE_PREVIEW);
   const cap = a ? rowCap(a) : null;
+  const capNote = cap ? `그래프 조회가 ${cap}편에서 멈췄습니다. 더 있을 수 있어요 — 연도나 분야를 붙여 다시 물으면 좁혀집니다.` : "";
 
   return (
     <div className="stack">
@@ -257,34 +261,48 @@ function TurnView({ turn, onKorean, onLang }: { turn: Turn; onKorean: () => void
         {showKorean && <p className="hint">답은 영어로 만들고 한국어로 옮겼습니다. 옮긴 문장이 어색하면 원문을 보세요.</p>}
       </article>
 
-      {a && a.evidence_ids.length > 0 && (
+      {a && rest.length === 0 && inTable.length > 0 && (
+        <details className="card fold">
+          <summary>
+            근거 논문 {inTable.length}편 <span className="hint">· 위 표에 모두 있습니다. 저자와 함께 보려면 펼치세요.</span>
+          </summary>
+          <ul className="paper-cards">
+            {inTable.map((id) => (
+              <li key={id}>
+                <PaperCard id={id} paper={titles.get(id)} loading={!turn.subgraph} />
+              </li>
+            ))}
+          </ul>
+          {capNote && <p className="callout" style={{ marginTop: 12 }}>{capNote}</p>}
+        </details>
+      )}
+
+      {a && rest.length > 0 && (
         <section aria-labelledby="ev-h" className="stack-sm">
           <div className="section-head">
-            <h2 id="ev-h">답의 근거가 된 논문</h2>
+            <h2 id="ev-h">{inTable.length ? "답의 표에 없는 근거 논문" : "답의 근거가 된 논문"}</h2>
             <span className="hint">
-              {evidence.length < a.evidence_ids.length ? `${a.evidence_ids.length}편 중 ${evidence.length}편` : `${a.evidence_ids.length}편`}
+              {[
+                evidence.length < rest.length ? `${rest.length}편 중 ${evidence.length}편` : `${rest.length}편`,
+                inTable.length ? `표에 있는 ${inTable.length}편은 뺐습니다` : "",
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </span>
           </div>
           <ul className="paper-cards">
             {evidence.map((id) => (
               <li key={id}>
-                <Link href={`/papers/${id}`} className="paper-card">
-                  <span className="paper-title">{titles.get(id)?.title ?? (turn.subgraph ? id : "제목을 읽는 중…")}</span>
-                  <span className="hint">{paperLine(titles.get(id), id)}</span>
-                </Link>
+                <PaperCard id={id} paper={titles.get(id)} loading={!turn.subgraph} />
               </li>
             ))}
           </ul>
-          {(cap || a.evidence_ids.length > EVIDENCE_PREVIEW) && (
+          {(capNote || rest.length > EVIDENCE_PREVIEW) && (
             <div className="callout">
-              <span style={{ flex: "1 1 320px" }}>
-                {cap
-                  ? `그래프 조회가 ${cap}편에서 멈췄습니다. 더 있을 수 있어요 — 연도나 분야를 붙여 다시 물으면 좁혀집니다.`
-                  : "근거 논문을 모두 펼쳐 볼 수 있습니다."}
-              </span>
-              {a.evidence_ids.length > EVIDENCE_PREVIEW && (
+              <span style={{ flex: "1 1 320px" }}>{capNote || "근거 논문을 모두 펼쳐 볼 수 있습니다."}</span>
+              {rest.length > EVIDENCE_PREVIEW && (
                 <button type="button" className="btn" aria-expanded={allEvidence} onClick={() => setAllEvidence((v) => !v)}>
-                  {allEvidence ? "5편만 보기" : `${a.evidence_ids.length}편 모두 보기`}
+                  {allEvidence ? "5편만 보기" : `${rest.length}편 모두 보기`}
                 </button>
               )}
             </div>
@@ -319,6 +337,15 @@ function TurnView({ turn, onKorean, onLang }: { turn: Turn; onKorean: () => void
 
       {a && <HowFound answer={a} ms={turn.ms} />}
     </div>
+  );
+}
+
+function PaperCard({ id, paper, loading }: { id: string; paper?: SubgraphPaper; loading: boolean }) {
+  return (
+    <Link href={`/papers/${id}`} className="paper-card">
+      <span className="paper-title">{paper?.title ?? (loading ? "제목을 읽는 중…" : id)}</span>
+      <span className="hint">{paperLine(paper, id)}</span>
+    </Link>
   );
 }
 
