@@ -7,7 +7,7 @@ from src import table_passthrough as t
 ANSWER = "\n".join([
     "The graph lists these papers:",
     "",
-    "| arXiv ID | Title |",
+    "| arXiv ID | Relationship |",
     "|---|---|",
     "| 1706.03762 | Attention Is All You Need |",
     "| 1810.04805 | BERT |",
@@ -20,7 +20,7 @@ ROWS = "| 1706.03762 | Attention Is All You Need |\n| 1810.04805 | BERT |"
 def test_the_header_is_sent_and_the_rows_become_one_marker_line():
     prose, tables = t.split_tables(ANSWER)
     assert tables == [ROWS]
-    assert prose.split("\n") == ["The graph lists these papers:", "", "| arXiv ID | Title |",
+    assert prose.split("\n") == ["The graph lists these papers:", "", "| arXiv ID | Relationship |",
                                  "|---|---|", "[[TABLE_1]]", "", "Both are about transformers."]
 
 
@@ -36,10 +36,10 @@ def test_a_header_without_rows_is_left_for_the_translator():
 def test_translation_gets_the_rows_back_under_the_translated_header():
     prose, tables = t.split_tables(ANSWER)
     korean = (prose.replace("The graph lists these papers:", "그래프에 있는 논문입니다:")
-              .replace("| arXiv ID | Title |", "| arXiv ID | 제목 |")
+              .replace("| arXiv ID | Relationship |", "| arXiv ID | 관계 |")
               .replace("Both are about transformers.", "둘 다 트랜스포머 논문입니다."))
     restored = t.restore(korean, tables)
-    assert "| arXiv ID | 제목 |\n|---|---|\n| 1706.03762 | Attention Is All You Need |" in restored
+    assert "| arXiv ID | 관계 |\n|---|---|\n| 1706.03762 | Attention Is All You Need |" in restored
     assert restored.startswith("그래프에 있는 논문입니다:")
 
 
@@ -86,3 +86,35 @@ def test_a_streaming_translation_shows_tables_once_their_marker_arrives():
     assert t.restore_partial("[보통 괄호] 글", rows) == "[보통 괄호] 글"
     # 번호가 넘치면 그대로 둡니다. 끝나고 `restore`가 None이면 전체를 다시 번역합니다.
     assert t.restore_partial("[[TABLE_2]]", rows) == "[[TABLE_2]]"
+
+
+def test_a_known_header_is_translated_here_and_the_whole_table_is_kept():
+    """에이전트의 기본 표는 머리줄까지 사전으로 옮깁니다(ADR-117). 모델은 표를 보지 않습니다."""
+    table = "| arXiv ID | Title | Primary category |\n|---|---|---|\n| 1 | A | cs.CL |"
+    prose, tables = t.split_tables("Found:\n" + table + "\n\nDone.")
+    assert prose == "Found:\n[[TABLE_1]]\n\nDone."
+    korean_table = "| arXiv ID | 제목 | 주 분류 |\n|---|---|---|\n| 1 | A | cs.CL |"
+    assert tables == [korean_table]
+    restored = t.restore("찾았습니다:\n[[TABLE_1]]\n\n끝.", tables)
+    assert restored == "찾았습니다:\n" + korean_table + "\n\n끝."
+
+
+def test_the_blank_line_between_a_paragraph_and_a_whole_table_marker_is_kept():
+    """빈 줄을 지우는 것은 머리줄 바로 아래 자리표시뿐입니다. 문단에 붙으면 표가 문단이 됩니다."""
+    tables = ["| arXiv ID | 제목 |\n|---|---|\n| 1 | A |"]
+    restored = t.restore("다섯 편입니다.\n\n[[TABLE_1]]\n\n끝.", tables)
+    assert restored == "다섯 편입니다.\n\n" + tables[0] + "\n\n끝."
+    partial = t.restore_partial("다섯 편입니다.\n\n[[TABLE_1]]", tables)
+    assert partial == "다섯 편입니다.\n\n" + tables[0]
+
+
+def test_header_words_are_matched_whole_and_without_case():
+    assert t._known_header("| ARXIV ID | title | Citations |") == "| arXiv ID | 제목 | 인용 수 |"
+    assert t._known_header("| arXiv ID | Title | Why read it |") is None
+
+
+def test_a_table_only_answer_gets_its_known_header_in_korean():
+    """옮길 문장이 없는 표뿐인 답도 머리줄은 한국어가 됩니다. 모델은 부르지 않습니다."""
+    prose, tables = t.split_tables("| arXiv ID | Title |\n|---|---|\n| 1 | A |")
+    assert not t.has_prose(prose)
+    assert t.restore(prose, tables) == "| arXiv ID | 제목 |\n|---|---|\n| 1 | A |"

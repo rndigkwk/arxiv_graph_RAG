@@ -6,6 +6,10 @@
 구분선은 번역에 보내 "Title"이 "제목"이 되게 두고, 그 아래 행만 자리표시로 바꿔 돌아온 번역에
 그대로 끼웁니다.
 
+머리줄의 칸이 모두 아래 사전(`HEADERS`)에 있으면 머리줄도 여기서 옮기고 표 전체를 자리표시로
+바꿉니다(ADR-117). 모델에 맡기면 같은 "Primary category"가 실행마다 "주 카테고리", "1차 카테고리"가
+되거나 영어로 남았습니다. 사전에 없는 칸이 하나라도 있으면 지금처럼 머리줄을 번역에 보냅니다.
+
 자리표시가 번역에서 사라지거나 바뀌면 `restore`가 `None`을 돌려줍니다. 그때는 부르는 쪽이 예전처럼
 전체를 번역합니다 - 표를 잃는 것보다 느린 편이 낫습니다.
 """
@@ -17,8 +21,41 @@ import re
 MARKER = "[[TABLE_{}]]"
 _MARKER = re.compile(r"\[\[TABLE_(\d+)\]\]")
 # 모델이 머리줄과 자리표시 사이에 빈 줄을 넣으면 표가 끊깁니다. 되돌릴 때 그 빈 줄을 지웁니다.
-_GAP_BEFORE_MARKER = re.compile(r"\n[ \t]*(?:\n[ \t]*)+(?=\[\[TABLE_\d+\]\])")
+# 바로 위가 표 줄일 때만입니다. 표 전체가 자리표시이면(ADR-117) 문단과 표 사이 빈 줄은 남깁니다.
+_GAP_BEFORE_MARKER = re.compile(r"(?m)(^[ \t]*\|[^\n]*)\n(?:[ \t]*\n)+(?=\[\[TABLE_\d+\]\])")
 _SEPARATOR = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$")
+
+
+# 답 쓰는 에이전트가 표에 쓰는 머리줄입니다(`prompts.AGENT_SYSTEM`의 "arXiv ID | Title | Primary
+# category"와, 평가·측정 보고서에 나온 칸). 키는 소문자입니다. 뜻이 질문마다 다른 칸("Relationship",
+# "Focus", "Why read it")은 넣지 않습니다 - 그런 표는 모델이 옮깁니다.
+HEADERS = {
+    "arxiv id": "arXiv ID",
+    "title": "제목",
+    "primary category": "주 분류",
+    "category": "분류",
+    "author": "저자",
+    "authors": "저자",
+    "shared author": "겹치는 저자",
+    "shared author(s)": "겹치는 저자",
+    "shared authors": "겹치는 저자",
+    "citations": "인용 수",
+    "citation count": "인용 수",
+    "published": "발행일",
+    "pdf": "PDF",
+}
+
+
+def _cells(line: str) -> list[str]:
+    return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+
+def _known_header(line: str) -> str | None:
+    """머리줄의 칸이 모두 사전에 있으면 옮긴 머리줄, 하나라도 없으면 None."""
+    cells = _cells(line)
+    if not all(cell.lower() in HEADERS for cell in cells):
+        return None
+    return "| " + " | ".join(HEADERS[cell.lower()] for cell in cells) + " |"
 
 
 def _is_table_line(line: str) -> bool:
@@ -61,6 +98,9 @@ def split_tables(text: str) -> tuple[str, list[str]]:
             head = _head_size(block)
             if _has_sentences(block[head:]):
                 head = len(block)
+            elif head == 2 and len(block) > 2 and (korean := _known_header(block[0])):
+                # 머리줄을 사전으로 옮기면 번역에 보낼 줄이 없습니다. 표 전체가 자리표시입니다.
+                block, head = [korean, *block[1:]], 0
             out.extend(block[:head])
             if block[head:]:
                 tables.append("\n".join(block[head:]))
@@ -81,7 +121,7 @@ def restore(translated: str, tables: list[str]) -> str | None:
     found = [int(n) for n in _MARKER.findall(translated)]
     if sorted(found) != list(range(1, len(tables) + 1)):
         return None
-    joined = _GAP_BEFORE_MARKER.sub("\n", translated)
+    joined = _GAP_BEFORE_MARKER.sub(r"\1\n", translated)
     return _MARKER.sub(lambda m: tables[int(m.group(1)) - 1], joined)
 
 
@@ -96,7 +136,7 @@ def restore_partial(translated: str, tables: list[str]) -> str:
     끝에 걸린 반쪽 자리표시는 지웁니다. 번호가 표 수를 넘는 자리표시는 그대로 둡니다 - 끝나고
     `restore`가 `None`을 돌려주면 부르는 쪽이 전체를 다시 번역합니다.
     """
-    text = _PARTIAL_TAIL.sub("", _GAP_BEFORE_MARKER.sub("\n", translated))
+    text = _PARTIAL_TAIL.sub("", _GAP_BEFORE_MARKER.sub(r"\1\n", translated))
 
     def table(match: re.Match[str]) -> str:
         index = int(match.group(1)) - 1
