@@ -47,6 +47,7 @@ from src import (
     prompts,
     related_by_app,
     release,
+    row_cap,
     source_check,
     table_passthrough,
     title_search,
@@ -272,6 +273,10 @@ def search_graph(cypher: str) -> dict:
         check_order_by(cypher)
         rows = to_jsonable(run_read(cypher))
         check_evidence_alias(rows)
+        # 긴 논문 목록은 앞 10행만 돌려줍니다. 모델이 25행 표를 쓰느라 7~8초를 썼습니다(ADR-120).
+        rows, omitted = row_cap.cap_paper_rows(rows)
+        if omitted:
+            return {"cypher": cypher, "rows": rows, "rows_omitted": omitted}
         return {"cypher": cypher, "rows": rows}
     except (ValueError, Neo4jError) as exc:
         # 모델이 작성한 Cypher의 오류는 대화를 끊지 않고 돌려주어 한 번 더 고치게 합니다.
