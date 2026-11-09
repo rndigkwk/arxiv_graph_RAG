@@ -45,6 +45,9 @@ RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
 # 2026-10-27 측정에서 434편 묶음 하나가 통째로 실패했고, 같은 묶음을 바로 다시 보내니 16초에
 # 끝났습니다. 상태 코드가 아닌 끊김(시간 초과 등)도 다시 시도합니다.
 RETRYABLE_NETWORK = (urllib.error.URLError, TimeoutError, ConnectionError)
+# 2026-11-09 정기 실행에서 무키 429가 한 묶음의 재시도 6번을 다 썼습니다. 그 500편이 실패율을
+# 13.5%로 올려 적재를 막았습니다. 다른 묶음을 다 받은 뒤 1분 쉬고 그 묶음만 다시 보냅니다(ADR-118).
+SECOND_PASS_PAUSE = 60.0
 
 Fetch = Callable[[list[str]], list[dict[str, Any] | None]]
 
@@ -127,7 +130,12 @@ def fetch_references(
     sleep: Callable[[float], None] = time.sleep,
     batch_size: int = BATCH_SIZE,
 ) -> ReferenceBatch:
-    """논문마다 arXiv 참고문헌 목록을 받습니다. 한 묶음이 실패해도 나머지 묶음은 받습니다."""
+    """논문마다 arXiv 참고문헌 목록을 받습니다. 한 묶음이 실패해도 나머지 묶음은 받습니다.
+
+    통째로 실패한 묶음은 다른 묶음을 다 받은 뒤 `SECOND_PASS_PAUSE`초 쉬고 한 번 더
+    보냅니다(ADR-118).
+    두 번째에도 실패한 묶음만 `failures`에 남습니다.
+    """
     key = api_key()
     if fetch is None:
         def fetch(ids: list[str]) -> list[dict[str, Any] | None]:
@@ -135,28 +143,42 @@ def fetch_references(
     interval = INTERVAL_WITH_KEY if key else INTERVAL_WITHOUT_KEY
     ids = list(dict.fromkeys(arxiv_ids))
     result = ReferenceBatch()
-    for start in range(0, len(ids), batch_size):
-        chunk = ids[start:start + batch_size]
+    chunks = [ids[start:start + batch_size] for start in range(0, len(ids), batch_size)]
+    failed: list[tuple[list[str], Exception]] = []
+    for chunk in chunks:
         if result.requests:
             sleep(interval)
-        result.requests += 1
-        try:
-            records = fetch(chunk)
-        except Exception as exc:  # noqa: BLE001 - 한 묶음의 실패는 다음 묶음을 막지 않습니다
+        if (error := _take(chunk, fetch, result)) is not None:
+            failed.append((chunk, error))
+    if failed:
+        sleep(SECOND_PASS_PAUSE)
+    for index, (chunk, _) in enumerate(failed):
+        if index:
+            sleep(interval)
+        if (error := _take(chunk, fetch, result)) is not None:
             result.failures.extend({"arxiv_id": arxiv_id,
-                                    "error": f"{type(exc).__name__}: {str(exc)[:200]}"}
+                                    "error": f"{type(error).__name__}: {str(error)[:200]}"}
                                    for arxiv_id in chunk)
-            continue
-        if len(records) != len(chunk):
-            raise RuntimeError(f"S2가 {len(chunk)}편을 받고 {len(records)}개를 돌려줬습니다")
-        for arxiv_id, record in zip(chunk, records, strict=True):
-            if record is None:
-                result.not_found.append(arxiv_id)
-                continue
-            kept, dropped = arxiv_references(record, arxiv_id)
-            result.non_arxiv += dropped
-            if kept:
-                result.references[arxiv_id] = kept
-            else:
-                result.empty.append(arxiv_id)
     return result
+
+
+def _take(chunk: list[str], fetch: Fetch, result: ReferenceBatch) -> Exception | None:
+    """한 묶음을 받아 `result`에 나눠 담습니다. 실패하면 예외를 돌려줍니다(던지지 않습니다)."""
+    result.requests += 1
+    try:
+        records = fetch(chunk)
+    except Exception as exc:  # noqa: BLE001 - 한 묶음의 실패는 다음 묶음을 막지 않습니다
+        return exc
+    if len(records) != len(chunk):
+        raise RuntimeError(f"S2가 {len(chunk)}편을 받고 {len(records)}개를 돌려줬습니다")
+    for arxiv_id, record in zip(chunk, records, strict=True):
+        if record is None:
+            result.not_found.append(arxiv_id)
+            continue
+        kept, dropped = arxiv_references(record, arxiv_id)
+        result.non_arxiv += dropped
+        if kept:
+            result.references[arxiv_id] = kept
+        else:
+            result.empty.append(arxiv_id)
+    return None

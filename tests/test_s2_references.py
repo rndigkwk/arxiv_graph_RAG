@@ -36,11 +36,8 @@ def test_sorts_found_empty_and_missing_papers_apart():
 
 
 def test_one_failed_chunk_does_not_lose_the_others():
-    calls = []
-
     def fetch(ids):
-        calls.append(list(ids))
-        if len(calls) == 1:
+        if "a" in ids:
             raise TimeoutError("read timed out")
         return [record("z") for _ in ids]
 
@@ -48,9 +45,37 @@ def test_one_failed_chunk_does_not_lose_the_others():
     batch = s2.fetch_references(["a", "b", "c"], fetch=fetch, sleep=pauses.append,
                                 batch_size=2)
     assert [f["arxiv_id"] for f in batch.failures] == ["a", "b"]
+    assert batch.failures[0]["error"].startswith("TimeoutError")
     assert batch.references == {"c": ["z"]}
-    assert batch.requests == 2
-    assert pauses == [s2.INTERVAL_WITHOUT_KEY]  # 묶음 사이에만 쉽니다
+    assert batch.requests == 3  # 실패한 묶음은 끝에 한 번 더 보냅니다(ADR-118)
+    # 묶음 사이에 쉬고, 두 번째 차례 앞에서 길게 쉽니다.
+    assert pauses == [s2.INTERVAL_WITHOUT_KEY, s2.SECOND_PASS_PAUSE]
+
+
+def test_a_chunk_that_failed_once_is_taken_on_the_second_pass():
+    """11-09에 무키 429가 한 묶음을 막아 적재가 멈췄습니다. 끝에 다시 보내면 받습니다(ADR-118)."""
+    calls = []
+
+    def fetch(ids):
+        calls.append(list(ids))
+        if len(calls) == 1:
+            raise TimeoutError("HTTP Error 429")
+        return [record("z") for _ in ids]
+
+    pauses = []
+    batch = s2.fetch_references(["a", "b", "c"], fetch=fetch, sleep=pauses.append,
+                                batch_size=2)
+    assert batch.failures == []
+    assert batch.references == {"a": ["z"], "b": ["z"], "c": ["z"]}
+    assert calls == [["a", "b"], ["c"], ["a", "b"]]
+    assert pauses == [s2.INTERVAL_WITHOUT_KEY, s2.SECOND_PASS_PAUSE]
+
+
+def test_no_second_pass_pause_when_nothing_failed():
+    pauses = []
+    s2.fetch_references(["a", "b", "c"], fetch=lambda ids: [record() for _ in ids],
+                        sleep=pauses.append, batch_size=2)
+    assert pauses == [s2.INTERVAL_WITHOUT_KEY]
 
 
 def test_a_short_answer_is_an_error_not_a_silent_shift():
