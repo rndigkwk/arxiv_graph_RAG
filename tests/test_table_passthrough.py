@@ -108,6 +108,14 @@ def test_the_blank_line_between_a_paragraph_and_a_whole_table_marker_is_kept():
     assert partial == "다섯 편입니다.\n\n" + tables[0]
 
 
+def test_category_words_in_translated_prose_match_the_screen():
+    """모델은 같은 말을 실행마다 다르게 옮겼습니다. 머리줄 "주 분류"와 맞춥니다(ADR-119)."""
+    for said in ("주 카테고리가", "기본 카테고리가", "1차 카테고리가", "주카테고리가"):
+        assert t.korean_terms(f"{said} cs.CL인 논문") == "주 분류가 cs.CL인 논문"
+    assert t.korean_terms("인용, 카테고리를 봅니다") == "인용, 분류를 봅니다"
+    assert t.korean_terms("Category Theory 논문") == "Category Theory 논문"  # 영어는 그대로
+
+
 def test_header_words_are_matched_whole_and_without_case():
     assert t._known_header("| ARXIV ID | title | Citations |") == "| arXiv ID | 제목 | 인용 수 |"
     assert t._known_header("| arXiv ID | Title | Why read it |") is None
