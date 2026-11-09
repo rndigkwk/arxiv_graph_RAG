@@ -71,6 +71,12 @@ NOT_A_QUALITY_METRIC = frozenset({
 })
 
 
+# 문항당 출력 토큰(답과 판정을 합친 값)이 이보다 크면 경고합니다. 위반이 아닙니다(ADR-116).
+# 정상 실행의 최대는 1,085토큰이었고(ADR-101), 판정 한 번은 4,000토큰에서 잘립니다. 판정이 상한에
+# 닿으면 다시 부르므로 그 문항은 5,000을 넘습니다. 상한이 없는 에이전트가 길어져도 여기서 보입니다.
+OUTPUT_TOKEN_ALARM = 5000
+
+
 @dataclass(frozen=True)
 class Violation:
     rule: str
@@ -147,6 +153,10 @@ def normalize(report: dict[str, Any]) -> dict[str, Any]:
         failed = bool(row.get("failed"))
         answer_failures += int(failed)
         cases[case_id] = {"failed": failed, "metrics": _numeric(row)}
+        output = row.get("chat_output_tokens")
+        if isinstance(output, int) and not isinstance(output, bool):
+            # 품질 지표가 아니라 비교하지 않습니다. 경고만 읽습니다(`long_outputs`).
+            cases[case_id]["output_tokens"] = output
 
     # 품질 지표는 **답을 만든 사례만으로** 집계합니다. 하네스의 summary는 멈춘 사례를 0점으로
     # 섞어서, 근거 recall이 품질이 아니라 실패율을 재게 됩니다. 2026-10-16 세 번째 full 실행이
@@ -232,6 +242,12 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
         }
         for case_id in set().union(*(set(report["cases"]) for report in reports))
     }
+    # 출력 토큰은 가장 긴 실행을 남깁니다. 경고는 한 번이라도 길어진 것을 봐야 합니다.
+    for case_id, case in merged["cases"].items():
+        outputs = [report["cases"][case_id]["output_tokens"] for report in reports
+                   if "output_tokens" in report["cases"].get(case_id, {})]
+        if outputs:
+            case["output_tokens"] = max(outputs)
     return merged
 
 
@@ -459,6 +475,22 @@ def transient_failures(
     )
 
 
+def output_peak(report: dict[str, Any]) -> tuple[str, int] | None:
+    """문항당 출력 토큰이 가장 큰 사례. 사용량이 없는 보고서면 None."""
+    counted = [(case_id, case["output_tokens"]) for case_id, case in report["cases"].items()
+               if "output_tokens" in case]
+    return max(counted, key=lambda item: item[1]) if counted else None
+
+
+def long_outputs(report: dict[str, Any], limit: int = OUTPUT_TOKEN_ALARM) -> list[tuple[str, int]]:
+    """출력이 `limit`토큰을 넘은 사례, 큰 순서. 판정을 바꾸지 않습니다(ADR-116)."""
+    return sorted(
+        ((case_id, case["output_tokens"]) for case_id, case in report["cases"].items()
+         if case.get("output_tokens", 0) > limit),
+        key=lambda item: -item[1],
+    )
+
+
 def _lower_is_better(name: str) -> bool:
     return name.endswith(("_failure_rate", "_errors"))
 
@@ -514,6 +546,17 @@ def write_summary(path: Path, baseline: dict[str, Any], report: dict[str, Any],
             f"- 실패율 {report['metrics'].get('answer_failure_rate', 0):.4f}로 상한 "
             f"{baseline['absolute_floor'].get('answer_failure_rate', 0):.4f} 안입니다. "
             "측정된 변동 범위(5.6~8.3%)이므로 회귀로 세지 않습니다.",
+        ]
+    if (peak := output_peak(report)) is not None:
+        lines += ["", f"- 문항당 출력 최대: {peak[1]:,}토큰 (`{peak[0]}`)"]
+    if long := long_outputs(report):
+        lines += [
+            "",
+            "### 출력이 긴 사례 (위반 아님)",
+            "",
+            f"- 문항당 출력이 {OUTPUT_TOKEN_ALARM:,}토큰을 넘었습니다. 판정이 상한(4,000)에 "
+            "닿았거나 에이전트가 길어졌을 수 있습니다. 재현율이 떨어지기 전에 그 사례를 보세요.",
+            *(f"- `{case_id}`: {tokens:,}토큰" for case_id, tokens in long),
         ]
     if violations:
         lines += ["", "### 위반", ""] + [f"- {violation}" for violation in violations]
@@ -615,6 +658,10 @@ def main() -> int:
         write_summary(args.summary, baseline, merged, violations)
         for violation in violations:
             print(violation)
+        # GitHub Actions가 이 줄을 실행 화면 위에 경고로 띄웁니다. 판정은 바꾸지 않습니다(ADR-116).
+        for case_id, tokens in long_outputs(merged):
+            print(f"::warning title=출력이 긴 사례::{case_id} 출력 {tokens:,}토큰 "
+                  f"(경고 기준 {OUTPUT_TOKEN_ALARM:,})")
         print(f"위반 {len(violations)}건, 판정은 pytest가 합니다")
     return 0
 
