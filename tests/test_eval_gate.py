@@ -21,13 +21,18 @@ import pytest
 from evals.gate import (
     BASELINE,
     GATE_REPORT,
+    OUTPUT_TOKEN_ALARM,
     RAGAS_FAITHFULNESS,
     RAGAS_STABLE_PRECISION,
     check,
     compares_aggregates,
+    long_outputs,
+    merge,
     normalize,
+    output_peak,
     ragas_metrics,
     transient_failures,
+    write_summary,
 )
 
 FIXTURES = sorted((Path(__file__).parent / "fixtures" / "eval_gate").iterdir())
@@ -157,6 +162,53 @@ def test_cost_and_latency_are_not_gated():
     assert "recall_at_k" in metrics
     assert "elapsed_seconds" not in metrics
     assert "chat_input_tokens" not in metrics
+
+
+def _run(outputs: dict) -> dict:
+    return normalize({"results": [
+        {"id": case_id, "answer_evidence_recall": 1.0, "failed": False,
+         "chat_output_tokens": tokens}
+        for case_id, tokens in outputs.items()
+    ]})
+
+
+def _summary_baseline() -> dict:
+    return {"source": {"runs": 3}, "metrics": {}, "absolute_floor": {}, "case_ids": [],
+            "stable_cases": []}
+
+
+def test_a_long_output_warns_without_changing_the_verdict(tmp_path: Path):
+    """11-02의 128,424토큰 판정은 재현율이 떨어진 뒤에야 보였습니다.
+
+    이제 요약에 먼저 뜹니다(ADR-116)."""
+    run = _run({"short": 900, "runaway": 128_424})
+    assert long_outputs(run) == [("runaway", 128_424)]
+    assert output_peak(run) == ("runaway", 128_424)
+    # 토큰은 품질 지표가 아니라 기준선과 비교하지 않습니다.
+    assert "chat_output_tokens" not in run["cases"]["runaway"]["metrics"]
+    baseline = _summary_baseline()
+    summary = tmp_path / "summary.md"
+    write_summary(summary, baseline, run, [])
+    text = summary.read_text(encoding="utf-8")
+    assert "판정: 통과" in text and "출력이 긴 사례" in text and "`runaway`: 128,424토큰" in text
+
+
+def test_a_normal_run_only_states_its_peak(tmp_path: Path):
+    """정상 실행의 최대는 1,085토큰이었습니다(ADR-101). 경고 기준은 그 4배가 넘습니다."""
+    assert OUTPUT_TOKEN_ALARM > 4 * 1085
+    run = _run({"a": 1085, "b": 300})
+    assert long_outputs(run) == []
+    summary = tmp_path / "summary.md"
+    write_summary(summary, _summary_baseline(), run, [])
+    text = summary.read_text(encoding="utf-8")
+    assert "문항당 출력 최대: 1,085토큰 (`a`)" in text and "출력이 긴 사례" not in text
+
+
+def test_merging_runs_keeps_the_longest_output():
+    """세 실행 중 한 번만 길어져도 경고해야 합니다."""
+    merged = merge([_run({"a": 800}), _run({"a": 9000}), _run({"a": 700})])
+    assert merged["cases"]["a"]["output_tokens"] == 9000
+    assert long_outputs(merged) == [("a", 9000)]
 
 
 # --- 2층: 이번 평가 ----------------------------------------------------------------

@@ -187,3 +187,4 @@
 | [ADR-113](ADR-113-search-the-named-category-before-the-agent.md) | 분류 코드와 주제를 함께 묻는 질문은 앱이 그 분류 안에서 먼저 찾는다 — 도구에 인자를 더하지 않는다 | 채택 |
 | [ADR-114](ADR-114-the-translation-streams.md) | 답의 한국어 번역을 흘려 보낸다 — 첫 조각부터 한국어로 보여 준다 | 채택 |
 | [ADR-115](ADR-115-the-screen-says-when-an-answer-is-cut-or-the-model-is-down.md) | 끊긴 답과 모델 장애를 화면이 알린다 — 끝 이벤트 없는 스트림은 오류, 장애는 할 일로 | 채택 |
+| [ADR-116](ADR-116-warn-on-a-long-output-per-case.md) | 문항당 출력이 길면 회귀 평가가 경고한다 — 판정은 바꾸지 않는다 | 채택 |
