@@ -39,6 +39,7 @@ from src import (
     agent_graph,
     early_judge,
     pagerank,
+    pre_author,
     pre_category,
     pre_recent,
     pre_resolve,
@@ -772,6 +773,28 @@ def ask(question, history, on_answer=None):
                                           time.perf_counter() - started)
         return {"record": record, "hint": pre_category.hint(output, found)}
 
+    def author_first(asked, english):
+        """저자를 묻는 질문의 이름이 그래프에 딱 맞게 없을 때만 후보를 붙입니다(ADR-121)."""
+        if not pre_author.asks_author(asked, english):
+            return None
+        for name in pre_author.names(asked, english):
+            started = time.perf_counter()
+            try:
+                matches = run_read(
+                    "CALL db.index.fulltext.queryNodes($index, $phrase) YIELD node "
+                    "RETURN node.name AS name, COUNT { (node)-[:AUTHORED]->() } AS papers "
+                    "LIMIT 50",
+                    {"index": pre_author.INDEX, "phrase": pre_author.lucene_phrase(name)},
+                )
+            except Exception:  # noqa: BLE001 - 못 보면 모델이 지금처럼 찾습니다.
+                return None
+            # 딱 맞는 저자가 있거나 아무도 없으면 다음 이름을 봅니다.
+            if candidates := pre_author.unresolved(name, to_jsonable(matches)):
+                record = pre_author.call_record(name, candidates,
+                                                time.perf_counter() - started)
+                return {"record": record, "hint": pre_author.hint(name, candidates)}
+        return None
+
     def scope_first(asked, english):
         """연구 단서가 없는 질문만 컬렉션에 가까운 논문이 있는지 봅니다(ADR-095)."""
         if pre_scope.has_domain_cue(asked, english):
@@ -835,6 +858,7 @@ def ask(question, history, on_answer=None):
         resolve=resolve_first,
         recent=recent_first,
         category=category_first,
+        author=author_first,
         scope=scope_first,
     )
     state = agent_graph.build_graph(deps).invoke({

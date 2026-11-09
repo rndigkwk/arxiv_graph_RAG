@@ -133,6 +133,7 @@ TOOL_LABEL = {"translate_to_english": "한국어→영어 번역",
               "search_graph": "Text2Cypher 관계 조회",
               "search_papers": "벡터 의미 검색",
               "resolve_paper": "제목으로 논문 특정",
+              "find_author": "저자 이름 후보",
               # 주 경로는 공동인용입니다(ADR-034·ADR-065). 보조 경로 이름으로 부르지 않습니다.
               "rank_related_papers": "관련 논문 (공동인용·PageRank·임베딩)"}
 # 11-46절이 기준선 90건에서 잰 값입니다. 이번 한 건만 보면 빠른지 느린지 알 수 없습니다.

@@ -21,6 +21,8 @@ Day 50~53 교안의 구조입니다. 바꾸는 것은 **흐름의 모양**이고
    찾아 이번 턴의 메시지로 붙입니다([`pre_recent.py`](pre_recent.py), ADR-090).
 8. **분류 안 주제 찾기도 노드가 됩니다.** `category`가 분류 코드와 주제를 함께 묻는 질문만 그
    분류 안에서 먼저 찾아 메시지로 붙입니다([`pre_category.py`](pre_category.py), ADR-113).
+9. **저자 이름 확인도 노드가 됩니다.** `author`가 저자를 묻는 질문의 이름이 그래프에 딱 맞게 없을
+   때만 그 이름을 담은 저자 후보를 메시지로 붙입니다([`pre_author.py`](pre_author.py), ADR-121).
 
 **행동은 바꾸지 않았습니다.** `abstain`은 지금도 `AnswerValidationError`를 올립니다. 평가
 하네스가 그 예외를 "답하지 못함"으로 세고 게이트의 `answer_failure_rate` 기준선이 그 정의로
@@ -66,6 +68,7 @@ class AnswerState(TypedDict, total=False):
     resolution: dict[str, Any]
     recency: dict[str, Any]
     category: dict[str, Any]
+    author: dict[str, Any]
     scope: dict[str, Any]
     attempt: int
     result: dict[str, Any]
@@ -96,6 +99,9 @@ class Dependencies:
     # 같은 모양입니다. 분류 코드와 주제를 함께 묻는 질문을 앱이 그 분류 안에서 먼저 찾습니다
     # (ADR-113). 인자는 `recent`와 같습니다. None이면 노드가 없습니다.
     category: Callable[[str, str], dict[str, Any] | None] | None = None
+    # 같은 모양입니다. 저자를 묻는 질문의 이름이 그래프에 딱 맞게 없으면 후보를 붙입니다(ADR-121).
+    # 인자는 `recent`와 같습니다. None이면 노드가 없습니다.
+    author: Callable[[str, str], dict[str, Any] | None] | None = None
     # 범위 밖 질문을 앱이 먼저 가립니다(ADR-095). 인자는 `recent`와 같습니다. None이면 범위
     # 안이고, `{"decline": True, "answer": ..., "record": ...}`이면 에이전트 없이 답하고,
     # `{"record": ...}`이면 확인 검색만 기록하고 에이전트에 그대로 맡깁니다. 메시지는 붙이지
@@ -188,10 +194,23 @@ def build_graph(deps: Dependencies):
 
         return _timed("category", state, work)
 
+    def author(state: AnswerState) -> dict[str, Any]:
+        def work() -> dict[str, Any]:
+            # 논문 하나를 지칭했으면 건너뜁니다. 제목 낱말이 저자 이름 후보로 잡힙니다.
+            if state.get("resolution"):
+                return {}
+            done = deps.author(state["question"], english_of(state))
+            if not done:
+                return {}
+            return {"author": done,
+                    "messages": [*state["messages"], ("user", done["hint"])]}
+
+        return _timed("author", state, work)
+
     def scope(state: AnswerState) -> dict[str, Any]:
         def work() -> dict[str, Any]:
             # 앱이 논문을 찾았거나 "최근" 검색이 무언가를 찾았으면 범위 안입니다.
-            if state.get("resolution") or state.get("recency") or state.get("category"):
+            if any(state.get(key) for key in ("resolution", "recency", "category", "author")):
                 return {}
             done = deps.scope(state["question"], english_of(state))
             return {"scope": done} if done else {}
@@ -282,10 +301,17 @@ def build_graph(deps: Dependencies):
                     if (state.get(key) or {}).get("record")
                 )
                 response["tool_calls"].insert(position, record)
+            # 저자 후보도 같은 자리입니다. 논문 근거가 아니므로 `papers`에는 넣지 않습니다.
+            if record := (state.get("author") or {}).get("record"):
+                position = sum(
+                    1 for key in ("translation", "resolution", "recency", "category")
+                    if (state.get(key) or {}).get("record")
+                )
+                response["tool_calls"].insert(position, record)
             # 범위 확인 검색은 그 뒤입니다. 근거 후보가 아니므로 `papers`에는 넣지 않습니다.
             if record := (state.get("scope") or {}).get("record"):
                 position = sum(
-                    1 for key in ("translation", "resolution", "recency", "category")
+                    1 for key in ("translation", "resolution", "recency", "category", "author")
                     if (state.get(key) or {}).get("record")
                 )
                 response["tool_calls"].insert(position, record)
@@ -359,6 +385,8 @@ def build_graph(deps: Dependencies):
         graph.add_node("recent", recent)
     if deps.category is not None:
         graph.add_node("category", category)
+    if deps.author is not None:
+        graph.add_node("author", author)
     if deps.scope is not None:
         graph.add_node("scope", scope)
         graph.add_node("decline", decline)
@@ -375,10 +403,11 @@ def build_graph(deps: Dependencies):
         graph.add_node(name, node)
 
     # 앞 단계는 있는 것만 차례로 잇습니다:
-    # [translate] → [resolve] → [recent] → [category] → [scope] → route.
+    # [translate] → [resolve] → [recent] → [category] → [author] → [scope] → route.
     previous = START
     for name, present in (("translate", deps.translate), ("resolve", deps.resolve),
-                          ("recent", deps.recent), ("category", deps.category)):
+                          ("recent", deps.recent), ("category", deps.category),
+                          ("author", deps.author)):
         if present is not None:
             graph.add_edge(previous, name)
             previous = name
