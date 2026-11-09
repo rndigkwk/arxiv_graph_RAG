@@ -913,16 +913,18 @@ def translate_to_korean(text, on_partial=None):
 
 
 def _to_korean(text, on_partial=None):
+    """모델 번역. 분류 용어는 화면 용어로 맞춥니다(ADR-119) - 흘려 보내는 조각도 같습니다."""
+    terms = table_passthrough.korean_terms
     messages = [("system", korean_system), ("user", text)]
     if on_partial is None:
         message = translator.invoke(messages)
-        return (message.text or "").strip() or text
+        return terms((message.text or "").strip()) or text
     parts = []
     for chunk in translator.stream(messages):
         if piece := chunk.text:
             parts.append(piece)
-            on_partial("".join(parts))
-    return "".join(parts).strip() or text
+            on_partial(terms("".join(parts)))
+    return terms("".join(parts).strip()) or text
 
 
 GRAPH_COUNTS = """

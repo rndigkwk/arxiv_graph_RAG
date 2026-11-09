@@ -46,6 +46,18 @@ HEADERS = {
 }
 
 
+# 모델이 문단에서 "primary category"를 실행마다 "주 카테고리", "기본 카테고리", "1차 카테고리"로
+# 옮겼습니다. 화면(머리줄 "주 분류", 노드 "분류 안에서 찾기")과 같은 말로 맞춥니다(ADR-119).
+# 앞의 둘레말이 붙은 것부터 바꾸고, 남은 "카테고리"는 "분류"로 바꿉니다. 둘 다 모음으로 끝나
+# 조사(가·를·는·와·로)가 그대로 맞습니다.
+_PRIMARY_CATEGORY = re.compile(r"(?:주|기본|1차|일차) ?카테고리")
+
+
+def korean_terms(text: str) -> str:
+    """모델이 옮긴 한국어 글의 분류 용어를 화면 용어로 맞춥니다."""
+    return _PRIMARY_CATEGORY.sub("주 분류", text).replace("카테고리", "분류")
+
+
 def _cells(line: str) -> list[str]:
     return [cell.strip() for cell in line.strip().strip("|").split("|")]
 
