@@ -901,7 +901,8 @@ def translate_to_korean(text, on_partial=None):
         return text
     prose, tables = table_passthrough.split_tables(text)
     if tables and not table_passthrough.has_prose(prose):
-        return text  # 표뿐인 답 - 옮길 문장이 없습니다.
+        # 표뿐인 답 - 옮길 문장이 없습니다. 사전으로 옮긴 머리줄만 되돌립니다(ADR-117).
+        return table_passthrough.restore(prose, tables) or text
     if tables:
         show = None if on_partial is None else (
             lambda so_far: on_partial(table_passthrough.restore_partial(so_far, tables)))
