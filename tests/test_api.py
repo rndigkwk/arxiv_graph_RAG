@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from src import api
+from src import api, model_outage
 
 
 class Validation(Exception):
@@ -178,6 +178,24 @@ def test_unexpected_errors_do_not_leak_their_message():
     assert kind == "error"
     assert data["type"] == "RuntimeError"
     assert "secret" not in json.dumps(data)
+
+
+def test_a_model_outage_tells_the_screen_what_to_do():
+    """한도가 다 되면 다시 물어도 같은 실패입니다. 웹에 할 일을 말합니다(ADR-115)."""
+    import httpx
+    import openai
+
+    class Outage(FakeBot):
+        def ask(self, question, history, on_answer=None):
+            request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+            raise openai.RateLimitError(
+                "quota", response=httpx.Response(429, request=request),
+                body={"error": {"code": "insufficient_quota"}})
+
+    kind, data = events(client(Outage()).post("/api/ask", json={"question": "q"}).text)[-1]
+    assert kind == "error" and data["type"] == "RateLimitError"
+    assert data["message"] == model_outage.WEB_MESSAGES[model_outage.QUOTA]
+    assert "탭" not in data["message"]  # Streamlit의 탭 이름은 웹에 없습니다
 
 
 def test_paid_paths_are_rate_limited_per_ip():

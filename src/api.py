@@ -41,6 +41,7 @@ from src import (
     citations,
     family_board,
     ingest_status,
+    model_outage,
     quality_board,
     release,
     routing,
@@ -307,7 +308,9 @@ def create_app(
                 put(
                     "error",
                     {
-                        "message": "답변을 만들지 못했습니다. 다시 시도해 주세요.",
+                        # 한도가 다 된 날에는 다시 물어도 같은 실패입니다(ADR-115).
+                        "message": model_outage.web_message(exc)
+                        or "답변을 만들지 못했습니다. 다시 시도해 주세요.",
                         "type": type(exc).__name__,
                     },
                 )

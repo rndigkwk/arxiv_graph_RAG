@@ -18,14 +18,17 @@ import openai
 QUOTA = "quota"
 UNAVAILABLE = "unavailable"
 
-# 모델을 쓰지 않는 탭입니다. 실패 안내가 "할 수 있는 것"을 함께 말하도록 둡니다.
-STILL_WORKS = "홈·PageRank 순위·품질 게이트 탭은 모델 없이 동작합니다."
-MESSAGES = {
-    QUOTA: ("AI 모델의 사용 한도가 다 되어 답을 쓰지 못합니다. 한도가 초기화되면 다시 시도하세요. "
-            + STILL_WORKS),
-    UNAVAILABLE: ("AI 모델이 응답하지 않습니다(시간 초과·연결 실패·제공자 오류). 잠시 뒤 다시 "
-                  "시도하세요. " + STILL_WORKS),
+REASONS = {
+    QUOTA: "AI 모델의 사용 한도가 다 되어 답을 쓰지 못합니다. 한도가 초기화되면 다시 시도하세요.",
+    UNAVAILABLE: ("AI 모델이 응답하지 않습니다(시간 초과·연결 실패·제공자 오류). "
+                  "잠시 뒤 다시 시도하세요."),
 }
+# 모델을 쓰지 않는 화면입니다. 실패 안내가 "할 수 있는 것"을 함께 말하도록 둡니다.
+STILL_WORKS = "홈·PageRank 순위·품질 게이트 탭은 모델 없이 동작합니다."
+# 웹 화면(ADR-115). 논문·탐색·품질·그래프 화면은 모델을 부르지 않습니다.
+WEB_STILL_WORKS = "논문·탐색·품질·그래프 화면은 모델 없이 동작합니다."
+MESSAGES = {kind: f"{reason} {STILL_WORKS}" for kind, reason in REASONS.items()}
+WEB_MESSAGES = {kind: f"{reason} {WEB_STILL_WORKS}" for kind, reason in REASONS.items()}
 
 
 def chain(exc: BaseException):
@@ -62,3 +65,9 @@ def outage_kind(exc: BaseException) -> str | None:
 def message(exc: BaseException) -> str | None:
     kind = outage_kind(exc)
     return MESSAGES[kind] if kind else None
+
+
+def web_message(exc: BaseException) -> str | None:
+    """웹 API의 `error` 이벤트에 쓰는 문장입니다(ADR-115). 모델 문제가 아니면 `None`."""
+    kind = outage_kind(exc)
+    return WEB_MESSAGES[kind] if kind else None

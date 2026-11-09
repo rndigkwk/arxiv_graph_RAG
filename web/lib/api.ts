@@ -233,8 +233,20 @@ export async function* ask(question: string, history: Turn[], signal?: AbortSign
   for await (const { event, data } of readEvents(response.body)) {
     const d = data as Record<string, unknown>;
     if (event === "partial") yield { kind: "partial", answer: String(d.answer ?? "") };
-    else if (event === "final") yield { kind: "final", answer: d as unknown as Answer };
-    else if (event === "abstain") yield { kind: "abstain", abstain: d as unknown as Abstain };
-    else if (event === "error") yield { kind: "error", message: String(d.message ?? "오류") };
+    else if (event === "final") {
+      yield { kind: "final", answer: d as unknown as Answer };
+      return;
+    } else if (event === "abstain") {
+      yield { kind: "abstain", abstain: d as unknown as Abstain };
+      return;
+    } else if (event === "error") {
+      yield { kind: "error", message: String(d.message ?? "오류") };
+      return;
+    }
   }
+  // 끝 이벤트 없이 닫혔습니다. API 재시작이 진행 중인 답을 끊으면 이렇게 됩니다(ADR-107).
+  // 그냥 끝내면 그 턴이 "답하는 중…"에 남아 입력창이 막힙니다(ADR-115).
+  yield { kind: "error", message: CUT_OFF };
 }
+
+export const CUT_OFF = "답이 중간에 끊겼습니다. 다시 물어 주세요.";
