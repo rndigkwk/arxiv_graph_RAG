@@ -192,3 +192,4 @@
 | [ADR-118](ADR-118-retry-a-failed-s2-batch-once-at-the-end.md) | 통째로 실패한 Semantic Scholar 묶음은 끝에 한 번 더 보낸다 — 실패율 기준은 그대로 둔다 | 채택 |
 | [ADR-119](ADR-119-translated-prose-uses-the-screens-category-word.md) | 옮긴 문단의 분류 용어를 화면 용어로 맞춘다 — 지시문은 바꾸지 않는다 | 채택 |
 | [ADR-120](ADR-120-long-paper-lists-are-cut-to-ten-rows-at-the-tool.md) | 긴 논문 목록은 도구에서 10행으로 자른다 — 지시문은 바꾸지 않는다 | 채택 |
+| [ADR-121](ADR-121-an-inexact-author-name-gets-the-candidates-first.md) | 저자 이름이 딱 맞지 않으면 앱이 후보를 먼저 알려 준다 — 지시문은 바꾸지 않는다 | 채택 |
