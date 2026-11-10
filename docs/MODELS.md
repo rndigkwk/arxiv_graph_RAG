@@ -11,7 +11,7 @@
 
 | 모델 | 어디서 | 무엇을 | 조정 방식 |
 |---|---|---|---|
-| **`gpt-6-luna`** (OpenAI chat) | [`chatbot.py`](../src/chatbot.py) — 에이전트, `translate_to_english`, 번역 버튼 | 도구를 가진 에이전트(목록은 `chatbot.py`의 `tools=`; 관련 논문은 앱이 답 뒤에 부릅니다, [ADR-086](adr/ADR-086-the-app-ranks-related-papers-not-the-model.md)). 구조화 출력 `GroundedAnswer`(answer + evidence_ids) | **가중치 조정 없음.** 조정 대상은 프롬프트이고 MLflow에 버전으로 남깁니다([ADR-018](adr/ADR-018-prompt-versioning.md)) |
+| **`gpt-6-luna`** (OpenAI chat) | [`chatbot.py`](../src/chatbot.py) — 에이전트, `translate_to_english`, 답 번역(추론 끔, [ADR-112](adr/ADR-112-translation-without-reasoning.md)) | 도구를 가진 에이전트(목록은 `chatbot.py`의 `tools=`; 관련 논문은 앱이 답 뒤에 부릅니다, [ADR-086](adr/ADR-086-the-app-ranks-related-papers-not-the-model.md)). 구조화 출력 `GroundedAnswer`(answer + evidence_ids) | **가중치 조정 없음.** 조정 대상은 프롬프트이고 MLflow에 버전으로 남깁니다([ADR-018](adr/ADR-018-prompt-versioning.md)) |
 | **`text-embedding-3-large`** (768차원) | 같은 파일 — `search_papers`의 벡터 검색 | **질문만** 임베딩합니다. 논문 벡터는 적재 때 만든 것을 다시 쓰고 새로 만들지 않습니다 | 차원을 적재와 같은 768로 고정. 파인튜닝은 재고 기각했습니다(4절) |
 
 | **`graph-text-gbm`** (저장된 가중치 380KB) | [`forecast.py`](../src/forecast.py) — "앞으로 함께 인용될 논문" 패널. 웹의 논문 화면과 답변 화면(`/api/papers/{id}/forecast`), Streamlit 백업 판 | 후보 50편을 재정렬합니다. **버튼을 눌러야 돕니다** | 학습은 오프라인. 앱은 지문을 맞춰 보고 읽기만 합니다([ADR-038](adr/ADR-038-the-forecast-panel.md)) |
@@ -31,6 +31,8 @@
 | **개인화 PageRank** | 같은 함수 2단계(보충), 분류별 추천 | damping 0.85 · 200회 · 허용오차 1e-11 | 공동인용이 다섯 칸을 못 채울 때만([`pagerank.py`](../src/pagerank.py)) |
 | **Lucene 전문 검색** | `resolve_paper` | 모호성 간격 0.10 · 커버리지 0.8 · 최소 단어 3자 | `CONTAINS`가 비슷한 제목에서 엉뚱한 논문을 집었습니다([ADR-028](adr/ADR-028-resolve-titles-with-a-fulltext-index.md)) |
 | **규칙 기반 라우팅** | [`routing.py`](../src/routing.py) | 어휘 단서 목록 | 모델 분류는 **기각** — 아끼려는 것이 토큰인데 분류가 토큰을 더 씁니다([ADR-024](adr/ADR-024-route-by-question-type.md)) |
+| **에이전트 앞의 앱 노드** | [`agent_graph.py`](../src/agent_graph.py), `pre_*.py` | 질문 번역 · 제목 해석 · "최근" 기간 · 분류 · 저자 후보 · 범위 밖 | 코드로 가릴 수 있는 질문만 앞에서 처리합니다. 도구 인자나 지시문을 늘리면 **모든 질문의 턴**이 느려졌습니다([ADR-090](adr/ADR-090-recent-is-a-date-filtered-search.md); [ADR-087](adr/ADR-087-translate-before-the-agent.md)·[088](adr/ADR-088-resolve-the-named-paper-before-the-agent.md)·[113](adr/ADR-113-search-the-named-category-before-the-agent.md)·[121](adr/ADR-121-an-inexact-author-name-gets-the-candidates-first.md)) |
+| **도구 결과 손질** | `search_graph` | 논문 행 10행 · ID 모양 근거 별칭 고쳐 받기 | 25행 표가 마지막 턴을 7~8초로 만들었고, 모양만 어긋난 별칭이 조회를 한 번 더 쓰게 했습니다([ADR-120](adr/ADR-120-long-paper-lists-are-cut-to-ten-rows-at-the-tool.md)·[122](adr/ADR-122-repair-an-id-shaped-evidence-alias-at-the-tool.md)) |
 
 ## 3. 학습하고 등록까지 했지만 앱에 없는 것
 

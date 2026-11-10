@@ -198,6 +198,9 @@ RAGAS 점수는 판정 모델(`ragas_judge_model`)에 따라 달라지므로, �
 다른 판정 모델, 다른 사례 집합입니다 - 모수가 다른 값을 비교하지 않으려는 규칙입니다. 평가를 시작조차 못 한
 실행(OpenAI 예산 소진 등)은 회귀가 아니라 "돌리지 못함"으로 적습니다.
 
+**문항당 출력 토큰이 5,000을 넘으면 경고만 냅니다**([ADR-116](adr/ADR-116-warn-on-a-long-output-per-case.md)). 요약에 문항당 출력 최댓값과
+긴 사례를 적고, 머지는 막지 않습니다.
+
 ### 지연은 품질과 따로 잽니다
 
 [`scripts/measure_vm_answer_latency.py`](../scripts/measure_vm_answer_latency.py)가 VM API에 그래프 조건 셋의 가족마다
@@ -211,8 +214,15 @@ RAGAS 점수는 판정 모델(`ragas_judge_model`)에 따라 달라지므로, �
 | 같은 7문항, 한국어 답이 뜨기까지(받는 쪽 답 + 번역) | e8ace8e | 12.12초 | 22.46초 | 1/7 |
 | 2026-11-07 같은 7문항, 표 행 건너뛰기 뒤 서버 ([`reports/vm_answer_latency_examples_81a39c9.json`](../reports/vm_answer_latency_examples_81a39c9.json)) | 81a39c9 | 8.85초 | 19.91초 | 4/7 |
 | 같은 7문항, 한국어 답이 뜨기까지 | 81a39c9 | 11.24초 | 22.67초 | 2/7 |
-| 2026-11-08 같은 7문항, 번역 추론 끔·분류 노드·번역 스트리밍 뒤 서버 ([`reports/vm_answer_latency_examples.json`](../reports/vm_answer_latency_examples.json)) | 3ee8abb | 6.91초 | 12.77초 | 6/7 |
+| 2026-11-08 같은 7문항, 번역 추론 끔·분류 노드·번역 스트리밍 뒤 서버 ([`reports/vm_answer_latency_examples_3ee8abb.json`](../reports/vm_answer_latency_examples_3ee8abb.json)) | 3ee8abb | 6.91초 | 12.77초 | 6/7 |
 | 같은 7문항, 한국어 답이 뜨기까지 | 3ee8abb | 8.77초 | 14.31초 | 5/7 |
+| 2026-11-09 같은 7문항, 긴 논문 목록 10행 뒤 서버 ([`reports/vm_answer_latency_examples_e75596c.json`](../reports/vm_answer_latency_examples_e75596c.json)) | e75596c | 8.62초 | 12.82초 | 6/7 |
+| 같은 7문항, 한국어 답이 뜨기까지 | e75596c | 10.61초 | 14.75초 | 3/7 |
+| 2026-11-10 같은 7문항, 저자 후보 노드 뒤 서버 ([`reports/vm_answer_latency_examples_92cecfe.json`](../reports/vm_answer_latency_examples_92cecfe.json)) | 92cecfe | 8.54초 | 14.24초 | 6/7 |
+| 같은 7문항, 한국어 답이 뜨기까지 | 92cecfe | 10.31초 | 17.52초 | 3/7 |
+
+`reports/vm_answer_latency_examples.json`은 `--examples`의 기본 출력이라 **가장 최근 실행으로 덮입니다.** 표와 ADR은
+커밋 이름을 붙인 사본을 가리킵니다.
 
 **15문항은 모두 영어이고, 사람이 누르는 화면 예시는 모두 한국어입니다.** 한국어 질문은 번역을 두 번 거칩니다.
 서버가 질문을 영어로 옮기고(노드 `translate`, p50 1.69초), 화면이 영어 답을 한국어로 옮깁니다(`/api/translate`,
@@ -236,6 +246,14 @@ p50 2.52초, 25행 표가 든 답은 7초)([ADR-108](adr/ADR-108-the-question-sc
 - 한국어 답이 다 뜨기까지 p50은 8.77초이고, 7문항 중 5문항이 10초 안입니다.
 - 화면은 번역 첫 조각부터 한국어로 보여 줍니다. VM 스트림에서 첫 조각은 0.76~0.91초, 끝은 1.5~1.6초였습니다.
   운영 화면에서 예시 4를 한 번 물었을 때는 영어 답 8.1초, 한국어 첫 글 9.1초, 한국어 끝 9.8초였습니다.
+
+**2026-11-09~10, e75596c·92cecfe.** 인용 403편인 예시 5가 25행 표를 쓰느라 두 측정 모두 10초를 넘겼습니다.
+`search_graph`가 논문 행을 10행만 돌려주게 했습니다([ADR-120](adr/ADR-120-long-paper-lists-are-cut-to-ten-rows-at-the-tool.md)).
+- 마지막 턴 출력은 999토큰에서 430토큰 안팎이 되었습니다. 11-10에는 서버 9.5초로 처음 10초 안에 들었습니다.
+- 11-09는 모델 출력이 평소의 절반 남짓(73~85토큰/초)이라 서버 p50이 올랐습니다. 짝을 지은 비교는 ADR-120의 로컬 측정입니다.
+- 11-10에 10초를 넘긴 하나는 측정의 첫 질문(예시 1, 14.5초)이었습니다. 번역 4.3초와 검색 2.1초가 평소의 두 배였습니다.
+- 한국어 답이 뜨기까지는 p50 10.3~10.6초입니다. 3ee8abb의 8.77초보다 깁니다. 같은 날 짝을 짓지 않은 비교라, 차이는 대부분
+  모델 쪽 속도로 봅니다.
 
 ## 5. 한계 — 이 평가가 주장하지 않는 것
 

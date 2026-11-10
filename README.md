@@ -177,13 +177,13 @@ RAGAS 쪽이었습니다 — 지표마다 `None`을 적고 계속 가므로 게�
 |---|---|
 | [결정 기록](docs/adr/) | 결정마다 측정값과 그 측정을 만든 스크립트 경로. **뒤집힌 결정을 지우지 않고** 상태를 바꿉니다 |
 | [`docs/MODELS.md`](docs/MODELS.md) | **쓰는 모델과 쓰지 않는 모델.** 앱이 쓰는 것과 재서 기각한 아홉을 같은 표에 둡니다 |
-| [`EXPERIMENTS.md`](EXPERIMENTS.md) | 측정 51건. "어떻게 알았는가"가 서술로 남습니다 |
+| [`EXPERIMENTS.md`](EXPERIMENTS.md) | 측정 70여 건. "어떻게 알았는가"가 서술로 남습니다 |
 | 앱의 **[품질 화면](https://arxiv-graphrag.vercel.app/quality)** | 게이트 일곱 규칙, 지표별 하한·여유·변동폭, 기각한 모델을 **한 화면에**. 새로 재지 않고 기준선과 커밋된 보고서를 읽어 모양만 바꿉니다 |
 | `scripts/check_doc_numbers.py` | 문서의 숫자를 **출처 보고서에 묶어** CI가 신선도를 검사합니다(묶인 수치 100여 개 — 정확한 수는 검사기 출력에 있습니다) |
 | `scripts/check_doc_links.py` | 문서 간 링크와 앵커를 검사합니다. 대상 문서 수는 검사기 출력에 있습니다 |
 | `evals/ledger.py` | 평가 실행마다 **사례별 지표 한 줄**을 남깁니다. 보고서는 CI에서 버려지는데 그 값이 변동 질문의 유일한 데이터입니다(ADR-055) |
 | `scripts/check_adr_rules.py` | ADR 색인이 **선언한 규칙**을 ADR 파일에서 검사합니다 — 민감도 절과 상태 어휘. 없는 19개는 **명시적인 빚**이고 그 목록은 줄기만 합니다 |
-| 테스트 1,300여 개 | 게이트 규칙·라우팅·보류·제목 해석·승격 판정·내보내기를 **접속 없이** 검증합니다 |
+| 테스트 1,600여 개 | 게이트 규칙·라우팅·보류·제목 해석·앱 노드·승격 판정·내보내기를 **접속 없이** 검증합니다 |
 
 측정에 쓰는 통계도 손으로 고른 숫자가 아닙니다 — 변형 비교는 **쌍체 부트스트랩**으로 구간을
 내고, 구간이 0을 포함하면 "측정되지 않았다"로 적습니다. 그 규율 때문에 기각된 것이 여럿입니다
@@ -197,6 +197,9 @@ RAGAS 쪽이었습니다 — 지표마다 `None`을 적고 계속 가므로 게�
 브라우저가 GCP VM의 FastAPI(`src/api.py`)를 부릅니다. VM 한 대에 Neo4j·API·Caddy(HTTPS)가 컨테이너로 돌고
 ([`deploy/vm/compose.yml`](deploy/vm/compose.yml), [ADR-079](docs/adr/ADR-079-one-vm-mounts-the-repo-and-opens-only-https.md)),
 Streamlit은 VM에서 내렸습니다([ADR-083](docs/adr/ADR-083-take-streamlit-off-the-vm.md)).
+그래프는 **매주 월요일 VM에서 새 논문을 받아 자랍니다.** 새 논문의 참고문헌은 Semantic Scholar에서 붙이고
+([ADR-099](docs/adr/ADR-099-keep-the-weekly-ingest-criteria.md), [ADR-104](docs/adr/ADR-104-weekly-ingest-runs-on-the-vm.md)),
+수집이 멈추면 health와 이슈가 알립니다([ADR-106](docs/adr/ADR-106-alert-when-the-vm-ingest-stops.md)).
 [Streamlit 백업 판](https://arxivgraphrag-nxuoq53irzeuzpqgdtkeun.streamlit.app/)은 Aura Free의 2026-10-27 그래프에 고정돼 있습니다.
 
 > Streamlit 판의 탭·도구별 상세 기능과 PageRank 계산 방식은 [`APP_README.md`](APP_README.md)를 참고하세요.
@@ -215,7 +218,15 @@ Streamlit은 VM에서 내렸습니다([ADR-083](docs/adr/ADR-083-take-streamlit-
 - PageRank 순위, 커뮤니티, 스키마 메타그래프 시각화
 - 답변에 사용된 arXiv ID·Cypher·도구 호출 순서 확인, 그리고 답하지 못했을 때의 **보류 설명**
 - **품질 화면(`/quality`)** — 게이트 규칙과 지표별 하한·여유·변동폭, 기각한 모델
-- 답변 단계별 소요 시간 표시 — 목표는 VM에서 p50 10초입니다([ADR-084](docs/adr/ADR-084-answer-p50-under-10s-measure-the-vm-first.md)부터 087까지)
+- **에이전트 앞에서 앱이 먼저 하는 일** — 코드로 가릴 수 있는 질문은 모델 턴을 쓰지 않습니다. 지시문과 도구는
+  그대로라 다른 질문의 턴이 느려지지 않습니다([`src/agent_graph.py`](src/agent_graph.py)).
+  - 한국어 질문 번역([ADR-087](docs/adr/ADR-087-translate-before-the-agent.md)), 제목으로 논문 특정([ADR-088](docs/adr/ADR-088-resolve-the-named-paper-before-the-agent.md))
+  - "최근" 질문은 최근 12개월 안에서([ADR-090](docs/adr/ADR-090-recent-is-a-date-filtered-search.md)), 분류+주제 질문은 그 분류 안에서([ADR-113](docs/adr/ADR-113-search-the-named-category-before-the-agent.md)) 먼저 찾기
+  - 이름 일부만 쓴 저자는 후보와 편수를 먼저 알리기([ADR-121](docs/adr/ADR-121-an-inexact-author-name-gets-the-candidates-first.md)), 범위 밖 질문은 에이전트 없이 거절([ADR-095](docs/adr/ADR-095-out-of-scope-at-the-router.md))
+  - 도구 쪽에서는 긴 논문 목록을 10행으로 자르고([ADR-120](docs/adr/ADR-120-long-paper-lists-are-cut-to-ten-rows-at-the-tool.md)), 모양만 어긋난 근거 별칭을 고쳐 받습니다([ADR-122](docs/adr/ADR-122-repair-an-id-shaped-evidence-alias-at-the-tool.md))
+- 답변 단계별 소요 시간 표시 — 목표는 VM에서 서버 p50 10초이고 지키고 있습니다. 영어 15문항은 p50 6.09초(11-06), 한국어
+  화면 예시 7문항은 6/7이 10초 안입니다(11-10). 한국어 답은 번역까지 p50 10.3초입니다([`docs/EVALUATION.md` 4절](docs/EVALUATION.md#지연은-품질과-따로-잽니다))
+- 답을 먼저 영어로 보이고 한국어 번역을 흘려 보냅니다. 표 행과 아는 머리줄은 모델에 보내지 않습니다([ADR-108](docs/adr/ADR-108-the-question-screen-shows-the-answer-first.md)·[111](docs/adr/ADR-111-translation-skips-table-rows.md)·[114](docs/adr/ADR-114-the-translation-streams.md)·[117](docs/adr/ADR-117-known-table-headers-are-translated-without-the-model.md))
 
 ## Architecture
 
@@ -279,7 +290,9 @@ Streamlit 판(`app.py`)도 그대로 돕니다(`uv run streamlit run app.py`). �
 | 인용 원천 | `data/citations_ai/arxiv_citations_part1~2.jsonl` | AI 논문별 Semantic Scholar 인용·참고문헌 메타데이터 |
 | 참고문헌 논문 | `data/ai_references/arxiv_ai_references_api/arxiv_ai_references_api_part1~7.jsonl` | AI 논문이 인용한 논문 메타데이터 **31,913행** 및 `cit_arxiv_id` 목록 |
 
-동일한 arXiv ID는 하나의 논문으로 통합합니다. 적재 결과는 논문 **37,854개**, 저자 이름 **111,171개**, `AUTHORED` **268,928개**, `REFERENCES` **69,438개**입니다.
+동일한 arXiv ID는 하나의 논문으로 통합합니다. 첫 적재 결과는 논문 **37,854개**, 저자 이름 **111,171개**, `AUTHORED` **268,928개**, `REFERENCES` **69,438개**입니다.
+그 뒤 주간 수집으로 2026-11-10 VM 그래프는 논문 **43,728개**, 저자 이름 **123,402개**, `AUTHORED` **304,479개**, `REFERENCES` **148,051개**입니다
+(Streamlit 백업 판의 Aura는 2026-10-27 그래프에 고정돼 있습니다).
 
 ### GPU 노트북 — 배지를 누르면 Colab에서 바로 열립니다
 
@@ -464,10 +477,13 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 ├── web/                           # 배포된 화면 (Next.js, Vercel)
 ├── deploy/vm/                     # VM의 Neo4j·API·Caddy compose와 배포 스크립트
 ├── app.py                         # Streamlit 판 진입점 (백업 판이 이 경로를 가리킵니다)
-├── src/                           # 앱이 쓰는 모듈 18개
+├── src/                           # 앱이 쓰는 모듈 35개
 │   ├── api.py                     # 화면이 부르는 FastAPI (유료 호출 한도 포함)
 │   ├── chatbot.py                 # 검색 도구·에이전트·개인화 PageRank
 │   ├── agent_graph.py             # 답변 흐름 StateGraph (노드별 소요 시간 추적)
+│   ├── pre_*.py                   # 에이전트 앞의 앱 노드 — 번역·제목·최근·분류·저자·범위
+│   ├── table_passthrough.py       # 답 번역에서 표 행과 아는 머리줄을 빼고 되돌림
+│   ├── row_cap.py · evidence_alias.py # search_graph 결과 손질 (ADR-120·122)
 │   ├── routing.py                 # 질문 유형으로 경로를 정하는 규칙
 │   ├── abstain.py                 # 답하지 못한 이유를 사유 코드로 설명
 │   ├── forecast.py                # 승격된 가중치를 읽어 "함께 인용될 논문" 재정렬
@@ -496,11 +512,14 @@ PageRank 점수·논문 정보·피인용 수를 순위표로 보고 상위 논�
 
 - Neo4j Aura Free의 노드·관계 한도 때문에 `Category` 라벨과 `IN_CATEGORY` 관계를 만들지 못하고 분류를 논문 속성으로 저장했습니다. VM으로 옮긴 뒤에는 그 한도가 없지만 스키마는 아직 그대로입니다.
 - 시간 제약으로 AI 외 다른 분야의 논문까지 수집하지 못했습니다.
+- **같은 이름의 다른 사람을 가르지 못합니다.** 저자는 이름 문자열 하나가 노드 하나라 "Yang Liu" 한 노드에 여러 사람이
+  섞입니다. Semantic Scholar 저자 ID는 한 사람도 여러 ID로 쪼개서(Sergey Levine 52편에 12개) 쓰지 않았습니다
+  ([`docs/lecture-review.md`](docs/lecture-review.md) Day 39).
 - AI 관련 논문이 인용한 1-hop 논문만 수집해 더 깊은 인용망은 포함하지 못했습니다.
 - 컴퓨터 용량 제약으로 PDF를 청킹·임베딩하지 못하고 제목과 abstract만 사용했습니다.
 - 예측 패널의 **정답이 아직 오지 않았습니다.** 모델이 통과한 기준은 과거 창에서 잰 것이고,
   실제 채점에는 다음 달 스냅샷이 필요합니다([ADR-038](docs/adr/ADR-038-the-forecast-panel.md)).
-- 그 다음 달을 넣을 자리는 **세어 두었습니다** — 관계가 먼저 차고, 적재가 멈추는 선(95%)
+- (Aura Free 시절의 계산입니다. 지금 VM에는 그 한도가 없고, 백업 판의 Aura만 해당합니다.) 그 다음 달을 넣을 자리는 **세어 두었습니다** — 관계가 먼저 차고, 적재가 멈추는 선(95%)
   안에서 **3.4개월**(가장 생산량이 많았던 달의 속도로는 2.0개월)이 남아 있어 **아무것도
   지우지 않고** 들어갑니다. 지울 후보는 수확과 함께 **무엇을 깨뜨리는지**까지 쟀고, 네 번째
   달이 필요해지면 먼저 재야 하는 것도 적었습니다

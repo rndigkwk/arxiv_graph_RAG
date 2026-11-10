@@ -6,8 +6,8 @@
 
 작성 기준일: 2026-10-12
 
-> **교안별 적용 현황은 [`docs/lecture-review.md`](docs/lecture-review.md)에 day별로 따로 있습니다**(Day 02~69,
-> 2026-10-28). 이 문서의 4·5·11·12절은 그때그때의 계획과 재검토 기록입니다.
+> **교안별 적용 현황은 [`docs/lecture-review.md`](docs/lecture-review.md)에 day별로 따로 있습니다**(Day 02~77,
+> 2026-11-10). 10-29 이후의 결정은 [결정 기록 색인](docs/adr/README.md)에 있습니다. 이 문서의 4·5·11·12절은 그때그때의 계획과 재검토 기록입니다.
 
 ## 목차
 
