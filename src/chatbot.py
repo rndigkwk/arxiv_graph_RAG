@@ -38,6 +38,7 @@ from pipeline import tracing
 from src import (
     agent_graph,
     early_judge,
+    evidence_alias,
     pagerank,
     pre_author,
     pre_category,
@@ -272,7 +273,9 @@ def search_graph(cypher: str) -> dict:
         # 문자열로 변환된 값을 ORDER BY에 쓰면 질의는 성공하면서 순위만 틀어집니다.
         # 조용히 틀린 행을 돌려주는 것이 오류보다 나쁘므로 실행 전에 막습니다.
         check_order_by(cypher)
-        rows = to_jsonable(run_read(cypher))
+        # 모양만 어긋난 근거 별칭(ID 문자열 하나, 단수 `evidence_id`)은 고쳐 받습니다. 돌려보내면
+        # 모델이 조회를 다시 쓰느라 턴 하나가 더 들었습니다(ADR-122).
+        rows = evidence_alias.repair(to_jsonable(run_read(cypher)))
         check_evidence_alias(rows)
         # 긴 논문 목록은 앞 10행만 돌려줍니다. 모델이 25행 표를 쓰느라 7~8초를 썼습니다(ADR-120).
         rows, omitted = row_cap.cap_paper_rows(rows)

@@ -103,7 +103,7 @@
 | [ADR-016](ADR-016-stay-on-streamlit.md) | Cloud Run으로 옮기지 않는다 | 보류 |
 | [ADR-017](ADR-017-regression-gate.md) | 품질 회귀는 CI가 기준선과 대조해 막는다 | 채택 |
 | [ADR-018](ADR-018-prompt-versioning.md) | 프롬프트 본문은 한 모듈에 모으고 버전은 MLflow에 남긴다 | 채택 |
-| [ADR-019](ADR-019-validate-evidence-alias-at-the-tool.md) | 근거 별칭은 도구 경계에서 검사한다 | 채택 |
+| [ADR-019](ADR-019-validate-evidence-alias-at-the-tool.md) | 근거 별칭은 도구 경계에서 검사한다 (기각한 대안 둘을 ADR-122가 뒤집음) | 채택 |
 | [ADR-020](ADR-020-judge-called-once.md) | 심판은 질문당 한 번만 부른다 | 채택 |
 | [ADR-021](ADR-021-ragas-four-of-six.md) | RAGAS 지표는 여섯 중 넷만 쓰고 둘은 게이트에 넣지 않는다 | 채택 |
 | [ADR-022](ADR-022-answer-flow-as-a-stategraph.md) | 답변 흐름을 StateGraph로 세우되 행동은 바꾸지 않는다 | 채택 |
@@ -193,3 +193,4 @@
 | [ADR-119](ADR-119-translated-prose-uses-the-screens-category-word.md) | 옮긴 문단의 분류 용어를 화면 용어로 맞춘다 — 지시문은 바꾸지 않는다 | 채택 |
 | [ADR-120](ADR-120-long-paper-lists-are-cut-to-ten-rows-at-the-tool.md) | 긴 논문 목록은 도구에서 10행으로 자른다 — 지시문은 바꾸지 않는다 | 채택 |
 | [ADR-121](ADR-121-an-inexact-author-name-gets-the-candidates-first.md) | 저자 이름이 딱 맞지 않으면 앱이 후보를 먼저 알려 준다 — 지시문은 바꾸지 않는다 | 채택 |
+| [ADR-122](ADR-122-repair-an-id-shaped-evidence-alias-at-the-tool.md) | arXiv ID 모양인 근거 별칭은 도구에서 고쳐 받는다 — 별칭이 없는 행은 그대로 돌려보낸다 | 채택 |
