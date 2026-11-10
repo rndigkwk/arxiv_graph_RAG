@@ -11,6 +11,7 @@
 3. [표본 크기와 반복](#3-표본-크기와-반복) — 30문항으로 무엇을 구별할 수 있고 무엇을 못 하나
 4. [게이트](#4-게이트--머지를-막는-규칙) — 언제 어느 셋을 돌려 머지를 막나
 5. [한계](#5-한계--이-평가가-주장하지-않는-것) — 이 평가가 주장하지 않는 것
+6. [실행 명령](#6-실행-명령) — 평가 하네스를 돌리는 명령
 
 ## 0. 무엇을 평가하나
 
@@ -265,6 +266,60 @@ p50 2.52초, 25행 표가 든 답은 7초)([ADR-108](adr/ADR-108-the-question-sc
 - **답 문장의 품질은 RAGAS 두 지표가 거칠게만 봅니다.** 두 지표 모두 파국용 하한입니다.
 - **한국어 손실은 하한입니다.** 모델이 만든 한국어를 같은 계열 모델이 되돌리기 때문입니다.
 - **스냅샷(2026-10-14)에 묶여 있습니다.** 11월에 수집한 논문은 게이트 셋에 없습니다.
+
+## 6. 실행 명령
+
+README에서 옮긴 평가 하네스 명령입니다. RAG 검색·답변 평가 방법의 상세는 [`advanced.md`](../advanced.md)에 있습니다.
+
+```bash
+# 그래프 조건 평가 케이스를 만들고 정답을 라이브 DB의 Cypher와 대조합니다
+uv run python -m evals.build_graph_cases --verify-against-db
+
+# 벡터 단독 대 GraphRAG 비교
+uv run python -m evals.run --mode compare --cases evals/cases_graph.json --limit 30   --output reports/rag_eval_graph_compare.json
+
+# 조건 판정 심판만 따로 재는 하네스
+uv run python -m evals.judge_study
+
+# GraphRAG 변형 비교 (벡터 / PPR / 하이브리드), 질문 유형별
+uv run python -m evals.variant_study
+
+# LLM 색인 비용 하한과 부분 색인 정답 커버리지
+uv run --group dev python -m evals.index_cost
+
+# 한국어 질문의 번역 손실 (혼용/순수 두 형태 × 직접/번역)
+uv run python -m evals.language_study
+
+# 다른 곳에서 돌린 실행의 보고서를 로컬 추적에 등록 (예: Colab 파인튜닝)
+uv run python -m pipeline.register_run reports/embedding_finetune_colab.json
+
+# 집계 순위 질문이 수치를 문자열로 정렬하는 빈도 (유형당 반복 실행)
+uv run python -m evals.order_study --repeats 3
+
+# RAGAS 하한이 최악의 정상 실행을 넘는지, 결함을 심으면 걸리는지 (API 비용 없음)
+uv run python -m evals.ragas_spread --floors baselines/eval_baseline.json \
+    --group "기준선=reports/baseline_resolve_run1_ragas.json,reports/baseline_resolve_run2_ragas.json,reports/baseline_resolve_run3_ragas.json" \
+    --perturbed reports/ragas_perturbed_luna.json
+
+# 평가를 돌리지 못했다는 표식이 있으면 그 사유를 적습니다 (CI 요약이 이것을 읽습니다)
+uv run python -m evals.budget --explain
+
+# 모델이 쓴 Cypher를 막는 가드를 40가지로 때립니다 (EXPLAIN만, 통과한 질의도 실행 안 함)
+uv run python scripts/probe_cypher_guard.py --list   # 질의만, 접속 없음
+uv run python scripts/probe_cypher_guard.py
+
+# 교차 인코더에 보낼 (시드, 후보) 쌍 68,182개를 굳혀 내보냅니다 (GPU는 밖에서)
+uv run python -m evals.export_rerank_pairs
+
+# 밖에서 채점한 쌍 점수로 재정렬 변형을 판정합니다
+uv run python -m evals.related_study --cases evals/cases_related_future.json     --variants rerank vector --rerank-scores derived/2026-10-14/rerank-<slug>.jsonl.gz     --output reports/rerank_<name>.json
+```
+
+> **API 비용이 없는 하네스와 있는 하네스가 갈립니다.** 임베딩 비교(`related_study`·
+> `embedding_slice_study`), 하한 검사(`ragas_spread --floors`), 용량 계산(`pipeline.capacity`),
+> 재채점(`rescore`)은 **스냅샷과 커밋된 보고서만 읽습니다** — OpenAI도 Aura도 쓰지 않습니다.
+> 답변을 새로 만드는 `run`·`ragas_study`·`judge_study` 계열만 호출이 듭니다.
+
 
 ## 참고
 
