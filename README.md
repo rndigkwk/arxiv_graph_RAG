@@ -38,7 +38,8 @@ arXiv AI 논문 4만여 편과 인용 관계를 Neo4j 지식 그래프로 만들
   제목 전문 검색(`resolve_paper`). 그 앞에서 **앱 노드**가 번역·제목·"최근"·분류·저자 이름·범위 밖 질문을 코드로 먼저 처리해
   모델 턴을 아낍니다.
 - **무엇을 판별했나** — 관련 논문 추천에서 학습 모델 셋을 재서 기각하고 Cypher 한 줄을 골랐습니다(recall@5 2.2배).
-  결정 123개를 [ADR](docs/adr/README.md)로 남기고, 뒤집힌 결정도 지우지 않습니다.
+  직접 학습한 공동인용 예측 GBM은 휴리스틱을 신뢰구간으로 이겨 채택했고, 임베딩 파인튜닝 세 번은 OpenAI 임베딩을 넘지 못해 기각했습니다.
+  결정 123개를 [ADR](docs/adr/README.md)로 남기고, 뒤집힌 결정도 지우지 않습니다. 한 장 요약은 [`docs/VALIDATION.md`](docs/VALIDATION.md)입니다.
 - **어떻게 지키나** — PR마다 회귀 평가가 돌고, 지표 10개 중 하나라도 하한 아래면 머지되지 않습니다.
   모델이 쓴 Cypher는 읽기 전용 세션 · 계획 유형 검사 · 프로시저 허용 목록의 세 겹으로 막습니다.
 - **어디서 도나** — 화면은 Vercel의 Next.js, API·Neo4j는 GCP VM 한 대. 그래프는 매주 월요일 새 논문을 받아 자랍니다.
@@ -48,7 +49,8 @@ arXiv AI 논문 4만여 편과 인용 관계를 Neo4j 지식 그래프로 만들
 | 무엇 | 값 | 출처 |
 |---|---|---|
 | 관련 논문 recall@5 — Cypher 공동인용 정렬 대 개인화 PageRank | **0.8892** 대 0.3957 (적격 시드 3,740개 전수) | [ADR-030](docs/adr/ADR-030-related-papers-needs-a-query-not-a-model.md)·[034](docs/adr/ADR-034-measure-every-eligible-seed.md) |
-| 재서 기각한 모델 | 선형 어댑터 · 미세조정 임베딩 · 교차 인코더 재정렬 등 아홉 | [`docs/MODELS.md`](docs/MODELS.md) |
+| 직접 학습한 모델 — 공동인용 예측 `graph-text-gbm` | MRR **0.6513**, 최고 휴리스틱 대비 +0.0818 [+0.0699, +0.0936] | [ADR-031](docs/adr/ADR-031-the-model-that-wins-is-the-forecast.md) |
+| 재서 기각한 모델 | 선형 어댑터 · 미세조정 임베딩 · 교차 인코더 재정렬 등 아홉 | [`docs/VALIDATION.md`](docs/VALIDATION.md) · [`docs/MODELS.md`](docs/MODELS.md) |
 | 머지 게이트 | 지표 10개 · 규칙 7개, 변동폭보다 좁은 하한 0개 | [`docs/EVALUATION.md`](docs/EVALUATION.md) 4절 |
 | 답 지연 (VM 서버) | 영어 15문항 p50 **6.09초**, 한국어 화면 예시 7문항 중 6개가 10초 안 | [`docs/EVALUATION.md`](docs/EVALUATION.md#지연은-품질과-따로-잽니다) |
 | Cypher 가드 공격 | 40가지 중 쓰기 20/20 차단, 외부 읽기 2건을 찾아 막음 | [ADR-048](docs/adr/ADR-048-the-type-check-does-not-know-the-internet.md) |
@@ -74,8 +76,9 @@ arXiv AI 논문 4만여 편과 인용 관계를 Neo4j 지식 그래프로 만들
 
 ## 판별한 것
 
-**"GraphRAG 앱을 만들었다"가 아니라 "변화가 도움이 되는지 판별했다"가 이 저장소의 주장입니다.** 자세한 경과는
-[`docs/ENGINEERING.md`](docs/ENGINEERING.md)에 있습니다.
+**"GraphRAG 앱을 만들었다"가 아니라 "변화가 도움이 되는지 판별했다"가 이 저장소의 주장입니다.**
+학습한 모델과 판정, 걸린 함정, 평가 도구 검증을 한 장에 모은 것이 [`docs/VALIDATION.md`](docs/VALIDATION.md)이고,
+자세한 경과는 [`docs/ENGINEERING.md`](docs/ENGINEERING.md)에 있습니다.
 
 1. **학습 모델을 재서 기각하고 Cypher 한 줄을 골랐습니다.** 관련 논문 자리에서 선형 어댑터 둘·벡터 최근접·개인화 PageRank가
    공동 인용자 수로 정렬하는 Cypher에 졌습니다(0.8892 대 0.3957 이하). 정답이 공동인용이라 이 정답으로는 모델을 재지 못한다는 점도 적었습니다.
@@ -86,12 +89,16 @@ arXiv AI 논문 4만여 편과 인용 관계를 Neo4j 지식 그래프로 만들
 4. **집계 1위 모델을 집단으로 쪼개 기각했고, 그 판단이 나중에 확인됐습니다.** `graph-text-gbm`은 두 집단 모두에서 졌고,
    배포 경로의 빈칸을 메우자 집계 우위도 사라졌습니다([ADR-037](docs/adr/ADR-037-the-gbm-wins-the-average-and-loses-both-halves.md)·[040](docs/adr/ADR-040-fill-the-empty-panel.md)).
 
-넷 중 둘은 제가 먼저 틀리게 적고 측정으로 고친 것이고, 그 과정이 ADR에 남아 있습니다.
+5. **평가 도구 자체를 시험했습니다.** 결함을 심은 답 20건에서 지표가 1.000 → 0.000으로 떨어지는지 봤고,
+   일부러 망친 모델이 승격 판정에서 거부되고 롤백되는 것까지 돌렸습니다([ADR-032](docs/adr/ADR-032-close-the-model-lifecycle.md)).
+
+1~4 중 둘은 제가 먼저 틀리게 적고 측정으로 고친 것이고, 그 과정이 ADR에 남아 있습니다.
 
 ## 처음 보시는 분께 — 더 읽을 곳
 
 | 보고 싶은 것 | 어디로 |
 |---|---|
+| **무엇을 재서 무엇을 버렸나 (한 장 요약)** | [`docs/VALIDATION.md`](docs/VALIDATION.md) — 학습한 모델과 결과, 걸린 함정, 평가 도구 검증, 머지를 막는 장치 |
 | **지금 무엇을 쓰고, 무엇을 왜 안 쓰는가** | [`docs/MODELS.md`](docs/MODELS.md) — 앱이 쓰는 모델, 재서 기각한 아홉 |
 | **평가를 어떻게 만들었나** | [`docs/EVALUATION.md`](docs/EVALUATION.md) — 평가 셋 · 지표 · 표본 크기 · 게이트 · 지연 · 한계 · 실행 명령 |
 | **결정과 그 근거 수치** | [결정 기록](docs/adr/README.md) — 채택·기각·보류, 뒤집힌 것은 지우지 않고 표시 |
