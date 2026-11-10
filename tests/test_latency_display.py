@@ -14,14 +14,31 @@
 """
 
 import json
+import re
 from pathlib import Path
 
 import app
+from src.agent_graph import Dependencies, build_graph
 
 LATENCY = Path("reports/answer_latency.json")
-AGENT_NODES = ("translate", "resolve", "recent", "category", "route", "generate", "collect",
-               "check_format",
-               "check_conditions", "revise", "accept", "abstain")
+WEB_ANSWER = Path("web/lib/answer.ts")
+
+
+def _unused(*_args):
+    return None
+
+
+# 앞 단계를 모두 켠 그래프에서 노드 이름을 읽습니다. 손으로 적은 목록은 author·scope·decline이
+# 늘었을 때 따라가지 못해 화면에 영어 이름이 나왔습니다(2026-11-10).
+AGENT_NODES = tuple(
+    name for name in build_graph(Dependencies(
+        stream_answer=_unused, collect=_unused, check_format=_unused,
+        check_conditions=_unused, log_failure=_unused,
+        translate=_unused, resolve=_unused, recent=_unused, category=_unused,
+        author=_unused, scope=_unused,
+    )).get_graph().nodes
+    if not name.startswith("__")
+)
 
 
 def trace(seconds, *, attempts=1, visits=None):
@@ -108,6 +125,15 @@ def test_every_graph_node_has_a_label():
     """StateGraph에 노드가 늘었는데 표찰이 없으면 화면에 영어 이름이 나옵니다."""
     for node in AGENT_NODES:
         assert app.NODE_LABEL.get(node), node
+
+
+def test_the_web_labels_match_the_streamlit_labels():
+    """Next.js 화면(`web/lib/answer.ts`)의 표찰도 같은 노드를 같은 말로 부릅니다."""
+    source = WEB_ANSWER.read_text(encoding="utf-8")
+    block = source.split("export const NODE_LABEL", 1)[1].split("};", 1)[0]
+    web = dict(re.findall(r'^\s*(\w+): "([^"]+)",', block, flags=re.M))
+
+    assert web == app.NODE_LABEL
 
 
 def test_an_unknown_node_falls_back_to_its_name():
