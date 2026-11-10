@@ -52,7 +52,7 @@
 main은 근거 0~1편으로 답한 실행이 다섯 번 있었습니다. "cs.CL에서 기계 번역 논문"은 한 번 `search_papers`를
 40번 넘게 부르며 101초를 썼습니다.
 
-**머지 뒤 VM에서 쟀습니다**(2026-11-08, 3ee8abb, `reports/vm_answer_latency_examples.json`). 예시 4는 서버 19.91초
+**머지 뒤 VM에서 쟀습니다**(2026-11-08, 3ee8abb, `reports/vm_answer_latency_examples_3ee8abb.json`). 예시 4는 서버 19.91초
 (턴 7개)에서 7.80초(턴 2개, `category` 노드 1.65초)가 되었습니다. 운영 화면에서 한 번 물었을 때도 8.1초였습니다.
 
 ## 고르지 않은 것
