@@ -80,7 +80,7 @@ docker compose --env-file .local\neo4j.env -f compose.local.yml start
 
 그래프를 두 배로 키웠을 때의 크기·지연은 **별도 컨테이너**에서 잽니다. 1배 기준선과 이미지·heap·
 page cache·CPU가 같고(`tests/test_measure_double_graph.py`가 대조합니다), 포트(27687)와 볼륨이
-다릅니다. 위의 1배 로컬 DB에는 쓰지 않습니다. 결과는 [ADR-071](docs/adr/ADR-071-double-the-graph-move-only-the-database.md)에 있습니다.
+다릅니다. 위의 1배 로컬 DB에는 쓰지 않습니다. 결과는 [ADR-071](adr/ADR-071-double-the-graph-move-only-the-database.md)에 있습니다.
 
 ```powershell
 # 1배 컨테이너가 돌고 있으면 CPU를 나눠 쓰므로 잠시 멈춥니다(볼륨은 남습니다).

@@ -11,7 +11,7 @@ Day 49 교안의 "PageRank 포화 점수로 검색 순위를 재정렬"과 Day 4
 후보를 한 번만 가져와 모든 가중치에 같은 후보를 쓰므로, 검색 변동이 비교에 끼지 않습니다.
 
 재정렬은 여기에만 있고 `chatbot`에는 넣지 않았습니다. 측정 결과 채택하지 않았기 때문입니다
-(`advanced.md`의 "PageRank 재정렬" 참고). 재현하거나 다시 판단할 때 이 스크립트를 쓰세요.
+(`docs/advanced.md`의 "PageRank 재정렬" 참고). 재현하거나 다시 판단할 때 이 스크립트를 쓰세요.
 """
 
 from __future__ import annotations

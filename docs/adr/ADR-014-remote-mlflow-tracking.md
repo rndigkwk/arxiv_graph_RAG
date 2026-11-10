@@ -47,4 +47,4 @@ DagsHub 무료 등급의 조건이 바뀌면 재검토합니다. **TensorBoard�
 
 - 끝난 실행의 보고서는 [`pipeline/register_run.py`](../../pipeline/register_run.py)로 등록합니다.
   그것은 **최종 지표용**이고 스텝별 곡선을 대신하지 못합니다.
-- [`advanced.md` Colab 파인튜닝 준비](../../advanced.md)
+- [`advanced.md` Colab 파인튜닝 준비](../advanced.md)

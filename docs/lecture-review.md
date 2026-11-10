@@ -83,7 +83,7 @@
 | 29~30 | Cypher 기초·경로·`WITH` 파이프라인·`EXISTS` | ✅ | 에이전트가 쓰는 조회와 평가 정답 조회가 모두 Cypher입니다. 패턴 규칙은 지시문에 있습니다(`src/prompts.py`). |
 | 30 | 최단 경로 | ➖ | 질문 가족에 "몇 단계 떨어져 있나"가 없습니다. |
 | 29, 32 | `MERGE`는 키만, 나머지는 `SET`, 멱등 적재 | ✅ | 적재는 MERGE만 씁니다(`pipeline/ingest.py`). 다시 받기는 워터마크를 되감아서 합니다([ADR-074](adr/ADR-074-rewind-the-ingest-watermark.md)). |
-| 31 | 집계가 조용히 틀리는 자리 | ✅ | 문자열로 바꾼 값으로 정렬해 9가 88보다 위에 오던 결함을 검사로 막습니다(`src/cypher_validation.py`, advanced.md). |
+| 31 | 집계가 조용히 틀리는 자리 | ✅ | 문자열로 바꾼 값으로 정렬해 9가 88보다 위에 오던 결함을 검사로 막습니다(`src/cypher_validation.py`, docs/advanced.md). |
 | 31 | 인덱스·제약, 실행 계획 | ✅ | 전문 색인으로 제목을 찾고([ADR-028](adr/ADR-028-resolve-titles-with-a-fulltext-index.md)), 실행 계획(EXPLAIN)으로 조회 유형을 판정합니다([ADR-048](adr/ADR-048-the-type-check-does-not-know-the-internet.md)). 리스트 원소는 RANGE 인덱스가 못 받는다는 것을 재서 저자 접기를 미뤘습니다([ADR-063](adr/ADR-063-what-folding-authored-would-cost.md)). |
 | 32 | 배치 적재(`UNWIND`) | ✅ | 행 묶음을 `UNWIND $rows`로 보냅니다(`pipeline/ingest.py`). |
 | 32 | `LOAD CSV` 파일 적재 | ➖ | API에서 받습니다. 모델이 쓰는 조회에서는 오히려 막습니다([ADR-048](adr/ADR-048-the-type-check-does-not-know-the-internet.md)). |
@@ -109,7 +109,7 @@
 | 47 | Self-Query(질문에서 조건 뽑기) | ✅ | 모델이 아니라 코드가 뽑습니다 - "최근"은 정규식으로 가려 발표일 필터를 겁니다([ADR-090](adr/ADR-090-recent-is-a-date-filtered-search.md)). 질문이 지칭한 논문은 앱이 먼저 찾습니다([ADR-088](adr/ADR-088-resolve-the-named-paper-before-the-agent.md)). |
 | 47 | HyDE, Multi-Query, Step-back, 질문 분해 | ➖ | 하이브리드와 같은 이유(검색 여유 0.1%p)이고, 질문마다 모델 호출이 늡니다. |
 | 47 | Jev로 질의 분기 | ✅ 다르게 | 질문 유형으로 코드가 경로를 정합니다. 호출률 0.34 → 0.00, 근거 recall 0.956 → 1.000([ADR-024](adr/ADR-024-route-by-question-type.md)). |
-| 48 | 후보와 순서를 나눠 평가 | ✅ | 재정렬이 노릴 여지를 먼저 쟀습니다(advanced.md "재정렬의 여지 측정"). |
+| 48 | 후보와 순서를 나눠 평가 | ✅ | 재정렬이 노릴 여지를 먼저 쟀습니다(docs/advanced.md "재정렬의 여지 측정"). |
 | 48 | Cross-Encoder 리랭킹 | 🧪 | 호스팅을 사기 전에 바를 적고 쟀습니다([ADR-050](adr/ADR-050-measure-the-cross-encoder-before-buying-the-host.md)). 코사인을 못 이겼습니다([ADR-051](adr/ADR-051-the-cross-encoder-loses-to-cosine.md)). |
 | 48 | 재정렬기 미세조정, 약한 자리에만 쓰기 | 🧪 | 공동인용으로 미세조정했지만 코사인에 졌고([ADR-057](adr/ADR-057-fine-tune-the-reranker-on-cocitation.md)), 코사인이 약한 자리만 고르는 규칙도 186개를 훑어 최선이 0이었습니다([ADR-061](adr/ADR-061-whether-the-reranker-is-worth-keeping-where-cosine-is-weak.md)). |
 | 48 | ColBERT | ➖ | Cross-Encoder가 진 자리이고 CPU·메모리 부담이 더 큽니다. |

@@ -1,6 +1,6 @@
 # 평가 카드 — 무엇을 재려고, 무엇을, 어떻게 만들었나
 
-이 저장소의 평가 기록은 결정마다 ADR과 [`advanced.md`](../advanced.md)·[`EXPERIMENTS.md`](../EXPERIMENTS.md)에 나뉘어
+이 저장소의 평가 기록은 결정마다 ADR과 [`advanced.md`](advanced.md)·[`EXPERIMENTS.md`](../EXPERIMENTS.md)에 나뉘어
 있습니다. 이 문서는 그것을 한곳에 모은 **색인**입니다. 새로 잰 값은 없고, 칸마다 근거 문서를 붙였습니다.
 (2026-11-06 기준)
 
@@ -48,7 +48,7 @@
 ### 그래프 조건 30문항 — 게이트의 본 셋
 
 **왜 만들었나.** 2026-10-13에 처음 두 셋(`cases.json`, `cases_curated.json`)이 **변별력이 없다**는 것을 쟀습니다
-([`advanced.md`](../advanced.md) "ID 기반 precision·recall은 품질을 재지 못합니다").
+([`advanced.md`](advanced.md) "ID 기반 precision·recall은 품질을 재지 못합니다").
 
 - 주제 질문은 정답이 수백~수천 편이라, 맞는 논문 5편을 골라도 ID 기준 점수가 0에 가깝습니다.
 - 정확한 제목 질문은 벡터 검색만으로 풀립니다. 그래프를 쓰는지 못 봅니다.
@@ -269,7 +269,7 @@ p50 2.52초, 25행 표가 든 답은 7초)([ADR-108](adr/ADR-108-the-question-sc
 
 ## 6. 실행 명령
 
-README에서 옮긴 평가 하네스 명령입니다. RAG 검색·답변 평가 방법의 상세는 [`advanced.md`](../advanced.md)에 있습니다.
+README에서 옮긴 평가 하네스 명령입니다. RAG 검색·답변 평가 방법의 상세는 [`advanced.md`](advanced.md)에 있습니다.
 
 ```bash
 # 그래프 조건 평가 케이스를 만들고 정답을 라이브 DB의 Cypher와 대조합니다
@@ -323,7 +323,7 @@ uv run python -m evals.related_study --cases evals/cases_related_future.json    
 
 ## 참고
 
-- 실행 방법: [`evals/README.md`](../evals/README.md), [`advanced.md`](../advanced.md)
+- 실행 방법: [`evals/README.md`](../evals/README.md), [`advanced.md`](advanced.md)
 - 측정의 경과(질문·방법·결과·결론): [`EXPERIMENTS.md`](../EXPERIMENTS.md)
 - 결정 기록: [ADR 색인](adr/README.md)
 - 화면에서 보는 게이트: [품질 화면](https://arxiv-graphrag.vercel.app/quality)

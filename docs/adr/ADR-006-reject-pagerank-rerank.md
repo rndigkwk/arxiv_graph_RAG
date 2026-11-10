@@ -48,4 +48,4 @@ Day 49 교안의 "PageRank 포화 점수로 검색 순위 재정렬"은 로드�
 
 ## 참고
 
-- [`advanced.md` 재정렬의 여지 측정](../../advanced.md)
+- [`advanced.md` 재정렬의 여지 측정](../advanced.md)

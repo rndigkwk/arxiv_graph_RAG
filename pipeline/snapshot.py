@@ -26,7 +26,7 @@ TABLES = ("papers", "authors", "authored", "references")
 
 # arXiv 신식 ID는 YYMM.NNNNN 꼴이고 YYMM은 최초 제출 시점입니다. 이 값은 나중에 바뀌지
 # 않으므로 시간 분할의 기준으로 쓸 수 있습니다. `published` 속성은 OAI 수집 시점이 섞여
-# 들어와 신뢰할 수 없습니다(`advanced.md`의 "발행일 필드를 믿을 수 없습니다").
+# 들어와 신뢰할 수 없습니다(`docs/advanced.md`의 "발행일 필드를 믿을 수 없습니다").
 NEW_STYLE_ID = re.compile(r"^(\d{2})(\d{2})\.\d{4,5}$")
 
 

@@ -119,4 +119,4 @@ Day 56 교안이 경고하는 "계층마다 곱해지는 시도 수"를 셌습�
 
 ## 참고
 
-- [`advanced.md` PageRank 적재 타임아웃](../../advanced.md)
+- [`advanced.md` PageRank 적재 타임아웃](../advanced.md)

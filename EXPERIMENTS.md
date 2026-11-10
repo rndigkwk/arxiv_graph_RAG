@@ -2,7 +2,7 @@
 
 개선안 A(인용 그래프로 모델 학습)와 B(증분 데이터 파이프라인)를 동시에 적용하면서 돌린 실험을
 **왜 했는지 / 어떻게 했는지 / 무엇이 나왔는지** 순서로 적습니다. 측정 세부와 표는
-[`advanced.md`](advanced.md)에, 원시 수치는 `reports/`에, 작업 순서는
+[`advanced.md`](docs/advanced.md)에, 원시 수치는 `reports/`에, 작업 순서는
 [`ROADMAP.md`](ROADMAP.md)에 있습니다.
 
 이 문서를 따로 두는 이유는, 기능 목록보다 **판단의 근거와 그 근거를 어떻게 얻었는지**가 더
@@ -4374,7 +4374,7 @@ uv run python scripts/measure_citation_graph_warmup.py --repeats 3 \
 # 11-50절: 조건 판정이 받는 값과 바꾸는 값. 저장된 기준선만 읽습니다(API 비용 0원)
 uv run python scripts/measure_condition_check.py
 
-# 11-51절: 그래프 두 배의 크기·지연. 빈 측정용 컨테이너가 먼저입니다(LOCAL_DOCKER.md, 0원, 약 10분)
+# 11-51절: 그래프 두 배의 크기·지연. 빈 측정용 컨테이너가 먼저입니다(docs/LOCAL_DOCKER.md, 0원, 약 10분)
 uv run python scripts/measure_double_graph.py --runs 8
 
 # 11-5절: 로컬 임베딩 모델 비교. 첫 실행은 CPU 인코딩에 모델당 3시간 25분 걸립니다

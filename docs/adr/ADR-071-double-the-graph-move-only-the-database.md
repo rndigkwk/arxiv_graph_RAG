@@ -22,7 +22,7 @@
 - 1은 두 번째 오인용입니다. 조건 원문은 "**keep-alive가 비활성화돼** 실제로 `Zzzz` 화면이 노출된
   적"이고 비활성화는 없었습니다(ADR-016에 10-25 대조를 적었습니다).
 - 2의 1.745GiB는 데이터의 크기가 아니라 **설정의 크기**입니다. 그 측정은 heap 1G·page cache 1G로
-  고정했고, [`LOCAL_DOCKER_RESULT.md`](../../LOCAL_DOCKER_RESULT.md)가 스스로 "단순히 두 배로
+  고정했고, [`LOCAL_DOCKER_RESULT.md`](../LOCAL_DOCKER_RESULT.md)가 스스로 "단순히 두 배로
   계산하면 안 됩니다"라고 적어 두었습니다. `/data` 1,268MiB 중 771MiB는 트랜잭션 로그였습니다.
 - 그래서 3도 근거를 잃습니다.
 
@@ -157,4 +157,4 @@ Cloud를 떠날 이유가 없다는 결정이고, 그 전환 조건(keep-alive �
 - [ADR-001](ADR-001-neo4j-graph-and-vector.md) — 관계 한도가 이 결정을 흔든다
 - [ADR-016](ADR-016-stay-on-streamlit.md) — 앱을 옮기는 조건
 - [ADR-067](ADR-067-warm-the-citation-graph-at-boot.md) — 부팅 때의 인용망 예열
-- [`LOCAL_DOCKER_RESULT.md`](../../LOCAL_DOCKER_RESULT.md) — 10-14 1배 실측
+- [`LOCAL_DOCKER_RESULT.md`](../LOCAL_DOCKER_RESULT.md) — 10-14 1배 실측

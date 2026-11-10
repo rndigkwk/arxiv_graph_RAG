@@ -16,7 +16,7 @@
 그 기준으로 두 후보를 먼저 떨어뜨렸습니다.
 
 **제목 중의성 분류기** — 상한이 +0.034입니다(혼합 규칙이 이미 0.9663). 보류로 남겨
-뒀습니다([`models/title_disambiguation/`](../../models/title_disambiguation/)).
+뒀습니다([`models/title_disambiguation/`](../../models/title_disambiguation)).
 
 **파이프라인 실패 예측** — **2번 기준에서 떨어집니다.** 저장된 보고서 30개, 사례-실행 746건
 중 최종 실패가 **17건(2.28%)**, 수정 발생이 8건(1.07%)입니다. 그중 8건은
@@ -27,7 +27,7 @@
 ## 결정
 
 **세 기준을 통과하는 과제는 이미 만들어져 있었습니다** —
-[`models/link_prediction/`](../../models/link_prediction/)의 공동인용 예측입니다
+[`models/link_prediction/`](../../models/link_prediction)의 공동인용 예측입니다
 ([ADR-011](ADR-011-cocitation-link-prediction.md)).
 
 - **라벨이 미래입니다.** W1 그래프로 피처를 만들고 W2에서 **새로 생긴** 공동인용을 맞힙니다.

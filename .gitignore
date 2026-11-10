@@ -32,3 +32,5 @@ reports/summary.md
 reports/regression_*.json
 reports/junit.xml
 deploy/vm/snapshot/
+# 내려받은 묶음 파일(env2.zip 등)은 키가 들어 있을 수 있어 올리지 않습니다.
+*.zip
