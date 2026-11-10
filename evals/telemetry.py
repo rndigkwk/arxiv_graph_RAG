@@ -108,6 +108,10 @@ def build_run_metadata(
                 cwd=repo_root,
                 capture_output=True,
                 text=True,
+                # git은 경로를 UTF-8로 냅니다.
+                # Windows 기본(cp949)으로 읽으면 한글 파일명에서 깨집니다.
+                encoding="utf-8",
+                errors="replace",
                 check=True,
             ).stdout.strip()
         )

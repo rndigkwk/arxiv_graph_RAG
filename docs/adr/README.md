@@ -2,7 +2,7 @@
 
 이 프로젝트가 **무엇을 쓰고, 무엇을 왜 안 쓰는지**를 한 장에서 답하기 위한 색인입니다.
 
-[`advanced.md`](../../advanced.md)와 [`EXPERIMENTS.md`](../../EXPERIMENTS.md)에는 측정 과정이
+[`advanced.md`](../advanced.md)와 [`EXPERIMENTS.md`](../../EXPERIMENTS.md)에는 측정 과정이
 서술로 남아 있습니다. 그 서술은 "어떻게 알았는가"에 답하지만 "그래서 지금 무엇을 쓰는가"에는
 답하지 못합니다. ADR은 후자만 담고, 과정은 원문으로 링크합니다.
 
@@ -194,3 +194,4 @@
 | [ADR-120](ADR-120-long-paper-lists-are-cut-to-ten-rows-at-the-tool.md) | 긴 논문 목록은 도구에서 10행으로 자른다 — 지시문은 바꾸지 않는다 | 채택 |
 | [ADR-121](ADR-121-an-inexact-author-name-gets-the-candidates-first.md) | 저자 이름이 딱 맞지 않으면 앱이 후보를 먼저 알려 준다 — 지시문은 바꾸지 않는다 | 채택 |
 | [ADR-122](ADR-122-repair-an-id-shaped-evidence-alias-at-the-tool.md) | arXiv ID 모양인 근거 별칭은 도구에서 고쳐 받는다 — 별칭이 없는 행은 그대로 돌려보낸다 | 채택 |
+| [ADR-123](ADR-123-the-api-container-runs-as-the-vm-user.md) | API 컨테이너는 root가 아니라 저장소를 clone한 VM 사용자로 돈다 — 레지스트리 이미지는 따로 다룬다 | 채택 |

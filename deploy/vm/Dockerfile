@@ -8,6 +8,10 @@ COPY pyproject.toml uv.lock .python-version ./
 # dev 그룹(평가 전용)은 넣지 않습니다 - Streamlit Cloud와 같은 설치에 FastAPI 층(`api` extra,
 # ADR-081)만 더합니다. VM의 Streamlit은 내렸습니다(ADR-083) - 화면은 Vercel입니다.
 RUN uv sync --locked --no-dev --no-install-project --extra api
+# root로 돌지 않습니다(ADR-123). 마운트한 저장소를 쓰는 사람과 같은 uid여야 수집 상태 파일과
+# 보고서를 쓸 수 있어서, compose.yml이 VM 사용자의 uid:gid로 덮습니다. 여기 app(1000)은 기본값입니다.
+RUN useradd --uid 1000 --create-home --shell /usr/sbin/nologin app
+USER app
 WORKDIR /app
 EXPOSE 8000
 # 워커 하나: 상한(Limiter)이 프로세스 메모리에 있고, 인용망도 프로세스마다 한 벌씩 올라갑니다.

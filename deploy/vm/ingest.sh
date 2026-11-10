@@ -9,6 +9,10 @@
 # DB에 붙으므로 DB 포트를 열지 않습니다. 키는 저장소 루트의 .env(OPENAI_API_KEY, NEO4J_PASSWORD)입니다.
 set -euo pipefail
 cd "$HOME/arxiv_graph_RAG"
+# API 컨테이너는 이 사용자로 돕니다(ADR-123, compose.yml의 user).
+export APP_UID APP_GID
+APP_UID=$(id -u)
+APP_GID=$(id -g)
 
 exec 8>/tmp/arxiv-ingest.lock
 flock -n 8 || { echo "수집이 이미 돌고 있습니다"; exit 0; }

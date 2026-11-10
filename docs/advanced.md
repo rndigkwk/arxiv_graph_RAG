@@ -4,9 +4,9 @@
 
 ## RAG 평가
 
-> 실험을 질문·방법·결과·결론 단위로 읽으려면 [`EXPERIMENTS.md`](EXPERIMENTS.md)를 보세요. 이 문서는 측정 세부와 수치표입니다.
+> 실험을 질문·방법·결과·결론 단위로 읽으려면 [`EXPERIMENTS.md`](../EXPERIMENTS.md)를 보세요. 이 문서는 측정 세부와 수치표입니다.
 
-Aura의 그래프 적재 무결성 검사와 검색·답변 품질 평가는 별도입니다. [`evals/cases.json`](evals/cases.json)은 고정 스냅샷으로 만든 31개 재현 케이스(주제 검색 10개, 정확한 제목 21개)입니다. 주제 검색은 원천 seed/reference 데이터의 제목·초록에 문구가 포함되는지로 라벨링했고, 제목 케이스는 원천 제목과 arXiv ID를 사용합니다. 전문가 관련성 판단 데이터가 아니므로 점수를 일반적인 RAG 품질로 해석하지 않습니다.
+Aura의 그래프 적재 무결성 검사와 검색·답변 품질 평가는 별도입니다. [`evals/cases.json`](../evals/cases.json)은 고정 스냅샷으로 만든 31개 재현 케이스(주제 검색 10개, 정확한 제목 21개)입니다. 주제 검색은 원천 seed/reference 데이터의 제목·초록에 문구가 포함되는지로 라벨링했고, 제목 케이스는 원천 제목과 arXiv ID를 사용합니다. 전문가 관련성 판단 데이터가 아니므로 점수를 일반적인 RAG 품질로 해석하지 않습니다.
 
 ### 실행
 
@@ -29,15 +29,15 @@ uv run python -m evals.run --mode compare --limit 31 --top-k 5 --output reports/
 
 세 모드 모두 `.env`, 실행 가능한 Neo4j Aura, `arxiv_paper_embedding_index` 벡터 인덱스, OpenAI API 접근이 필요합니다. 비교 모드는 동일한 케이스에 대해 벡터 검색 결과만 문맥으로 받은 구조화 답변과 현재 GraphRAG 에이전트를 각각 실행합니다. 리포트 스키마 버전은 2입니다. 케이스별로 직접 답변 근거와 PageRank 관련 논문을 별도 기록하고, 전체 및 category 요약에 평균·p50·p95 처리 시간, 제공자가 보고한 채팅 토큰, 모델 토크나이저로 추정한 검색 임베딩 토큰을 포함합니다. 토큰 정보가 빠진 경우 0으로 대신하지 않고 알 수 없음으로 남깁니다. 금액은 세 가지 토큰별 백만 단위 요금과 요금 출처가 모두 `.env`에 입력된 경우에만 추정하며 Neo4j 비용은 포함하지 않습니다. 기본 출력 경로는 `reports/rag_eval.json`이며 비교 결과는 `--output`으로 별도 저장하세요.
 
-각 리포트에는 UTC 실행 시각, 데이터셋 파일명과 SHA-256, 선택 케이스 ID, 실행 모드/top-k, 채팅·임베딩 모델명, Python·플랫폼·주요 패키지 버전, Git 커밋과 dirty 여부가 포함됩니다. 비밀 키와 전체 환경변수는 기록하지 않습니다. 요금 설정 키는 [`.env.example`](.env.example)을 참고하세요.
+각 리포트에는 UTC 실행 시각, 데이터셋 파일명과 SHA-256, 선택 케이스 ID, 실행 모드/top-k, 채팅·임베딩 모델명, Python·플랫폼·주요 패키지 버전, Git 커밋과 dirty 여부가 포함됩니다. 비밀 키와 전체 환경변수는 기록하지 않습니다. 요금 설정 키는 [`.env.example`](../.env.example)을 참고하세요.
 
 평가 지표는 hit@k, recall@k, reciprocal rank이며, 에이전트·비교 모드에서는 필수 답변 문구 일치와 직접 답변 근거 precision/recall도 계산합니다. PageRank 관련 논문은 별도 `related_retrieval_precision/recall`로 채점합니다. 비교 요약은 전체뿐 아니라 category별로도 집계합니다. `answer_correct`는 케이스에 지정한 문구 포함 여부를 검사하므로 답변의 완전성이나 사실성을 판정하지 않습니다. 현재 기존 토픽 케이스에는 답변 정답 문구 라벨이 없어 답변 정확도는 exact-title 케이스만 채점됩니다.
 
 ### 실제 실행 결과
 
-- 전체 31개 검색 평가: hit@5 **1.00**, recall@5 **0.68**, MRR **1.00**. 결과: [`reports/rag_eval.json`](reports/rag_eval.json), 실행일 2026-09-26.
-- exact-title 답변 평가 1건: 문구 일치·인용 precision·recall 모두 **1.00**. 결과: [`reports/rag_agent_smoke.json`](reports/rag_agent_smoke.json), 실행일 2026-09-27.
-- 동일한 31개 케이스 비교: 벡터 단독과 GraphRAG 모두 hit@5 **1.00**. 혼합 전체 recall@5는 각각 **0.6805**, **0.6804**이고, MRR은 **1.0000**, **0.9839**입니다. 상세 케이스별 데이터와 category별 집계는 [`reports/rag_compare.json`](reports/rag_compare.json)에 있습니다. 실행일 2026-09-27.
+- 전체 31개 검색 평가: hit@5 **1.00**, recall@5 **0.68**, MRR **1.00**. 결과: [`reports/rag_eval.json`](../reports/rag_eval.json), 실행일 2026-09-26.
+- exact-title 답변 평가 1건: 문구 일치·인용 precision·recall 모두 **1.00**. 결과: [`reports/rag_agent_smoke.json`](../reports/rag_agent_smoke.json), 실행일 2026-09-27.
+- 동일한 31개 케이스 비교: 벡터 단독과 GraphRAG 모두 hit@5 **1.00**. 혼합 전체 recall@5는 각각 **0.6805**, **0.6804**이고, MRR은 **1.0000**, **0.9839**입니다. 상세 케이스별 데이터와 category별 집계는 [`reports/rag_compare.json`](../reports/rag_compare.json)에 있습니다. 실행일 2026-09-27.
 - exact-title 21건의 문자열 정답률은 두 방식 모두 **21/21 (1.00)**입니다. 인용 precision/recall은 벡터 단독 **1.000/1.000**, GraphRAG **0.476/1.000**입니다. GraphRAG가 정답 논문을 인용하지만 답변에 사용하지 않은 관련 논문 ID까지 인용 목록에 넣는 사례가 있어 precision이 낮아졌습니다.
 - topic 10건의 citation precision/recall은 벡터 단독 **0.880/0.0095**, GraphRAG **0.630/0.0129**입니다. 각 토픽의 정답 ID 집합이 넓고 대규모라 recall은 top-5 기준으로 낮게 나옵니다. 그래프 관계 및 관련 논문 근거도 검색 ID 평가에 포함합니다.
 - 케이스당 평균 end-to-end 시간은 벡터 단독 **2.58초**, GraphRAG **9.10초**였습니다. 채팅 모델 사용량은 각각 **51,565**, **314,767 토큰**(평균 1,663, 10,154 토큰/케이스)입니다. 이는 이번 실행 환경에서의 단일 순차 실행 결과이며 성능 보증 수치가 아닙니다.
@@ -47,8 +47,8 @@ uv run python -m evals.run --mode compare --limit 31 --top-k 5 --output reports/
 
 위 수치는 모두 복합 조건 검증(2026-09-28)을 넣기 **전**의 측정값입니다. 같은 31개 케이스를 같은
 `--mode compare`로 다시 돌려 전후를 비교했습니다. 결과:
-[`reports/rag_compare_20261012.json`](reports/rag_compare_20261012.json). 9/26 기준선
-[`reports/rag_compare.json`](reports/rag_compare.json)은 비교 대상으로 그대로 두었습니다.
+[`reports/rag_compare_20261012.json`](../reports/rag_compare_20261012.json). 9/26 기준선
+[`reports/rag_compare.json`](../reports/rag_compare.json)은 비교 대상으로 그대로 두었습니다.
 
 | GraphRAG 지표 | 2026-09-26 | 2026-10-12 | 변화 |
 |---|---:|---:|---:|
@@ -128,7 +128,7 @@ exact-title 21문항에서 인용 ID 총합이 **80개 → 21개**(문항당 정
 
 금액은 여전히 `null`입니다. `.env`에 `EVAL_CHAT_INPUT_USD_PER_1M` 등 요율과 출처를 넣지 않았습니다.
 
-답변 결과는 한 케이스만 측정한 smoke 평가이며 일반적인 답변 품질을 대표하지 않습니다. 기존 [`reports/aura_graph_rag_quality_report.json`](reports/aura_graph_rag_quality_report.json)의 100% 수치는 표본 기반 원천-그래프 정합성 결과이지 검색 정확도나 생성 답변 품질 점수가 아닙니다.
+답변 결과는 한 케이스만 측정한 smoke 평가이며 일반적인 답변 품질을 대표하지 않습니다. 기존 [`reports/aura_graph_rag_quality_report.json`](../reports/aura_graph_rag_quality_report.json)의 100% 수치는 표본 기반 원천-그래프 정합성 결과이지 검색 정확도나 생성 답변 품질 점수가 아닙니다.
 
 ### LLM 심판 정확도 측정 (2026-10-12)
 
@@ -138,7 +138,7 @@ exact-title 21문항에서 인용 ID 총합이 **80개 → 21개**(문항당 정
 큐레이션 10건은 아직 `pending_human_review`이지만, exact-title 21건의 정답은 원천 제목·arXiv ID에서
 나온 사실이라 **사람 라벨링 없이 채점할 수 있습니다.** 한 호출에 정답 논문(양성)과 다른 케이스의
 정답 논문(음성)을 함께 넣어 구분 능력을 봤습니다. 결과:
-[`reports/judge_accuracy_20261012.json`](reports/judge_accuracy_20261012.json).
+[`reports/judge_accuracy_20261012.json`](../reports/judge_accuracy_20261012.json).
 
 | 항목 | 결과 |
 |---|---|
@@ -259,8 +259,8 @@ Aura Free는 **3일 동안 접속이 없으면 멈춥니다.** 그리고 멈추�
 주간 회귀 평가를 cron으로 걸면 멈춘 DB를 만나 그대로 실패합니다. 그래서 회귀 평가보다 이 작업이
 먼저입니다.
 
-[`scripts/keep_awake.py`](scripts/keep_awake.py)와
-[`.github/workflows/keep-alive.yml`](.github/workflows/keep-alive.yml)을 추가했습니다.
+[`scripts/keep_awake.py`](../scripts/keep_awake.py)와
+[`.github/workflows/keep-alive.yml`](../.github/workflows/keep-alive.yml)을 추가했습니다.
 12시간마다 읽기 쿼리 하나로 유휴 타이머를 되돌리고, 이미 멈춰 있으면 Aura API로 재개한 뒤
 `running`이 될 때까지 기다립니다. 3일 한도에 4배 여유를 둔 주기입니다.
 
@@ -323,8 +323,8 @@ Windows 콘솔(cp949)에서 `UnicodeEncodeError`를 냈고, `ping`을 감싼 `ex
 
 Day 48 교안의 "후보 안에 정답이 있는가"와 "순서가 맞는가"를 나눠 재고, Day 49 교안의
 "PageRank 포화 점수로 검색 순위 재정렬"을 같은 세트에서 비교했습니다. 재현 스크립트는
-[`evals/rerank_study.py`](evals/rerank_study.py), 결과는
-[`reports/rerank_study.json`](reports/rerank_study.json)입니다. 후보를 한 번만 가져와 모든
+[`evals/rerank_study.py`](../evals/rerank_study.py), 결과는
+[`reports/rerank_study.json`](../reports/rerank_study.json)입니다. 후보를 한 번만 가져와 모든
 가중치에 같은 후보를 쓰므로 검색 변동이 비교에 끼지 않습니다. 모델 호출은 질의 임베딩 31건뿐입니다.
 
 #### ✅ Day 48: 재정렬이 가져갈 여지가 없습니다
@@ -343,7 +343,7 @@ Day 48 교안의 "후보 안에 정답이 있는가"와 "순서가 맞는가"를
 있는 것이 0.1%p 뿐입니다. 이것이 리랭킹을 시도하기 전에 재야 하는 수치이고, dograg가 ✅로
 넣었던 "후보 범위와 순서를 나눠 평가"가 바로 이 역할입니다.
 
-지표는 [`evals/metrics.py`](evals/metrics.py)의 `score_ceiling()`으로 넣었고 회귀 테스트 4개를
+지표는 [`evals/metrics.py`](../evals/metrics.py)의 `score_ceiling()`으로 넣었고 회귀 테스트 4개를
 붙였습니다.
 
 #### 🧪 Day 49: PageRank 재정렬은 재보고 넣지 않았습니다
@@ -380,13 +380,13 @@ Day 48 교안의 "후보 안에 정답이 있는가"와 "순서가 맞는가"를
 
 그래서 topic recall@5가 0.0106인 것은 검색 실패가 아닙니다. k=5에서 도달 가능한 최대가
 0.0120이고 그 **88.3%** 를 달성하고 있습니다. 여러 리포트에서 "정답 ID 집합이 넓다"고 적어 온
-진단에 이제 수치가 붙었고, 큐레이션 10건의 사람 검토([`evals/curated_review.md`](evals/curated_review.md))가
+진단에 이제 수치가 붙었고, 큐레이션 10건의 사람 검토([`evals/curated_review.md`](../evals/curated_review.md))가
 필요한 이유도 같습니다.
 
 ### 큐레이션 10건 검토와 필수 답변 문구 폐기 (2026-10-13)
 
 `cases_curated.json` 10건은 자동 규칙으로 만든 라벨이라 `pending_human_review`로 묶여 있었습니다.
-검토 기록은 [`evals/curated_review.md`](evals/curated_review.md)입니다.
+검토 기록은 [`evals/curated_review.md`](../evals/curated_review.md)입니다.
 
 > **이 검토는 사람 검토가 아닙니다.** `review_status`를 `assistant_reviewed`로 두었고, 그 자체로
 > 이 케이스의 점수를 검증된 품질 지표로 제시할 근거가 되지 않습니다. `human_reviewed`로 승격하는
@@ -459,7 +459,7 @@ Day 48 교안의 "후보 안에 정답이 있는가"와 "순서가 맞는가"를
 ### 넓은 주제 질문에 ID 기반 precision·recall은 품질을 재지 못합니다 (2026-10-13)
 
 큐레이션 10건을 `--mode compare`로 돌려 변별력을 확인하려 했습니다
-([`reports/rag_curated_compare.json`](reports/rag_curated_compare.json)). 결과가 지표 자체의
+([`reports/rag_curated_compare.json`](../reports/rag_curated_compare.json)). 결과가 지표 자체의
 무효를 드러냈습니다.
 
 #### 같은 질문, 정답 집합만 바꿨을 때
@@ -615,7 +615,7 @@ arXiv 신식 ID의 `YYMM`은 최초 제출 시점이고 나중에 바뀌지 않�
 2026-10-13에 평가 세트 세 개 모두 변별력이 없음을 확인했습니다. 주제 질문은 정답이 수백~수천
 편이라 recall이 의미를 잃고, 정확한 제목 질문은 벡터 단독으로 21/21 풀립니다.
 
-새 세트([`evals/cases_graph.json`](evals/cases_graph.json), 30건)는 두 조건을 동시에 만족하도록
+새 세트([`evals/cases_graph.json`](../evals/cases_graph.json), 30건)는 두 조건을 동시에 만족하도록
 만들었습니다.
 
 - **정답이 작고 정확합니다.** 2~5편으로 확정되며, 정답을 Cypher가 정합니다.
@@ -874,7 +874,7 @@ reason=citation_missing_content_match
 
 2026-10-13에 이 프롬프트를 고치다가 `requires_graph` 오탐은 잡았지만 `requires_content`가
 21/21에서 11/21로 떨어진 적이 있습니다. 두 판정이 한 호출에 묶여 있어 한쪽 설명이 다른 쪽으로
-번집니다. 같은 실수를 반복하지 않으려고 [`evals/judge_study.py`](evals/judge_study.py)를
+번집니다. 같은 실수를 반복하지 않으려고 [`evals/judge_study.py`](../evals/judge_study.py)를
 만들었습니다. 질문당 구조화 호출 한 번이라 싸고, 라벨은 기존 케이스 파일에서 기계적으로 정합니다.
 
 #### 수정 전 — 결함이 세 유형에 정확히 국한됩니다
@@ -954,7 +954,7 @@ condition, not a graph condition"이었습니다. "돌려줄 논문"과 "관계�
 판정할 수 없습니다.**
 
 그래서 유형 전체(6건)를 3회씩, 18회 돌리는 하네스를 만들었습니다
-([`evals/order_study.py`](evals/order_study.py)). 측정값은 0.722이 아니라 **0.519**였습니다.
+([`evals/order_study.py`](../evals/order_study.py)). 측정값은 0.722이 아니라 **0.519**였습니다.
 처음 본 숫자가 낙관적인 쪽으로 치우친 표본이었습니다.
 
 #### 원인: `toString()`으로 감싼 값으로 정렬
@@ -1012,13 +1012,13 @@ cs.SE의 `95, 9, 8`이 그 분류의 문자열 내림차순과 정확히 일치�
 프롬프트 규칙만으로는 47.1%에서 5.9%로 줄었을 뿐 0이 되지 않았습니다. **프롬프트는 권고이고
 검사는 강제이므로**, 남은 경우는 실행 전에 막기로 했습니다.
 
-[`cypher_validation.py`](src/cypher_validation.py)가 `toString(x) AS alias`로 문자열이 된 별칭을
+[`cypher_validation.py`](../src/cypher_validation.py)가 `toString(x) AS alias`로 문자열이 된 별칭을
 찾고, 그 별칭이 `ORDER BY`에 쓰였는지 봅니다. 쓰였으면 `search_graph`가 실행하지 않고 오류를
 돌려주며, 에이전트는 다른 Cypher 오류와 같은 경로로 한 번 고쳐 다시 호출합니다.
 
 표시용으로 문자열을 만들면서 정렬은 숫자로 하는 경우는 통과시켜야 합니다. 기존 질의에
 `toString(p.published) AS published`가 이미 있으므로 그것까지 막으면 멀쩡한 질의가 깨집니다.
-그 구분을 테스트로 못박았습니다([`tests/test_cypher_validation.py`](tests/test_cypher_validation.py)).
+그 구분을 테스트로 못박았습니다([`tests/test_cypher_validation.py`](../tests/test_cypher_validation.py)).
 
 #### 세 구성 비교 (유형 6건 × 3회 = 18회)
 
@@ -1286,7 +1286,7 @@ GraphRAG가 추가로 돌리는 커뮤니티 요약 통과는 포함하지 않�
 한국어 질문을 **모델이 생성**했습니다. 같은 계열 모델이 영어로 되돌리므로 왕복이 실제 사용자
 한국어보다 쉽고, 여기서 나온 손실 19~20%는 **하한**입니다. 실제 사용자의 한국어, 특히 오타·축약·
 구어가 섞인 질의에서는 더 클 것입니다. 생성한 세트는
-[`evals/cases_korean.json`](evals/cases_korean.json)에 커밋해 고정했습니다 — 측정할 때마다 다시
+[`evals/cases_korean.json`](../evals/cases_korean.json)에 커밋해 고정했습니다 — 측정할 때마다 다시
 만들면 번역 손실인지 생성 변동인지 구별할 수 없습니다.
 
 #### 영어 전용 임베딩 모델을 검토할 때의 의미
@@ -1611,7 +1611,7 @@ SMOKE는 `colab_finetune_report-smoke.json`으로 나가 섞일 수 없습니다
 `pipeline.tracking`에 등록하면 다른 측정들과 같은 자리에 남습니다. 실행 환경과 기록 위치를
 분리하는 쪽이 VM이 사라지는 환경에서 안전합니다.
 
-등록은 [`pipeline/register_run.py`](pipeline/register_run.py)가 합니다.
+등록은 [`pipeline/register_run.py`](../pipeline/register_run.py)가 합니다.
 
 ```bash
 uv run python -m pipeline.register_run reports/embedding_finetune_colab.json --dry-run
@@ -1644,7 +1644,7 @@ hf auth login
 hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-type dataset --private
 ```
 
-그다음 [`notebooks/finetune_embedding_colab.ipynb`](notebooks/finetune_embedding_colab.ipynb)를
+그다음 [`notebooks/finetune_embedding_colab.ipynb`](../notebooks/finetune_embedding_colab.ipynb)를
 열어 `SMOKE = True`로 한 번, `False`로 본 실행을 합니다. **계정명은 토큰에서 꺼내므로 손으로 적을 것이 없습니다** — 자리표시자를 두면 빠뜨렸을 때 `huggingface_hub` 안쪽에서 `HFValidationError`가 나와 원인을 찾기 어렵습니다.
 결과 `colab_finetune_report.json`을 `reports/`로 가져오면 다른 측정들과 같은 자리에 남습니다.
 
@@ -1658,7 +1658,7 @@ hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-ty
 오류입니다. 그때는 한 번 겪고 넘어갔고 **30초가 빡빡한 값인지** 재지 않았습니다. 고치는 방향이
 타임아웃 상향인지 재시도인지는 그 수치에 달려 있습니다.
 
-**방법.** [`scripts/measure_graph_load.py`](scripts/measure_graph_load.py)로 두 질의를 8회씩
+**방법.** [`scripts/measure_graph_load.py`](../scripts/measure_graph_load.py)로 두 질의를 8회씩
 측정했습니다. `run_read`를 그대로 쓰지 않았습니다 — 그 함수는 질의마다 `EXPLAIN`을 한 번 더
 돌려서 재는 값에 그 비용이 섞입니다. 본 질의만 재고 `EXPLAIN`은 따로 적었습니다.
 
@@ -1666,7 +1666,7 @@ hf upload <사용자>/arxiv-graphrag-colab exports/colab exports/colab --repo-ty
 uv run python scripts/measure_graph_load.py --runs 8
 ```
 
-**결과** ([`reports/graph_load_latency.json`](reports/graph_load_latency.json)):
+**결과** ([`reports/graph_load_latency.json`](../reports/graph_load_latency.json)):
 
 | 질의 | 행 | p50 | p95 | 최대 | 실패 | 30초까지 여유 |
 |---|---|---|---|---|---|---|
@@ -1692,7 +1692,7 @@ Bolt 라우팅까지 실패하던 구간이었고 90초 뒤 자체 회복했습�
 - 재시도마다 `graph_load_retry attempt=n reason=...`을 남깁니다. 질의 본문은 적지 않습니다 —
   운영 로그에 데이터가 섞이지 않게.
 
-[`tests/test_graph_load_retry.py`](tests/test_graph_load_retry.py)가 이 다섯 가지를 각각
+[`tests/test_graph_load_retry.py`](../tests/test_graph_load_retry.py)가 이 다섯 가지를 각각
 검증합니다. `chatbot`은 임포트만으로 Aura와 OpenAI에 붙으므로 테스트에서 가져오지 않고, 같은
 규칙을 주입 가능한 형태로 재구성해 확인합니다.
 
@@ -1739,7 +1739,7 @@ arXiv OAI-PMH는 `from`·`until` 날짜 범위로 조회하므로 증분이 본�
 | 결과 | `fits: true`, `stopped_at: dry_run` — **아무것도 쓰지 않음** |
 
 기본값이 시험 실행입니다. `--load`를 명시하지 않으면 Aura에 쓰지 않습니다. 주간 워크플로
-([`ingest.yml`](.github/workflows/ingest.yml))도 시험 실행만 하며, 실제 적재는 사람이
+([`ingest.yml`](../.github/workflows/ingest.yml))도 시험 실행만 하며, 실제 적재는 사람이
 `workflow_dispatch`에서 `load=true`를 골라야 합니다. 이 그래프는 관계 한도의 84.6%를 이미
 쓰고 있어서 자동 적재를 켜면 몇 주 안에 한도에 부딪힙니다.
 
@@ -1773,7 +1773,7 @@ arXiv OAI-PMH는 `from`·`until` 날짜 범위로 조회하므로 증분이 본�
 - 앱 실행에 필요한 의존성을 기본 그룹에 두고, 노트북과 Aura Graph Analytics 의존성은 `notebooks`, `gds` 선택 extra로 분리했습니다. 기본 앱 설치에서는 Torch, Transformers, JupyterLab을 설치하지 않습니다.
 - 홈 탭의 `metagraph.py`가 사용하는 `networkx`는 기본 앱 의존성입니다. 2026-09-28 배포에서 누락으로 앱 실행이 중단되어 기본 의존성으로 옮겼고, 기본 설치 후 실제 Aura 연결과 Streamlit 홈 화면 실행을 확인했습니다.
 - `pytest`, `ruff`, 테스트 경로와 lint 설정을 추가했습니다. 비교 평가기는 벡터 검색 문맥 기반 답변과 GraphRAG를 같은 질의에서 측정하고, 분리된 근거 지표와 텔레메트리를 기록합니다.
-- 안전한 값만 담은 [`.env.example`](.env.example)과 GitHub Actions CI([`.github/workflows/ci.yml`](.github/workflows/ci.yml))를 추가했습니다. CI는 잠금 파일, lint, 테스트, Python 컴파일을 검사합니다.
+- 안전한 값만 담은 [`.env.example`](../.env.example)과 GitHub Actions CI([`.github/workflows/ci.yml`](../.github/workflows/ci.yml))를 추가했습니다. CI는 잠금 파일, lint, 테스트, Python 컴파일을 검사합니다.
 - 평가 및 데이터셋 테스트는 아래 검증 기록에서 전체 실행 결과를 확인할 수 있습니다. GitHub Actions 워크플로는 테스트, lint, 컴파일 단계를 실행합니다. 저장소의 실제 원격 실행 상태는 로컬 인증이 없어 확인하지 않습니다.
 
 ### 앱 시작 실패 대응
@@ -1806,7 +1806,7 @@ arXiv OAI-PMH는 `from`·`until` 날짜 범위로 조회하므로 증분이 본�
 
 ### 문서와 데모 동작
 
-- [`README.md`](README.md), [`APP_README.md`](APP_README.md), 이 문서의 기능·설치·평가 설명을 현재 저장소와 맞췄습니다.
+- [`README.md`](../README.md), [`APP_README.md`](../APP_README.md), 이 문서의 기능·설치·평가 설명을 현재 저장소와 맞췄습니다.
 - 공개 Streamlit 데모는 비활성 상태에서 잠들 수 있습니다. 2026-09-27 실제 확인 때 깨우기 요청 후 앱이 Aura에 연결되어 홈 화면과 그래프 지표를 표시했습니다. 방문자는 `Zzzz` 안내에서 **Yes, get this app back up!**을 누르고 시작을 기다리면 됩니다.
 
 ### 기존 벤치마크 해석과 후속 개선 여지

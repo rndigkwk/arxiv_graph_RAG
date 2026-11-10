@@ -173,3 +173,16 @@ def test_ingest_sh_writes_the_status_even_when_the_run_fails():
     assert "pipeline/state/last-ingest.json" in script
     assert script.rstrip().endswith('[ "$ingest_exit" -eq 0 ] && [ "$backfill_exit" = 0 ]')
 
+
+
+def test_the_api_container_does_not_run_as_root():
+    """ADR-123: 이미지 기본 사용자는 app이고, compose가 저장소를 clone한 VM 사용자로 덮습니다."""
+    dockerfile = Path("deploy/vm/Dockerfile").read_text(encoding="utf-8")
+    assert re.search(r"^USER app$", dockerfile, flags=re.M)
+    compose = yaml.safe_load(Path("deploy/vm/compose.yml").read_text(encoding="utf-8"))
+    assert compose["services"]["api"]["user"] == "${APP_UID:-1000}:${APP_GID:-1000}"
+    for script in ("deploy/vm/deploy.sh", "deploy/vm/ingest.sh"):
+        text = Path(script).read_text(encoding="utf-8")
+        assert "export APP_UID APP_GID" in text
+        # compose를 부르기 전에 넘겨야 합니다.
+        assert text.index("APP_UID=$(id -u)") < text.index("docker compose")

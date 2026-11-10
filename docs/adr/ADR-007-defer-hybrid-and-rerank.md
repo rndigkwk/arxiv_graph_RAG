@@ -48,4 +48,4 @@ topic 라벨이 사람 검토로 좁혀지면 **그때 다시 재야 합니다**
 
 ## 참고
 
-- [`advanced.md` 재정렬의 여지 측정](../../advanced.md) · [`ROADMAP.md` 4절](../../ROADMAP.md)
+- [`advanced.md` 재정렬의 여지 측정](../advanced.md) · [`ROADMAP.md` 4절](../../ROADMAP.md)

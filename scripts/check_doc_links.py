@@ -22,7 +22,7 @@ import re
 import sys
 from pathlib import Path
 
-DEFAULT_DOCS = ("README.md", "ROADMAP.md", "advanced.md", "EXPERIMENTS.md", "APP_README.md")
+DEFAULT_DOCS = ("README.md", "ROADMAP.md", "EXPERIMENTS.md", "APP_README.md")
 ADR_DIR = Path("docs/adr")
 DOCS_DIR = Path("docs")
 LINK = re.compile(r"\[(?:[^\]]*)\]\(([^)]+)\)")

@@ -3,7 +3,7 @@
     uv run python scripts/measure_double_graph.py --runs 8
 
 2026-10-26에 "Aura Free 한도를 넘겨 두 배로 키우려면 어디에 올리나"를 두고 추정 두 개가
-열 배 차이로 맞섰습니다. 하나는 10-14 로컬 실측(`LOCAL_DOCKER_RESULT.md`)의 컨테이너 피크
+열 배 차이로 맞섰습니다. 하나는 10-14 로컬 실측(`docs/LOCAL_DOCKER_RESULT.md`)의 컨테이너 피크
 1.745GiB를 두 배 해서 "DB 혼자 4GB"라 했고, 다른 하나는 원시 데이터 160MB를 두 배 해서
 "2GB급이면 된다"고 했습니다. **둘 다 측정이 아닙니다.** 앞의 것은 heap 1G·page cache 1G로
 **고정한 설정**의 그림자이고, 뒤의 것은 인덱스를 빼고 셌습니다.

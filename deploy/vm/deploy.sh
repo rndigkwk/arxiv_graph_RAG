@@ -4,6 +4,10 @@
 # 배포 점검(.github/workflows/deployed-app.yml)은 새 커밋이 화면에 뜰 때까지 10분을 기다립니다.
 set -euo pipefail
 cd "$HOME/arxiv_graph_RAG"
+# API 컨테이너는 이 사용자로 돕니다(ADR-123, compose.yml의 user).
+export APP_UID APP_GID
+APP_UID=$(id -u)
+APP_GID=$(id -g)
 
 # 빌드가 2분을 넘기면 다음 타이머가 겹칩니다. 겹친 쪽은 그냥 나갑니다.
 exec 9>/tmp/arxiv-deploy.lock

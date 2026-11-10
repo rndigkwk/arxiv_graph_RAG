@@ -39,7 +39,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 DEFAULT_DOCS = (
     "README.md",
     "ROADMAP.md",
-    "advanced.md",
     "EXPERIMENTS.md",
     "APP_README.md",
 )

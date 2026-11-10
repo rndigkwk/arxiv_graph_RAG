@@ -155,7 +155,7 @@ def test_the_notebook_says_which_model_is_out_of_scope(notebook):
 def test_the_notebook_caps_the_sequence_length_with_a_measured_reason(notebook):
     """8192/32k를 열어 두면 어텐션 활성값이 seq_len^2으로 커집니다 - OOM 위험의 거의 전부입니다.
 
-    이 말뭉치는 **512에서 초과 논문이 0.0%**이므로(advanced.md의 토큰 분포) 자르는 대가가
+    이 말뭉치는 **512에서 초과 논문이 0.0%**이므로(docs/advanced.md의 토큰 분포) 자르는 대가가
     없습니다. 기존 비교(512)와 같은 조건이 되는 덤도 있습니다.
     """
     body = "\n".join(sources(notebook))

@@ -178,7 +178,7 @@ dograg README는 1분 요약에 `0.46 → 0.84`, `23 → 30/36 (p=0.016)`, `165�
 
 **가져올 것:**
 
-1. `advanced.md`에 dograg의 **✅ 적용 / 🧪 재봤지만 안 넣음 / ➖ 안 맞아서 안 함** 3단 표.
+1. `docs/advanced.md`에 dograg의 **✅ 적용 / 🧪 재봤지만 안 넣음 / ➖ 안 맞아서 안 함** 3단 표.
    특히 "➖ 안 한 이유" 열이 면접에서 가장 강합니다
 2. 기능 PR마다 같은 세트로 전후 측정
 3. **당장의 숙제: 현재 HEAD로 `--mode compare` 재실행.** 복합 조건 검증이 추가된 뒤의 지연·토큰이
@@ -264,7 +264,7 @@ PageRank가 벡터 점수를 압도하지 않게 하는 것입니다.
 (인덱스 저장 공간은 늘어나므로 생성 전후로 인스턴스 사용량을 확인하세요.)
 
 **효과는 기대하지 마세요. 2026-10-13 측정으로 확인됐습니다.** 검색은 이미 **k=5가 허용하는 값의
-99.9%** 를 달성하고 있고, 31건 모두 정답이 후보 20개 안에 있습니다(`advanced.md`의 "재정렬의 여지
+99.9%** 를 달성하고 있고, 31건 모두 정답이 후보 20개 안에 있습니다(`docs/advanced.md`의 "재정렬의 여지
 측정"). 어떤 검색 개선도 가져갈 수 있는 것이 0.1%p 뿐입니다.
 
 topic recall@5가 0.0106으로 낮아 보이는 것도 검색 실패가 아닙니다. **정답 ID가 평균 1,162개
@@ -315,7 +315,7 @@ dograg는 LLM으로 합성 질의를 만들었습니다($3.37). 이 프로젝트
 
 #### Day 59 — RAGAS
 
-현재 `answer_correct`는 **문구 포함 검사**입니다. `advanced.md`도 "완전성이나 사실성을 판정하지
+현재 `answer_correct`는 **문구 포함 검사**입니다. `docs/advanced.md`도 "완전성이나 사실성을 판정하지
 않는다"고 적고 있습니다. Context Precision/Recall/Relevancy + Faithfulness/Answer
 Relevancy/Correctness로 바꾸면 자체 지표가 표준 지표가 되고, exact-title만 채점되던 한계도 풀립니다.
 
@@ -352,7 +352,7 @@ dograg의 `regression-eval.yml`(주간 cron + 임계값 게이트 + 아티팩트
 
 ## 6. 제약 때문에 기각한 항목
 
-기각 이유를 남기는 것이 목적입니다. `advanced.md`의 ➖ 열에 그대로 옮깁니다.
+기각 이유를 남기는 것이 목적입니다. `docs/advanced.md`의 ➖ 열에 그대로 옮깁니다.
 
 | Day | 항목 | 기각 이유 |
 |---|---|---|
@@ -447,7 +447,7 @@ Day 57에서 추출 그래프를 Cypher로 다루고 싶다면 두 번째 Aura �
 | 8 | Day 59 RAGAS + Day 61 회귀 CI (MLflow) | 4번 | 5~7의 결과를 표준 지표로 재보고. **`answer_correct`는 실행 간 1~2건이 흔들려 2건 미만의 변화를 신호로 읽을 수 없음**(재실행으로 확인) |
 | 9 | Day 50 LangGraph 재구성 + Day 79 Langfuse | 8번 | 노드 단위 관측이 가능해짐. 지연 p95 16초(topic 34초)의 원인 구간을 찾으려면 필요 |
 
-**6b번과 7번이 포트폴리오 차별점**이고, **6a번이 그 비교를 성립시키는 전제**입니다. 2026-10-13 측정에서 세 평가 세트 모두 변별력이 없음이 확인됐습니다(`advanced.md`의 "ID 기반 precision·recall은 품질을 재지 못합니다").
+**6b번과 7번이 포트폴리오 차별점**이고, **6a번이 그 비교를 성립시키는 전제**입니다. 2026-10-13 측정에서 세 평가 세트 모두 변별력이 없음이 확인됐습니다(`docs/advanced.md`의 "ID 기반 precision·recall은 품질을 재지 못합니다").
 8·9번은 MLOps 체크박스인데 dograg와 겹치므로 **설계를 다르게 한 이유를 문서에 남기는 것**까지가
 작업 범위입니다.
 
@@ -641,7 +641,7 @@ Aura Free가 공짜로 주던 부분입니다.
 더해도 573 → 422로 낮습니다.
 
 > **지연 비교의 한계** — 실행 간 변동이 큽니다. 같은 코드로 돌린 두 세트가 각각 −3.19초와
-> +0.68초로 반대 방향이 나왔습니다(`advanced.md`의 "종단 효과" 참고). 위 지연 수치는 각 1회
+> +0.68초로 반대 방향이 나왔습니다(`docs/advanced.md`의 "종단 효과" 참고). 위 지연 수치는 각 1회
 > 측정이므로 ±3초 수준의 불확실성을 감안해 읽으세요.
 
 지연 증가는 사용자 체감(질문당 +2.14초)과 Cloud Run 과금(8-1절: 활성 시간 비례) 양쪽에 영향을
@@ -808,7 +808,7 @@ A:  스냅샷 vN만 읽고 학습. 분할 기준월은 vN의 기준월에 맞춤
 > 이름을 하나도 잃지 않습니다).
 
 따라서 B의 전체 적재는 로컬 Docker로 가고 Aura는 앱 시연용 스냅샷으로 고정합니다
-([`LOCAL_DOCKER_RESULT.md`](LOCAL_DOCKER_RESULT.md)에서 현재 규모가 4GiB 한도를 통과함을
+([`LOCAL_DOCKER_RESULT.md`](docs/LOCAL_DOCKER_RESULT.md)에서 현재 규모가 4GiB 한도를 통과함을
 확인했습니다). 파이프라인에는 적재 전 용량 검사를 넣어 95%에서 차단하고, 주간 워크플로는
 시험 실행만 합니다.
 
@@ -827,7 +827,7 @@ A가 768차원 임베딩을 텍스트 피처로 쓰므로, 임베딩 없는 논�
 
 ## 10. 진행 결과 (2026-10-15)
 
-측정 상세는 [`advanced.md`](advanced.md)에, 실험별 질문·방법·결론은 [`EXPERIMENTS.md`](EXPERIMENTS.md)에, 원시 수치는 `reports/`에 있습니다.
+측정 상세는 [`advanced.md`](docs/advanced.md)에, 실험별 질문·방법·결론은 [`EXPERIMENTS.md`](EXPERIMENTS.md)에, 원시 수치는 `reports/`에 있습니다.
 
 ### 10-1. 6a — 그래프 평가 케이스: 변별력 확보
 
@@ -1111,7 +1111,7 @@ PR에서는 smoke, cron에서는 full로 나누는 구조도 교안에 있습니
 ### 11-3. Day 58 — ADR과 지배·민감도 분석
 
 기각 근거는 이미 많습니다(PageRank 재정렬, 하이브리드, SPECTER, hard negative, 타임아웃 상향).
-문제는 그것이 `advanced.md` 1,600줄의 서술로만 흩어져 있어 **"지금 무엇을 쓰고 무엇을 왜 안
+문제는 그것이 `docs/advanced.md` 1,600줄의 서술로만 흩어져 있어 **"지금 무엇을 쓰고 무엇을 왜 안
 쓰는가"를 한 장으로 답할 수 없다**는 것입니다. 번호 붙인 ADR로 고정합니다 →
 [`docs/adr/`](docs/adr/README.md).
 
@@ -1373,5 +1373,5 @@ VM은 e2-medium(4GB, 공유 vCPU 2개)이고 Neo4j와 API가 같이 씁니다. �
 
 - [Aura Free 지원 FAQ](https://support.neo4j.com/s/article/16094506528787-Support-resources-and-FAQ-for-Aura-Free-Tier) · [AuraDB FAQ](https://neo4j.com/cloud/platform/aura-graph-database/faq/) · [무료 그래프 DB 안내](https://neo4j.com/free-graph-database/) — 그래프 크기 한도 (문서 간 불일치, 0-1절 참고)
 - [Streamlit Community Cloud 앱 관리](https://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app) — 메모리·CPU 한도
-- 이 저장소: [`README.md`](README.md) · [`APP_README.md`](APP_README.md) · [`advanced.md`](advanced.md)
+- 이 저장소: [`README.md`](README.md) · [`APP_README.md`](APP_README.md) · [`advanced.md`](docs/advanced.md)
 - dograg 측정 기록: `docs/wiki/deployment-resources.md`(메모리), `docs/wiki/retrieval-experiments.md`(검색 실험), `docs/docker-deployment.md`(배포)
