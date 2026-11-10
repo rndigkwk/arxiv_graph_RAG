@@ -94,7 +94,7 @@
 | 35, 49 | 개체 PageRank를 문서 점수에 섞기 | 🧪 | 포화 함수로 섞어 재정렬해 봤고 넣지 않았습니다. 재정렬이 가져갈 여지 자체가 없었습니다([ADR-006](adr/ADR-006-reject-pagerank-rerank.md)). |
 | 35 | 커뮤니티로 검색 범위 좁히기 | ➖ | 검색이 이미 k=5 허용값의 99.9%입니다(ROADMAP 11-8절). |
 | 36~38 | NER, 트리플 추출, 추출 품질 지표 | ➖ | 그래프를 본문에서 추출하지 않고 메타데이터로 짓습니다. 추출 오류가 생길 자리가 없습니다. |
-| 39 | 엔티티 정규화 — 같은 이름, 다른 사람 | 🟢 | 저자는 표기 문자열 하나가 한 노드라 동명이인을 구별하지 않습니다(ADR-042에 적어 둠). `coauthor` 가족의 거짓 공저자가 여기서 나옵니다. Semantic Scholar가 저자 ID를 주므로, 인용 논문 수집(이전 계획 2단계)이 들어올 때 함께 붙입니다. |
+| 39 | 엔티티 정규화 — 같은 이름, 다른 사람 | 🟢 | 저자는 표기 문자열 하나가 한 노드라 동명이인을 구별하지 않습니다. `coauthor` 가족의 거짓 공저자가 여기서 나옵니다. ~~Semantic Scholar가 저자 ID를 주므로, 인용 논문 수집(이전 계획 2단계)이 들어올 때 함께 붙입니다.~~ **S2 저자 ID로는 가르지 않습니다(2026-11-10 측정).** S2는 한 사람을 여러 ID로 쪼갭니다. Sergey Levine은 이름이 맞은 52편이 ID 12개, "Yang Liu" 227편은 ID 140개였습니다. 그대로 쓰면 같은 사람을 다른 사람으로 가릅니다. S2가 이름을 줄여 써서("Y. Bengio") Yoshua Bengio 95편 중 51편은 이름으로 맞추지도 못했습니다. 이름 일부만 쓴 질문은 [ADR-121](adr/ADR-121-an-inexact-author-name-gets-the-candidates-first.md)이 후보를 알려 줍니다. |
 | 39~40 | 외부 KB 표준 ID(Wikidata) 연결 | ➖ | 논문은 arXiv ID가 이미 표준 키입니다([ADR-002](adr/ADR-002-arxiv-id-as-time-key.md)). |
 | 40 | 문서에서 KG 자동 생성(KG Builder) | ➖ | 36~38과 같은 이유입니다. 예전 교안 노트북만 `notebooks/old/`에 남아 있습니다. |
 | 41 | 증분 적재, 처리 이력, 이번 추가만 되돌리기 | ✅ | 주간 증분 수집과 실행 기록, 워터마크 되감기([ADR-074](adr/ADR-074-rewind-the-ingest-watermark.md)). 되돌리기가 아니라 다시 받기입니다 - MERGE만 쓰므로 지울 것이 없습니다. |
@@ -328,7 +328,7 @@
 | --- | --- | --- | --- |
 | 1 | ~~평가 질문 바꿔 말하기(Day 69)~~ ✅ [ADR-093](adr/ADR-093-paraphrased-eval-questions.md) | 60문항 모두 원문과 같은 점수 | 주간 게이트에 넣음(`paraphrase` 분할, 사례별 만점만) |
 | 2 | ~~레드팀 질문 셋(Day 62)~~ ✅ [ADR-094](adr/ADR-094-red-team-through-the-whole-app.md) | 범위 밖 질문 2/5에 관계없는 근거 | 라우터로 고침([ADR-095](adr/ADR-095-out-of-scope-at-the-router.md)), 주입한 근거 ID도 막음([ADR-096](adr/ADR-096-dictated-evidence-ids.md)), 다시 돌려 19/19 |
-| 3 | 저자 동명이인 구별(Day 39) | `coauthor` 가족의 거짓 공저자 | Semantic Scholar 저자 ID 수집과 함께 |
+| 3 | ~~저자 동명이인 구별(Day 39)~~ 하지 않음 | `coauthor` 가족의 거짓 공저자 | ~~Semantic Scholar 저자 ID 수집과 함께~~ S2 저자 ID가 한 사람을 여러 ID로 쪼개 쓸 수 없었습니다(2026-11-10, 위 Day 39 행). 이름 일부만 쓴 질문은 ✅ [ADR-121](adr/ADR-121-an-inexact-author-name-gets-the-candidates-first.md) |
 | 4 | 임베딩 퇴행 점검(Day 70) | ADR-097 학습은 논문 → 논문만 봅니다 | ~~`b256-e3`이 판정을 통과하면~~ 통과하지 못해 할 일이 없어졌습니다(2026-10-29, 미래 과제에서 동점 — ADR-097 기각) |
 | 5 | 가중치 보간 WiSE-FT(Day 70) | 다시 학습하지 않고 퇴행을 줄임 | 4번과 함께 없어졌습니다 |
 | 6 | ~~문항당 출력 길이 경보(Day 73·75)~~ ✅ [ADR-116](adr/ADR-116-warn-on-a-long-output-per-case.md) | 11-02의 12.8만 토큰 판정을 평가는 근거 재현율이 떨어진 뒤에야 알았습니다 | 회귀 평가 보고서에 문항당 출력 토큰 최댓값을 적고, 정상 실행의 최대(1,085토큰)보다 훨씬 크면 경고만 냅니다. 실패로 막을지는 몇 주 값을 본 뒤에 정합니다 |
