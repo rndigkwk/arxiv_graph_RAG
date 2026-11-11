@@ -21,7 +21,8 @@ VM 빌드가 실패하면 배포가 다시 시도하도록 고쳤지만(ADR-125,
 ## 결정
 
 - **`.github/workflows/vm-image.yml`**이 `deploy/vm/Dockerfile`을 VM과 같은 문맥(저장소 맨 위)으로 굽습니다.
-- 그 이미지에 저장소를 **읽기 전용으로** 마운트하고, 이미지의 사용자로 `import src.api, src.chatbot, uvicorn`을 합니다. `.env` 없이 불러져야 합니다. 모델과 그래프 연결은 첫 요청 때 만듭니다.
+- 그 이미지에 저장소를 **읽기 전용으로** 마운트하고, 이미지의 사용자로 `import src.api, src.chatbot, uvicorn`을 합니다. `src.chatbot`은 불러질 때 연결 값이 있는지만 보므로 **가짜 값**(`NEO4J_*`, `OPENAI_API_KEY`)을 줍니다. 실제 연결은 첫 요청 때라 어디에도 접속하지 않습니다.
+  첫 실행에서 값 없이 불렀다가 `ValueError`로 실패해서 알았습니다(로컬은 `.env`가 있어 통과했습니다).
 - **의존성 파일이 바뀐 PR과 main push에서만 돕니다.** 경로 목록은 `deploy.sh`가 이미지를 다시 굽는 목록(`pyproject.toml`, `uv.lock`, `.python-version`, `.dockerignore`, `deploy/vm/Dockerfile`)에 이 워크플로 파일을 더한 것입니다.
   `tests/test_vm_deploy.py`가 두 목록이 같은지 확인합니다. 한쪽에만 파일을 더하면 CI는 건너뛰었는데 VM 빌드가 깨지는 길이 다시 생깁니다.
 
