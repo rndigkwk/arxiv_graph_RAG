@@ -196,4 +196,5 @@
 | [ADR-122](ADR-122-repair-an-id-shaped-evidence-alias-at-the-tool.md) | arXiv ID 모양인 근거 별칭은 도구에서 고쳐 받는다 — 별칭이 없는 행은 그대로 돌려보낸다 | 채택 |
 | [ADR-123](ADR-123-the-api-container-runs-as-the-vm-user.md) | API 컨테이너는 root가 아니라 저장소를 clone한 VM 사용자로 돈다 — 레지스트리 이미지는 따로 다룬다 | 채택 |
 | [ADR-124](ADR-124-rescore-the-forecast-model-every-month.md) | 배포된 공동인용 예측 모델을 매달 지난달 라벨로 다시 잰다 — 재학습은 아직 하지 않는다 | 채택 |
+| [ADR-125](ADR-125-deploy-compares-against-the-last-successful-deploy.md) | VM 배포는 HEAD가 아니라 마지막으로 성공한 배포와 비교한다 | 채택 |
 | [ADR-128](ADR-128-ci-builds-the-vm-image-when-dependencies-change.md) | 의존성이 바뀐 PR은 CI가 VM 이미지를 먼저 굽고, 그 안에서 앱을 불러 본다 | 채택 |

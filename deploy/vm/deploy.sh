@@ -14,14 +14,28 @@ exec 9>/tmp/arxiv-deploy.lock
 flock -n 9 || exit 0
 
 git fetch -q origin main
-old=$(git rev-parse HEAD)
 new=$(git rev-parse origin/main)
+# old는 HEAD가 아니라 **끝까지 성공한 마지막 배포**입니다(ADR-125). fast-forward 뒤에 빌드가
+# 실패하면 HEAD는 이미 새 커밋인데 컨테이너는 옛것입니다. HEAD와 비교하면 다음 실행이
+# old=new로 보고 그냥 나가서, 다음 머지까지 아무도 다시 굽지 않습니다.
+mark=pipeline/state/deployed-commit
+mkdir -p pipeline/state
+old=$(cat "$mark" 2>/dev/null || true)
+if [ -z "$old" ]; then
+  # 기록이 없으면(이 장치 이전) 지금 HEAD가 배포돼 있다고 봅니다.
+  old=$(git rev-parse HEAD)
+  echo "$old" > "$mark"
+fi
 [ "$old" = "$new" ] && exit 0
+# 기록이 깨졌으면 무엇이 바뀌었는지 모르므로 전부 다시 합니다.
+full=0
+git cat-file -e "$old^{commit}" 2>/dev/null || full=1
 # fast-forward만 합니다. VM에서 누가 커밋했다면 멈추고 사람을 기다립니다(실패가 journal에 남습니다).
+# 지난 실행이 merge 뒤에 실패했으면 HEAD가 이미 new라 아무 일도 하지 않습니다.
 git merge -q --ff-only origin/main
 
 C="docker compose --env-file .env -f deploy/vm/compose.yml"
-changed() { ! git diff --quiet "$old" "$new" -- "$@"; }
+changed() { [ "$full" = 1 ] || ! git diff --quiet "$old" "$new" -- "$@"; }
 # 이미지는 의존성만 굽습니다. 의존성이 바뀌었을 때만 다시 굽습니다.
 if changed pyproject.toml uv.lock .python-version .dockerignore deploy/vm/Dockerfile; then
   $C build -q api
@@ -33,6 +47,7 @@ $C up -d --remove-orphans
 # 않는 파일만 바뀌었으면 건너뜁니다(ADR-107). 목록은 no-restart-paths 한 곳에 있습니다.
 runtime=$(git diff --no-renames --name-only "$old" "$new" \
   | grep -vE -f <(grep -vE '^(#|$)' deploy/vm/no-restart-paths) || true)
+[ "$full" = 1 ] && runtime=all
 if [ -n "$runtime" ]; then
   $C restart api
 else
@@ -41,4 +56,7 @@ fi
 if changed deploy/vm/Caddyfile; then
   $C restart caddy
 fi
+# 여기까지 왔을 때만 기록합니다. 위에서 실패하면 다음 실행(2분 뒤)이 같은 old에서 다시 합니다.
+echo "$new" > "$mark.tmp"
+mv "$mark.tmp" "$mark"
 echo "배포 ${old:0:7} -> ${new:0:7}"

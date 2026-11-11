@@ -6,13 +6,16 @@
   바뀐 배포는 건너뜁니다 - 재시작이 진행 중인 답을 끊습니다(ADR-107).
 - VM에는 Streamlit이 없습니다(ADR-083). 내린 서비스는 지우고, 예전 주소는 Vercel로 보냅니다.
 - 의존성이 바뀐 때만 이미지를 다시 굽습니다.
+- 빌드·재시작이 실패하면 다음 실행이 다시 합니다. 기준은 마지막 성공 배포입니다(ADR-125).
 - 의존성이 바뀐 PR은 CI가 VM 이미지를 먼저 굽습니다. 조건이 VM과 같습니다(ADR-128).
 - 배포 점검이 VM 주소를 봅니다.
 """
 
 from __future__ import annotations
 
+import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -227,3 +230,109 @@ def test_the_forecast_monitor_runs_as_the_vm_user_after_the_ingest():
     assert "last-forecast-monitor.json" in text
     timer = Path("deploy/vm/install_forecast_monitor_timer.sh").read_text(encoding="utf-8")
     assert "OnCalendar=*-*-03 04:19:00 UTC" in timer
+
+
+# --- 빌드가 실패한 배포는 다음 실행이 다시 합니다(ADR-125) ---------------------------------------
+# docker와 flock을 가짜로 바꿔 deploy.sh를 실제로 돌립니다. 가짜 docker는 부른 인자를 적고,
+# fail-build 파일이 있으면 build에서 실패합니다.
+
+FAKE_DOCKER = """#!/usr/bin/env bash
+echo "$*" >> "$HOME/docker.log"
+case "$*" in *" build "*) [ -e "$HOME/fail-build" ] && exit 1;; esac
+exit 0
+"""
+FAKE_FLOCK = "#!/usr/bin/env bash\nexit 0\n"
+
+
+def _bash():
+    """Windows에서 PATH의 bash는 WSL일 수 있습니다. Git for Windows의 bash를 먼저 씁니다."""
+    if os.name == "nt":
+        git = shutil.which("git")
+        found = [up / "bin/bash.exe" for up in Path(git).resolve().parents[:3]] if git else []
+        return next((str(b) for b in found if b.exists()), None)
+    return shutil.which("bash")
+
+
+def _git(cwd, *args):
+    return subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True,
+                          text=True).stdout.strip()
+
+
+@pytest.fixture
+def vm(tmp_path):
+    bash = _bash()
+    if bash is None:
+        pytest.skip("bash가 없습니다")
+    origin, seed = tmp_path / "origin.git", tmp_path / "seed"
+    home = tmp_path / "home"
+    repo = home / "arxiv_graph_RAG"
+    _git(tmp_path, "init", "-q", "--bare", "-b", "main", str(origin))
+    (seed / "deploy/vm").mkdir(parents=True)
+    for name in ("deploy/vm/deploy.sh", "deploy/vm/no-restart-paths"):
+        (seed / name).write_bytes(Path(name).read_bytes())
+    (seed / "pyproject.toml").write_text("v1\n", encoding="utf-8")
+    _git(seed.parent, "init", "-q", "-b", "main", str(seed))
+    for key, value in (("user.name", "t"), ("user.email", "t@t")):
+        _git(seed, "config", key, value)
+    _git(seed, "add", "-A")
+    _git(seed, "commit", "-qm", "first")
+    _git(seed, "remote", "add", "origin", str(origin))
+    _git(seed, "push", "-q", "origin", "main")
+    _git(tmp_path, "clone", "-q", str(origin), str(repo))
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    for name, body in (("docker", FAKE_DOCKER), ("flock", FAKE_FLOCK)):
+        (bin_dir / name).write_text(body, encoding="utf-8", newline="\n")
+        (bin_dir / name).chmod(0o755)
+    env = {**os.environ, "HOME": str(home),
+           "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+
+    def deploy():
+        log = home / "docker.log"
+        log.unlink(missing_ok=True)
+        done = subprocess.run([bash, "deploy/vm/deploy.sh"], cwd=repo, env=env,
+                              capture_output=True, text=True)
+        calls = log.read_text(encoding="utf-8").splitlines() if log.exists() else []
+        return done.returncode, calls
+
+    def merge(text):
+        (seed / "pyproject.toml").write_text(text, encoding="utf-8")
+        _git(seed, "commit", "-qam", text)
+        _git(seed, "push", "-q", "origin", "main")
+        return _git(seed, "rev-parse", "HEAD")
+
+    return home, repo, deploy, merge
+
+
+def test_a_failed_build_is_retried_on_the_next_run(vm):
+    home, repo, deploy, merge = vm
+    # 처음에는 기록이 없으므로 지금 HEAD를 배포된 것으로 적고 나갑니다.
+    assert deploy() == (0, [])
+    mark = repo / "pipeline/state/deployed-commit"
+    assert mark.read_text().strip() == _git(repo, "rev-parse", "HEAD")
+
+    new = merge("v2\n")
+    (home / "fail-build").touch()
+    code, calls = deploy()
+    assert code != 0 and any(" build " in c for c in calls)
+    # HEAD는 이미 새 커밋이지만, 기록은 옛것 그대로입니다.
+    assert _git(repo, "rev-parse", "HEAD") == new
+    assert mark.read_text().strip() != new
+
+    (home / "fail-build").unlink()
+    code, calls = deploy()
+    assert code == 0
+    assert any(" build " in c for c in calls) and any("restart api" in c for c in calls)
+    assert mark.read_text().strip() == new
+    # 다 끝났으면 다음 실행은 아무것도 하지 않습니다.
+    assert deploy() == (0, [])
+
+
+def test_a_broken_record_redoes_everything(vm):
+    _home, repo, deploy, merge = vm
+    deploy()
+    merge("v2\n")
+    (repo / "pipeline/state/deployed-commit").write_text("0" * 40 + "\n")
+    code, calls = deploy()
+    assert code == 0
+    assert any(" build " in c for c in calls) and any("restart api" in c for c in calls)
