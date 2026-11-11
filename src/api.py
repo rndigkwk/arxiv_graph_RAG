@@ -40,6 +40,7 @@ from src import (
     abstain,
     citations,
     family_board,
+    forecast_monitor_status,
     ingest_status,
     model_outage,
     quality_board,
@@ -273,6 +274,8 @@ def create_app(
             "citation_graph": warmup_task().state(),
             # VM의 주간 수집 상태입니다. 배포 점검이 8시간마다 읽습니다(ADR-106).
             "ingest": ingest_status.summary(),
+            # 공동인용 예측 모델의 월간 감시입니다(ADR-124). 같은 배포 점검이 읽습니다.
+            "forecast_monitor": forecast_monitor_status.summary(),
         }
 
     @app.get("/api/stats")
