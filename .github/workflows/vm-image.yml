@@ -8,6 +8,7 @@ on:
   pull_request:
     paths:
       - pyproject.toml
+      - deploy/vm/check_image_imports.py
       - uv.lock
       - .python-version
       - .dockerignore
@@ -17,6 +18,7 @@ on:
     branches: [main]
     paths:
       - pyproject.toml
+      - deploy/vm/check_image_imports.py
       - uv.lock
       - .python-version
       - .dockerignore
@@ -35,11 +37,8 @@ jobs:
       # VM과 같은 명령입니다(compose.yml의 build: context ../.., dockerfile deploy/vm/Dockerfile).
       - run: docker build -f deploy/vm/Dockerfile -t arxiv-graphrag-vm-api:ci .
       # VM처럼 저장소를 /app에 마운트하고, 이미지의 사용자(app, ADR-123)로 앱을 불러 봅니다.
-      # `src.chatbot`은 불러질 때 연결 값이 있는지만 봅니다. 연결은 첫 요청 때 하므로 가짜 값을
-      # 줍니다 - 비밀이 아니고, 어디에도 접속하지 않습니다.
+      # `src.chatbot`은 불러지는 순간 Neo4j에 접속하므로, `src/`가 쓰는 외부 패키지를 모두 불러
+      # 보고 `src.api`만 직접 불러 봅니다. 비밀은 주지 않습니다.
       - run: >
           docker run --rm -v "$PWD:/app:ro" -e PYTHONDONTWRITEBYTECODE=1
-          -e NEO4J_URI=bolt://localhost:7687 -e NEO4J_USER=neo4j
-          -e NEO4J_PASSWORD=not-a-secret -e OPENAI_API_KEY=not-a-key
-          arxiv-graphrag-vm-api:ci
-          python -c "import src.api, src.chatbot, uvicorn; print('VM 이미지에서 앱을 불러왔습니다')"
+          arxiv-graphrag-vm-api:ci python deploy/vm/check_image_imports.py

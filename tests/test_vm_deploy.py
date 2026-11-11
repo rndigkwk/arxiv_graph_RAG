@@ -138,13 +138,24 @@ def test_ci_builds_the_vm_image_when_the_vm_would():
     rebuild = set(re.search(r"if changed (.+); then\n  \$C build -q api", DEPLOY).group(1).split())
     workflow = yaml.safe_load(Path(".github/workflows/vm-image.yml").read_text(encoding="utf-8"))
     triggers = workflow[True]  # PyYAML은 `on`을 True로 읽습니다
-    own = ".github/workflows/vm-image.yml"
+    own = {".github/workflows/vm-image.yml", "deploy/vm/check_image_imports.py"}
     for event in ("pull_request", "push"):
-        assert set(triggers[event]["paths"]) == rebuild | {own}
+        assert set(triggers[event]["paths"]) == rebuild | own
     steps = workflow["jobs"]["build"]["steps"]
     commands = " ".join(step.get("run", "") for step in steps)
     assert "docker build -f deploy/vm/Dockerfile" in commands
-    assert "import src.api" in commands
+    assert "deploy/vm/check_image_imports.py" in commands
+
+
+def test_the_image_check_covers_every_third_party_import_in_src():
+    """`src.chatbot`은 불러지면 Neo4j에 접속해 CI에서 못 부릅니다. 의존성을 목록으로 봅니다."""
+    from deploy.vm import check_image_imports
+
+    names = check_image_imports.third_party()
+    assert {"langchain_openai", "neo4j", "neo4j_graphrag", "langgraph", "fastapi"} <= set(names)
+    assert not {"src", "pipeline", "os", "json"} & set(names)
+    # 함수 안에서만 불러오는 선택 도구는 이미지에 없어도 됩니다.
+    assert "graphdatascience" not in names
 
 
 def test_setup_installs_the_timer():
