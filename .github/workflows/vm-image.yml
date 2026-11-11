@@ -1,0 +1,44 @@
+name: VM image
+
+# VM의 API 이미지는 의존성만 굽고, VM이 머지 뒤에 직접 굽습니다(ADR-080·ADR-128).
+# 그래서 의존성이 바뀐 PR은 지금까지 VM에서 처음 빌드됐습니다. 여기서 먼저 굽고, 그 이미지
+# 안에서 앱을 불러 봅니다. 의존성 파일이 바뀔 때만 돕니다 - 경로 목록은 deploy.sh가 다시
+# 굽는 목록과 같아야 하고, tests/test_vm_deploy.py가 그것을 확인합니다.
+on:
+  pull_request:
+    paths:
+      - pyproject.toml
+      - deploy/vm/check_image_imports.py
+      - uv.lock
+      - .python-version
+      - .dockerignore
+      - deploy/vm/Dockerfile
+      - .github/workflows/vm-image.yml
+  push:
+    branches: [main]
+    paths:
+      - pyproject.toml
+      - deploy/vm/check_image_imports.py
+      - uv.lock
+      - .python-version
+      - .dockerignore
+      - deploy/vm/Dockerfile
+      - .github/workflows/vm-image.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      # VM과 같은 명령입니다(compose.yml의 build: context ../.., dockerfile deploy/vm/Dockerfile).
+      - run: docker build -f deploy/vm/Dockerfile -t arxiv-graphrag-vm-api:ci .
+      # VM처럼 저장소를 /app에 마운트하고, 이미지의 사용자(app, ADR-123)로 앱을 불러 봅니다.
+      # `src.chatbot`은 불러지는 순간 Neo4j에 접속하므로, `src/`가 쓰는 외부 패키지를 모두 불러
+      # 보고 `src.api`만 직접 불러 봅니다. 비밀은 주지 않습니다.
+      - run: >
+          docker run --rm -v "$PWD:/app:ro" -e PYTHONDONTWRITEBYTECODE=1
+          arxiv-graphrag-vm-api:ci python deploy/vm/check_image_imports.py
