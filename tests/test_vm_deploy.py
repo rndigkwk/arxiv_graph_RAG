@@ -67,6 +67,10 @@ def test_files_the_api_reads_restart_it(path):
     "docs/EVALUATION.md", "README.md", "evals/README.md", "tests/test_api.py",
     "web/app/page.tsx", "scripts/measure_vm_answer_latency.py", ".github/workflows/ci.yml",
     "reports/vm_answer_latency_2026-11-06.json", "deploy/vm/ingest.sh",
+    # 11-11 #160 머지가 이 파일 하나 때문에 API를 재시작했습니다. CI만 부르는 검사입니다.
+    "deploy/vm/check_image_imports.py",
+    # 월간 감시는 따로 컨테이너를 띄우고, API는 이 스크립트를 읽지 않습니다(ADR-124).
+    "deploy/vm/forecast_monitor.sh", "deploy/vm/install_forecast_monitor_timer.sh",
 ])
 def test_files_the_api_does_not_read_skip_the_restart(path):
     assert unread(path)
