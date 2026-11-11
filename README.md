@@ -39,7 +39,7 @@ arXiv AI 논문 4만여 편과 인용 관계를 Neo4j 지식 그래프로 만들
   모델 턴을 아낍니다.
 - **무엇을 판별했나** — 관련 논문 추천에서 학습 모델 셋을 재서 기각하고 Cypher 한 줄을 골랐습니다(recall@5 2.2배).
   직접 학습한 공동인용 예측 GBM은 휴리스틱을 신뢰구간으로 이겨 채택했고, 임베딩 파인튜닝 세 번은 OpenAI 임베딩을 넘지 못해 기각했습니다.
-  결정 124개를 [ADR](docs/adr/README.md)로 남기고, 뒤집힌 결정도 지우지 않습니다. 한 장 요약은 [`docs/VALIDATION.md`](docs/VALIDATION.md)입니다.
+  결정 125개를 [ADR](docs/adr/README.md)로 남기고, 뒤집힌 결정도 지우지 않습니다. 한 장 요약은 [`docs/VALIDATION.md`](docs/VALIDATION.md)입니다.
 - **어떻게 지키나** — PR마다 회귀 평가가 돌고, 지표 10개 중 하나라도 하한 아래면 머지되지 않습니다.
   모델이 쓴 Cypher는 읽기 전용 세션 · 계획 유형 검사 · 프로시저 허용 목록의 세 겹으로 막습니다.
 - **어디서 도나** — 화면은 Vercel의 Next.js, API·Neo4j는 GCP VM 한 대. 그래프는 매주 월요일 새 논문을 받아 자랍니다.
@@ -55,7 +55,7 @@ arXiv AI 논문 4만여 편과 인용 관계를 Neo4j 지식 그래프로 만들
 | 답 지연 (VM 서버) | 영어 15문항 p50 **6.09초**, 한국어 화면 예시 7문항 중 6개가 10초 안 | [`docs/EVALUATION.md`](docs/EVALUATION.md#지연은-품질과-따로-잽니다) |
 | Cypher 가드 공격 | 40가지 중 쓰기 20/20 차단, 외부 읽기 2건을 찾아 막음 | [ADR-048](docs/adr/ADR-048-the-type-check-does-not-know-the-internet.md) |
 | 그래프 (2026-11-10) | 논문 43,728 · 저자 123,402 · 인용 148,051 · 저술 304,479 | [`docs/DATA.md`](docs/DATA.md) |
-| 기록 | ADR 124개 · 실험 70여 건 · 테스트 1,600여 개 | [ADR 색인](docs/adr/README.md) · [`EXPERIMENTS.md`](EXPERIMENTS.md) |
+| 기록 | ADR 125개 · 실험 70여 건 · 테스트 1,600여 개 | [ADR 색인](docs/adr/README.md) · [`EXPERIMENTS.md`](EXPERIMENTS.md) |
 
 ## Architecture
 
