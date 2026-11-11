@@ -2,6 +2,7 @@
 
     python scripts/visit_deployed_app.py --expect-commit <sha>      # VM의 API와 Vercel 화면
     python scripts/visit_deployed_app.py --ingest                   # VM의 주간 수집(ADR-106)
+    python scripts/visit_deployed_app.py --forecast-monitor         # 예측 모델 월간 감시(ADR-124)
     uvx --with playwright==1.64.1 python scripts/visit_deployed_app.py --streamlit [URL]
     # Streamlit 판(백업 앱). 처음 한 번: uvx --with playwright==1.64.1 playwright install chromium
 
@@ -251,6 +252,46 @@ def check_ingest(base: str) -> int:
     return 0
 
 
+FORECAST_PROBLEMS = {
+    "monitor_stale": "월간 감시가 40일 넘게 돌지 않았습니다 - 타이머가 돌았는지 보세요",
+    "monitor_failed": "마지막 월간 감시가 실패로 끝났습니다",
+    "no_report": "감시 보고서를 읽지 못했습니다",
+    "below_bar": "배포 모델이 지난달 라벨에서 승격 기준 아래입니다 - 재학습을 검토하세요",
+}
+
+
+def forecast_problem(health: dict) -> str | None:
+    """`/api/health`의 `forecast_monitor`(src.forecast_monitor_status)를 읽습니다.
+
+    아직 한 번도 돌지 않은 상태(unknown)는 문제로 세지 않습니다. 문제가 없으면 `None`입니다.
+    """
+    status = health.get("forecast_monitor")
+    if not isinstance(status, dict):
+        return "API가 감시 상태를 내지 않습니다 - 이 점검보다 오래된 코드입니다"
+    if status.get("status") in ("ok", "unknown"):
+        return None
+    problems = status.get("problems") or ["unknown"]
+    reasons = [FORECAST_PROBLEMS.get(name, name) for name in problems]
+    return ("공동인용 예측 모델 감시에 문제가 있습니다: " + "; ".join(reasons)
+            + ". `journalctl -u arxiv-forecast-monitor`와 pipeline/state/reports/를 보세요")
+
+
+def check_forecast_monitor(base: str) -> int:
+    """배포된 `graph-text-gbm`의 월간 감시가 제때 돌았고 기준 위인지 봅니다(ADR-124). 0원입니다."""
+    health = read_json(base + "/api/health")
+    problem = forecast_problem(health)
+    if problem:
+        raise SystemExit(f"실패: {problem}")
+    status = health["forecast_monitor"]
+    report = status.get("report") or {}
+    if status.get("status") == "unknown":
+        summary("- 예측 모델 감시: 아직 돌지 않았습니다")
+    else:
+        summary(f"- 예측 모델 감시: {report.get('month')} {report.get('verdict')} · "
+                f"MRR {report.get('mrr')} · 휴리스틱 대비 {report.get('vs_best_heuristic')}")
+    return 0
+
+
 def summary(line: str) -> None:
     print(line)
     path = os.environ.get("GITHUB_STEP_SUMMARY")
@@ -300,12 +341,16 @@ def main() -> int:
                         help="API 대신 Streamlit 판을 브라우저로 엽니다(기본은 백업 앱)")
     parser.add_argument("--ingest", action="store_true",
                         help="VM의 주간 수집이 제때 끝났는지만 봅니다(ADR-106)")
+    parser.add_argument("--forecast-monitor", action="store_true",
+                        help="공동인용 예측 모델의 월간 감시만 봅니다(ADR-124)")
     parser.add_argument("--expect-commit", help="배포돼 있어야 할 커밋(워크플로가 넘깁니다)")
     args = parser.parse_args()
     if args.streamlit:
         return check(args.streamlit, args.expect_commit)
     if args.ingest:
         return check_ingest(API_URL)
+    if args.forecast_monitor:
+        return check_forecast_monitor(API_URL)
     return check_api(API_URL, WEB_URL, args.expect_commit)
 
 

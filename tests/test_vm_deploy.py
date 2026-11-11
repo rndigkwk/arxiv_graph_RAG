@@ -186,3 +186,15 @@ def test_the_api_container_does_not_run_as_root():
         assert "export APP_UID APP_GID" in text
         # compose를 부르기 전에 넘겨야 합니다.
         assert text.index("APP_UID=$(id -u)") < text.index("docker compose")
+
+
+def test_the_forecast_monitor_runs_as_the_vm_user_after_the_ingest():
+    """ADR-124: 월간 감시도 VM 사용자로 돌고, 적재 중인 그래프를 읽지 않게 수집 잠금을
+    기다립니다."""
+    text = Path("deploy/vm/forecast_monitor.sh").read_text(encoding="utf-8")
+    assert text.index("APP_UID=$(id -u)") < text.index("docker compose")
+    assert "flock -w" in text and "/tmp/arxiv-ingest.lock" in text
+    assert "python -m models.link_prediction.monitor" in text
+    assert "last-forecast-monitor.json" in text
+    timer = Path("deploy/vm/install_forecast_monitor_timer.sh").read_text(encoding="utf-8")
+    assert "OnCalendar=*-*-03 04:19:00 UTC" in timer

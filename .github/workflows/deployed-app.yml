@@ -45,3 +45,7 @@ jobs:
         # Runs even when the deploy check failed, so one alert names both.
         if: ${{ !cancelled() }}
         run: python3 scripts/visit_deployed_app.py --ingest
+      - name: Check the monthly forecast-model monitor
+        # The VM re-scores the deployed graph-text-gbm on last month's labels (ADR-124).
+        if: ${{ !cancelled() }}
+        run: python3 scripts/visit_deployed_app.py --forecast-monitor

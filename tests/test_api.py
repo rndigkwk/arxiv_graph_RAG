@@ -349,6 +349,8 @@ def test_health_reports_commits_without_loading_the_model():
     assert data["status"] == "ok" and data["module_commit"] == "abc1234"
     # VM의 주간 수집 상태도 함께 냅니다(ADR-106). 그래프에 묻지 않고 파일만 읽습니다.
     assert data["ingest"]["status"] in {"ok", "problem", "unknown"}
+    # 예측 모델 월간 감시도 같은 방식입니다(ADR-124).
+    assert data["forecast_monitor"]["status"] in {"ok", "problem", "unknown"}
 
 
 def test_quality_reads_the_committed_baseline():
