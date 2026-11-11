@@ -213,6 +213,10 @@ def test_compare_case_counts_the_condition_validation_call(monkeypatch):
 
     assert result["graph_rag"]["chat_input_tokens"] == 500
     assert result["graph_rag"]["chat_output_tokens"] == 30
+    # 캐시 비율의 분모는 에이전트 입력만입니다. 판정 호출(400)은 빼고,
+    # 캐시 기록이 없으면 None입니다(ADR-127).
+    assert result["graph_rag"]["chat_input_tokens_agent"] == 100
+    assert result["graph_rag"]["chat_input_tokens_cached"] is None
     # The vector-only baseline never calls the judge, so it stays at the stream total.
     assert result["vector_only"]["chat_input_tokens"] == 100
 
