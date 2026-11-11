@@ -6,6 +6,7 @@
   바뀐 배포는 건너뜁니다 - 재시작이 진행 중인 답을 끊습니다(ADR-107).
 - VM에는 Streamlit이 없습니다(ADR-083). 내린 서비스는 지우고, 예전 주소는 Vercel로 보냅니다.
 - 의존성이 바뀐 때만 이미지를 다시 굽습니다.
+- 의존성이 바뀐 PR은 CI가 VM 이미지를 먼저 굽습니다. 조건이 VM과 같습니다(ADR-128).
 - 배포 점검이 VM 주소를 봅니다.
 """
 
@@ -127,6 +128,23 @@ def test_image_is_rebuilt_only_when_its_inputs_change():
         encoding="utf-8"), re.MULTILINE).group(1).split()
     assert set(copied) <= set(rebuild)
     assert {".dockerignore", "deploy/vm/Dockerfile"} <= set(rebuild)
+
+
+def test_ci_builds_the_vm_image_when_the_vm_would():
+    """의존성이 바뀐 PR은 CI가 먼저 굽습니다. 조건이 VM이 다시 굽는 조건과 같아야 합니다(ADR-128).
+
+    한쪽에만 파일을 더하면, CI는 건너뛰었는데 VM 빌드가 깨지는 길이 다시 생깁니다.
+    """
+    rebuild = set(re.search(r"if changed (.+); then\n  \$C build -q api", DEPLOY).group(1).split())
+    workflow = yaml.safe_load(Path(".github/workflows/vm-image.yml").read_text(encoding="utf-8"))
+    triggers = workflow[True]  # PyYAML은 `on`을 True로 읽습니다
+    own = ".github/workflows/vm-image.yml"
+    for event in ("pull_request", "push"):
+        assert set(triggers[event]["paths"]) == rebuild | {own}
+    steps = workflow["jobs"]["build"]["steps"]
+    commands = " ".join(step.get("run", "") for step in steps)
+    assert "docker build -f deploy/vm/Dockerfile" in commands
+    assert "import src.api" in commands
 
 
 def test_setup_installs_the_timer():
