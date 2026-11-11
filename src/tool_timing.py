@@ -119,18 +119,21 @@ class InsideGenerate(BaseCallbackHandler):
         self._push(MODEL)
 
     def on_llm_end(self, response, **kwargs) -> None:
-        self._end_turn(self._pop(MODEL), output_tokens(response))
+        self._end_turn(self._pop(MODEL), output_tokens(response), input_tokens(response))
 
     def on_llm_error(self, error, **kwargs) -> None:
-        self._end_turn(self._pop(MODEL), None)
+        self._end_turn(self._pop(MODEL), None, (None, None))
 
-    def _end_turn(self, frame: dict[str, Any] | None, tokens: int | None) -> None:
+    def _end_turn(self, frame: dict[str, Any] | None, tokens: int | None,
+                  inputs: tuple[int | None, int | None]) -> None:
         if frame is None or not frame["counted"]:
             return
         with self._lock:
             self._model_seconds += frame["seconds"]
             self._model_turns += 1
-            self._turns.append({"seconds": round(frame["seconds"], 3), "output_tokens": tokens})
+            # 입력과 그중 캐시에서 읽은 양은 프롬프트 캐시가 깨졌는지 보는 데 씁니다(ADR-126).
+            self._turns.append({"seconds": round(frame["seconds"], 3), "output_tokens": tokens,
+                                "input_tokens": inputs[0], "cached_input_tokens": inputs[1]})
 
     # ── 읽기 ─────────────────────────────────────────────────────────────
     def seconds(self) -> dict[str, float]:
@@ -179,6 +182,20 @@ def output_tokens(response: Any) -> int | None:
     usage = getattr(message, "usage_metadata", None) or {}
     value = usage.get("output_tokens")
     return value if isinstance(value, int) else None
+
+
+def input_tokens(response: Any) -> tuple[int | None, int | None]:
+    """모델 응답의 (입력, 그중 캐시 읽기). 공급자가 말하지 않은 값은 None입니다."""
+    try:
+        message = response.generations[0][0].message
+    except (AttributeError, IndexError, TypeError):
+        return None, None
+    usage = getattr(message, "usage_metadata", None) or {}
+    total = usage.get("input_tokens")
+    details = usage.get("input_token_details") or {}
+    cached = details.get("cache_read") if isinstance(details, dict) else None
+    return (total if isinstance(total, int) else None,
+            cached if isinstance(cached, int) else None)
 
 
 def covered_seconds(spans: list[tuple[float, float]]) -> float:
