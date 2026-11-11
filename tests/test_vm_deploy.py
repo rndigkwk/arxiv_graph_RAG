@@ -71,6 +71,8 @@ def test_files_the_api_reads_restart_it(path):
     "deploy/vm/check_image_imports.py",
     # 월간 감시는 따로 컨테이너를 띄우고, API는 이 스크립트를 읽지 않습니다(ADR-124).
     "deploy/vm/forecast_monitor.sh", "deploy/vm/install_forecast_monitor_timer.sh",
+    # 이 목록 자체는 deploy.sh와 배포 점검만 읽습니다.
+    "deploy/vm/no-restart-paths",
 ])
 def test_files_the_api_does_not_read_skip_the_restart(path):
     assert unread(path)

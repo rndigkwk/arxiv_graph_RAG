@@ -14,3 +14,4 @@
 ^reports/vm_
 ^deploy/vm/(ingest|install_ingest_timer|setup|forecast_monitor|install_forecast_monitor_timer)\.sh$
 ^deploy/vm/check_image_imports\.py$
+^deploy/vm/no-restart-paths$
