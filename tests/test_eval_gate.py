@@ -20,10 +20,12 @@ import pytest
 
 from evals.gate import (
     BASELINE,
+    CACHE_READ_ALARM,
     GATE_REPORT,
     OUTPUT_TOKEN_ALARM,
     RAGAS_FAITHFULNESS,
     RAGAS_STABLE_PRECISION,
+    cache_read_ratio,
     check,
     compares_aggregates,
     long_outputs,
@@ -209,6 +211,60 @@ def test_merging_runs_keeps_the_longest_output():
     merged = merge([_run({"a": 800}), _run({"a": 9000}), _run({"a": 700})])
     assert merged["cases"]["a"]["output_tokens"] == 9000
     assert long_outputs(merged) == [("a", 9000)]
+
+
+def _cached_run(cases: dict) -> dict:
+    return normalize({"results": [
+        {"id": case_id, "answer_evidence_recall": 1.0, "failed": False,
+         "chat_input_tokens_agent": total, "chat_input_tokens_cached": cached}
+        for case_id, (total, cached) in cases.items()
+    ]})
+
+
+def test_the_cache_ratio_is_the_sum_over_the_run_not_a_mean_of_cases(tmp_path: Path):
+    """짧은 질문 하나의 낮은 비율(10-26 `author-01` 0.467)이 실행 전체를 끌어내리지 않습니다.
+
+    ADR-127."""
+    run = _cached_run({"long": (9000, 8100), "short": (1000, 467)})
+    assert cache_read_ratio(run) == pytest.approx(8567 / 10000)
+    # 토큰은 품질 지표가 아니라 기준선과 비교하지 않습니다.
+    assert not {"chat_input_tokens_agent", "chat_input_tokens_cached"} & set(
+        run["cases"]["long"]["metrics"])
+    summary = tmp_path / "summary.md"
+    write_summary(summary, _summary_baseline(), run, [])
+    text = summary.read_text(encoding="utf-8")
+    assert "판정: 통과" in text and "프롬프트 캐시 비율: 0.857" in text
+    assert "비율이 낮음" not in text
+
+
+def test_a_broken_cache_warns_without_changing_the_verdict(tmp_path: Path):
+    """지시문 앞부분이 질문마다 달라지면 캐시는 0 근처로 떨어집니다. 판정은 그대로입니다."""
+    run = _cached_run({"a": (9000, 0), "b": (8000, 1024)})
+    assert cache_read_ratio(run) < CACHE_READ_ALARM
+    summary = tmp_path / "summary.md"
+    write_summary(summary, _summary_baseline(), run, [])
+    text = summary.read_text(encoding="utf-8")
+    assert "판정: 통과" in text and "프롬프트 캐시 비율이 낮음" in text
+
+
+def test_the_alarm_sits_below_every_measured_run():
+    """잰 실행 전체 비율은 0.858과 0.885였습니다. 기준은 그보다 한참 아래입니다."""
+    assert CACHE_READ_ALARM < 0.858 - 0.25
+
+
+def test_no_cache_record_says_nothing(tmp_path: Path):
+    """캐시를 적기 전의 보고서는 비율을 지어내지 않습니다."""
+    run = _run({"a": 900})
+    assert cache_read_ratio(run) is None
+    summary = tmp_path / "summary.md"
+    write_summary(summary, _summary_baseline(), run, [])
+    assert "프롬프트 캐시" not in summary.read_text(encoding="utf-8")
+
+
+def test_merging_runs_adds_up_the_cache():
+    merged = merge([_cached_run({"a": (1000, 900)}), _cached_run({"a": (1000, 100)})])
+    assert merged["cases"]["a"]["cached_input_tokens"] == 1000
+    assert cache_read_ratio(merged) == pytest.approx(0.5)
 
 
 # --- 2층: 이번 평가 ----------------------------------------------------------------

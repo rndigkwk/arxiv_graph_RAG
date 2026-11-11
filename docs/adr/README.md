@@ -198,4 +198,5 @@
 | [ADR-124](ADR-124-rescore-the-forecast-model-every-month.md) | 배포된 공동인용 예측 모델을 매달 지난달 라벨로 다시 잰다 — 재학습은 아직 하지 않는다 | 채택 |
 | [ADR-125](ADR-125-deploy-compares-against-the-last-successful-deploy.md) | VM 배포는 HEAD가 아니라 마지막으로 성공한 배포와 비교한다 | 채택 |
 | [ADR-126](ADR-126-one-sli-line-per-question.md) | 질문마다 SLI 한 줄을 남기고, 그 줄로 좋은 요청 비율을 센다 — 지표 서버는 두지 않는다 | 채택 |
+| [ADR-127](ADR-127-warn-when-the-prompt-cache-breaks.md) | 회귀 평가가 프롬프트 캐시 비율을 적고, 크게 떨어지면 경고한다 — 판정은 바꾸지 않는다 | 채택 |
 | [ADR-128](ADR-128-ci-builds-the-vm-image-when-dependencies-change.md) | 의존성이 바뀐 PR은 CI가 VM 이미지를 먼저 굽고, 그 안에서 앱을 불러 본다 | 채택 |

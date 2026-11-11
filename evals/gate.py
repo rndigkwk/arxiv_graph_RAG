@@ -62,6 +62,9 @@ NOT_A_QUALITY_METRIC = frozenset({
     "elapsed_seconds",
     "latency_seconds",
     "chat_input_tokens",
+    "chat_input_tokens_agent",
+    "chat_input_tokens_cached",
+    "chat_input_tokens_fresh",
     "chat_output_tokens",
     "chat_tokens_total",
     "embedding_tokens_estimate",
@@ -76,6 +79,11 @@ NOT_A_QUALITY_METRIC = frozenset({
 # 닿으면 다시 부르므로 그 문항은 5,000을 넘습니다. 상한이 없는 에이전트가 길어져도 여기서 보입니다.
 OUTPUT_TOKEN_ALARM = 5000
 
+# 에이전트 입력 중 프롬프트 캐시에서 읽은 비율이 이보다 낮으면 경고합니다. 위반이 아닙니다(ADR-127).
+# 잰 값은 실행 전체로 0.858(2026-10-18, 18건)과 0.885(10-26, 30건)였고, 사례 하나의 최저는
+# 0.467이었습니다. 지시문 앞부분이 질문마다 달라지면 캐시는 0 근처로 떨어지므로 그 사이에 둡니다.
+CACHE_READ_ALARM = 0.5
+
 
 @dataclass(frozen=True)
 class Violation:
@@ -84,6 +92,10 @@ class Violation:
 
     def __str__(self) -> str:
         return f"[{self.rule}] {self.detail}"
+
+
+def _count(value: Any) -> int | None:
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
 
 
 def _numeric(row: dict[str, Any]) -> dict[str, float]:
@@ -157,6 +169,11 @@ def normalize(report: dict[str, Any]) -> dict[str, Any]:
         if isinstance(output, int) and not isinstance(output, bool):
             # 품질 지표가 아니라 비교하지 않습니다. 경고만 읽습니다(`long_outputs`).
             cases[case_id]["output_tokens"] = output
+        agent, cached = row.get("chat_input_tokens_agent"), row.get("chat_input_tokens_cached")
+        if _count(agent) and _count(cached) is not None:
+            # 이것도 경고만 읽습니다(`cache_read_ratio`).
+            cases[case_id]["input_tokens"] = agent
+            cases[case_id]["cached_input_tokens"] = cached
 
     # 품질 지표는 **답을 만든 사례만으로** 집계합니다. 하네스의 summary는 멈춘 사례를 0점으로
     # 섞어서, 근거 recall이 품질이 아니라 실패율을 재게 됩니다. 2026-10-16 세 번째 full 실행이
@@ -248,6 +265,13 @@ def merge(reports: list[dict[str, Any]]) -> dict[str, Any]:
                    if "output_tokens" in report["cases"].get(case_id, {})]
         if outputs:
             case["output_tokens"] = max(outputs)
+    # 캐시는 실행마다 더합니다. 비율은 실행 전체의 합으로 냅니다(`cache_read_ratio`).
+    for case_id, case in merged["cases"].items():
+        counted = [report["cases"][case_id] for report in reports
+                   if "cached_input_tokens" in report["cases"].get(case_id, {})]
+        if counted:
+            case["input_tokens"] = sum(c["input_tokens"] for c in counted)
+            case["cached_input_tokens"] = sum(c["cached_input_tokens"] for c in counted)
     return merged
 
 
@@ -491,6 +515,17 @@ def long_outputs(report: dict[str, Any], limit: int = OUTPUT_TOKEN_ALARM) -> lis
     )
 
 
+def cache_read_ratio(report: dict[str, Any]) -> float | None:
+    """에이전트 입력 중 캐시 읽기의 비율, 실행 전체의 합으로. 기록이 없으면 None(ADR-127).
+
+    사례마다의 평균이 아니라 합입니다. 짧은 질문 하나의 낮은 비율(0.467)이 평균을 끌어내리지 않게
+    하려는 것입니다 - 비용은 토큰의 합을 따라갑니다.
+    """
+    counted = [case for case in report["cases"].values() if "cached_input_tokens" in case]
+    total = sum(case["input_tokens"] for case in counted)
+    return sum(case["cached_input_tokens"] for case in counted) / total if total else None
+
+
 def _lower_is_better(name: str) -> bool:
     return name.endswith(("_failure_rate", "_errors"))
 
@@ -558,6 +593,16 @@ def write_summary(path: Path, baseline: dict[str, Any], report: dict[str, Any],
             "닿았거나 에이전트가 길어졌을 수 있습니다. 재현율이 떨어지기 전에 그 사례를 보세요.",
             *(f"- `{case_id}`: {tokens:,}토큰" for case_id, tokens in long),
         ]
+    if (ratio := cache_read_ratio(report)) is not None:
+        lines += ["", f"- 프롬프트 캐시 비율: {ratio:.3f} (경고 기준 {CACHE_READ_ALARM})"]
+        if ratio < CACHE_READ_ALARM:
+            lines += [
+                "",
+                "### 프롬프트 캐시 비율이 낮음 (위반 아님)",
+                "",
+                "- 에이전트 입력 중 캐시에서 읽은 비율이 기준보다 낮습니다. 지시문이나 도구 설명의 "
+                "앞부분이 질문마다 달라지면 품질은 같아도 입력 비용이 늘어납니다(ADR-127).",
+            ]
     if violations:
         lines += ["", "### 위반", ""] + [f"- {violation}" for violation in violations]
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -662,6 +707,13 @@ def main() -> int:
         for case_id, tokens in long_outputs(merged):
             print(f"::warning title=출력이 긴 사례::{case_id} 출력 {tokens:,}토큰 "
                   f"(경고 기준 {OUTPUT_TOKEN_ALARM:,})")
+        ratio = cache_read_ratio(merged)
+        if ratio is not None:
+            print(f"프롬프트 캐시 비율 {ratio:.3f} (경고 기준 {CACHE_READ_ALARM})")
+            if ratio < CACHE_READ_ALARM:
+                # 판정은 바꾸지 않습니다. 지시문 앞부분이 바뀌었는지 보라는 신호입니다(ADR-127).
+                print(f"::warning title=프롬프트 캐시 비율이 낮음::{ratio:.3f} "
+                      f"(경고 기준 {CACHE_READ_ALARM}). 지시문 앞부분이 질문마다 달라졌는지 보세요")
         print(f"위반 {len(violations)}건, 판정은 pytest가 합니다")
     return 0
 

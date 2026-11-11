@@ -463,9 +463,8 @@ def compare_case(
     graph_seconds = perf_counter() - start
     graph_row = evaluate_case(case, graph_response, mode="agent", top_k=top_k)
     graph_row["failed"] = False
-    graph_input, graph_output = _with_validation_usage(
-        *_token_totals(graph_messages), graph_response
-    )
+    agent_input, agent_output = _token_totals(graph_messages)
+    graph_input, graph_output = _with_validation_usage(agent_input, agent_output, graph_response)
     graph_queries = [
         call.get("args", {}).get("query", "")
         for call in graph_response.get("tool_calls", [])
@@ -479,6 +478,10 @@ def compare_case(
         {
             "elapsed_seconds": graph_seconds,
             "chat_input_tokens": graph_input,
+            # 프롬프트 캐시 비율의 분모와 분자입니다(ADR-127). 조건 판정 호출은 에이전트의
+            # 접두사를 쓰지 않으므로 분모에서 뺍니다 - 넣으면 판정 길이에 따라 비율이 흔들립니다.
+            "chat_input_tokens_agent": agent_input,
+            "chat_input_tokens_cached": cached_input_tokens(graph_messages),
             "chat_output_tokens": graph_output,
             "embedding_tokens_estimate": graph_embedding_tokens,
             "estimated_api_cost_usd": graph_cost,
