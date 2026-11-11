@@ -64,8 +64,10 @@ def test_each_model_turn_keeps_its_own_seconds_and_tokens():
     inside.on_llm_end(None)  # 사용량이 없으면 None - 0으로 적지 않습니다
 
     summary = inside.summary(5.5)
-    assert summary["turns"] == [{"seconds": 1.0, "output_tokens": 40},
-                                {"seconds": 4.0, "output_tokens": None}]
+    assert summary["turns"] == [
+        {"seconds": 1.0, "output_tokens": 40, "input_tokens": None, "cached_input_tokens": None},
+        {"seconds": 4.0, "output_tokens": None, "input_tokens": None, "cached_input_tokens": None},
+    ]
     assert summary["model_seconds"] == sum(turn["seconds"] for turn in summary["turns"])
 
 
@@ -420,3 +422,20 @@ def test_the_app_passes_the_recorder_into_the_stream():
     assert "stream_agent_answer(\n            messages, on_answer, [inside_generate]" in source
     # 붙인 개수를 보고서에 남기지 않으면 0을 알아차릴 방법이 없습니다.
     assert "tool_timing.attach(" in source
+
+
+class CachedUsage:
+    def __init__(self, total, cached):
+        usage = {"input_tokens": total, "output_tokens": 5,
+                 "input_token_details": {"cache_read": cached}}
+        message = type("Message", (), {"usage_metadata": usage})()
+        self.generations = [[type("Generation", (), {"message": message})()]]
+
+
+def test_each_turn_keeps_its_input_and_cache_read():
+    """프롬프트 캐시가 깨졌는지는 턴마다의 입력과 캐시 읽기로 봅니다(ADR-126)."""
+    inside = tool_timing.InsideGenerate(ticking(0.0, 1.0))
+    inside.on_chat_model_start({}, [])
+    inside.on_llm_end(CachedUsage(3000, 2560))
+    turn = inside.summary(1.0)["turns"][0]
+    assert (turn["input_tokens"], turn["cached_input_tokens"]) == (3000, 2560)
