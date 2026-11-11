@@ -200,3 +200,7 @@ Streamlit 판(`app.py`)도 그대로 돕니다(`uv run streamlit run app.py`). �
 
 GitHub Actions에서 잠금 파일, Ruff, 단위 테스트, 웹 테스트·빌드를 확인하고, PR마다 회귀 평가가 돕니다.
 문서의 숫자는 `scripts/check_doc_numbers.py`가 출처 보고서와, 링크는 `scripts/check_doc_links.py`가 대상 파일·앵커와 대조합니다.
+
+## License
+
+코드는 [MIT](LICENSE)입니다. 그래프의 논문 정보는 arXiv 메타데이터에서 왔고, 논문 본문과 초록의 권리는 각 저자와 arXiv 라이선스를 따릅니다.
