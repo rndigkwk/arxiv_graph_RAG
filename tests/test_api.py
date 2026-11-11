@@ -489,3 +489,38 @@ def test_a_failed_model_warmup_still_builds_the_citation_graph():
 
     assert _warm_app(Bot())["status"] == "done"
     assert built == [1]
+
+
+# --- 질문마다 SLI 한 줄(ADR-126) ----------------------------------------------------------
+
+@pytest.mark.parametrize(("mode", "outcome"), [("ok", "final"), ("abstain", "abstain"),
+                                               ("boom", "error")])
+def test_every_question_leaves_one_sli_line(monkeypatch, mode, outcome):
+    from src import sli
+
+    lines = []
+    monkeypatch.setattr(sli, "log", lines.append)
+    bot = FakeBot()
+    bot.mode = mode
+    client(bot).post("/api/ask", json={"question": "비밀 질문"})
+    assert len(lines) == 1
+    row = lines[0]
+    assert row["outcome"] == outcome and row["commit"] == "abc1234"
+    assert row["seconds"] >= 0
+    # 답이 나온 질문만 첫 조각이 있습니다.
+    assert (row["first_partial_seconds"] is not None) == (mode == "ok")
+    # 질문 내용은 남기지 않습니다.
+    assert "비밀" not in json.dumps(row, ensure_ascii=False)
+    if mode == "boom":
+        assert row["error"] == "RuntimeError" and "secret" not in json.dumps(row)
+
+
+def test_a_broken_sli_line_does_not_break_the_answer(monkeypatch):
+    from src import sli
+
+    def broken(row):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(sli, "log", broken)
+    got = events(client().post("/api/ask", json={"question": "q"}).text)
+    assert got[-1][0] == "final"

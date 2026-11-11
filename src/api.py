@@ -46,6 +46,7 @@ from src import (
     quality_board,
     release,
     routing,
+    sli,
     warmup,
 )
 
@@ -290,24 +291,49 @@ def create_app(
         loop = asyncio.get_running_loop()
         queue: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
 
+        started = time.perf_counter()
+        first_partial: list[float] = []
+
         def put(kind: str, data: Any) -> None:
             loop.call_soon_threadsafe(queue.put_nowait, (kind, data))
+
+        def partial(text: str) -> None:
+            if not first_partial:
+                first_partial.append(time.perf_counter() - started)
+            put("partial", {"answer": text})
+
+        def measured(outcome: str, response: Any = None, error: str | None = None) -> None:
+            """질문마다 SLI 한 줄(ADR-126). 기록이 실패해도 답을 막지 않습니다."""
+            try:
+                sli.log(sli.record(
+                    outcome, time.perf_counter() - started,
+                    first_partial[0] if first_partial else None,
+                    response if isinstance(response, dict) else None,
+                    getattr(bot, "LOADED_COMMIT", None), error,
+                ))
+            except Exception:  # noqa: BLE001
+                logger.exception("ask_sli_failed")
 
         def work() -> None:
             try:
                 response, _ = bot.ask(
                     body.question,
                     history_messages(body.history),
-                    lambda text: put("partial", {"answer": text}),
+                    partial,
                 )
-                put("final", bot.to_jsonable(response))
+                final = bot.to_jsonable(response)
+                # 기록을 먼저 합니다. 끝 이벤트 뒤에는 연결이 닫혀 이 스레드만 남습니다.
+                measured("final", final)
+                put("final", final)
             except bot.AnswerValidationError as exc:
                 diagnostics = exc.diagnostics()
                 # 사유 코드를 사람 말로 바꾸는 일은 Streamlit과 같은 `abstain.explain`이 합니다.
+                measured("abstain", diagnostics)
                 put("abstain", {"message": str(exc), **diagnostics,
                                 "explained": abstain.explain(diagnostics)})
             except Exception as exc:  # noqa: BLE001 - 화면에는 사유만, 로그에는 전부
                 logger.exception("ask_failed")
+                measured("error", error=type(exc).__name__)
                 put(
                     "error",
                     {

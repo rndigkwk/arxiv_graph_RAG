@@ -124,6 +124,12 @@ sudo systemctl start arxiv-deploy.timer
 첫 줄은 배포 기록, 둘째·셋째 줄은 자동 배포를 멈추고 다시 켭니다. VM이 재부팅되어도 세 컨테이너는
 `restart: unless-stopped`로 다시 뜨고 타이머도 다시 켜집니다.
 
+실제 질문이 얼마나 걸렸는지는 질문마다 남는 SLI 줄로 봅니다([ADR-126](adr/ADR-126-one-sli-line-per-question.md)). 질문 내용은 남지 않습니다.
+
+```bash
+docker logs --since 24h arxiv-graphrag-vm-api-1 2>&1 | python3 scripts/summarize_sli.py
+```
+
 ## 1단계에서 아직 아닌 것
 
 - ~~**주간 수집은 Aura에 씁니다.** 1단계의 VM은 옮긴 날의 사본을 보여 줍니다.~~ 2026-11-05부터 수집은 VM에서 돕니다
