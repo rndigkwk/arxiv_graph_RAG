@@ -113,6 +113,7 @@ uv run python scripts/move_graph.py diff --before .local/move/retrieval_aura.jso
 
 **자동입니다**([ADR-080](adr/ADR-080-the-vm-pulls-main.md)). VM의 타이머가 2분마다 main을 보고,
 바뀌었으면 fast-forward한 뒤 앱을 재시작합니다(의존성이 바뀌었으면 이미지도 다시 굽습니다).
+비교 기준은 끝까지 성공한 마지막 배포(`pipeline/state/deployed-commit`)라, 빌드가 실패하면 2분 뒤에 다시 합니다([ADR-125](adr/ADR-125-deploy-compares-against-the-last-successful-deploy.md)).
 배포 점검 워크플로가 새 커밋이 화면에 뜨는지 봅니다.
 
 ```bash
